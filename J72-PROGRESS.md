@@ -19,6 +19,7 @@ The work builds on [Hoolock Linux's A7 documentation](https://github.com/Hoolock
 | Arch and Omarchy A | An Arch Linux ARM root filesystem was served **read-only** over USB NBD. Labwc and Omarchy A's Quickshell ran as an unprivileged tablet user. With the corrected J72 initramfs, the owner again saw the rocket wallpaper, top bar, menu icon, clock, and pointer. The rebuilt kernel reported 1536 × 2048 at 60 Hz. |
 | Home button | The kernel reports Home presses as `KEY_HOMEPAGE`. A temporary userspace bridge opened and closed the Omarchy menu on physical Home presses in the first desktop session. Proper compositor/libinput handling remains to be done. |
 | SPI2 foundation | A J72 SPI2 controller-only kernel build and device tree booted with **no touch child**. The measured controller input clock is 60 MHz. A guarded RAM diagnostic brought its Linux power domain from `0x200` to `0x2ff`, read configuration registers, restored automatic power control, and returned it to `0x200`. It sent no SPI transfer. |
+| Touch power baseline | A one-shot, read-only RAM Linux module read two candidate PMU enable registers through the existing I²C regmap: `0x84 = 0x00`, `0x85 = 0x11`. The candidate enable bits were clear. Their connection to touch rails still needs verification; no PMU write or touch transfer was made. |
 | Recovery | After the RAM tests, the graphical processes and read-only NBD mount were stopped, Linux rebooted, and the Pi confirmed the same `iPad4,2` back in normal iOS USB mode. |
 
 ## Current limits
