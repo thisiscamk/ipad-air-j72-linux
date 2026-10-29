@@ -85,9 +85,9 @@ mount -t ext4 -o ro,noload /dev/nbd2 /mnt/omarchy
 
 Our first mount attempt raced the NBD capacity announcement; a later attempt succeeded. The paths and port are examples from this test, not reserved names.
 
-For the chroot session we bound `/dev`, `/dev/pts`, `/dev/shm`, `/proc` and `/sys`; `/run`, `/tmp` and `/home` were tmpfs in RAM. The `tablet` user had access to `seat`, `video` and `input`. Seatd supplied the DRM seat. Labwc ran on simpledrm with `WLR_BACKENDS=drm` and `WLR_RENDERER=pixman`; a user D-Bus session and Quickshell then started on its Wayland socket. The owner saw the Omarchy rocket wallpaper, top bar, clock, menu icon and pointer in the first session. The rebuilt-kernel session also reported Labwc's output at 1536×2048@60 and launched Quickshell.
+For the chroot session we bound `/dev`, `/dev/pts`, `/dev/shm`, `/proc` and `/sys`; `/run`, `/tmp` and `/home` were tmpfs in RAM. The `tablet` user had access to `seat`, `video` and `input`. Seatd supplied the DRM seat. Labwc ran on simpledrm with `WLR_BACKENDS=drm` and `WLR_RENDERER=pixman`; a user D-Bus session and Quickshell then started on its Wayland socket. The rebuilt-kernel session reported Labwc's output at 1536×2048@60. The owner confirmed the Omarchy rocket wallpaper, top bar, clock, menu icon and pointer on screen.
 
-The initramfs needed `/dev/pts` with usable `ptmx`, `/dev/shm`, `/dev/fd`, and standard device nodes accessible to the non-root user. `mdev -s` recreated `/dev/null` at mode 0660 in one test, so the permission adjustment has to run **after** mdev. We fixed it live and corrected the init source; a newly packed image with that source change remains untested. The public repo does not yet contain the full root-build recipe or the root image, so these desktop steps are a reproducible design and test record, not a one-command build.
+The initramfs needed `/dev/pts` with usable `ptmx`, `/dev/shm`, `/dev/fd`, and standard device nodes accessible to the non-root user. `mdev -s` recreated `/dev/null` at mode 0660 in one test, so the permission adjustment has to run **after** mdev. We rebuilt and booted the corrected image. The four standard nodes checked at boot were mode 0666, and user D-Bus and Quickshell started without a live chmod. The owner again confirmed the wallpaper, bar, menu icon, clock, and pointer. The public repo does not yet contain the full root-build recipe or the root image, so these desktop steps are a reproducible design and test record, not a one-command build.
 
 ## 6. Measure input and stage touch work separately
 
@@ -97,7 +97,7 @@ For touch, we compared the J72 Apple DeviceTree, a private owner calibration rea
 
 ## 7. Cleanly return to iOS
 
-For the USB-backed desktop, we stopped Quickshell, Labwc, D-Bus and seatd, then unmounted the chroot's bind/tmpfs mounts. The root unmount initially returned “busy” while chroot parent processes exited. In that session we detached NBD too early; the read-only mount showed `shutdown` until a later normal unmount succeeded. The corrected order is to confirm `/mnt/omarchy` is unmounted **before** detaching `/dev/nbd2`, then stop the Pi's qemu-nbd server. From the RAM shell we requested `sync; reboot -f`. The Pi subsequently saw the Linux gadget disconnect and normal iOS USB `05ac:12ab`; `ideviceinfo` again returned `iPad4,2`.
+For the USB-backed desktop, we stopped Quickshell, Labwc, D-Bus and seatd, then unmounted the chroot's bind/tmpfs mounts. An earlier root unmount briefly returned “busy” while chroot parent processes exited; a later normal unmount succeeded. In the corrected-image session, every chroot mount and the read-only ext4 root unmounted normally before `/dev/nbd2` was detached and the Pi's qemu-nbd server stopped. From the RAM shell we requested `sync; reboot -f`. The Pi subsequently saw the Linux gadget disconnect and normal iOS USB `05ac:12ab`; `ideviceinfo` again returned `iPad4,2`.
 
 The Pi USB connection did not reliably charge the iPad, so we returned to iOS and used a wall charger between sessions. No internal-storage write, partitioning, iOS erase or Pi kernel replacement was part of this workflow.
 

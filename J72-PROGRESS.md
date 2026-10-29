@@ -16,7 +16,7 @@ The work builds on [Hoolock Linux's A7 documentation](https://github.com/Hoolock
 | Linux identity | The running system reports `Apple iPad Air (Cellular)`, AArch64, and 4 KiB kernel pages. A rebuilt J72 development kernel reports `7.0.12-j72spi2`. |
 | Display | SimpleDRM exposes the panel at 1536 × 2048, 60 Hz. Labwc runs with software rendering. |
 | USB access | The Linux USB gadget provides CDC NCM networking and an ACM serial shell. The USB-only network link supports a RAM shell and a host-backed filesystem. |
-| Arch and Omarchy A | An Arch Linux ARM root filesystem was served **read-only** over USB NBD. Labwc and Omarchy A's Quickshell ran as an unprivileged tablet user. In the first session, the owner saw the rocket wallpaper, top bar, menu icon, clock, and pointer. The rebuilt-kernel session also started Labwc and Quickshell and reported the correct display mode; a second visual confirmation was not recorded. |
+| Arch and Omarchy A | An Arch Linux ARM root filesystem was served **read-only** over USB NBD. Labwc and Omarchy A's Quickshell ran as an unprivileged tablet user. With the corrected J72 initramfs, the owner again saw the rocket wallpaper, top bar, menu icon, clock, and pointer. The rebuilt kernel reported 1536 × 2048 at 60 Hz. |
 | Home button | The kernel reports Home presses as `KEY_HOMEPAGE`. A temporary userspace bridge opened and closed the Omarchy menu on physical Home presses in the first desktop session. Proper compositor/libinput handling remains to be done. |
 | SPI2 foundation | A J72 SPI2 controller-only kernel build and device tree booted with **no touch child**. The measured controller input clock is 60 MHz. A guarded RAM diagnostic brought its Linux power domain from `0x200` to `0x2ff`, read configuration registers, restored automatic power control, and returned it to `0x200`. It sent no SPI transfer. |
 | Recovery | After the RAM tests, the graphical processes and read-only NBD mount were stopped, Linux rebooted, and the Pi confirmed the same `iPad4,2` back in normal iOS USB mode. |
@@ -27,11 +27,11 @@ This is a host-backed desktop experiment, not a standalone Omarchy installation.
 
 The J72 touch hardware is described by Apple's device tree as a SPI-connected controller with separate reset, attention, clock, and PMU resources. The panel's calibration has been read from this device and kept private. The matching iOS firmware format differs from the format accepted by the current Linux `apple_z2` uploader. Touch power/reset order, wire settings, readiness handshake, and firmware upload still need board-specific work. The current test device tree deliberately has no touch child, so it cannot send touch traffic accidentally.
 
-The latest RAM session also found an initramfs ordering issue: `mdev` changed `/dev/null` permissions after they had been set for desktop users. A live permission correction let D-Bus and Quickshell start. The source init script has been corrected, but a new image containing that correction has not yet been built or tested.
+An initramfs ordering issue had let `mdev` reset standard device-node permissions after they were set for desktop users. The corrected image was built and booted on the iPad. `/dev/null`, `/dev/zero`, `/dev/tty`, and `/dev/ptmx` were mode `0666` immediately after boot; user D-Bus and Quickshell then started without a live permission repair.
 
 ## Next development steps
 
-1. Make the RAM boot and graphical startup repeatable, including the initramfs permission fix and clean NBD teardown.
+1. Make the validated RAM boot and graphical startup easier to repeat, including a scripted read-only NBD mount and clean teardown.
 2. Recover and implement J72 touch power, clock, reset, and bounded SPI protocol handling; validate input before enabling it in the desktop.
 3. Add an **experimental J72** profile to [OrchardLinux/hardware](https://github.com/OrchardLinux/hardware), with exact board matching, a 4 KiB kernel and matching modules, a RAM boot path, and explicit support limits. The public `devices/` directory has no J72 profile. Its [J72b profile](https://github.com/OrchardLinux/hardware/blob/main/devices/j72b/device.toml) is for the iPad 6 Cellular (`iPad7,6`, A10), a different board. The local J72 worktree is not an upstream port.
 
