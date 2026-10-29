@@ -33,7 +33,7 @@ The latest RAM session also found an initramfs ordering issue: `mdev` changed `/
 
 1. Make the RAM boot and graphical startup repeatable, including the initramfs permission fix and clean NBD teardown.
 2. Recover and implement J72 touch power, clock, reset, and bounded SPI protocol handling; validate input before enabling it in the desktop.
-3. Add an **experimental J72** profile to [OrchardLinux/hardware](https://github.com/OrchardLinux/hardware), with exact board matching, a 4 KiB kernel and matching modules, a RAM boot path, and explicit support limits. The public `devices/` directory currently has several profiles, including J71b and J72b, but no J72 profile. The local J72 worktree is not an upstream port.
+3. Add an **experimental J72** profile to [OrchardLinux/hardware](https://github.com/OrchardLinux/hardware), with exact board matching, a 4 KiB kernel and matching modules, a RAM boot path, and explicit support limits. The public `devices/` directory has no J72 profile. Its [J72b profile](https://github.com/OrchardLinux/hardware/blob/main/devices/j72b/device.toml) is for the iPad 6 Cellular (`iPad7,6`, A10), a different board. The local J72 worktree is not an upstream port.
 
 ## Sharing and attribution
 
