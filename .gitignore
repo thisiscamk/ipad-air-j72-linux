@@ -1,0 +1,12 @@
+# Local inputs and captures must be reviewed before any publication.
+private/
+logs/
+*.ipsw
+*.img4
+*.dmg
+*.bin
+*.ext4
+*.log
+*.mon
+*.pcap
+*.pcapng
