@@ -1,0 +1,41 @@
+# Roadmap to a usable J72 Omarchy A tablet
+
+This is a staged research plan, not an installation procedure. The current boot runs from RAM with a read-only root filesystem served by a Raspberry Pi. iOS and the iPad's internal storage remain intact. Each stage needs real-device evidence before it can be called working.
+
+## 1. Finish native touch
+
+- Check J72 SPI mode, bit order, clock output, chip select, reset timing and attention against the matching device tree and driver. A bounded identification frame should return a known boot-ROM status word. The latest attempt returned zero; a corrected mode 0, least significant bit first diagnostic is staged for a future DFU run.
+- Implement board-specific power, clock, reset and SPI handling with reliable cleanup.
+- Load the correct touch firmware format and this panel's calibration through a private, owner-controlled path. Verify firmware acknowledgment, touch events, multiple contacts, orientation and edge accuracy in Linux and the desktop.
+
+**Pass:** repeated cold RAM boots give usable touch in an unprivileged Omarchy A session, with clean return to iOS.
+
+## 2. Make the tethered desktop dependable
+
+- Script the Pi-to-iPad RAM boot, read-only root handoff, graphical startup and teardown with exact board and artifact checks.
+- Integrate Home button handling into the input stack, then test menu behavior without the temporary bridge.
+- Measure memory, frame rate and responsiveness on the A7 software-rendered desktop; trim the session where needed.
+
+**Pass:** repeatable desktop sessions with touch, Home and USB recovery.
+
+## 3. Bring up platform services individually
+
+- Establish battery reporting and safe charging under Linux. The Pi USB port has not provided reliable charging in these experiments.
+- Bring up Wi-Fi and Bluetooth using the J72 buses, power controls and required firmware. Keep USB networking available for recovery.
+- Qualify audio, brightness, cameras, cellular, GPU acceleration and suspend separately. There is no evidence yet that all will be available.
+
+**Pass:** each service works in use and survives repeated boot and shutdown cycles.
+
+## 4. Integrate and share the port
+
+- Turn the local experimental J72 worktree into a reproducible build with a 4 KiB-page kernel, matching modules, exact `iPad4,2`/`J72AP` identification and a documented RAM boot path.
+- Propose an experimental J72 profile to [OrchardLinux/hardware](https://github.com/OrchardLinux/hardware) once core desktop and touch are reproducible. State support limits clearly; J72 differs from existing Orchard profiles.
+- Publish original code and sanitized evidence. Keep Apple firmware, calibration and raw device logs local.
+
+**Pass:** another owner can build and test the RAM-only path on the exact model, with recovery instructions.
+
+## 5. Consider independent operation later
+
+A persistent root filesystem on an external host can come before internal-storage work. A standalone installation would need a separate storage driver, backup and recovery design, and explicit owner authorization. That work is outside the current RAM-only scope.
+
+Native touch is the main uncertainty. No reliable completion date is possible until the controller responds and its firmware protocol works on J72.
