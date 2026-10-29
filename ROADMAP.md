@@ -4,7 +4,7 @@ This is a staged research plan, not an installation procedure. The current boot 
 
 ## 1. Finish native touch
 
-- Continue from the first accepted J72 boot-ROM reply: a bounded identification frame returned `0x1f01, 0x1f01` after routing chip select through the correct pad. Check longer SPI transfers, the physical clock, reset timing and attention behavior before sending firmware.
+- Continue from the first accepted J72 boot-ROM reply and the successful 256-byte transmit-only test. The next gate is a one-shot acknowledgment check for a private, locally validated firmware packet. Physical clock rate, reset timing and attention behavior still need qualification.
 - Implement board-specific power, clock, reset and SPI handling with reliable cleanup.
 - Load the correct touch firmware format and this panel's calibration through a private, owner-controlled path. Verify firmware acknowledgment, touch events, multiple contacts, orientation and edge accuracy in Linux and the desktop.
 
