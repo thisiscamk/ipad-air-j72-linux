@@ -4,7 +4,7 @@ This is a staged research plan, not an installation procedure. The current boot 
 
 ## 1. Finish native touch
 
-- Continue from the accepted J72 boot-ROM reply and successful bounded SPI transfers. A full private firmware packet returned `0x4cb1`, and a valid 80-byte packet returned idle `0x1f01`; neither received the required `0x4bc1` acknowledgment. Test one intermediate packet, then investigate the wire transport and protocol preconditions before calibration or execution. Physical clock rate, reset timing and attention behavior still need qualification.
+- Continue from the accepted J72 boot-ROM reply and successful bounded SPI transfers. Valid 80-byte, 16,400-byte, and full firmware packets returned `0x1f01`, `0x4969`, and `0x4cb1`, respectively; none received the required `0x4bc1` acknowledgment. Investigate the J72 startup sequence and compare the physical SPI wire stream during iOS and RAM Linux operation before calibration or execution. Physical clock rate, reset timing and attention behavior still need qualification.
 - Implement board-specific power, clock, reset and SPI handling with reliable cleanup.
 - Load the correct touch firmware format and this panel's calibration through a private, owner-controlled path. Verify firmware acknowledgment, touch events, multiple contacts, orientation and edge accuracy in Linux and the desktop.
 
