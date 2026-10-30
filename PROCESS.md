@@ -103,9 +103,35 @@ A subsequent read-only RAM boot also sampled register `0x398 = 0x14`, the voltag
 
 The initial driver could report completed transfers while the touch controller had not accepted the packet. Repeating packet sizes and checksum variations did not establish that the intended bytes reached the wire. We therefore observed the SPI pads through their existing GPIO input buffers while sending a slow, known pattern, with touch reset asserted and rails off. This required no board access.
 
-Those measurements showed that AUTO_TX generated clocks with constant MOSI, and that the S5L bit-order flag mapping was reversed. A temporary GPIO SPI implementation then uploaded the original private packet and received `0x4bc1`. A direct-register hardware probe reproduced acceptance by disabling AUTO_TX for explicit commands, starting RUN before queuing every byte, draining RX and limiting outstanding data to the receive FIFO depth. Applying those rules to every explicit transfer in the normal Linux SPI driver also passed: readiness advanced to `0x4879`, all 57,016 bytes transferred in about 745 ms, ACK was `0x4bc1`, and a guarded execute command returned `0x4879, 0x4f81` with an attention change.
+Those measurements showed that AUTO_TX generated clocks with constant MOSI, and that the S5L bit-order flag mapping was reversed. A temporary GPIO SPI implementation then uploaded the original private packet and received `0x4bc1`. A direct-register hardware probe reproduced acceptance by disabling AUTO_TX for explicit commands, starting RUN before queuing every byte, draining RX and limiting outstanding data to the receive FIFO depth. Applying those rules to every explicit transfer in the normal Linux SPI driver also passed: readiness advanced to `0x4879`, all 57,016 bytes transferred in about 745 ms, ACK was `0x4bc1`, and the four-byte C4 command returned `0x4879, 0x4f81` with an attention change.
 
-The firmware packet itself was unchanged. These results identify a transport problem; they do not establish the precise ROM meaning of every earlier failure status. Each probe restored reset, chip select, rails, PWM and power domains, and normal iOS USB was verified after reboot. The next staged probe adds a bounded device-info query and reply-checksum validation. Calibration and native input remain separate work.
+The firmware packet itself was unchanged. These results identify a transport problem; they do not establish the precise ROM meaning of every earlier failure status. Each probe restored reset, chip select, rails, PWM and power domains, and normal iOS USB was verified after reboot. Follow-up queries showed that the four-byte C4 reply was not proof of firmware startup. We traced the N1-specific calibration override beyond the earlier disassembly range, checked its defaults against the live iOS properties, uploaded private proximity and panel calibration, and used the proper address-bearing Z2 execute frame. Device-info checksums then passed with interface version 1 and maximum packet size 2,454; screen metrics matched iOS. An initial application result frame passed header and payload checksums. These distinct probes ran in one RAM session. Continuous reading and real finger capture remain before evdev or desktop touch can be claimed.
+
+
+### Validated N1 startup in the RAM diagnostics
+
+These are observations from this J72, not a general driver or a completed touch port. Power, PWM, reset and CS guards surround the sequence, and every probe restores them. The packet framing was recovered from the matching driver; [Corellium's public hx-touchd](https://github.com/corellium/projectsandcastle/blob/03db9c6ae04141eb940f3b9f56d446f50d57fadf/hx-touchd/mtfw/mtfw.c) supplied a useful comparison. Its other board values must not replace J72's measured properties.
+
+1. Require the boot-ROM readiness exchange to advance to `0x4879`.
+2. Upload the private proximity calibration, then panel calibration, using chunks capped at 1,008 data bytes and requiring `0x4bc1` after each. This panel's calibration is 1,024 bytes; its data stays private.
+3. Upload the original 57,016-byte preconstructed firmware packet and require `0x4bc1`.
+4. Read the chip version through the ROM register protocol, validate the response checksum, and require the observed C1F15 ID before N1 setup.
+5. Apply the matching N1 register sequence below. Each write uses mask `0xffffffff` and requires `0x4ad1`.
+
+| Controller address | Value | Evidence |
+| --- | --- | --- |
+| `0x10003060` | `6089` | J72 FLL personality value |
+| `0x1000305c` | `0x20` | Matching N1 reference-divider default |
+| `0x10003058` | `6` | Matching N1 routine |
+| `0x10003000` | `3` | Matching N1 default for this chip version |
+| `0x10003518` | `1` | Live iOS clock-enable property; the static default alone was insufficient |
+
+6. Read the controller's SPI APU status, request calibration with `1f 01`, wait 65 ms, and query ACK. The matching method checks transfer success at this step; the observed `0x4969` has no assigned meaning here.
+7. Send the 12-byte Z2 execute frame addressed to the J72 personality's `0x10003400`. This supersedes the earlier four-byte C4 test.
+8. Send the application wake frame, then validate device information and screen metrics. Interface 1, maximum packet size 2,454 and the screen descriptor match iOS.
+9. Confirm normal operating mode and wait for **active-low attention** before reading result frames. An idle check captured one initial status frame with valid header and payload checksums, then waited without malformed reads. The next test will capture actual taps and swipes; evdev decoding follows that evidence.
+
+Several distinct probes ran in this one RAM session without another DFU. The live capture module is bounded in time and record count, exports data only through a root-readable RAM file, and resets and powers down the controller after capture. Firmware, calibration and raw traces remain local.
 
 ## 7. Cleanly return to iOS
 

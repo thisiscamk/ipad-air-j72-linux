@@ -7,11 +7,14 @@ This is a staged research plan, not an installation procedure. The current boot 
 - [x] Identify SCLK/MOSI through software pad sampling and measure SPI bit-order polarity.
 - [x] Receive firmware ACK `0x4bc1` through GPIO SPI using the original private packet.
 - [x] Receive firmware ACK `0x4bc1` through direct S5L hardware-controller PIO.
-- [x] Issue a GPIO execute command after a valid ACK; receive `0x4879, 0x4f81` and observe attention change.
-- [x] Validate the corrected normal Linux SPI driver: full upload, ACK `0x4bc1`, execute reply and attention edge.
-- [ ] **Next DFU:** read and checksum-validate the running firmware's device information using a bounded probe; the matching module is staged.
-- [ ] Validate application readiness and interface/report protocol against the exact J72 implementation.
-- [ ] Upload this panel's private calibration with validated framing and acknowledgment checks.
+- [x] Validate corrected normal Linux SPI driver upload with ACK `0x4bc1`.
+- [x] Distinguish the earlier C4 command from the proper address-bearing Z2 execute path.
+- [x] Upload this panel's private calibration and proximity calibration with checked ACKs.
+- [x] Apply the exact N1 setup and validate running firmware device information against iOS.
+- [x] Read checksum-valid screen metrics and normal operating mode matching iOS.
+- [x] Validate a bounded attention-gated reader at idle: one initial status frame passed both checksums, with no malformed frames.
+- [ ] Capture repeated finger frames and verify their layout and checksums.
+- [ ] **Next live test:** capture owner taps and swipes in the current RAM session with the prepared recorder. Another DFU is not currently required.
 - [ ] Read bounded touch reports and implement evdev input, including contact tracking, orientation and edges.
 - [ ] Verify touch in the unprivileged desktop with owner screen checks.
 - [ ] Repeat cold RAM boots and verify cleanup and return to iOS.
