@@ -56,6 +56,8 @@ The transmit-only receive-drain experiment timed out with exactly 16 received wo
 
 An initramfs ordering issue had let `mdev` reset standard device-node permissions after they were set for desktop users. The corrected image was built and booted on the iPad. `/dev/null`, `/dev/zero`, `/dev/tty`, and `/dev/ptmx` were mode `0666` immediately after boot; user D-Bus and Quickshell then started without a live permission repair.
 
+The next staged RAM test follows a newly resolved startup difference. The matching J72 iOS helper writes control register `0x0d` (RUN plus both FIFO-reset bits) before TXDATA. Linux previously wrote reset `0x0c`, queued data, then wrote RUN `0x01`; its earlier zero-prefill test also used `0x01`. The new image queues no pre-RUN bytes and writes `0x0d` before the first byte, with full TX/RX counts and normal `0x20` PIO mode. It logs the control/configuration and completion counters and adds no filler bytes. This is a startup-order test, not evidence that reset bits caused the missing acknowledgment.
+
 ## Next development steps
 
 1. Make the validated RAM boot and graphical startup easier to repeat, including a scripted read-only NBD mount and clean teardown.
