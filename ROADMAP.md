@@ -25,7 +25,7 @@ The [DFU session plan](DFU-PLAN.md) expands these milestones into proposed boot 
 - [x] Test owner gestures with the verified candidate setting and display sync: 180 seconds, zero packets; firmware information remains valid at the end.
 - [x] Verify all 1,152 calibration bytes by checksum-valid SRAM reads before and after firmware upload.
 - [x] Verify all five N1 setup register values immediately after writing and after calibration.
-- [x] Build and run eight distinct reader comparisons in one RAM boot, with final firmware health and full restoration verified; eleven synthetic parser/transfer checks pass.
+- [x] Build and run eight distinct reader comparisons in one RAM boot, with final firmware health and full restoration verified; the initial synthetic parser/transfer checks pass.
 - [x] Compare 0/10/1,000-microsecond CS timing, success-only read tags, display sync, candidate BF setting and query priming; none establishes finger reporting.
 - [x] Run corrected no-sync reader during confirmed owner gestures: one valid startup status frame, no finger packets, no malformed frames or transfer errors.
 - [x] Compare the corrected reader with display sync enabled during confirmed owner gestures: zero packets, final firmware health and restoration passed.
@@ -36,7 +36,9 @@ The [DFU session plan](DFU-PLAN.md) expands these milestones into proposed boot 
 - [x] Read processing counters: capture advances in native mode even while native report submission and USB output remain absent.
 - [x] Test the verified candidate BF setting with the corrected reader during confirmed owner gestures: zero native frames; capture counter advances, health and restoration pass.
 - [x] Identify active C8 report mask separately from BF and enable contact/periodic output: 228 valid empty native frames at idle, with advancing submission count and clean teardown.
-- [ ] **Current RAM session:** validate real contacts with C8 enabled, then qualify coordinates and native input.
+- [x] Test confirmed owner gestures with C8 enabled: all 5,297 valid native frames contain zero fingers; health and restoration pass.
+- [x] Review current Orchard touch PRs and add bounded classic-layout analysis; 18 offline checks pass.
+- [ ] **Current RAM session:** resolve acquisition/processing that produces no detected contacts, then qualify coordinates and native input.
 - [ ] Establish actual scan/report enablement and attention behavior from finger packets.
 - [ ] Read bounded touch reports and implement evdev input, including contact tracking, orientation and edges.
 - [ ] Verify touch in the unprivileged desktop with owner screen checks.

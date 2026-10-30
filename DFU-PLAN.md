@@ -2,7 +2,7 @@
 
 Updated 31 October 2026. This is a work queue for this exact J72, not a promise of a fixed number of DFUs. Each row groups work that can share a RAM boot. A failed hardware milestone can require more boots; working modules and userspace changes should be tested within the existing boot wherever possible.
 
-**Current position:** Linux, USB debugging and the Omarchy A desktop work. Raw reporting is reproducible, and the active native-report gate has now been identified separately from BF. C8 = `0x19` produced 228 valid native `0x44` frames in an eight-second idle test with health and restoration verified. Their zero-finger contents were expected; contact coordinates and desktop touch remain unproven. The next gesture test uses that corrected mask in the same RAM boot.
+**Current position:** Linux, USB debugging and the Omarchy A desktop work. Raw reporting and native packet output are reproducible. C8 = `0x19` enabled 228 valid native frames at idle; a subsequent confirmed owner gesture capture retained 5,297 valid native frames, all with zero fingers. Health and restoration passed. B01 remains open at contact detection; another unchanged gesture test is not planned. The current RAM boot remains available for distinct diagnostics.
 
 ## How we will reduce button sequences
 
@@ -20,7 +20,7 @@ IDs identify milestones, not a guaranteed one-DFU-per-row schedule. Batches may 
 
 | Batch | Work within that boot | Pass condition / owner action |
 | --- | --- | --- |
-| **B01 — next: touch protocol** | Compare explicit CS setup/hold times of 0, 10 and 1,000 microseconds using the same instrumented reader. Distinguish silence, padding-only replies, valid empty lengths, stale replies, malformed lengths and valid data. Retain the read tag after a failed read. Then compare display sync, the verified candidate BF setting and the earlier counter policy if the first results justify it. | Checksums, firmware health and full cleanup pass. Recover the previously observed startup frame as a useful positive control if possible. Ask for gestures only after a concrete change has passed the automated checks. A gesture test may share this boot. |
+| **B01 — current: contact detection** | The reader, raw path and C8 native-output gate are qualified. Confirmed gestures still produce only zero-contact native frames. Review exact J72 acquisition/processing state and current upstream N1 behavior; run distinct guarded comparisons in the existing boot. Corrected N1 control reads now pass an eight-second hardware comparison. | Actual contact counts, coordinates and release states must respond to owner gestures. Ask for another gesture test after a justified configuration change passes automated health and cleanup checks. No unchanged DFU or gesture loop. |
 | **B02 — touch in Linux input** | Decode actual finger packets; qualify contact IDs, count, press/move/lift and axes; integrate a J72 input driver. Run evdev/libinput and the unprivileged desktop; integrate Home handling and a software keyboard. | Owner can tap, drag, reach screen edges, enter text and release every contact. Two fingers do not leave stuck contacts. Keep a USB shell for recovery. |
 | **B03 — touch cold-start confirmation** | Boot the integrated driver from a clean state; repeat input and desktop checks, then return to iOS. | Independent boot succeeds without live register patches or manual permission fixes. Additional cold starts are validation work, not unchanged attempts at a known failure. |
 | **B04 — battery and display controls** | Bring up the J72 UART5/HDQ gauge using exact board wiring; begin with identification and telemetry. Read brightness through the existing PMIC backlight driver, then test bounded changes and restore the starting value. | Plausible battery voltage, temperature, state of charge and current; compare with an iOS baseline. Owner confirms brightness changes. Battery reporting alone does not establish charging. |
@@ -72,6 +72,7 @@ The first intended installation stores Linux on the iPad and retains a **host-as
 - [x] Continuous raw result frames captured and checksum-validated; firmware health and restoration passed.
 - [ ] Raw sensor contents correlated with deliberate owner touches.
 - [x] Enable the active C8 native-report gate; validate 228 empty native frames at idle.
+- [x] Test gestures with C8 enabled: 5,297 valid native frames, all zero fingers; contact detection remains unresolved.
 - [ ] Actual finger reports and native desktop touch.
 - [ ] Repeatable input/desktop boot and Home/keyboard integration.
 - [ ] Battery, brightness, Wi-Fi, Bluetooth and charging qualified.
