@@ -4,10 +4,19 @@ This is a staged research plan, not an installation procedure. The current boot 
 
 ## 1. Finish native touch
 
-- Continue from the accepted J72 boot-ROM reply and successful bounded SPI transfers. Valid 80-byte, 16,400-byte, and full firmware packets returned `0x1f01`, `0x4969`, and `0x4cb1`, respectively; none received the required `0x4bc1` acknowledgment. Adding the matching iOS pre-reset N1 wake still gave `0x4cb1` for the full packet. A receive-drain kernel timed out with 16 RX words outstanding; a half-prefill variation timed out with 8 outstanding. Zero prefill completed the full transfer but returned idle `0x1f01`. One-word prefill with corrected RX accounting completed the transfer and restored the `0x4cb1` reply. Altering one header checksum byte did not change that reply. A bounded counter test then showed one hardware TX byte outstanding after the full one-word-prefill packet, despite an empty FIFO and a 20 ms wait; the transmit-complete bit stayed clear. Clocking an extra byte cleared that count and set completion, but the touch reply remained `0x4cb1` both when copying the last packet byte and when using the `0xff` filler found in iOS. Keeping the full receive count and supplying filler while the receive window was active completed both hardware counters, yet the reply stayed `0x4cb1`. Setting SPI mode bits to `0x40` changed transfer status flags but not the reply; further audit showed the iOS `0x40` write belongs to its memory-descriptor path, while FIFO PIO uses `0x20`. Further touch DFUs require stronger evidence about the physical wire stream or another specific controller difference. Qualify transport before calibration or execution. Physical clock rate, reset timing and attention behavior still need qualification.
-- Startup accounting and full-duplex capture now distinguish two behaviors: explicit long TX with AUTO_TX off completes but receives only idle `0x1f01`; AUTO_TX on exhausts receive clocks while most payload bytes remain unqueued. Next staged DFU: a reset-held, rails-off GPIO input sampler observes candidate SPI pads during slow known controller patterns, without uploading touch firmware. This may provide software access to clock/data activity; peripheral pad input readback is still unverified.
-- Implement board-specific power, clock, reset and SPI handling with reliable cleanup.
-- Load the correct touch firmware format and this panel's calibration through a private, owner-controlled path. Verify firmware acknowledgment, touch events, multiple contacts, orientation and edge accuracy in Linux and the desktop.
+- [x] Identify SCLK/MOSI through software pad sampling and measure SPI bit-order polarity.
+- [x] Receive firmware ACK `0x4bc1` through GPIO SPI using the original private packet.
+- [x] Receive firmware ACK `0x4bc1` through direct S5L hardware-controller PIO.
+- [x] Issue a GPIO execute command after a valid ACK; receive `0x4879, 0x4f81` and observe attention change.
+- [x] Validate the corrected normal Linux SPI driver: full upload, ACK `0x4bc1`, execute reply and attention edge.
+- [ ] **Next DFU:** read and checksum-validate the running firmware's device information using a bounded probe; the matching module is staged.
+- [ ] Validate application readiness and interface/report protocol against the exact J72 implementation.
+- [ ] Upload this panel's private calibration with validated framing and acknowledgment checks.
+- [ ] Read bounded touch reports and implement evdev input, including contact tracking, orientation and edges.
+- [ ] Verify touch in the unprivileged desktop with owner screen checks.
+- [ ] Repeat cold RAM boots and verify cleanup and return to iOS.
+
+The current driver correction starts every explicit transfer before queuing bytes, enables AUTO_TX only for receive-only transfers, drains the receive side within the FIFO window, and fixes the reversed Linux bit-order flag mapping. The GPIO path is a working upload fallback. Several distinct modules can run in one RAM session; these milestones are not necessarily one DFU each. Native touch input remains unproven until reports reach the desktop.
 
 **Pass:** repeated cold RAM boots give usable touch in an unprivileged Omarchy A session, with clean return to iOS.
 
@@ -39,4 +48,4 @@ This is a staged research plan, not an installation procedure. The current boot 
 
 A persistent root filesystem on an external host can come before internal-storage work. A host-launched internal install would need J72 ANS1 write support, an iOS 12-compatible layout procedure, backup and recovery evidence, and explicit owner authorization. The current Orchard installer and APFS resizer do not support this J72/iOS 12 combination. See the [deferred internal-storage plan](INTERNAL-STORAGE-PLAN.md). Internal storage would not by itself eliminate the host needed for DFU/Pongo after a cold restart. That work is outside the current RAM-only scope.
 
-Native touch is the main uncertainty. No reliable completion date is possible until the controller responds and its firmware protocol works on J72.
+Native touch is the main uncertainty. Firmware upload and execute now pass; a reliable completion date still depends on calibration, report handling and real input validation.

@@ -99,6 +99,14 @@ The next RAM-only session measured a touch-power baseline without enabling any r
 
 A subsequent read-only RAM boot also sampled register `0x398 = 0x14`, the voltage-setting field associated with the candidate analog rail. The matching driver's table maps this code to a nominal 6,000 mV setting, but the rail was disabled and we did not measure an output voltage. The owner confirmed that iOS came back on screen after the RAM reboot and moved the iPad to a wall charger. The Pi did not see normal iOS USB before it was unplugged.
 
+### Follow-up: resolve the SPI upload blocker
+
+The initial driver could report completed transfers while the touch controller had not accepted the packet. Repeating packet sizes and checksum variations did not establish that the intended bytes reached the wire. We therefore observed the SPI pads through their existing GPIO input buffers while sending a slow, known pattern, with touch reset asserted and rails off. This required no board access.
+
+Those measurements showed that AUTO_TX generated clocks with constant MOSI, and that the S5L bit-order flag mapping was reversed. A temporary GPIO SPI implementation then uploaded the original private packet and received `0x4bc1`. A direct-register hardware probe reproduced acceptance by disabling AUTO_TX for explicit commands, starting RUN before queuing every byte, draining RX and limiting outstanding data to the receive FIFO depth. Applying those rules to every explicit transfer in the normal Linux SPI driver also passed: readiness advanced to `0x4879`, all 57,016 bytes transferred in about 745 ms, ACK was `0x4bc1`, and a guarded execute command returned `0x4879, 0x4f81` with an attention change.
+
+The firmware packet itself was unchanged. These results identify a transport problem; they do not establish the precise ROM meaning of every earlier failure status. Each probe restored reset, chip select, rails, PWM and power domains, and normal iOS USB was verified after reboot. The next staged probe adds a bounded device-info query and reply-checksum validation. Calibration and native input remain separate work.
+
 ## 7. Cleanly return to iOS
 
 For the USB-backed desktop, we stopped Quickshell, Labwc, D-Bus and seatd, then unmounted the chroot's bind/tmpfs mounts. An earlier root unmount briefly returned “busy” while chroot parent processes exited; a later normal unmount succeeded. In the corrected-image session, every chroot mount and the read-only ext4 root unmounted normally before `/dev/nbd2` was detached and the Pi's qemu-nbd server stopped. From the RAM shell we requested `sync; reboot -f`. The Pi subsequently saw the Linux gadget disconnect and normal iOS USB `05ac:12ab`; `ideviceinfo` again returned `iPad4,2`.
