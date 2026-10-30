@@ -2,7 +2,7 @@
 
 Updated 31 October 2026. This is a work queue for this exact J72, not a promise of a fixed number of DFUs. Each row groups work that can share a RAM boot. A failed hardware milestone can require more boots; working modules and userspace changes should be tested within the existing boot wherever possible.
 
-**Current position:** Linux, USB debugging and the Omarchy A desktop work. SPI upload, N1 startup and calibration/setup readbacks pass. A selected raw-report path now yields continuous valid frames; full tap/swipe and steady-hold captures retained 833 and 1,089 frames respectively. Native finger coordinates remain unproven. Switching from raw to native reporting and back recovered raw frames but no native frames. Read-only counters confirm that the capture path continues advancing in native mode while native output remains absent. The next gesture comparison uses the existing candidate BF setting with the corrected reader, in the same RAM boot.
+**Current position:** Linux, USB debugging and the Omarchy A desktop work. Raw reporting is reproducible, and the active native-report gate has now been identified separately from BF. C8 = `0x19` produced 228 valid native `0x44` frames in an eight-second idle test with health and restoration verified. Their zero-finger contents were expected; contact coordinates and desktop touch remain unproven. The next gesture test uses that corrected mask in the same RAM boot.
 
 ## How we will reduce button sequences
 
@@ -71,6 +71,7 @@ The first intended installation stores Linux on the iPad and retains a **host-as
 - [x] Corrected reader with display sync tested during confirmed owner gestures; no packets, health and restoration passed.
 - [x] Continuous raw result frames captured and checksum-validated; firmware health and restoration passed.
 - [ ] Raw sensor contents correlated with deliberate owner touches.
+- [x] Enable the active C8 native-report gate; validate 228 empty native frames at idle.
 - [ ] Actual finger reports and native desktop touch.
 - [ ] Repeatable input/desktop boot and Home/keyboard integration.
 - [ ] Battery, brightness, Wi-Fi, Bluetooth and charging qualified.

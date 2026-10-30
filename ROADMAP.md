@@ -34,7 +34,9 @@ The [DFU session plan](DFU-PLAN.md) expands these milestones into proposed boot 
 - [x] Retain full tap/swipe and steady-hold captures: 833 and 1,089 valid raw frames, no overwritten data, final health and restoration passed.
 - [x] Compare raw/native/raw modes in one power cycle: raw reporting resumes; no native finger frames.
 - [x] Read processing counters: capture advances in native mode even while native report submission and USB output remain absent.
-- [ ] **Current RAM session:** compare the verified candidate BF setting with the corrected reader during gestures; establish reliable contacts and coordinates.
+- [x] Test the verified candidate BF setting with the corrected reader during confirmed owner gestures: zero native frames; capture counter advances, health and restoration pass.
+- [x] Identify active C8 report mask separately from BF and enable contact/periodic output: 228 valid empty native frames at idle, with advancing submission count and clean teardown.
+- [ ] **Current RAM session:** validate real contacts with C8 enabled, then qualify coordinates and native input.
 - [ ] Establish actual scan/report enablement and attention behavior from finger packets.
 - [ ] Read bounded touch reports and implement evdev input, including contact tracking, orientation and edges.
 - [ ] Verify touch in the unprivileged desktop with owner screen checks.
