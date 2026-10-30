@@ -17,7 +17,10 @@ This is a staged research plan, not an installation procedure. The current boot 
 - [x] Run the first owner tap-and-swipe capture: only startup status, no finger reports.
 - [x] Compare polling both attention levels and alternating counters: no additional packets; owner participation in this second window is unconfirmed.
 - [x] Trace the missing J72 display-sync setup, validate a guarded idle test, and observe an active sync-pad signal with full cleanup.
-- [ ] **Next live test:** compare owner gestures with the exact display-sync mux enabled. Another DFU is not currently required.
+- [x] Test owner gestures with display sync enabled: 180-second capture, zero packets.
+- [x] Validate application health with six known-query checks over ten seconds.
+- [x] Validate a candidate BF setting across three delayed wake/readback cycles and an idle recorder with final application-health check.
+- [ ] **Next live test:** capture owner gestures with that verified candidate configuration and display sync enabled. Another DFU is not currently required.
 - [ ] Establish actual scan/report enablement and attention behavior from finger packets.
 - [ ] Read bounded touch reports and implement evdev input, including contact tracking, orientation and edges.
 - [ ] Verify touch in the unprivileged desktop with owner screen checks.

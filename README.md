@@ -6,6 +6,6 @@ Read the [progress report](J72-PROGRESS.md) for measured results and current lim
 
 The present desktop uses software rendering and a read-only Arch Linux ARM filesystem served by a Raspberry Pi over USB. Native touch is still being ported. This repository is a place to share reviewed notes while J72 support is developed; a focused hardware implementation may later be proposed to [OrchardLinux/hardware](https://github.com/OrchardLinux/hardware).
 
-**Touch milestone:** the corrected SPI driver accepts firmware and panel calibration. The firmware now starts through the exact N1 sequence and answers checksum-validated device-info and screen-metric queries matching iOS. The first owner tap-and-swipe capture received only a startup status packet, with no finger reports. We are investigating the remaining scan/display-sync setup; touchscreen input is not enabled in the desktop yet.
+**Touch milestone:** the corrected SPI driver accepts firmware and panel calibration. The firmware now starts through the exact N1 sequence and answers checksum-validated device-info and screen-metric queries matching iOS. Owner tap-and-swipe captures have not produced finger reports, including a new test with display sync enabled. Repeated health queries pass, and a candidate stream setting now survives delayed readback. A gesture test with that configuration is next; touchscreen input is not enabled in the desktop yet.
 
 Private firmware, device calibration, identifying logs, and local disk images are intentionally excluded.
