@@ -14,7 +14,11 @@ This is a staged research plan, not an installation procedure. The current boot 
 - [x] Read checksum-valid screen metrics and normal operating mode matching iOS.
 - [x] Validate a bounded attention-gated reader at idle: one initial status frame passed both checksums, with no malformed frames.
 - [ ] Capture repeated finger frames and verify their layout and checksums.
-- [ ] **Next live test:** capture owner taps and swipes in the current RAM session with the prepared recorder. Another DFU is not currently required.
+- [x] Run the first owner tap-and-swipe capture: only startup status, no finger reports.
+- [x] Compare polling both attention levels and alternating counters: no additional packets; owner participation in this second window is unconfirmed.
+- [x] Trace the missing J72 display-sync setup, validate a guarded idle test, and observe an active sync-pad signal with full cleanup.
+- [ ] **Next live test:** compare owner gestures with the exact display-sync mux enabled. Another DFU is not currently required.
+- [ ] Establish actual scan/report enablement and attention behavior from finger packets.
 - [ ] Read bounded touch reports and implement evdev input, including contact tracking, orientation and edges.
 - [ ] Verify touch in the unprivileged desktop with owner screen checks.
 - [ ] Repeat cold RAM boots and verify cleanup and return to iOS.
@@ -51,4 +55,4 @@ The current driver correction starts every explicit transfer before queuing byte
 
 A persistent root filesystem on an external host can come before internal-storage work. A host-launched internal install would need J72 ANS1 write support, an iOS 12-compatible layout procedure, backup and recovery evidence, and explicit owner authorization. The current Orchard installer and APFS resizer do not support this J72/iOS 12 combination. See the [deferred internal-storage plan](INTERNAL-STORAGE-PLAN.md). Internal storage would not by itself eliminate the host needed for DFU/Pongo after a cold restart. That work is outside the current RAM-only scope.
 
-Native touch is the main uncertainty. Firmware upload and execute now pass; a reliable completion date still depends on calibration, report handling and real input validation.
+Native touch is the main uncertainty. Firmware upload, calibration acceptance and application startup now pass; a reliable completion date still depends on scan/report enablement, report handling and real input validation.
