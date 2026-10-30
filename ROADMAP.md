@@ -38,7 +38,7 @@ The [DFU session plan](DFU-PLAN.md) expands these milestones into proposed boot 
 - [x] Identify active C8 report mask separately from BF and enable contact/periodic output: 228 valid empty native frames at idle, with advancing submission count and clean teardown.
 - [x] Test confirmed owner gestures with C8 enabled: all 5,297 valid native frames contain zero fingers; health and restoration pass.
 - [x] Review current Orchard touch PRs and add bounded classic-layout analysis; 18 offline checks pass.
-- [ ] **Current RAM session:** resolve acquisition/processing that produces no detected contacts, then qualify coordinates and native input.
+- [ ] **Next RAM session:** qualify the prepared earlier-image and contact/status-only probes, then resolve acquisition/processing that produces no detected contacts, then qualify coordinates and native input.
 - [ ] Establish actual scan/report enablement and attention behavior from finger packets.
 - [ ] Read bounded touch reports and implement evdev input, including contact tracking, orientation and edges.
 - [ ] Verify touch in the unprivileged desktop with owner screen checks.
