@@ -36,6 +36,6 @@ This is a staged research plan, not an installation procedure. The current boot 
 
 ## 5. Consider independent operation later
 
-A persistent root filesystem on an external host can come before internal-storage work. A standalone installation would need a separate storage driver, backup and recovery design, and explicit owner authorization. That work is outside the current RAM-only scope.
+A persistent root filesystem on an external host can come before internal-storage work. A host-launched internal install would need J72 ANS1 write support, an iOS 12-compatible layout procedure, backup and recovery evidence, and explicit owner authorization. The current Orchard installer and APFS resizer do not support this J72/iOS 12 combination. See the [deferred internal-storage plan](INTERNAL-STORAGE-PLAN.md). Internal storage would not by itself eliminate the host needed for DFU/Pongo after a cold restart. That work is outside the current RAM-only scope.
 
 Native touch is the main uncertainty. No reliable completion date is possible until the controller responds and its firmware protocol works on J72.
