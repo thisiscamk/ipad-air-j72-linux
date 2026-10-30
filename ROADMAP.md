@@ -4,7 +4,7 @@ This is a staged research plan, not an installation procedure. The current boot 
 
 ## 1. Finish native touch
 
-- Continue from the accepted J72 boot-ROM reply and successful bounded SPI transfers. Valid 80-byte, 16,400-byte, and full firmware packets returned `0x1f01`, `0x4969`, and `0x4cb1`, respectively; none received the required `0x4bc1` acknowledgment. Adding the matching iOS pre-reset N1 wake still gave `0x4cb1` for the full packet. A receive-drain kernel timed out with 16 RX words outstanding; a strict 16-word window then stalled at startup. Test the staged half-prefill variation once, then audit the SPI controller and clock setup before calibration or execution. Physical clock rate, reset timing and attention behavior still need qualification.
+- Continue from the accepted J72 boot-ROM reply and successful bounded SPI transfers. Valid 80-byte, 16,400-byte, and full firmware packets returned `0x1f01`, `0x4969`, and `0x4cb1`, respectively; none received the required `0x4bc1` acknowledgment. Adding the matching iOS pre-reset N1 wake still gave `0x4cb1` for the full packet. A receive-drain kernel timed out with 16 RX words outstanding; a half-prefill variation timed out with 8 outstanding. Test the staged zero-prefill variation once, then audit the SPI controller and clock setup before calibration or execution. Physical clock rate, reset timing and attention behavior still need qualification.
 - Implement board-specific power, clock, reset and SPI handling with reliable cleanup.
 - Load the correct touch firmware format and this panel's calibration through a private, owner-controlled path. Verify firmware acknowledgment, touch events, multiple contacts, orientation and edge accuracy in Linux and the desktop.
 
