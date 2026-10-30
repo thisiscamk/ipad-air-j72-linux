@@ -58,6 +58,8 @@ An initramfs ordering issue had let `mdev` reset standard device-node permission
 
 The next staged RAM test follows a newly resolved startup difference. The matching J72 iOS helper writes control register `0x0d` (RUN plus both FIFO-reset bits) before TXDATA. Linux previously wrote reset `0x0c`, queued data, then wrote RUN `0x01`; its earlier zero-prefill test also used `0x01`. The new image queues no pre-RUN bytes and writes `0x0d` before the first byte, with full TX/RX counts and normal `0x20` PIO mode. It logs the control/configuration and completion counters and adds no filler bytes. This is a startup-order test, not evidence that reset bits caused the missing acknowledgment.
 
+The first attempt to run this startup test stopped during the USB boot handoff. The Pi recorded USB hub protocol errors and a hub reset; PongoOS did not become usable, so the RAM image and touch probe did not run. Normal iOS USB returned and the exact model was verified. The next attempt will use a different physical USB data port before a fresh DFU.
+
 ## Next development steps
 
 1. Make the validated RAM boot and graphical startup easier to repeat, including a scripted read-only NBD mount and clean teardown.
