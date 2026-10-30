@@ -2,7 +2,7 @@
 
 Updated 31 October 2026. This is a work queue for this exact J72, not a promise of a fixed number of DFUs. Each row groups work that can share a RAM boot. A failed hardware milestone can require more boots; working modules and userspace changes should be tested within the existing boot wherever possible.
 
-**Current position:** Linux, USB debugging and the Omarchy A desktop work. Touch firmware starts, but finger packets are missing. Eight short reader comparisons completed in one RAM boot with firmware health and full restoration verified. A confirmed owner gesture capture with corrected read-tag handling and sync disabled still produced only startup status. The next comparison enables display sync with that reader in the same active RAM boot; no new DFU is needed for it.
+**Current position:** Linux, USB debugging and the Omarchy A desktop work. Touch firmware starts, but finger packets are missing. Eight short reader comparisons completed in one RAM boot with firmware health and full restoration verified. A confirmed owner gesture capture with corrected read-tag handling and sync disabled still produced only startup status. A second confirmed gesture test with display sync enabled also returned zero frames, with firmware health and full restoration verified. Targeted status diagnostics passed, and a temporary raw-report selection produced 106 checksum-valid raw result frames in eight seconds. The next owner comparison checks whether raw contents respond to touch, in the same RAM boot.
 
 ## How we will reduce button sequences
 
@@ -68,7 +68,9 @@ The first intended installation stores Linux on the iPad and retains a **host-as
 - [x] SPI upload, N1 firmware startup, calibration retention and setup-register readback verified.
 - [x] Eight short reader comparisons completed on hardware with health and restoration verified.
 - [x] Corrected no-sync reader tested during confirmed owner gestures; no finger packets.
-- [ ] Corrected reader with display sync tested during confirmed owner gestures.
+- [x] Corrected reader with display sync tested during confirmed owner gestures; no packets, health and restoration passed.
+- [x] Continuous raw result frames captured and checksum-validated; firmware health and restoration passed.
+- [ ] Raw sensor contents correlated with deliberate owner touches.
 - [ ] Actual finger reports and native desktop touch.
 - [ ] Repeatable input/desktop boot and Home/keyboard integration.
 - [ ] Battery, brightness, Wi-Fi, Bluetooth and charging qualified.

@@ -28,7 +28,10 @@ The [DFU session plan](DFU-PLAN.md) expands these milestones into proposed boot 
 - [x] Build and run eight distinct reader comparisons in one RAM boot, with final firmware health and full restoration verified; eleven synthetic parser/transfer checks pass.
 - [x] Compare 0/10/1,000-microsecond CS timing, success-only read tags, display sync, candidate BF setting and query priming; none establishes finger reporting.
 - [x] Run corrected no-sync reader during confirmed owner gestures: one valid startup status frame, no finger packets, no malformed frames or transfer errors.
-- [ ] **Current RAM session:** compare the corrected reader with display sync enabled during owner gestures; no additional DFU needed for this comparison.
+- [x] Compare the corrected reader with display sync enabled during confirmed owner gestures: zero packets, final firmware health and restoration passed.
+- [x] Run targeted read-only status comparisons: report7f is `0x00040000` without sync and zero with sync; final health and restoration passed.
+- [x] Select the audited alternative RAM report path: 106 checksum-valid raw result frames in eight seconds, with healthy firmware and full restoration.
+- [ ] **Current RAM session:** compare raw contents during deliberate owner touches, then qualify contact decoding.
 - [ ] Establish actual scan/report enablement and attention behavior from finger packets.
 - [ ] Read bounded touch reports and implement evdev input, including contact tracking, orientation and edges.
 - [ ] Verify touch in the unprivileged desktop with owner screen checks.
