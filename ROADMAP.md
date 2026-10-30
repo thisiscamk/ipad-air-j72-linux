@@ -20,7 +20,10 @@ This is a staged research plan, not an installation procedure. The current boot 
 - [x] Test owner gestures with display sync enabled: 180-second capture, zero packets.
 - [x] Validate application health with six known-query checks over ten seconds.
 - [x] Validate a candidate BF setting across three delayed wake/readback cycles and an idle recorder with final application-health check.
-- [ ] **Next live test:** capture owner gestures with that verified candidate configuration and display sync enabled. Another DFU is not currently required.
+- [x] Test owner gestures with the verified candidate setting and display sync: 180 seconds, zero packets; firmware information remains valid at the end.
+- [x] Verify all 1,152 calibration bytes by checksum-valid SRAM reads before and after firmware upload.
+- [x] Verify all five N1 setup register values immediately after writing and after calibration.
+- [ ] **Next RAM session:** compare known chip-select timing requirements and report transactions, with bounded idle/liveness checks before any new gesture test. A new DFU is needed after the charging break.
 - [ ] Establish actual scan/report enablement and attention behavior from finger packets.
 - [ ] Read bounded touch reports and implement evdev input, including contact tracking, orientation and edges.
 - [ ] Verify touch in the unprivileged desktop with owner screen checks.

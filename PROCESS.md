@@ -1,6 +1,6 @@
 # How we brought up RAM Linux and Omarchy A on J72
 
-This records the path followed on one iPad Air 1 Cellular (`iPad4,2` / `J72AP`, Apple A7) through 29 October 2026. It is a **method and measured workflow**, not a ready-made installer. The iPad still has iOS 12.5.7, and every Linux boot in this project has used RAM. Read [J72-PROGRESS.md](J72-PROGRESS.md) for the current support status.
+This records the path followed on one iPad Air 1 Cellular (`iPad4,2` / `J72AP`, Apple A7) through 30 October 2026. It is a **method and measured workflow**, not a ready-made installer. The iPad still has iOS 12.5.7, and every Linux boot in this project has used RAM. Read [J72-PROGRESS.md](J72-PROGRESS.md) for the current support status.
 
 ## What can be reproduced from this report
 
@@ -133,7 +133,9 @@ These are observations from this J72, not a general driver or a completed touch 
 
 The next comparison adds a missing board lifecycle step **before step 1**, during reset-held startup. Its J72 startup enables display sync on GPIO119 after the pre-reset wake and before reset release. A guarded RAM idle test has validated the corresponding mux readback and full restoration. A separate GPIO-only sample observed transitions only with this mux enabled, then restored the original pad. The owner completed a 180-second gesture capture with this setting and no packets arrived. Display sync alone is insufficient.
 
-Known application queries then passed six times over ten seconds. For the next candidate configuration, report BF is written with `95 81 09 00`. Validate the E1 reply checksum and its command/report/status fields at bytes 6/7/8, then wait, wake the application and read BF back. Three independent delayed readbacks now match, followed by a checked normal-mode write. A two-second idle recorder passed with no packets or malformed frames and valid application information at its end. This is configuration and cleanup evidence; the next gesture test must establish whether finger packets appear before evdev integration.
+Known application queries then passed six times over ten seconds. For the next candidate configuration, report BF is written with `95 81 09 00`. Validate the E1 reply checksum and its command/report/status fields at bytes 6/7/8, then wait, wake the application and read BF back. Three independent delayed readbacks now match, followed by a checked normal-mode write. A two-second idle recorder passed with no packets or malformed frames and valid application information at its end. The owner then performed gestures during a 180-second recording: no packets arrived, and the final device-info checksum was valid. This configuration has not established finger reporting or evdev input.
+
+Follow-up ROM reads checked every calibration word before and after uploading firmware: all 1,152 bytes matched the private expected data. Each N1 setup register was also read immediately after its write and again after calibration; all five retained their intended values with valid checksums. These checks distinguish acknowledged commands from actual retained contents. They still do not establish that the application is scanning.
 
 Several distinct probes ran in this one RAM session without another DFU. The live capture module is bounded in time and record count, exports data only through a root-readable RAM file, and resets and powers down the controller after capture. Firmware, calibration and raw traces remain local.
 
