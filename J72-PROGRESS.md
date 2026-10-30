@@ -80,6 +80,16 @@ Wi-Fi, Bluetooth, audio, brightness control, suspend, charging and battery repor
 
 ## Next development steps
 
+### Prepared during the charging break
+
+Six distinct private ARM64 modules are built for the working kernel ABI. They compare CS setup/hold delays, display sync, the verified candidate stream setting and read-counter policy without changing the firmware payload. The new recorder separates all-zero and padding-only responses from checksum-valid empty lengths, other command replies and valid data. The matching iOS driver advances its read tag after success; the earlier recorder advanced it after every attempt. That difference is a testable reader hypothesis, not an established explanation for missing touch.
+
+Offline artifact/ABI checks pass, along with ten synthetic parser and shell-transfer checks. The new snapshot retains full returned packets. The runner defaults to offline preflight, checks the exact J72 model/kernel before a RAM probe, and stops the batch on failed health or cleanup. These tests do not establish live behavior; all six modules await hardware testing. Firmware, calibration, binaries and raw captures remain local.
+
+The [expanded session plan](DFU-PLAN.md) now covers input integration, battery/brightness, J72 HSIC Wi-Fi, Bluetooth, charging, the remaining tablet services, integrated qualification and the separately gated internal installation.
+
+### Development queue
+
 1. Make the validated RAM boot and graphical startup easier to repeat, including a scripted read-only NBD mount and clean teardown.
 2. Finish the continuous report reader and qualify actual finger data; verify native input before enabling it in the desktop.
 3. Add an **experimental J72** profile to [OrchardLinux/hardware](https://github.com/OrchardLinux/hardware), with exact board matching, a 4 KiB kernel and matching modules, a RAM boot path, and explicit support limits. The public `devices/` directory has no J72 profile. Its [J72b profile](https://github.com/OrchardLinux/hardware/blob/main/devices/j72b/device.toml) is for the iPad 6 Cellular (`iPad7,6`, A10), a different board. The local J72 worktree is not an upstream port. See the [full roadmap](ROADMAP.md) for milestones and pass conditions.
