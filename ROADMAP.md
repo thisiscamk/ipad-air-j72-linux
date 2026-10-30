@@ -25,8 +25,10 @@ The [DFU session plan](DFU-PLAN.md) expands these milestones into proposed boot 
 - [x] Test owner gestures with the verified candidate setting and display sync: 180 seconds, zero packets; firmware information remains valid at the end.
 - [x] Verify all 1,152 calibration bytes by checksum-valid SRAM reads before and after firmware upload.
 - [x] Verify all five N1 setup register values immediately after writing and after calibration.
-- [x] Build six private reader-audit modules with matching ARM64 ABI and artifact checks; validate the snapshot parser and transfer framing offline. These modules have not run on the iPad yet.
-- [ ] **Next RAM session:** compare known chip-select timing requirements and report transactions, with bounded idle/liveness checks before any new gesture test. A new DFU is needed after the charging break.
+- [x] Build and run eight distinct reader comparisons in one RAM boot, with final firmware health and full restoration verified; eleven synthetic parser/transfer checks pass.
+- [x] Compare 0/10/1,000-microsecond CS timing, success-only read tags, display sync, candidate BF setting and query priming; none establishes finger reporting.
+- [x] Run corrected no-sync reader during confirmed owner gestures: one valid startup status frame, no finger packets, no malformed frames or transfer errors.
+- [ ] **Current RAM session:** compare the corrected reader with display sync enabled during owner gestures; no additional DFU needed for this comparison.
 - [ ] Establish actual scan/report enablement and attention behavior from finger packets.
 - [ ] Read bounded touch reports and implement evdev input, including contact tracking, orientation and edges.
 - [ ] Verify touch in the unprivileged desktop with owner screen checks.

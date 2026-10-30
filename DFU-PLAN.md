@@ -1,8 +1,8 @@
 # J72 session plan: touch to an internal root filesystem
 
-Updated 30 October 2026. This is a work queue for this exact J72, not a promise of a fixed number of DFUs. Each row groups work that can share a RAM boot. A failed hardware milestone can require more boots; working modules and userspace changes should be tested within the existing boot wherever possible.
+Updated 31 October 2026. This is a work queue for this exact J72, not a promise of a fixed number of DFUs. Each row groups work that can share a RAM boot. A failed hardware milestone can require more boots; working modules and userspace changes should be tested within the existing boot wherever possible.
 
-**Current position:** Linux, USB debugging and the Omarchy A desktop work. Touch firmware starts, but finger packets are missing. The iPad has returned to iOS for charging. Six distinct reader diagnostics are built and checked offline for the next RAM session; none has run on hardware yet.
+**Current position:** Linux, USB debugging and the Omarchy A desktop work. Touch firmware starts, but finger packets are missing. Eight short reader comparisons completed in one RAM boot with firmware health and full restoration verified. A confirmed owner gesture capture with corrected read-tag handling and sync disabled still produced only startup status. The next comparison enables display sync with that reader in the same active RAM boot; no new DFU is needed for it.
 
 ## How we will reduce button sequences
 
@@ -66,7 +66,9 @@ The first intended installation stores Linux on the iPad and retains a **host-as
 
 - [x] RAM Linux, USB debugging and graphical desktop demonstrated.
 - [x] SPI upload, N1 firmware startup, calibration retention and setup-register readback verified.
-- [x] Next reader comparison built and checked offline; hardware results pending.
+- [x] Eight short reader comparisons completed on hardware with health and restoration verified.
+- [x] Corrected no-sync reader tested during confirmed owner gestures; no finger packets.
+- [ ] Corrected reader with display sync tested during confirmed owner gestures.
 - [ ] Actual finger reports and native desktop touch.
 - [ ] Repeatable input/desktop boot and Home/keyboard integration.
 - [ ] Battery, brightness, Wi-Fi, Bluetooth and charging qualified.
