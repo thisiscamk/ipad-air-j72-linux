@@ -2,7 +2,7 @@
 
 Progress report as of 31 October 2026. This is a hardware bring-up report for one iPad, not a general installation guide or an Orchard hardware profile.
 
-**Latest:** the corrected D2089 analog enable (`0x84: 0x00 → 0x07`, preserving voltage setting `0x398 = 0x14`) produced real native finger reports during owner gestures. Of 1,801 checksum-valid native `0x44` frames, 542 contained one finger and 50 contained two. The decoded stream has nine matched press/release lifecycles, coordinates covering most of the panel, and no contacts remaining at the end. No malformed layouts, SPI errors or dropped records occurred; final firmware health, zero global status flags and full hardware restoration passed. Linux evdev and visual orientation have since passed an owner target/trace test, including multiple fingers and 21 matched presses/releases. Desktop interaction remains to be qualified.
+**Latest:** the corrected D2089 analog enable (`0x84: 0x00 → 0x07`, preserving voltage setting `0x398 = 0x14`) produced real native finger reports during owner gestures. Of 1,801 checksum-valid native `0x44` frames, 542 contained one finger and 50 contained two. The decoded stream has nine matched press/release lifecycles, coordinates covering most of the panel, and no contacts remaining at the end. No malformed layouts, SPI errors or dropped records occurred; final firmware health, zero global status flags and full hardware restoration passed. Linux evdev and visual orientation have since passed an owner target/trace test, including multiple fingers and 21 matched presses/releases. The owner subsequently opened desktop menus and launched Foot by touch. On-screen keyboard entry and integrated cold boot remain to be checked.
 
 ## Device and approach
 
@@ -207,3 +207,10 @@ This qualifies actual contact detection in the diagnostic path. It does not yet 
 A guarded RAM module now registers a direct Linux multitouch device with ten slots. Its decoder checks the complete native layout before emitting events, handles the observed 30-byte stride, inverts native Y using the validated J72 surface bounds, and releases absent contacts. A frame timeout releases outstanding slots. The same C decoder accepted all 1,801 captured reports and rejected malformed-layout test cases with undefined-behavior/bounds instrumentation enabled.
 
 The first integration trial stopped on its diagnostic three-invalid-reply guard; firmware health and full hardware cleanup passed. A distinct bounded recovery trial releases contacts and checks firmware health, zero global flags and the active report gate before continuing, with a strict recovery limit. The visual test then recorded 21 presses and 21 releases, including simultaneous contacts. The owner confirmed that all targets and traces worked at the correct on-screen positions. This qualifies Linux input and screen mapping in the live RAM session. Compositor interaction, keyboard entry and integrated cold boot remain separate checks.
+
+
+### Desktop menus and application launch confirmed
+
+The owner opened Omarchy A menus and launched Foot using the touchscreen. The compositor now explicitly enables both DRM and libinput backends (`WLR_BACKENDS=drm,libinput`); the previous display-only setting excluded input. Labwc logs confirm the touchscreen and GPIO keys were added, and its file descriptors show both evdev devices open. This also explains the earlier need for a Home userspace bridge, although the new native Home binding still needs a physical check.
+
+A source-built, pinned wvkbd v0.20 keyboard with the existing Omarchy patch is now staged in RAM with a top-bar toggle. Its visible state and startup have been checked; owner text entry is the next test. A small Bash session controller is used because the minimal read-only desktop image lacks Python. The desktop remains a read-only USB-backed root with RAM state, rather than an installed system.
