@@ -395,3 +395,35 @@ At the owner's request, PR #43 is back in draft with review on hold. The [implem
 At the owner's request, [PR #43](https://github.com/OrchardLinux/orchard/pull/43/files) now includes the actual hardware development implementation at commit `fb22beb94995e216b7b14c6a535dd41e6817bed5`: full SPI correction/baseline, touch worker/decoder, battery frontend/support patches, read-only observer, tested 425 mA worker, synthetic tests and provenance/licenses. The source is under `experiments/j72/` and is inactive in Orchard's builds. Desktop code remains here for a separate omarchy-a change.
 
 The PR remains draft. All 362 Orchard unit tests and the copied source's offline checks passed. Firmware/calibration/generated includes/binaries/raw captures stay private. Normal driver/DT/recipe/host integration and device testing of that integrated revision remain required; this code snapshot does not make J72 a supported Orchard device. The prepared 850 mA comparison remains untested at this publication point.
+
+## 850 mA wall comparison: brief net charging observed
+
+One 30-second, single-attempt test on the separate owner-rated 5 V / 1 A
+charger changed the nominal input limit from 100 mA (`0x04c0 = 0x02`) to
+850 mA (`0x3e`). The USB-backed desktop/root and touch worker were stopped
+before the cable move. The owner confirmed advancing uptime on that charger
+and pressed Home once after the baseline interval.
+
+| Phase | Battery current |
+| --- | --- |
+| Same-source baseline | -766 mA |
+| Trial, 12 retained samples | **+20 to +51 mA** |
+| After automatic restoration | -765 mA |
+
+The active photo shows the green screen, `Charging` and `0x04c0 = 0x3e`.
+The final photo shows `used=1`, `active=0`, `armed=0`, `restored=1`,
+`restore_failed=0`, `error=0`, and `0x04c0 = 0x02`. Temperature in the two
+photos is 34.9 and 35.1 degrees C; reported charge stays at 91%. The owner
+then confirmed iOS is visible and charging on the same wall source.
+
+This demonstrates brief positive **net battery current**, with verified
+restoration. It does not qualify sustained charging, a charge-level trend,
+source detection, protections or desktop charging. Actual USB input current
+and supply capacity were not measured; the exact restoration instant was
+not photographed, and the full wall RAM log was not retrieved. Raw photos
+remain private. The source snapshot still contains the tested 425 mA worker;
+the 850 mA variant used for this result is not bundled in that snapshot.
+
+Next: implement source-aware bounded charging, qualify a longer guarded
+measurement and recovery, then proceed to Wi-Fi. No internal-storage writes
+or host-kernel changes were performed.

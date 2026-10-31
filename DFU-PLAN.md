@@ -4,7 +4,7 @@
 - [x] B02: Linux multitouch slots, evdev and visual orientation passed (owner target/trace confirmation; 21 matched presses/releases). Compositor/libinput, touch menus and launching Foot now pass. Keyboard text entry and the top-bar toggle now pass too. Window dragging also passes. Native Home also opens and closes the menu without the earlier bridge. No new DFU requested.
 - [x] B03: automatic self-check, full cleanup, touch restart and read-only desktop startup passed. The owner confirmed repeated keyboard hide/tap/type after the combined image's fresh boot.
 - [ ] B04: brightness, Linux power-supply registration/readings and the corrected remaining/full capacity pairing passed. A fresh iOS comparison and battery UI remain; battery-health estimates are unqualified.
-- [ ] B04C: battery reporting and the visible PMIC observer passed. One wall-charger 425 mA control test reduced battery discharge from −764 mA to −423…−400 mA; automatic restoration to the original 100 mA setting was verified, with −767 mA afterward. Net charging remains unproven. The owner-confirmed separate 5 V / 1 A source is available, and one 850 mA / 30-second comparison is prepared but untested. Charging policy/protections and sustained charging remain open. Serial recovery and the earlier host hang remain open. This precedes Wi-Fi.
+- [ ] B04C: brief net charging now passed: one 850 mA / 30-second wall test retained 12 samples at +20…+51 mA, from −766 mA baseline; automatic restoration passed and current returned to −765 mA. iOS recovery and charging are confirmed. Sustained charging, source detection/protections and USB recovery remain open before Wi-Fi.
 - [ ] B05–B11: Wi-Fi, persistence/Bluetooth, charging regression with the desktop, audio/rotation, power/remaining hardware, integrated use.
 - [ ] B12–B15: storage read-only qualification, installer rehearsal, separately authorized installation, installed-system verification.
 
@@ -184,18 +184,27 @@ Current batch checklist:
 
 These steps use one RAM boot; no extra DFU is needed between them.
 
-### Next charging DFU: fixed 850 mA comparison ready
+### Completed charging DFU: fixed 850 mA comparison
 
 The single 425 mA comparison is complete, and the owner confirmed return to iOS and charging. A separate charger photo and the owner's explicit 5 V / 1 A rating now identify the next source. Its actual capacity has not been independently measured. The earlier powerboard will not be used for this test.
 
 - [x] Obtain the separate source's stated rating.
 - [x] Build and pin an isolated fixed 850 mA variant, preserving the measured 425 mA artifacts.
 - [x] Pass native build/import, actual policy/failure, battery-guard, source-flag refusal, syntax and artifact checks.
-- [ ] New charged DFU; reuse the existing target RAM image.
-- [ ] Pass startup, capture battery baseline and stop desktop/input/root/export cleanly.
-- [ ] Stage the 850 mA module unarmed, confirm its screen and arm after battery checks pass.
-- [ ] Move to the specific 5 V / 1 A charger; confirm advancing uptime and allow a baseline.
-- [ ] One Home press: fixed 850 mA for 30 seconds, then automatic restoration to 100 mA. Photograph the active and restored phases.
-- [ ] Return to iOS while remaining on the charger; confirm charging before any Pi attachment.
+- [x] New charged DFU; reuse the existing target RAM image.
+- [x] Pass startup, capture battery baseline and stop desktop/input/root/export cleanly.
+- [x] Stage the 850 mA module unarmed, confirm its screen and arm after battery checks pass.
+- [x] Move to the specific 5 V / 1 A charger; confirm advancing uptime and allow a baseline.
+- [x] One Home press: fixed 850 mA for 30 seconds, then automatic restoration to 100 mA. Photograph the active and restored phases.
+- [x] Return to iOS while remaining on the charger; confirm charging before any Pi attachment.
 
-These steps require **one new DFU**. No host kernel or internal-storage changes are included. The same physical charging source must be used for all three comparison phases. A short positive battery-current result alone will not complete B04C: sustained positive current and charge-level trend, source policy/protections and desktop charging regression remain required.
+These steps completed in **one RAM boot**. No host kernel or internal-storage changes are included. The same physical charging source must be used for all three comparison phases. A short positive battery-current result alone will not complete B04C: sustained positive current and charge-level trend, source policy/protections and desktop charging regression remain required.
+
+### Remaining charging tests before Wi-Fi
+
+- [x] Short positive net-current test and automatic rollback; owner-confirmed iOS recovery.
+- [ ] Prepare source-aware policy and a longer bounded test with battery/current/temperature guards and independent rollback. New build and DFU only after offline preparation.
+- [ ] Measure sustained positive current and charge trend; verify restoration and iOS recovery.
+- [ ] Qualify USB recovery and later full-desktop charging/cable regression; do not return live Linux from wall to Pi before that path is resolved.
+
+No next test image or DFU is requested yet.

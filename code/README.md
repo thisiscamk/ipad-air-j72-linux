@@ -13,7 +13,9 @@ exact-board guards and direct hardware access. Review them before reuse.
 | [charging](charging/) | Read-only PMIC observer and the tested 425 mA one-shot kernel worker/policy core | -764 mA baseline, -423…-400 mA trial, automatic restoration and -767 mA afterward |
 | [desktop](desktop/) | wvkbd v0.20 changes, keyboard controller and experimental Foot 1.28 tap patch | Repeated keyboard hide/tap/reopen/type in the tested desktop combination |
 
-The 850 mA follow-up is not included as a measured result: it has not run.
+The later 850 mA / 30-second follow-up produced +20…+51 mA net battery
+current and verified restoration; sustained charging remains unqualified.
+This source snapshot contains the 425 mA worker, not that 850 mA variant.
 The Foot patch's independent contribution was not isolated from the other
 keyboard/input fixes. See [the evidence report](../J72-PROGRESS.md).
 
