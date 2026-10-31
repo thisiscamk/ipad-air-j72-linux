@@ -472,3 +472,22 @@ requires clean desktop/root/NBD/input teardown before unbinding, then an
 owner move to the powered hub and one Home-triggered rebind. Charging is
 gated on live data and completed handoff; no current write occurs during
 the transfer. See [the revised plan](PI-CHARGING-PLAN.md).
+
+## Direct RAM boot and powered-hub data handoff passed
+
+The final direct-connected DFU boot reached Pongo and the unchanged #33
+Linux image. Automatic desktop/touch startup passed. Healthy teardown
+retained 2,807 native frames, zero layout rejects/SPI errors/timeouts/
+recoveries, and successful firmware health and restoration. Root/NBD/export
+were detached before the cable move.
+
+The owner moved to the powered JCH377 marked port and pressed Home once.
+The one-shot gadget rebind completed; the native NCM shell now responds
+through the hub with the exact model/kernel, `REBOUND` status and the
+transfer process exited. The separately guarded 850 mA worker is staged
+unarmed at the original 100 mA input setting. The current comparison has
+not yet run.
+
+Current Orchard main was reviewed for reuse; see
+[the integration notes](ORCHARD-POWER-PLAN.md). No driver/mux/source-detection
+change was made to the running kernel.

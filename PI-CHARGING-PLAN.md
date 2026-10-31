@@ -194,3 +194,17 @@ guards and artifact preflight pass. **The new RAM USB transfer has not yet
 been device tested.** It requires one new direct-connected DFU for the whole
 transfer/current batch, if the transfer succeeds. This is one initial cable
 move to qualify the hub path, followed by fixed cabling during charging.
+
+## Current RAM handoff result and Orchard reuse
+
+The direct Pi boot passed. After healthy desktop/root/NBD/input teardown,
+the one-shot gadget handoff reached the JCH377 marked port: native NCM
+enumerated at 480 Mbit/s, the RAM shell responded, transfer state reported
+`REBOUND` and its handler exited. Battery read 89%, 4.091 V, -750 mA and
+37.1 degrees C before the current trial. The visible 850 mA trial is staged
+**unarmed**, with input limit still `0x04c0=0x02`; no hub charging result is
+claimed yet.
+
+The [Orchard power integration review](ORCHARD-POWER-PLAN.md) identifies
+existing generic-PHY current reporting, source-event ownership, early BC1.2
+detection and PMIC readback handling to reuse after verifying J72 mappings.
