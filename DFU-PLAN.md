@@ -1,3 +1,13 @@
+# Current checkpoint — 31 October 2026
+
+- [x] B01: real native one- and two-finger contacts, matched presses/releases, firmware health and full cleanup. Corrected analog enable is `0x07`; voltage setting is unchanged.
+- [ ] B02: Linux multitouch slots, visual orientation, evdev/libinput, desktop taps/drags and keyboard. Preparing in the current RAM boot; no new DFU requested.
+- [ ] B03: integrated driver and independent cold-start confirmation.
+- [ ] B04–B11: battery/display, Wi-Fi, persistence/Bluetooth, charging, audio/rotation, power/remaining hardware, integrated use.
+- [ ] B12–B15: storage read-only qualification, installer rehearsal, separately authorized installation, installed-system verification.
+
+Earlier zero-contact results below are historical. The corrected-power gesture test now passes B01.
+
 # J72 session plan: touch to an internal root filesystem
 
 Updated 31 October 2026. This is a work queue for this exact J72, not a promise of a fixed number of DFUs. Each row groups work that can share a RAM boot. A failed hardware milestone can require more boots; working modules and userspace changes should be tested within the existing boot wherever possible.
@@ -35,8 +45,8 @@ IDs identify milestones, not a guaranteed one-DFU-per-row schedule. Batches may 
 
 | Batch | Work within that boot | Pass condition / owner action |
 | --- | --- | --- |
-| **B01 — current: contact detection** | The reader, raw path and C8 native-output gate are qualified. Confirmed gestures still produce only zero-contact native frames. Review exact J72 acquisition/processing state and current upstream N1 behavior; run distinct guarded comparisons in the existing boot. Corrected N1 control reads pass. Exact-stock analog dependency correction is now prepared and takes priority over other comparisons. | Actual contact counts, coordinates and release states must respond to owner gestures. Ask for another gesture test after a justified configuration change passes automated health and cleanup checks. No unchanged DFU or gesture loop. |
-| **B02 — touch in Linux input** | Decode actual finger packets; qualify contact IDs, count, press/move/lift and axes; integrate a J72 input driver. Run evdev/libinput and the unprivileged desktop; integrate Home handling and a software keyboard. | Owner can tap, drag, reach screen edges, enter text and release every contact. Two fingers do not leave stuck contacts. Keep a USB shell for recovery. |
+| **B01 — passed: contact detection** | The reader, raw path and C8 native-output gate are qualified. Confirmed gestures still produce only zero-contact native frames. Review exact J72 acquisition/processing state and current upstream N1 behavior; run distinct guarded comparisons in the existing boot. Corrected N1 control reads pass. Exact-stock analog dependency correction is now prepared and takes priority over other comparisons. | Actual contact counts, coordinates and release states must respond to owner gestures. Ask for another gesture test after a justified configuration change passes automated health and cleanup checks. No unchanged DFU or gesture loop. |
+| **B02 — current: touch in Linux input** | Decode actual finger packets; qualify contact IDs, count, press/move/lift and axes; integrate a J72 input driver. Run evdev/libinput and the unprivileged desktop; integrate Home handling and a software keyboard. | Owner can tap, drag, reach screen edges, enter text and release every contact. Two fingers do not leave stuck contacts. Keep a USB shell for recovery. |
 | **B03 — touch cold-start confirmation** | Boot the integrated driver from a clean state; repeat input and desktop checks, then return to iOS. | Independent boot succeeds without live register patches or manual permission fixes. Additional cold starts are validation work, not unchanged attempts at a known failure. |
 | **B04 — battery and display controls** | Bring up the J72 UART5/HDQ gauge using exact board wiring; begin with identification and telemetry. Read brightness through the existing PMIC backlight driver, then test bounded changes and restore the starting value. | Plausible battery voltage, temperature, state of charge and current; compare with an iOS baseline. Owner confirms brightness changes. Battery reporting alone does not establish charging. |
 | **B05 — Wi-Fi bus and device** | Qualify the internal EHCI/HSIC host, PHY, clocks, rails and reset without disturbing the external USB gadget. Read descriptors before selecting a WLAN transport driver. | The internal WLAN USB device enumerates and remains stable; external USB debug still works. Firmware startup and association are separate checks. |

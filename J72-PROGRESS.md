@@ -2,7 +2,7 @@
 
 Progress report as of 31 October 2026. This is a hardware bring-up report for one iPad, not a general installation guide or an Orchard hardware profile.
 
-**Latest:** enabling the active C8 report mask fixed native packet output. After the 228-frame idle positive control, a confirmed owner gesture capture retained **5,297 checksum-valid native `0x44` frames, all with zero fingers**. There were no transfer errors or overwritten records; C8 remained `0x19`, final status flags were zero, firmware information was valid and full hardware restoration passed. Contact detection remains unresolved. The next investigation targets sensor acquisition and processing configuration before another gesture test.
+**Latest:** the corrected D2089 analog enable (`0x84: 0x00 → 0x07`, preserving voltage setting `0x398 = 0x14`) produced real native finger reports during owner gestures. Of 1,801 checksum-valid native `0x44` frames, 542 contained one finger and 50 contained two. The decoded stream has nine matched press/release lifecycles, coordinates covering most of the panel, and no contacts remaining at the end. No malformed layouts, SPI errors or dropped records occurred; final firmware health, zero global status flags and full hardware restoration passed. Linux evdev, visual orientation and desktop interaction are still to be qualified.
 
 ## Device and approach
 
@@ -191,3 +191,12 @@ The [J86 driver](https://github.com/perryraskin/ipad-mini2-linux/blob/e23198d542
 This is a demonstrated mismatch to the stock software sequence, **not yet proof of the entire touch failure's cause**. Firmware communication can be healthy while an analog prerequisite is missing. The programmed voltage code is retained; no new voltage is selected. The new probes require the exact initial register values, verify the corrected enabled values, and restore all three owned bits along with the existing LDO/pin/clock state.
 
 The next priority is now the corrected-analog native idle probe, followed by a confirmed owner contact/release capture if health and restoration pass. Corrected-analog earlier-image idle/live probes are also built as a fallback in the same RAM boot. All four pass offline hash/ARM64/ABI preflight; the existing 20 offline checks pass. **None of the corrected-power probes has run.** The earlier contact-mask/sample-stage probes remain controls, but their old analog setup must not be mistaken for the corrected baseline. The iPad remains on its charging break; no new DFU has been requested.
+
+
+## 31 October: corrected analog power produces native contacts
+
+A working related A7 iPad mini 2 implementation supplied a lead: its D2089 analog enable uses all three low bits. We checked the exact J72 stock driver's dependency handling independently. Our earlier probes set only `0x04`; the matching driver also enables shared `0x03` when the relevant analog rail is enabled. The next test changed that enable to `0x07` while preserving firmware, calibration, SPI timing, native report mask and the voltage setting.
+
+The short idle control produced 237 valid empty native frames and passed health/cleanup. The subsequent owner gesture capture produced 1,801 valid native frames: 1,209 empty, 542 one-finger and 50 two-finger. Active native coordinates ranged x=447–13,858 and y=672–18,924. There were nine down transitions and nine matching up transitions, ending empty. The 150 rejected data transactions were not passed to the contact decoder; no SPI transfer errors or capture loss occurred.
+
+This qualifies actual contact detection in the diagnostic path. It does not yet qualify a Linux touchscreen, visual coordinate orientation, a persistent driver or a cold integrated boot. Those are the immediate next steps, using this same RAM session where possible. All firmware, calibration, raw captures and identifying logs remain local.
