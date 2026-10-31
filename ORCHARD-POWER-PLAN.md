@@ -22,7 +22,10 @@ is mainly measured on J71b: D2365/CBTL1610, with input limit at `0x0a03`.
 Our independently audited J72 input limit is D2089 `0x04c0`; its configured
 battery-current ceiling is `0x04ce`. Do not copy the reference register map,
 ADC mux, interrupt/event layout, thresholds or board maximum unchanged.
-The J72 port-controller model and detection path still need verification.
+The J72 port controller is now confirmed as **CBTL1610, revision 137** by
+owner-local iOS records. It is on I²C2 at address `0x1a`; the board's BrickID
+function refers to D2089 ADC channel 6. Detection sequences, event ownership
+and ADC interpretation still require verification before control writes.
 
 Orchard documents remaining limits too: BC1.2 classification depends on
 running before enumeration, USB-PD is not implemented, and charging suspend
@@ -45,3 +48,29 @@ J72 charger implementation.
 No source-detection/mux changes were made during tonight's live trial.
 The prototype's explicit source qualification and 30-second rollback remain
 separate from this future automatic policy.
+
+## 1 November preparation
+
+Fresh paired iOS observations confirm a 5 V / 1.5 A allowance with data active
+on the same powered hub. A separate 1,250 mA / 30-second diagnostic worker is
+built against the unchanged #33 kernel. It requires both a configured
+high-speed gadget and a lease renewed by a host that checks the qualified
+physical hub port. Lease expiry or loss of the required USB state requests
+rollback; an independent software deadline still bounds the trial. This is
+an interim host-qualified experiment, not autonomous BC1.2 detection.
+
+A separate five-minute variant refuses staging until a captured short result
+shows positive current samples, no errors and verified restoration. Neither
+new variant has run on the device yet. Kernel builds/modpost, actual-kernel
+export/ABI checks, rollback and pack guards, lease expiry, simulated USB
+states, host topology refusals and pinned-image preflight passed.
+
+Orchard `main` was rechecked at
+`824bf0346ae4c3debd208cd34b053130576af60c`; its power and USB patches are
+unchanged from the review above. Wi-Fi preparation also found useful HSIC
+transport and firmware-packaging work in
+[Project Cascadia](https://github.com/rzxvx/Project-Cascadia/tree/0237307d0d74910b7a682200252403d0fe5809b7).
+Its BCM4334/A5 implementation requires adaptation to this J72's BCM4324B5/A7;
+its register addresses, GPIOs and device IDs must not be copied unchanged.
+Matching owner-local J72 firmware and board data have been extracted and
+remain private; no WLAN firmware upload or enumeration is claimed.

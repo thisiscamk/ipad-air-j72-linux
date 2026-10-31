@@ -1,4 +1,4 @@
-# Current checkpoint — 31 October 2026
+# Current checkpoint — 1 November 2026
 
 - [x] B01: real native one- and two-finger contacts, matched presses/releases, firmware health and full cleanup. Corrected analog enable is `0x07`; voltage setting is unchanged.
 - [x] B02: Linux multitouch slots, evdev and visual orientation passed (owner target/trace confirmation; 21 matched presses/releases). Compositor/libinput, touch menus and launching Foot now pass. Keyboard text entry and the top-bar toggle now pass too. Window dragging also passes. Native Home also opens and closes the menu without the earlier bridge. No new DFU requested.
@@ -8,7 +8,25 @@
 - [ ] B05–B11: Wi-Fi, persistence/Bluetooth, charging regression with the desktop, audio/rotation, power/remaining hardware, integrated use.
 - [ ] B12–B15: storage read-only qualification, installer rehearsal, separately authorized installation, installed-system verification.
 
-**End of session:** normal iOS charging is confirmed on the powered hub. No further DFU tonight; the next changed charging-policy test needs preparation.
+**Current session:** normal iOS reports 100% on the powered hub. The changed charging/EHCI batch has passed offline preparation; direct Pi DFU is requested. Automatic charger detection and Wi-Fi remain unqualified.
+
+## Power and Wi-Fi work queue — 1 November
+
+- [x] Identify J72 port controller in owner-local iOS records: CBTL1610, revision 137; D2089 PMIC.
+- [x] Reconfirm the powered hub's iOS-reported 5 V / 1.5 A allowance with USB data active.
+- [x] Identify WLAN firmware family BCM4324B5, module `dureza`, vendor USI; extract matching firmware/board inputs privately.
+- [x] Prepare a separate fixed 1,250 mA / 30-second charging worker with the existing battery guards, a 250 ms USB-state check and a host-renewed source lease expiring in 2.5 seconds.
+- [x] Prepare a separate five-minute variant, gated on verified positive short-test samples and restoration.
+- [x] Prepare an EHCI capability diagnostic using the existing Linux power-domain owner and a temporary node; no radio, PHY, GPIO or PMIC programming.
+- [ ] Boot directly from the Pi; qualify EHCI capabilities and domain restoration, then use the proven controlled transfer to the hub.
+- [ ] Run the short charging comparison; verify net current, USB continuity, lease behavior and restoration.
+- [ ] If the short test passes, measure sustained charging in the same RAM boot.
+- [ ] Implement and qualify autonomous J72 source detection, fault handling and source withdrawal; host-qualified experiments are an interim step.
+- [ ] Implement internal HSIC/WLAN power, clock and reset sequencing; enumerate the actual USB device before selecting its transport changes.
+- [ ] Start matching Wi-Fi firmware/driver, then test scan, association, DHCP, DNS, traffic and reconnects.
+- [ ] Qualify Wi-Fi SSH and combined desktop/charging operation, followed by power-saving and suspend/resume checks.
+
+The next batch uses the existing #33 RAM image. The EHCI diagnostic checks controller accessibility only; it does not establish WLAN enumeration. The current kernel has wireless support disabled, so a later isolated target build may still require another DFU.
 
 Earlier zero-contact results below are historical. The corrected-power gesture test now passes B01.
 
