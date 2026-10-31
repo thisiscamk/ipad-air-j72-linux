@@ -97,3 +97,37 @@ longer or desktop-loaded trials.
 
 The iPad remains charging in iOS. No DFU is requested yet. The host kernel
 and iPad internal storage remain unchanged.
+
+## Owner's available hub: model confirmation pending
+
+The owner reports an external hub with a **5 V / 4 A** adapter and an
+uncertain model reading of **JCH337**, plus the official Pi 4 power supply.
+The closest documented candidate is **j5create JCH377**, not a confirmed
+identification. Its [manufacturer specification](https://en.j5create.com/pages/jch377-specifications)
+lists the same adapter rating and one 2.4 A fast-charging USB-A port plus
+six other data ports. The [manufacturer quick guide](https://download.j5create.com/qig/JUH377_JCH377_qig.pdf)
+identifies the marked charging port. These documents do not by themselves
+prove which charging mode operates simultaneously with data on this unit.
+
+A photo of the actual label/ports/data cable is requested. If confirmed,
+use the hub's own adapter and its proper upstream data cable to a Pi USB-A
+host port. The Pi retains its official supply; its attached SSD stays in
+place. Initial topology is Pi data -> powered hub -> marked port -> iPad.
+Charging power should come from the hub adapter, subject to verification.
+
+Before requesting a DFU:
+
+1. Identify the exact model, marked charging port and matching adapter.
+2. Connect the empty powered hub using its proper data lead; inspect its
+   enumeration and self-powered reporting without moving the mounted SSD.
+3. With iOS running, verify that the intended port supports data enumeration
+   while the iPad reports charging. That does not measure net charge or
+   prove BC1.2/CDP negotiation; retain that distinction.
+4. Resolve the port's simultaneous charging mode and current entitlement,
+   then prepare a separate guarded **hub-source** trial. The existing
+   wall-only 850 mA module must not be reused unchanged for the hub.
+5. Qualify a bounded current comparison with NCM active and host/target
+   logging, followed by restoration and USB/iOS recovery. Only then extend
+   duration or add the desktop workload.
+
+No new hardware purchase is proposed before checking the available hub.
