@@ -170,3 +170,16 @@ There is no reliable total DFU count or completion date yet. Touch reporting, HS
 5. Return to iOS while staying on the charger and confirm charging before any Pi attachment. Do not repeat the live Linux charger-to-Pi return.
 
 The exact-kernel module build, 46 imported-symbol checks, 15 tests of the actual policy core, 10 battery-guard cases, syntax checks and pinned-artifact preflight passed. **The control experiment is not yet device tested.** The comparison may only reduce discharge: a higher input-limit setting alone does not establish actual USB input power or net charging. B04C remains open.
+
+Current batch checklist:
+
+- [x] Reuse verified J72 DFU; boot existing image.
+- [x] Save battery baseline; stop desktop/input/root/export cleanly.
+- [x] Load both modules unarmed; verify the original input setting.
+- [x] Owner confirms the new screen and ready/unarmed/unused values.
+- [ ] Wait for battery at or below 95%; arm with all guards passing.
+- [ ] Owner confirms wall attachment, then triggers one Home press.
+- [ ] Compare current response and photograph verified restoration.
+- [ ] Return to iOS on the charger and confirm charging.
+
+These steps use one RAM boot; no extra DFU is needed between them.
