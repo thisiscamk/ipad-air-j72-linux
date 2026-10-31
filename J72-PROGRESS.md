@@ -318,3 +318,16 @@ A fresh RAM boot reused the current kernel and passed automatic input/desktop st
 The exact-board observer loaded and read all 18 permitted registers. The initial Pi snapshot reports input-suspend bit 2 clear at `0x0010`, input-limit code `0x02` at `0x04c0` (about 100 mA nominal), and `0x3f` at active battery-current register `0x04c6` and both ceiling registers `0x04c7`/`0x04ce`. The latter codes correspond to 3,150 mA settings, **not measured charging current**. The RAM-only baseline remained about −741 mA, 4.07 V, 91% and 34.6°C.
 
 The visible recorder now includes raw PMIC fields. The owner has been asked to check that block is readable, then photograph it after about one and five minutes on the usual wall charger. That comparison is pending; the low Pi input setting alone does not establish the cause of the earlier wall discharge or the wall source's capability. No charger settings, ADC controls, charge timers or GPIOs were changed, and no serial connection or Home recovery is part of this trial. Return to iOS on the charger before any Pi attachment remains required.
+
+### Wall comparison received: 100 mA input-limit setting persists
+
+The owner supplied the PMIC-screen photos and explicitly confirmed both were on the wall charger. The displayed sample times are 277.17 and 381.51 seconds, an interval of 104.34 seconds; these are two observations, not a verified five-minute interval. The corresponding PMIC timestamps advance as well.
+
+| Observation | Battery | Voltage | Current | Temperature |
+| --- | --- | --- | --- | --- |
+| First wall photo | 89% | 4,056 mV | −742 mA | 34.5°C |
+| Second wall photo | 87% | 4,050 mV | −743 mA | 34.6°C |
+
+All 18 observed PMIC values match the Pi baseline, including `0x0010 = 0x00`, `0x04c0 = 0x02`, and `0x04c6`/`0x04c7`/`0x04ce = 0x3f`. Thus the nominal 100 mA input ceiling persisted on the wall charger while input suspend was clear and the battery-current setting remained nonzero. The latter is a setting, not measured battery charge current. The screen's USB `configured` value is not source-capability evidence.
+
+This makes input-current policy/source detection the concrete next investigation. It does not yet establish that changing the ceiling will restore net charging, and actual USB input power has not been measured. No register setting was changed. The owner has been asked for the charger's output rating and to return to iOS while staying on the wall charger; those replies are pending. The next control experiment must use a bounded limit, telemetry checks and verified restoration, selected for the known source.
