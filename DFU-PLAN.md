@@ -208,3 +208,20 @@ These steps completed in **one RAM boot**. No host kernel or internal-storage ch
 - [ ] Qualify USB recovery and later full-desktop charging/cable regression; do not return live Linux from wall to Pi before that path is resolved.
 
 No next test image or DFU is requested yet.
+
+## Added priority: charging with the Pi data link attached
+
+See [the Pi charging plan](PI-CHARGING-PLAN.md). Audit the source and host USB
+budget before the next current test. A separate powered charging/data hub
+may be required: ordinary USB 2 standard-port allocation is at most 500 mA,
+and the attached SSD declares 896 mA against the Pi 4's shared 1.2 A budget.
+The wall-only 850 mA trial must not be run unchanged on a direct Pi port.
+
+- [x] Static gadget/PHY/current-request audit and host descriptor inventory.
+- [ ] Confirm Pi supply and any powered hub; select a qualified source.
+- [ ] Prepare one guarded RAM boot for live USB configuration/current-path
+  checks, a source-limited test and stable-data measurements.
+- [ ] Qualify sustained charge and desktop operation without cable moves.
+
+This work precedes another longer wall-only test where practical. No new
+DFU is requested until a concrete source-qualified test is ready.
