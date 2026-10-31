@@ -347,3 +347,21 @@ Success in this comparison means acknowledged setting change, a measured battery
 The existing DFU connection was verified as J72 and reused without another button sequence. The unchanged RAM image passed automatic desktop startup. Battery telemetry initially reported 100%, about 4.06–4.08 V, 34.5°C and negative battery current. Desktop/root, input and NBD export stopped cleanly: 2,362 emitted frames, zero layout rejects, SPI errors, timeouts or recoveries, and successful firmware health/hardware restoration.
 
 Both diagnostic modules loaded successfully. The new module reported ready, unarmed and unused, and readback retained the original nominal 100 mA input setting. The owner confirms those values are visible on the comparison screen. No charger control has been written. The same RAM boot is waiting for the battery to enter the test's maximum 95% guard before arming; the current-change and restoration sequence remains untested. One transient descriptor error at USB attachment recovered without a reset. Serial access and live Linux charger-to-Pi return are still excluded.
+
+### Wall control test: 425 mA acknowledged, discharge reduced, restoration verified
+
+After the pause, the same RAM boot remained healthy at 83% and 35.7°C. The stopped recorder's files were preserved, its pinned RAM script restarted, and arming passed without changing the original input setting. The owner moved to wall power and confirmed the screen's uptime continued advancing. One physical Home press triggered the single trial. Active-phase photographs show the 425 mA input-limit code and an active trial; the kernel message also reports successful setting verification.
+
+The final photograph retains the comparison:
+
+| Phase | Nominal USB input-limit setting | Battery current |
+| --- | --- | --- |
+| Before trial | 100 mA | −764 mA |
+| During trial | 425 mA | −423 to −400 mA across 12 retained samples |
+| After automatic restoration | 100 mA | −767 mA |
+
+The final screen reports `used=1`, `active=0`, `restored=1`, `restore_failed=0`, `error=0`, with actual input-register readback back at the original code. It also shows 78%, 3.955 V and 35.3°C. The exact restoration instant was not photographed; the module's completion state and the independent register snapshot verify the restored result. The complete wall RAM log was not retrieved.
+
+This reversible response supports a substantial input-limit contribution to the discharge: its magnitude fell by approximately 45–48% during the trial. It does not measure actual USB input current. **Net battery current remained negative throughout the retained samples, so Linux charging has not passed.** No higher-current step, charge-timer reset, GPIO/ADC change, battery NVM operation or internal-storage write was performed.
+
+The owner returned to iOS while keeping the iPad on the charger and confirmed iOS is visible and charging. The next experiment requires a USB source with a readable output rating before selecting a higher bounded setting. The powerboard's blurred label remains unconfirmed. Charging policy/source detection, sustained net charging and the later desktop regression remain open.

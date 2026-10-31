@@ -4,7 +4,7 @@
 - [x] B02: Linux multitouch slots, evdev and visual orientation passed (owner target/trace confirmation; 21 matched presses/releases). Compositor/libinput, touch menus and launching Foot now pass. Keyboard text entry and the top-bar toggle now pass too. Window dragging also passes. Native Home also opens and closes the menu without the earlier bridge. No new DFU requested.
 - [x] B03: automatic self-check, full cleanup, touch restart and read-only desktop startup passed. The owner confirmed repeated keyboard hide/tap/type after the combined image's fresh boot.
 - [ ] B04: brightness, Linux power-supply registration/readings and the corrected remaining/full capacity pairing passed. A fresh iOS comparison and battery UI remain; battery-health estimates are unqualified.
-- [ ] B04C: live battery/PMIC screen readings passed. The latest owner-confirmed wall photos show the nominal 100 mA input-limit setting unchanged from the Pi, with input suspend clear and continued discharge near −743 mA. Next: one fixed 425 mA / 30-second input-limit comparison, with battery checks and automatic restoration to 100 mA. Offline preparation passed; device testing is pending. iOS charging is confirmed; the powerboard USB rating remains unconfirmed, so no higher-current step is enabled. Serial recovery and the earlier host hang remain open. This precedes Wi-Fi.
+- [ ] B04C: battery reporting and the visible PMIC observer passed. One wall-charger 425 mA control test reduced battery discharge from −764 mA to −423…−400 mA; automatic restoration to the original 100 mA setting was verified, with −767 mA afterward. Net charging remains unproven. Next: source qualification, a bounded higher-limit comparison, charging policy/protections and sustained charging. Serial recovery and the earlier host hang remain open. This precedes Wi-Fi.
 - [ ] B05–B11: Wi-Fi, persistence/Bluetooth, charging regression with the desktop, audio/rotation, power/remaining hardware, integrated use.
 - [ ] B12–B15: storage read-only qualification, installer rehearsal, separately authorized installation, installed-system verification.
 
@@ -178,8 +178,14 @@ Current batch checklist:
 - [x] Load both modules unarmed; verify the original input setting.
 - [x] Owner confirms the new screen and ready/unarmed/unused values.
 - [x] Wait for battery at or below 95%; arm with all guards passing. The owner paused before the wall move; the test was disarmed without a control write. The same boot later resumed at 83%, the recorder restarted, and arming passed again with the original input setting unchanged.
-- [ ] Owner confirms wall attachment, then triggers one Home press.
-- [ ] Compare current response and photograph verified restoration.
-- [ ] Return to iOS on the charger and confirm charging.
+- [x] Owner confirms wall attachment, then triggers one Home press.
+- [x] Compare current response and photograph verified restoration: 12 trial samples at −423…−400 mA versus −764 mA before; final `restored=1`, `restore_failed=0`, `error=0` and original input-limit readback.
+- [x] Return to iOS on the charger and confirm charging.
 
 These steps use one RAM boot; no extra DFU is needed between them.
+
+### Next charging DFU: source qualification first
+
+The single 425 mA comparison is complete. The iPad is back in iOS and charging. Before preparing another DFU, obtain a clearly readable output rating for a separate USB charging source. The current powerboard's rating remains unconfirmed. No unchanged repeat or higher-current test on that unconfirmed source is planned.
+
+Once source capability is established, select and prepare one bounded next setting with battery checks, a fixed timer, independent restoration and visible retained results. Reuse the verified policy core while preserving the successful 425 mA artifacts. Confirm the source information and complete offline checks before requesting the next physical DFU. Sustained positive battery current and charge-level trend, source policy/protections and desktop charging regression remain required for B04C.
