@@ -2,7 +2,7 @@
 
 Progress report as of 31 October 2026. This is a hardware bring-up report for one iPad, not a general installation guide or an Orchard hardware profile.
 
-**Latest:** the corrected D2089 analog enable (`0x84: 0x00 → 0x07`, preserving voltage setting `0x398 = 0x14`) produced real native finger reports during owner gestures. Of 1,801 checksum-valid native `0x44` frames, 542 contained one finger and 50 contained two. The decoded stream has nine matched press/release lifecycles, coordinates covering most of the panel, and no contacts remaining at the end. No malformed layouts, SPI errors or dropped records occurred; final firmware health, zero global status flags and full hardware restoration passed. Linux evdev, visual orientation and desktop interaction are still to be qualified.
+**Latest:** the corrected D2089 analog enable (`0x84: 0x00 → 0x07`, preserving voltage setting `0x398 = 0x14`) produced real native finger reports during owner gestures. Of 1,801 checksum-valid native `0x44` frames, 542 contained one finger and 50 contained two. The decoded stream has nine matched press/release lifecycles, coordinates covering most of the panel, and no contacts remaining at the end. No malformed layouts, SPI errors or dropped records occurred; final firmware health, zero global status flags and full hardware restoration passed. Linux evdev and visual orientation have since passed an owner target/trace test, including multiple fingers and 21 matched presses/releases. Desktop interaction remains to be qualified.
 
 ## Device and approach
 
@@ -200,3 +200,10 @@ A working related A7 iPad mini 2 implementation supplied a lead: its D2089 analo
 The short idle control produced 237 valid empty native frames and passed health/cleanup. The subsequent owner gesture capture produced 1,801 valid native frames: 1,209 empty, 542 one-finger and 50 two-finger. Active native coordinates ranged x=447–13,858 and y=672–18,924. There were nine down transitions and nine matching up transitions, ending empty. The 150 rejected data transactions were not passed to the contact decoder; no SPI transfer errors or capture loss occurred.
 
 This qualifies actual contact detection in the diagnostic path. It does not yet qualify a Linux touchscreen, visual coordinate orientation, a persistent driver or a cold integrated boot. Those are the immediate next steps, using this same RAM session where possible. All firmware, calibration, raw captures and identifying logs remain local.
+
+
+### Linux input and visual mapping confirmed
+
+A guarded RAM module now registers a direct Linux multitouch device with ten slots. Its decoder checks the complete native layout before emitting events, handles the observed 30-byte stride, inverts native Y using the validated J72 surface bounds, and releases absent contacts. A frame timeout releases outstanding slots. The same C decoder accepted all 1,801 captured reports and rejected malformed-layout test cases with undefined-behavior/bounds instrumentation enabled.
+
+The first integration trial stopped on its diagnostic three-invalid-reply guard; firmware health and full hardware cleanup passed. A distinct bounded recovery trial releases contacts and checks firmware health, zero global flags and the active report gate before continuing, with a strict recovery limit. The visual test then recorded 21 presses and 21 releases, including simultaneous contacts. The owner confirmed that all targets and traces worked at the correct on-screen positions. This qualifies Linux input and screen mapping in the live RAM session. Compositor interaction, keyboard entry and integrated cold boot remain separate checks.

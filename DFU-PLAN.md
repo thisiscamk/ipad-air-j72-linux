@@ -1,7 +1,7 @@
 # Current checkpoint — 31 October 2026
 
 - [x] B01: real native one- and two-finger contacts, matched presses/releases, firmware health and full cleanup. Corrected analog enable is `0x07`; voltage setting is unchanged.
-- [ ] B02: Linux multitouch slots, visual orientation, evdev/libinput, desktop taps/drags and keyboard. Preparing in the current RAM boot; no new DFU requested.
+- [ ] B02: Linux multitouch slots, evdev and visual orientation passed (owner target/trace confirmation; 21 matched presses/releases). Next: compositor/libinput, desktop taps/drags and keyboard in this RAM boot. No new DFU requested.
 - [ ] B03: integrated driver and independent cold-start confirmation.
 - [ ] B04–B11: battery/display, Wi-Fi, persistence/Bluetooth, charging, audio/rotation, power/remaining hardware, integrated use.
 - [ ] B12–B15: storage read-only qualification, installer rehearsal, separately authorized installation, installed-system verification.
