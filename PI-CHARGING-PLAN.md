@@ -1,3 +1,34 @@
+# 1 November: brief net charging with hub data; pack guard stopped trial
+
+The source-qualified nominal **1,250 mA / 30-second** comparison started in
+the working #33 RAM image after direct boot and controlled transfer to the
+powered JCH377 marked charging/data port. The host continuously verified the
+qualified USB port and renewed a 2.5-second lease. USB data stayed available.
+
+- Baseline battery current: **−771 mA**.
+- RAM recorder readings during the short active interval: **+373, +368 and
+  +201 mA**, with voltage **4.196, 4.200 and 4.200 V**.
+- The worker stopped after **5.43 seconds**, reporting `-ERANGE` from its pack
+  guard. The original worker did not record which pack field failed. The
+  voltage boundary is a hypothesis supported by the recorder, not a proven
+  identification of the exact failed reading.
+- Automatic restoration passed: inactive, disarmed, `restored=1`,
+  `restore_failed=0`, and independent `0x04c0=0x02` readback.
+- The first five seconds are excluded from retained worker statistics;
+  **zero retained worker samples** passed before the stop. The five-minute
+  1,250 mA trial remains **blocked**. Brief positive recorder readings do not
+  establish sustained charging.
+
+A separate **1,050 mA / 30-second** comparison is staged unarmed in the same
+RAM boot. It retains the same source, voltage, temperature, SOC, current and
+rollback guards and records the exact failed guard values. No safety bound
+has been raised. Hardware qualification is pending.
+
+The #33 target kernel cannot unload modules. The completed 1,250 mA worker
+remains resident, disarmed and permanently used; the new worker has a distinct
+module identity. A planned same-name module replacement was refused before
+any hardware change. Future batch planning must account for this constraint.
+
 # Charging while connected to the Pi
 
 ## 31 October: powered-hub trial completed; back in iOS

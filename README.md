@@ -10,7 +10,7 @@ The present desktop uses software rendering and a read-only Arch Linux ARM files
 
 Private firmware, device calibration, identifying logs, and local disk images are intentionally excluded.
 
-**Latest charging milestone:** the powered-hub 850 mA / 30-second trial retained live USB data and reached **−10…+37 mA** battery current, from −773 mA baseline. Rollback passed; sustained charging remains unqualified. The iPad is back in iOS and reports charging on the same hub. See the [current result](PI-CHARGING-PLAN.md#31-october-powered-hub-trial-completed-back-in-ios).
+**Latest charging milestone:** with hub USB data live, the 1,250 mA comparison briefly produced **+373 / +368 / +201 mA** battery-current readings, then a pack guard stopped it after **5.43 seconds**. Restoration passed. Sustained charging remains unqualified; a lower 1,050 mA comparison with precise guard diagnostics is staged. See the [current result](PI-CHARGING-PLAN.md).
 
 **Working source:** [code/](code/) now contains the measured SPI driver, touch worker and decoder, HDQ battery frontend, bounded charging diagnostics, desktop changes and offline tests. Private firmware/calibration are supplied separately. [Native Orchard integration work](code/UPSTREAM-PLAN.md) remains before resubmission.
 
@@ -20,7 +20,7 @@ Private firmware, device calibration, identifying logs, and local disk images ar
 
 **Earlier USB recovery issue:** the earlier wall-charger recording was lost when USB failed on return to the Pi and the owner subsequently reported a Pi hang. The revised image now displays live battery readings on screen, confirmed by the owner. Two Home-button USB rebinds enumerated without new host USB errors. Network access recovered, but serial access failed after the first rebind and network access subsequently stopped too. A second rebind restored sustained network access without opening serial. This is partial recovery, with the cause unresolved. **That earlier session showed no Linux wall charging**; the wall observation below shows net discharge. The Pi kernel and original desktop image are unchanged, and battery-health estimates remain unqualified.
 
-**Next tests:** a source-qualified 1.25 A charging comparison, with USB-state and expiring-host-lease guards, plus an internal EHCI capability check are prepared for the next RAM boot. Matching BCM4324B5 Wi-Fi firmware inputs are extracted privately. The [current checklist](DFU-PLAN.md#power-and-wi-fi-work-queue--1-november) tracks charging and Wi-Fi; neither sustained charging nor Wi-Fi networking is qualified yet.
+**Next tests:** finish guarded hub charging, then internal HSIC/WLAN sequencing and enumeration. The read-only EHCI capability check passed with power-domain restoration; this establishes controller access, not WLAN enumeration. Matching BCM4324B5 firmware inputs remain private, and a separate Wi-Fi kernel build is running. See the [current checklist](DFU-PLAN.md#power-and-wi-fi-work-queue--1-november).
 
 **Wall-charger result:** the owner confirmed both supplied photos were taken on the wall charger. They show 88% → 86%, 4.046 → 4.037 V and −743 / −746 mA over 161 seconds: **net discharge in this Linux session**. The cause remains unresolved; no charger controls were changed. The desktop/input/export had been stopped and Home recovery disabled. The owner has since confirmed iOS is visible and charging on the wall charger.
 

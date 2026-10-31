@@ -8,7 +8,7 @@
 - [ ] B05–B11: Wi-Fi, persistence/Bluetooth, charging regression with the desktop, audio/rotation, power/remaining hardware, integrated use.
 - [ ] B12–B15: storage read-only qualification, installer rehearsal, separately authorized installation, installed-system verification.
 
-**Current session:** normal iOS reports 100% on the powered hub. The changed charging/EHCI batch has passed offline preparation; direct Pi DFU is requested. Automatic charger detection and Wi-Fi remain unqualified.
+**Current session:** Linux #33 remains running on the powered hub with USB data. Read-only EHCI capabilities and power-domain restoration passed. The 1,250 mA comparison briefly charged but stopped on a pack guard after 5.43 seconds; restoration passed, sustained qualification did not. The lower 1,050 mA comparison with precise guard diagnostics is staged unarmed in the same RAM boot.
 
 ## Power and Wi-Fi work queue — 1 November
 
@@ -18,15 +18,15 @@
 - [x] Prepare a separate fixed 1,250 mA / 30-second charging worker with the existing battery guards, a 250 ms USB-state check and a host-renewed source lease expiring in 2.5 seconds.
 - [x] Prepare a separate five-minute variant, gated on verified positive short-test samples and restoration.
 - [x] Prepare an EHCI capability diagnostic using the existing Linux power-domain owner and a temporary node; no radio, PHY, GPIO or PMIC programming.
-- [ ] Boot directly from the Pi; qualify EHCI capabilities and domain restoration, then use the proven controlled transfer to the hub.
-- [ ] Run the short charging comparison; verify net current, USB continuity, lease behavior and restoration.
+- [x] Boot directly from the Pi; qualify EHCI capabilities and domain restoration, then use the proven controlled transfer to the hub. EHCI 1.0 / three ports read successfully; domain restored. The observer code remains resident because module unloading is disabled.
+- [ ] Complete the short charging comparison: 1,250 mA produced brief positive recorder readings with data live but aborted on a pack guard; restoration passed. The lower 1,050 mA candidate preserves all bounds and adds exact guard telemetry.
 - [ ] If the short test passes, measure sustained charging in the same RAM boot.
 - [ ] Implement and qualify autonomous J72 source detection, fault handling and source withdrawal; host-qualified experiments are an interim step.
 - [ ] Implement internal HSIC/WLAN power, clock and reset sequencing; enumerate the actual USB device before selecting its transport changes.
 - [ ] Start matching Wi-Fi firmware/driver, then test scan, association, DHCP, DNS, traffic and reconnects.
 - [ ] Qualify Wi-Fi SSH and combined desktop/charging operation, followed by power-saving and suspend/resume checks.
 
-The next batch uses the existing #33 RAM image. The EHCI diagnostic checks controller accessibility only; it does not establish WLAN enumeration. The current kernel has wireless support disabled, so a later isolated target build may still require another DFU.
+The current batch uses the existing #33 RAM image. The EHCI diagnostic checks controller accessibility only; it does not establish WLAN enumeration. The current kernel has wireless support disabled, so a later isolated target build may still require another DFU.
 
 Earlier zero-contact results below are historical. The corrected-power gesture test now passes B01.
 
