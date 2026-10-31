@@ -52,13 +52,15 @@ The completed boot's test sequence was:
 
 **Remaining battery work:** a fixed read-only audit showed that the compensated remaining/full pair agrees with the gauge percentage, while Linux's exported `charge_now` uses uncompensated capacity. Correct that pairing and compare with iOS before displaying health estimates. Signed UPower packages remain staged; their UI trial is deferred. The current image performs no battery NVM or charger-control writes. No iPad storage write is authorized.
 
-### Prepare before the next charging attempt
+### Revised next DFU prepared: capacity and recoverable observation
 
-- Correct the exported remaining/full capacity pairing and retain the working image as a fallback.
-- Reduce verbose per-transfer SPI logging so startup and USB diagnostics remain available.
-- Show the RAM recorder's readings on the iPad as well as retaining its log, allowing an owner photo or reading if USB cannot return.
-- Prepare a bounded local USB-recovery action, guarded by desktop/root/export teardown. Qualify it while still attached to the Pi before another charger transition; it is an untested recovery candidate.
-- Capture host and target USB diagnostics before a transition. Keep the Pi kernel unchanged. Request another charged DFU only once the concrete revised test is built and checked.
+- The revised target kernel pairs compensated remaining/full capacity on J72. The previous working image is retained as a fallback.
+- An 8 MiB RAM kernel log retains startup and USB evidence. The proven SPI transfer code and its register accesses are unchanged.
+- The manual RAM recorder shows voltage, current, temperature and percentage, with green/red backgrounds for positive/negative battery current. It also retains the full RAM log.
+- A local Home press/release may request a guarded USB gadget rebind, at most three separate requests. Desktop, NBD and input must already be stopped. This is an **untested recovery candidate**, not a demonstrated USB fix.
+- The kernel, rebuilt touch module and diagnostic assets are packaged. Six capacity-selection cases, eleven Home-event cases, wrong-host refusal, shell checks and pinned-artifact preflight passed. Device qualification remains open.
+
+In the next charged session, first qualify the visible readings and one Home recovery **while still attached to the Pi**. Capture host/target diagnostics before that action. If it fails, stop the batch. If it passes, observe the wall charger from the screen and take readings/photos at intervals. Return the iPad to iOS while it is still on the wall charger **before another Pi connection**; do not repeat the live Linux charger-to-Pi return in this trial. USB/source isolation and the host hang remain separate unresolved work. The Pi kernel stays unchanged.
 
 ## Immediately after battery reporting: B04C charging bring-up
 
@@ -66,7 +68,7 @@ The completed boot's test sequence was:
 2. Audit the exact J72 D2089 charger path, inherited state, USB source detection, current limits and temperature protections. Prepare bounded diagnostics and any required driver changes before hardware testing.
 3. Measure the existing Pi USB arrangement first. Determine whether the battery is gaining charge, discharging more slowly, or still discharging; a connected cable or a charging icon does not establish net charging.
 4. Prepare a recorder and all its dependencies in RAM. Stop the desktop, unmount its root and detach the host export before asking the owner to switch to a wall charger. Wi-Fi is not a prerequisite for this RAM-only trial.
-5. Record charger attach/detach and sustained operation, then reconnect USB data and collect the RAM log. If charging requires driver work, qualify the documented control sequence with limits, fault handling and recovery before repeating the measurement.
+5. Record charger attach/detach and sustained operation. For the next trial, use the visible readings/photos and return to iOS on the wall charger before connecting to the Pi; live Linux USB return is not yet qualified. If charging requires driver work, qualify the documented control sequence with limits, fault handling and recovery before repeating the measurement.
 6. Pass only with measured net charging over a useful interval, a consistent charge trend, temperature/current within the qualified limits, stable Linux operation and successful recovery of USB debugging and iOS.
 
 Reuse the battery-test RAM boot when possible. New kernel/DT requirements may need another DFU; this milestone is not a promise of one boot. B08 remains a later regression of charging and cable transitions with the full desktop and a proven independent root/debug path.

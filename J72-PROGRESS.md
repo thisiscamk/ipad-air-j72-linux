@@ -275,3 +275,11 @@ A fixed read-only audit through the bound kernel transport explained the capacit
 Final touch cleanup passed after 12,404 emitted frames, with zero SPI errors, timeouts or recoveries. One checksum-valid contact-state-1 layout was refused and retained for review; its meaning remains unassigned. The desktop/root unmounted, NBD detached and host export stopped normally before cable changes.
 
 A recorder then ran entirely from RAM to observe the wall charger. USB descriptor requests failed when the device returned to the Pi. The owner subsequently reported a Pi hang during the cable/port change and restarted the host. The wall-charger log was not retrieved, and the preceding host crash journal is unavailable. **This does not establish Linux charging or its failure; charging and USB reconnection remain unresolved.** The next test needs visible readings and local recovery in addition to RAM logging. No charger-control, battery-NVM or internal-storage write was made.
+
+### Revised diagnostic image prepared
+
+A new target-kernel image now selects compensated remaining capacity for this exact J72/BQ27545, pairing it with compensated full capacity. Six tests of the actual C selection branch cover J72 and preserved behavior on other chips/boards. The RAM kernel log grows from 128 KiB to 8 MiB to retain startup evidence; the working SPI code and register accesses are unchanged.
+
+Manual diagnostic tools now display battery readings and current-sign colours on the active text console, retain the RAM log and offer at most three separately requested Home-button USB rebinds after full desktop/NBD/input teardown. Eleven tests cover the actual Home-event decoder, and the static helper refuses the non-J72 host. The kernel/module build, shell checks and full artifact preflight passed. **The visible console and recovery action are not yet device tested.** The recovery candidate is not evidence that the USB or Pi-hang problem is fixed.
+
+The next wall-charger observation will use screen readings/photos and return to iOS while still on the charger before another Pi connection. Live Linux USB return, charger policy/limits and the cause of the host hang still need qualification. The Pi kernel and original desktop image remain unchanged.
