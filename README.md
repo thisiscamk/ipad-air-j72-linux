@@ -10,7 +10,6 @@ The present desktop uses software rendering and a read-only Arch Linux ARM files
 
 Private firmware, device calibration, identifying logs, and local disk images are intentionally excluded.
 
-**Current session:** automatic touch self-check, full cleanup, restart and read-only desktop startup passed on the device. A longer touch cycle also stopped cleanly, and the same worker restarted without DFU. The keyboard now uses automatic text focus; its revised startup package still needs an independent cold confirmation. Native Home opens/closes the menu, and the owner confirmed a three-second brightness dim followed by restoration. Battery telemetry, charging and Wi-Fi remain unqualified.
+**Latest session:** UART5 now communicates with the battery gauge. Three voltage reads returned 3.824 V; the gauge identified as BQ27545 and returned charge level, temperature, current and cycle data. Charging remains untested. A touch status-query failure was diagnosed and a revised worker restored input without DFU; it then emitted 11,708 frames and passed final health/cleanup. The owner confirmed repeated keyboard hide/tap/type with a small Foot patch. The desktop and read-only root were shut down cleanly.
 
-
-**Next DFU prepared:** cold confirmation of automatic keyboard behavior, then UART5 registration and one bounded battery-voltage read trial. The exact-board device-tree change preserves the kernel; no battery commands run automatically. The reader has passed offline protocol and timeout checks. Actual battery communication is still untested.
+**Next build in progress:** integrate the gauge with Linux's battery interface and combine the Foot patch with bounded touch status-read retries. These changes still need independent cold qualification. The iPad has been asked to reboot to iOS for charging; no next DFU has been requested.

@@ -3,7 +3,7 @@
 - [x] B01: real native one- and two-finger contacts, matched presses/releases, firmware health and full cleanup. Corrected analog enable is `0x07`; voltage setting is unchanged.
 - [x] B02: Linux multitouch slots, evdev and visual orientation passed (owner target/trace confirmation; 21 matched presses/releases). Compositor/libinput, touch menus and launching Foot now pass. Keyboard text entry and the top-bar toggle now pass too. Window dragging also passes. Native Home also opens and closes the menu without the earlier bridge. No new DFU requested.
 - [ ] B03: automatic self-check, full cleanup, touch restart and read-only desktop startup passed a fresh boot. Same-worker reuse also passed. Revised automatic keyboard startup still needs independent cold confirmation.
-- [ ] B04: visible brightness dim/restore passed. Battery gauge telemetry remains open.
+- [ ] B04: brightness dim/restore and UART5 gauge transport passed. BQ27545 identity, voltage, charge level and temperature now read in RAM. Linux power-supply integration, iOS comparison and charging qualification remain open.
 - [ ] B05–B11: Wi-Fi, persistence/Bluetooth, charging, audio/rotation, power/remaining hardware, integrated use.
 - [ ] B12–B15: storage read-only qualification, installer rehearsal, separately authorized installation, installed-system verification.
 
@@ -25,30 +25,31 @@ Updated 31 October 2026. This is a work queue for this exact J72, not a promise 
 - Request a new boot when a kernel/DT/loader change or an independent cold-start check actually needs it.
 - Record a physical screen/gesture/charger check only when the owner performs it. An automated protocol check is not a substitute.
 
-## Completed in this boot
+## Latest boot results
 
-- Automatic touch self-check, full cleanup, restart and read-only desktop startup passed.
-- Owner checks passed: menus, window dragging, on-screen typing/reopening, keyboard icon, native Home open/close, and visible brightness dim/restore.
-- A longer cycle and another same-boot restart passed. The final cycle emitted 38,237 frames with zero layout rejects, timeouts, recoveries or SPI errors; common rejected wire replies remained filtered. Final firmware health and full cleanup passed.
-- Desktop teardown exposed an executable-symlink check issue; it was fixed and verified in this boot. The original root was unmounted, NBD detached and the host export stopped.
+- Automatic touch self-check, cleanup, restart and read-only desktop startup passed.
+- UART5 registered and the bounded voltage trial returned three matching 3.824 V samples. The gauge identified as BQ27545 (`0x0545`); charge, temperature and cycle data also read successfully.
+- Touch stopped on a stale C8 status-query reply. Final health and hardware restoration passed. A revised worker with bounded strict retries restored input in this same boot, then emitted 11,708 frames and stopped cleanly.
+- The owner confirmed keyboard hide → tap → type twice in patched Foot; logs independently recorded the tap requests. Combined cold qualification remains open.
+- Desktop/root unmounted, NBD detached and the owned export stopped. Normal iOS reboot requested for charging.
 
-## Next DFU: keyboard cold confirmation and first battery voltage trial
+## Next DFU being prepared: Linux battery interface plus input fixes
 
-The next private image adds the exact J72 UART5 description to the device tree. It preserves the kernel and includes the automatic keyboard mode and corrected teardown script. UART5 is absent from the running tree used in the completed boot, so this test needs a fresh boot. No battery command runs automatically.
+A target-kernel build is being prepared for the existing HDQ/UART frontend and two-stop-bit serdev API, adapted to verified J72 wiring and BQ27545 identity. The Pi kernel stays unchanged. The image will also package the Foot tap fix and bounded touch status retries. No new DFU is requested until the build and checks finish.
 
-1. Verify exact J72 identity and pinned image, then boot the integrated touch/desktop session.
-2. Confirm automatic startup and the revised keyboard behavior without live repairs.
-3. Inspect UART5 registration at its exact J72 address/interrupt and confirm external USB debugging still works.
-4. Take a passive pad/domain snapshot. Refuse the voltage trial unless the inherited GPIO44 state and UART5 tty provider match the verified guards; leave the separate PMU GPIO control untouched.
-5. Run one bounded diagnostic for three voltage samples. It sends only the two voltage register read addresses, checks command echo and response layout, and restores/readback-checks UART settings. No gauge reset, Control subcommand, firmware or data-flash write is implemented.
-6. If successful, use this same boot to prepare further read-only telemetry checks. Voltage alone does not identify the exact gauge or qualify battery reporting or charging. A failed trial saves its evidence and stops without automatic retries.
-7. Finish with orderly desktop/root teardown, touch health/restoration checks and a return to iOS.
+1. Verify exact J72 identity and pinned artifacts, then boot the combined image.
+2. Check the battery driver identifies `0x0545` and registers a Linux power supply; keep both USB debug paths available.
+3. Read voltage, temperature, charge level and current repeatedly. Compare with the prior bounded UART results and an iOS baseline; preserve uncertainty about capacity interpretation.
+4. Confirm automatic touch/desktop startup and repeated keyboard hide/tap/type without live repairs. Exercise Home, dragging, release behavior and the existing brightness control.
+5. Qualify the combined run with bounded status-read recovery, no stuck contacts or unexpected device loss, and full final hardware restoration.
+6. Continue further telemetry and desktop work in that boot when the checks pass. Charging remains a separate cable-transition test after the root/debug path is independent of active USB-backed files.
+7. Stop desktop/input, export evidence, detach the root/export and return to iOS.
 
-**Offline readiness:** the new DT variant changes only the UART5 node and a reference to its existing power domain; all original properties compare byte for byte. The actual reader passes 256 encode/decode cases and pseudo-terminal tests for leading noise, bad echo, malformed or short responses, disallowed commands and bounded timeouts with runtime bounds checks. Its loader/self-test and wrong-controller refusal also passed in the existing Arch RAM environment without opening a UART. The first real UART5/HDQ result remains pending.
+**Current preparation:** UART transport and identity have passed on the device; the proper Linux battery frontend and the newly packaged input fixes remain untested together. No battery NVM, charger control or iPad storage write is authorized by this plan.
 
 ## Subsequent DFUs and dependencies
 
-- **B04:** finish exact J72 HDQ pin/clock validation, build the read-only gauge path, compare plausible battery readings with iOS and qualify backlight controls. Brightness passed. The UART5 DT variant and bounded voltage-only diagnostic are built and checked; actual gauge communication remains untested.
+- **B04:** finish exact J72 HDQ pin/clock validation, build the read-only gauge path, compare plausible battery readings with iOS and qualify backlight controls. Brightness and actual UART5 gauge communication passed. The Linux battery frontend is being prepared; charging remains untested.
 - **B05–B06:** build and qualify the A7 internal HSIC/EHCI bus, enumerate the WLAN device, then validate matching firmware and the USB driver protocol, association and traffic. These are separate risks and may need several boots.
 - **B07–B11:** host persistence and Bluetooth, measured charging/cable changes, audio and rotation, power and remaining hardware, then integrated daily-use tests. Reuse a boot for userspace and runtime changes wherever possible.
 - **B12–B15:** only after the required hardware/usability gates: storage read-only qualification, installer rehearsal, a separately authorized installation, then cold installed-system and recovery checks. No internal-storage write is currently authorized.
