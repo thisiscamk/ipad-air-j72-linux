@@ -61,7 +61,7 @@ The current driver correction starts every explicit transfer before queuing byte
 
 ## 3. Bring up platform services individually
 
-- Establish battery reporting and safe charging under Linux. The Pi USB port has not provided reliable charging in these experiments.
+- Qualify Linux battery reporting, then prioritize charging bring-up before Wi-Fi (B04C in the DFU plan). Measure net battery current and charge trend; audit the J72 charger path and qualify any driver changes. Use a RAM-only recorder for wall-charger tests after detaching the USB-backed desktop. The current battery image adds reporting; Linux charging remains unproven.
 - Bring up Wi-Fi and Bluetooth using the J72 buses, power controls and required firmware. Keep USB networking available for recovery.
 - Qualify audio, brightness, cameras, cellular, GPU acceleration and suspend separately. There is no evidence yet that all will be available.
 
