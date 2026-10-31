@@ -1,9 +1,10 @@
 # Current checkpoint — 31 October 2026
 
 - [x] B01: real native one- and two-finger contacts, matched presses/releases, firmware health and full cleanup. Corrected analog enable is `0x07`; voltage setting is unchanged.
-- [ ] B02: Linux multitouch slots, evdev and visual orientation passed (owner target/trace confirmation; 21 matched presses/releases). Compositor/libinput, touch menus and launching Foot now pass. Keyboard text entry and the top-bar toggle now pass too. Remaining B02 checks: explicit native Home confirmation and window dragging; B03 packages reproducible startup and confirms a fresh boot. No new DFU requested.
-- [ ] B03: next bundle built and checked offline; automatic startup and reusable-worker cold-start confirmation await the next owner DFU.
-- [ ] B04–B11: battery/display, Wi-Fi, persistence/Bluetooth, charging, audio/rotation, power/remaining hardware, integrated use.
+- [x] B02: Linux multitouch slots, evdev and visual orientation passed (owner target/trace confirmation; 21 matched presses/releases). Compositor/libinput, touch menus and launching Foot now pass. Keyboard text entry and the top-bar toggle now pass too. Window dragging also passes. Native Home also opens and closes the menu without the earlier bridge. No new DFU requested.
+- [ ] B03: automatic self-check, full cleanup, touch restart and read-only desktop startup passed a fresh boot. Same-worker reuse also passed. Revised automatic keyboard startup still needs independent cold confirmation.
+- [ ] B04: visible brightness dim/restore passed. Battery gauge telemetry remains open.
+- [ ] B05–B11: Wi-Fi, persistence/Bluetooth, charging, audio/rotation, power/remaining hardware, integrated use.
 - [ ] B12–B15: storage read-only qualification, installer rehearsal, separately authorized installation, installed-system verification.
 
 Earlier zero-contact results below are historical. The corrected-power gesture test now passes B01.
@@ -12,7 +13,7 @@ Earlier zero-contact results below are historical. The corrected-power gesture t
 
 Updated 31 October 2026. This is a work queue for this exact J72, not a promise of a fixed number of DFUs. Each row groups work that can share a RAM boot. A failed hardware milestone can require more boots; working modules and userspace changes should be tested within the existing boot wherever possible.
 
-**Current position:** native multitouch, full-screen mapping, desktop menus, launching Foot, on-screen typing and keyboard show/hide have passed owner checks. The analog enable correction is `0x07`; the voltage setting is unchanged. Linux has returned to iOS and the owner confirms wall charging. The next private RAM bundle is built for automatic startup and a reusable touch worker, with the same kernel as the successful session. It has passed offline checks and has **not yet been tested on the device**.
+**Current position:** native multitouch, full-screen mapping, desktop menus, launching Foot, on-screen typing and keyboard show/hide have passed owner checks. The analog enable correction is `0x07`; the voltage setting is unchanged. The current RAM session passed automatic touch self-check, full cleanup, restart and desktop startup using the same kernel. The owner confirmed menus, window dragging and keyboard reopening/typing after live keyboard changes. A revised keyboard startup bundle is prepared; native Home and visible brightness dim/restore have also passed in this boot.
 
 ## How we will reduce button sequences
 
@@ -24,7 +25,7 @@ Updated 31 October 2026. This is a work queue for this exact J72, not a promise 
 - Request a new boot when a kernel/DT/loader change or an independent cold-start check actually needs it.
 - Record a physical screen/gesture/charger check only when the owner performs it. An automated protocol check is not a substitute.
 
-## Next owner-confirmed DFU: integrated startup and remaining input checks
+## Current boot: integrated startup and remaining input checks
 
 The concrete change is a private initramfs overlay on the exact successful kernel. The original boot image and read-only desktop image are preserved.
 
@@ -36,7 +37,7 @@ The concrete change is a private initramfs overlay on the exact successful kerne
 6. In the same boot, collect the read-only power/display/USB inventory. If the exact backlight interface passes its guards, arrange one visible three-second dim-and-restore check. This begins B04; it does not qualify battery telemetry or charging.
 7. Finish any remaining software work in that boot. On a charging break, stop desktop processes, unmount the read-only root, detach NBD, verify touch cleanup, stop the host export, then reboot to iOS.
 
-**Offline readiness:** the worker compiles for the matching ABI; the C decoder passes all 1,801 earlier captured native reports plus malformed-input checks; six new anomaly-format checks and twenty existing audit checks pass. Boot scripts, the keyboard source/binary, payload and original desktop are pinned. The overlay and reusable worker remain hardware-unverified until this boot.
+**Verification:** the worker compiles for the matching ABI; the C decoder passes all 1,801 earlier captured native reports plus malformed-input checks; six new anomaly-format checks and twenty existing audit checks pass. Boot scripts, the keyboard source/binary, payload and original desktop are pinned. The overlay and reusable worker have now passed hardware startup and same-boot reuse; revised keyboard cold startup remains pending.
 
 ## Subsequent DFUs and dependencies
 
@@ -54,9 +55,9 @@ IDs identify milestones, not a guaranteed one-DFU-per-row schedule. Batches may 
 | Batch | Work within that boot | Pass condition / owner action |
 | --- | --- | --- |
 | **B01 — passed: contact detection** | Corrected the missing shared analog enable. Native one- and two-finger reports, coordinates and matched release lifecycles now pass. | Owner gesture capture, final firmware health and full hardware restoration passed. |
-| **B02 — mostly passed: Linux input** | Linux MT slots, screen mapping, menus, Foot launch, typing and the keyboard toggle passed. | Remaining owner checks: native Home binding and window drag/release. Combine with the next B03 boot. |
-| **B03 — next: integrated cold start** | Private reusable worker, anomaly buffers, automatic startup, keyboard and read-only desktop scripts are built and checked offline; same kernel preserved. | Next owner-confirmed DFU must pass automatic start/stop/restart and the full desktop checks. No device pass is claimed yet. |
-| **B04 — battery and display controls** | Bring up the J72 UART5/HDQ gauge using exact board wiring; begin with identification and telemetry. Read brightness through the existing PMIC backlight driver, then test bounded changes and restore the starting value. | Plausible battery voltage, temperature, state of charge and current; compare with an iOS baseline. Owner confirms brightness changes. Battery reporting alone does not establish charging. |
+| **B02 — passed: Linux input** | Linux MT slots, screen mapping, menus, Foot launch, typing and the keyboard toggle passed. | Window dragging and native Home menu open/close passed. |
+| **B03 — partly passed: integrated cold start** | Automatic self-check, full cleanup, touch restart and desktop startup passed a fresh boot; a longer cycle and another same-boot restart also passed. | Confirm the revised automatic keyboard startup independently after a later cold boot; verify final desktop teardown and return to iOS. |
+| **B04 — partly passed: battery and display controls** | Owner confirmed PMIC brightness dim/restore. Bring up the J72 UART5/HDQ gauge using exact board wiring; begin with identification and telemetry. Read brightness through the existing PMIC backlight driver, then test bounded changes and restore the starting value. | Plausible battery voltage, temperature, state of charge and current; compare with an iOS baseline. Owner confirms brightness changes. Battery reporting alone does not establish charging. |
 | **B05 — Wi-Fi bus and device** | Qualify the internal EHCI/HSIC host, PHY, clocks, rails and reset without disturbing the external USB gadget. Read descriptors before selecting a WLAN transport driver. | The internal WLAN USB device enumerates and remains stable; external USB debug still works. Firmware startup and association are separate checks. |
 | **B06 — Wi-Fi firmware and networking** | Use the matching local WLAN firmware and board data, validate the driver protocol, then test scan, association, DHCP, DNS and traffic. Keep credentials and identifiers private. | Owner's network works reliably under load; reconnect after a controlled disconnect. No driver-probe-only success claim. This is a separate driver risk from touch. |
 | **B07 — persistence and Bluetooth** | Test a separate writable root/home image stored on the host, retaining the original image. Once Wi-Fi is stable, exercise the root/debug path over Wi-Fi. Bring up Bluetooth's UART transport and matching firmware with separate power guards. | Settings survive Linux sessions in the host image; Bluetooth discovery and a real keyboard/mouse connection work. No iPad storage is used. |
@@ -73,10 +74,10 @@ IDs identify milestones, not a guaranteed one-DFU-per-row schedule. Batches may 
 
 | Workstream | Prepare before the relevant DFU | Current evidence / unresolved work |
 | --- | --- | --- |
-| Input and desktop | Packet parser, contact-state checks, libinput orientation, Home binding, keyboard, service startup and teardown. | Desktop and temporary Home bridge have worked; native touch is not qualified. |
+| Input and desktop | Packet parser, contact-state checks, libinput orientation, Home binding, keyboard, service startup and teardown. | Native touch, menus, window dragging and keyboard entry work; native Home passed; revised keyboard cold startup remains open. |
 | Battery and charging | Audit the HDQ UART implementation, J72 clock/pin mapping, read-only gauge commands, charger telemetry and recording tools. | J72 identifies a BQ27540-family HDQ gauge under UART5. Air 2 work is reusable protocol research, with different board wiring. J72's D2089 PMU needs its own charger audit. |
 | WLAN and Bluetooth | Map J72 HSIC/PHY/UART power dependencies, audit transport compatibility and privately stage matching firmware/board inputs. | The captured iOS tree places WLAN under EHCI/HSIC; an observed internal device has VID:PID `0a5c:bd1c`. This is not evidence that the current Linux USB WLAN driver supports it. |
-| Display and power | Prepare backlight read/restore tools, thermal/idle logging, and display/input rotation configuration. | The existing target kernel builds the PMIC backlight driver. Its behavior on this panel still needs an owner check. |
+| Display and power | Prepare backlight read/restore tools, thermal/idle logging, and display/input rotation configuration. | The existing PMIC backlight driver passed a visible three-second dim/restore check and read back the original value. Battery and thermal telemetry remain absent. |
 | Root filesystem | Preserve the existing image; prepare an isolated host-backed writable copy, package cache, service definitions and reproducible image recipe. | This can establish persistence and update behavior before internal storage. |
 | Orchard | Split general SPI/input fixes from exact J72 activation, retain build hashes and module ABI, prepare an experimental profile and recovery instructions. | A focused contribution can be reviewed before an internal installer exists. Do not present the experimental worktree as a completed port. |
 | Storage | Audit ANS1 command submission and write refusal; model layouts on disposable disk images; research the iOS 12 APFS APIs and recovery requirements. | Existing sources contain real protocol and error-path gaps. No storage driver or resizer has been qualified on this J72. |
