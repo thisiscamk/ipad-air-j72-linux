@@ -2,7 +2,7 @@
 
 Progress report as of 31 October 2026. This is a hardware bring-up report for one iPad, not a general installation guide or an Orchard hardware profile.
 
-**Latest:** the corrected D2089 analog enable (`0x84: 0x00 → 0x07`, preserving voltage setting `0x398 = 0x14`) produced real native finger reports during owner gestures. Of 1,801 checksum-valid native `0x44` frames, 542 contained one finger and 50 contained two. The decoded stream has nine matched press/release lifecycles, coordinates covering most of the panel, and no contacts remaining at the end. No malformed layouts, SPI errors or dropped records occurred; final firmware health, zero global status flags and full hardware restoration passed. Linux evdev and visual orientation have since passed an owner target/trace test, including multiple fingers and 21 matched presses/releases. The owner subsequently opened desktop menus and launched Foot by touch. On-screen keyboard entry and integrated cold boot remain to be checked.
+**Latest:** the corrected D2089 analog enable (`0x84: 0x00 → 0x07`, preserving voltage setting `0x398 = 0x14`) produced real native finger reports during owner gestures. Of 1,801 checksum-valid native `0x44` frames, 542 contained one finger and 50 contained two. The decoded stream has nine matched press/release lifecycles, coordinates covering most of the panel, and no contacts remaining at the end. No malformed layouts, SPI errors or dropped records occurred; final firmware health, zero global status flags and full hardware restoration passed. Linux evdev and visual orientation have since passed an owner target/trace test, including multiple fingers and 21 matched presses/releases. The owner subsequently opened desktop menus and launched Foot by touch. The owner has now confirmed on-screen keyboard typing and the bar toggle too. Integrated cold boot remains to be checked.
 
 ## Device and approach
 
@@ -214,3 +214,8 @@ The first integration trial stopped on its diagnostic three-invalid-reply guard;
 The owner opened Omarchy A menus and launched Foot using the touchscreen. The compositor now explicitly enables both DRM and libinput backends (`WLR_BACKENDS=drm,libinput`); the previous display-only setting excluded input. Labwc logs confirm the touchscreen and GPIO keys were added, and its file descriptors show both evdev devices open. This also explains the earlier need for a Home userspace bridge, although the new native Home binding still needs a physical check.
 
 A source-built, pinned wvkbd v0.20 keyboard with the existing Omarchy patch is now staged in RAM with a top-bar toggle. Its visible state and startup have been checked; owner text entry is the next test. A small Bash session controller is used because the minimal read-only desktop image lacks Python. The desktop remains a read-only USB-backed root with RAM state, rather than an installed system.
+
+
+### On-screen typing confirmed
+
+The owner confirmed that the on-screen keyboard works in Foot and its top-bar toggle works. Touch, desktop menu selection, application launch and text entry have now been exercised in one RAM boot. The keyboard binary and controller remain in temporary RAM storage; integrating reproducible startup and independently verifying it after a fresh boot are the next touch milestones. Native Home handling still needs an explicit physical confirmation. The owner is taking a charging break; no internal-storage work is authorized.
