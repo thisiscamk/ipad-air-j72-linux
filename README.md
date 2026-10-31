@@ -10,6 +10,8 @@ The present desktop uses software rendering and a read-only Arch Linux ARM files
 
 Private firmware, device calibration, identifying logs, and local disk images are intentionally excluded.
 
+**Interim upstream contribution:** [draft Orchard PR #43](https://github.com/OrchardLinux/orchard/pull/43) records verified J72 hardware results, porting findings and remaining integration work under Orchard’s contribution guidance.
+
 **Latest session:** the revised kernel booted and corrected the exported remaining/full capacity pairing. The two values agreed with 100% charge at startup; later readings also followed the reported percentage. Automatic touch and desktop startup passed again. The touch worker stopped after 2,619 emitted frames with no rejected layouts, SPI errors, timeouts or recoveries, and passed firmware health and hardware cleanup. The previous cold boot already passed the owner's repeated keyboard hide/tap/type check.
 
 **Charging test unresolved:** the earlier wall-charger recording was lost when USB failed on return to the Pi and the owner subsequently reported a Pi hang. The revised image now displays live battery readings on screen, confirmed by the owner. Two Home-button USB rebinds enumerated without new host USB errors. Network access recovered, but serial access failed after the first rebind and network access subsequently stopped too. A second rebind restored sustained network access without opening serial. This is partial recovery, with the cause unresolved. **Linux wall charging is not working in the measured session**; the wall observation below shows net discharge. The Pi kernel and original desktop image are unchanged, and battery-health estimates remain unqualified.

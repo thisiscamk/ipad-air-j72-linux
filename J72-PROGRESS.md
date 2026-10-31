@@ -375,3 +375,9 @@ An isolated variant preserves the successful 425 mA artifacts and changes the fi
 Native compilation with additional warnings passed, with the same 46 exact-kernel imports as the measured variant. The actual policy core passed 15 normal/failure cases, 10 battery-guard cases and four fixed encoding/timer assertions. Two incorrect source-flag invocations were rejected before device contact. Shell/Python syntax and pinned-artifact preflight passed; the original 425 mA artifact preflight also remains intact. **The 850 mA experiment has not been device tested.**
 
 One new DFU will cover baseline, the single 850 mA trial, restored-state photographs and return to iOS on the charger. A positive reading would demonstrate short observed net charging; sustained charging, source policy/protections and the later desktop regression remain separate qualification gates.
+
+### Interim upstream report opened
+
+[Draft Orchard PR #43](https://github.com/OrchardLinux/orchard/pull/43) adds the J72 field report and a README link, following the current CONTRIBUTING.md guidance for bring-up material. It records verified display, touch, Home, brightness, keyboard, battery and the reversible charging result, with kernel provenance and physical-test limits. The two-file contribution contains no runtime/device-profile changes or private inputs. Production driver/DT/firmware-recipe integration remains future work.
+
+The submitted commit is `c6c08694862b5a18bba71535c6b5f3895fe8434a`. All 362 Orchard tests passed in an isolated editable installation with normal file permissions; local link, whitespace, evidence and publication-scope checks passed. The report describes the identified lab image’s earlier physical tests; this documentation revision was not newly booted on the device. The ready 850 mA test remains unrun while work shifted to this interim contribution.
