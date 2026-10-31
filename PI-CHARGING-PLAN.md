@@ -143,7 +143,7 @@ Before requesting a DFU:
 
 No new hardware purchase is proposed before checking the available hub.
 
-## Prepared next DFU: short Linux test with data retained
+## Prepared next DFU: direct boot, RAM handoff, then charging
 
 The separate hub-source worker keeps the measured 850 mA ceiling, 30-second
 independent rollback and battery guards. It changes the source arming token
@@ -166,3 +166,31 @@ bounded test without moving cables. If the inherited PMIC ceiling differs
 from the worker's required 100 mA baseline, preserve that boot and inspect it
 read-only instead of forcing a setting. Require final restoration, stable
 data and iOS recovery before extending duration or adding desktop load.
+
+## Boot-path update: direct Pi boot before the hub transfer
+
+Two isolated boot attempts through the JCH377 reached exploit setup and
+Checkmate but did not reappear in download mode. The second used the
+launcher’s existing exact-iPad-port power reconnect; port off/on completed
+and power was restored, but Pongo still did not start. No Linux charging
+trial ran. This does not invalidate the observed iOS charging/data path.
+
+The next test changes the boot transport to the previously working direct
+Pi connection. After automatic startup, the desktop/root, NBD and touch are
+stopped and health/restoration checked. A separate one-shot RAM script
+unbinds the gadget before the owner moves the iPad cable to the marked hub
+port. One Home press there rebinds USB. The script restores the original UDC
+on error where possible; its Home wait is bounded to 20 minutes.
+
+Only after live NCM, the qualified hub port, exact kernel/model and completed
+transfer-handler exit are verified can the separate charging worker be
+staged. The USB-reconnect Home press and charging-test Home press are
+distinct instructed steps. No charging worker runs on the direct Pi port or
+during the move. If the transfer fails, inspect the screen and return to iOS
+on the hub; no repeated reconnects are planned.
+
+Shell syntax, wrong-host refusal before state creation, the existing source
+guards and artifact preflight pass. **The new RAM USB transfer has not yet
+been device tested.** It requires one new direct-connected DFU for the whole
+transfer/current batch, if the transfer succeeds. This is one initial cable
+move to qualify the hub path, followed by fixed cabling during charging.

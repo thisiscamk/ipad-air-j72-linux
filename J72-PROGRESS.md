@@ -459,3 +459,16 @@ replug workaround. Only the target port would be cycled, before Linux starts.
 This control has not run on this Pi/hub setup, and an unchanged DFU retry is
 not planned. The hub's iOS charging/data result remains separate from Linux
 boot and charging qualification.
+
+## Second hub boot control stopped before Pongo
+
+The exact-iPad-port reconnect completed off/on and restored power, but the
+loader again timed out waiting for download mode after Checkmate. Its full
+process group was reaped; no Pongo, Linux or charging worker ran. The owner
+confirmed recovery to iOS on the hub.
+
+A direct-Pi boot followed by a one-shot RAM USB handoff is prepared. It
+requires clean desktop/root/NBD/input teardown before unbinding, then an
+owner move to the powered hub and one Home-triggered rebind. Charging is
+gated on live data and completed handoff; no current write occurs during
+the transfer. See [the revised plan](PI-CHARGING-PLAN.md).

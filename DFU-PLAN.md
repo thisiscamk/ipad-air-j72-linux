@@ -245,3 +245,18 @@ then use the prepared exact-iPad-port reconnect control during the loader
 handoff, with all other wiring unchanged. This is a new transport control,
 not another unchanged attempt. Charging and stable Linux data remain untested
 on the hub.
+
+### Revised next DFU: direct boot -> controlled RAM hub handoff
+
+- [x] Archive the second hub boot failure: exact-port off/on completed but download mode did not return. No charging result.
+- [x] Prepare and check a one-shot RAM UDC unbind/Home-rebind script with root/input/identity guards and no charger writes.
+- [x] Make charging staging refuse an incomplete or still-running transfer handler.
+- [ ] Connect the iPad directly to the Pi in iOS, verify it, then enter a new DFU.
+- [ ] Boot through the known direct path; finish startup and clean root/NBD/input teardown.
+- [ ] Follow the blue transfer screen: move to the powered hub’s marked port, then one Home press to rebind data.
+- [ ] Verify live NCM and completed transfer, then perform the separate guarded 850 mA comparison and restoration.
+- [ ] Return to iOS and confirm charging/data on the same hub connection.
+
+The hub boot attempts will not be repeated unchanged. This prepared batch
+uses one new DFU and one initial cable handoff; subsequent charging stays
+on the hub with data connected.
