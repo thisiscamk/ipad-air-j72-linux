@@ -10,7 +10,7 @@ The present desktop uses software rendering and a read-only Arch Linux ARM files
 
 Private firmware, device calibration, identifying logs, and local disk images are intentionally excluded.
 
-**Latest charging milestone:** with hub USB data live, the 1,250 mA comparison briefly produced **+373 / +368 / +201 mA** battery-current readings, then a pack guard stopped it after **5.43 seconds**. Restoration passed. Sustained charging remains unqualified; a lower 1,050 mA comparison with precise guard diagnostics is staged. See the [current result](PI-CHARGING-PLAN.md).
+**Latest charging milestone:** the 1,050 mA / 30-second powered-hub comparison passed: **12 positive samples at +177…+213 mA**, USB data retained and original input limit restored without errors. A five-minute test at the same setting is staged. The [tested source](code/charging/hub1050/) and [current result](PI-CHARGING-PLAN.md) are published; sustained charging remains unqualified.
 
 **Working source:** [code/](code/) now contains the measured SPI driver, touch worker and decoder, HDQ battery frontend, bounded charging diagnostics, desktop changes and offline tests. Private firmware/calibration are supplied separately. [Native Orchard integration work](code/UPSTREAM-PLAN.md) remains before resubmission.
 

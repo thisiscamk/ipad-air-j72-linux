@@ -19,6 +19,14 @@ This source snapshot contains the 425 mA worker, not that 850 mA variant.
 The Foot patch's independent contribution was not isolated from the other
 keyboard/input fixes. See [the evidence report](../J72-PROGRESS.md).
 
+## Additional measured powered-hub charging source
+
+The [1,050 mA hub worker](charging/hub1050/) is now included with its exact
+policy, source guard tests and sanitized validation. Its 30-second test
+retained 12 samples at +177..+213 mA, kept USB data and restored the original
+input limit. Sustained charging and autonomous source policy remain open.
+This is an additional source snapshot; the original 425 mA worker is retained.
+
 ## Run tests without an iPad
 
 Requirements: Python 3 and a C compiler supporting UBSan.

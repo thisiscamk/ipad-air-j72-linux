@@ -1,3 +1,24 @@
+# 1 November: 1,050 mA / 30-second powered-hub test passed
+
+All **12 retained worker samples** were positive at **+177..+213 mA** battery
+current, from **-809 mA** baseline. The measured active duration was 30 seconds.
+USB data stayed connected. Battery guards reported no faults; the last guard
+sample was 74%, 36.8 C and 4.126 V. Original input-limit restoration passed:
+inactive, disarmed, restored=1, restore_failed=0, error=0, and independent
+PMIC 0x04c0=0x02 readback. The RAM recorder was stopped and logs retained.
+
+The last host lease renewal raced normal completion and was refused by the
+terminal target. The watcher exited with an error; independent target status
+and timestamps establish successful duration and restoration. The later
+candidate checks terminal state on this race and still propagates errors
+while a trial is active.
+
+The [actual short-test source](code/charging/hub1050/) is published with tests
+and sanitized validation. A separate **1,050 mA / five-minute** worker is
+staged unarmed in the same RAM boot, gated on the actual successful short
+result and restoration. It retains all battery/source/USB guards. Sustained
+charging and automatic source detection are still unqualified.
+
 # 1 November: brief net charging with hub data; pack guard stopped trial
 
 The source-qualified nominal **1,250 mA / 30-second** comparison started in
@@ -19,10 +40,10 @@ qualified USB port and renewed a 2.5-second lease. USB data stayed available.
   1,250 mA trial remains **blocked**. Brief positive recorder readings do not
   establish sustained charging.
 
-A separate **1,050 mA / 30-second** comparison is staged unarmed in the same
-RAM boot. It retains the same source, voltage, temperature, SOC, current and
+The subsequent **1,050 mA / 30-second** comparison passed as described above.
+It ran in the same RAM boot. It retains the same source, voltage, temperature, SOC, current and
 rollback guards and records the exact failed guard values. No safety bound
-has been raised. Hardware qualification is pending.
+has been raised. Sustained qualification is pending.
 
 The #33 target kernel cannot unload modules. The completed 1,250 mA worker
 remains resident, disarmed and permanently used; the new worker has a distinct
