@@ -31,11 +31,11 @@ Updated 31 October 2026. This is a work queue for this exact J72, not a promise 
 - UART5 registered and the bounded voltage trial returned three matching 3.824 V samples. The gauge identified as BQ27545 (`0x0545`); charge, temperature and cycle data also read successfully.
 - Touch stopped on a stale C8 status-query reply. Final health and hardware restoration passed. A revised worker with bounded strict retries restored input in this same boot, then emitted 11,708 frames and stopped cleanly.
 - The owner confirmed keyboard hide → tap → type twice in patched Foot; logs independently recorded the tap requests. Combined cold qualification remains open.
-- Desktop/root unmounted, NBD detached and the owned export stopped. Normal iOS reboot requested for charging.
+- Desktop/root unmounted, NBD detached and the owned export stopped. The owner confirms normal iOS is visible and wall charging.
 
-## Next DFU being prepared: Linux battery interface plus input fixes
+## Next charged DFU ready: Linux battery interface plus input fixes
 
-A target-kernel build is being prepared for the existing HDQ/UART frontend and two-stop-bit serdev API, adapted to verified J72 wiring and BQ27545 identity. The Pi kernel stays unchanged. The image will also package the Foot tap fix and bounded touch status retries. No new DFU is requested until the build and checks finish.
+The separate target kernel has built with the HDQ/UART frontend and two-stop-bit serdev API, adapted to verified J72 wiring and BQ27545 identity. The combined image packages the Foot tap fix and bounded touch status retries. Offline driver tests, module/export checks and pinned-artifact preflight passed. The Pi kernel and original desktop image are unchanged. The owner confirms iOS is visible and wall charging; begin only when the owner supplies the next charged DFU.
 
 1. Verify exact J72 identity and pinned artifacts, then boot the combined image.
 2. Check the battery driver identifies `0x0545` and registers a Linux power supply; keep both USB debug paths available.
@@ -45,11 +45,11 @@ A target-kernel build is being prepared for the existing HDQ/UART frontend and t
 6. Continue further telemetry and desktop work in that boot when the checks pass. Charging remains a separate cable-transition test after the root/debug path is independent of active USB-backed files.
 7. Stop desktop/input, export evidence, detach the root/export and return to iOS.
 
-**Current preparation:** UART transport and identity have passed on the device; the proper Linux battery frontend and the newly packaged input fixes remain untested together. No battery NVM, charger control or iPad storage write is authorized by this plan.
+**Current preparation:** UART transport and identity have passed on the device. The proper Linux battery frontend and newly packaged input fixes are built and offline checked, but remain untested together. Signed UPower packages are staged for a possible same-boot indicator trial after the kernel interface passes; no indicator is included in the automatic startup yet. No battery NVM, charger control or iPad storage write is authorized by this plan.
 
 ## Subsequent DFUs and dependencies
 
-- **B04:** finish exact J72 HDQ pin/clock validation, build the read-only gauge path, compare plausible battery readings with iOS and qualify backlight controls. Brightness and actual UART5 gauge communication passed. The Linux battery frontend is being prepared; charging remains untested.
+- **B04:** qualify the new Linux battery interface, compare plausible readings with iOS and assess current/capacity interpretation. Brightness and actual UART5 gauge communication passed. The Linux battery image is ready for its first device test; charging remains untested.
 - **B05–B06:** build and qualify the A7 internal HSIC/EHCI bus, enumerate the WLAN device, then validate matching firmware and the USB driver protocol, association and traffic. These are separate risks and may need several boots.
 - **B07–B11:** host persistence and Bluetooth, measured charging/cable changes, audio and rotation, power and remaining hardware, then integrated daily-use tests. Reuse a boot for userspace and runtime changes wherever possible.
 - **B12–B15:** only after the required hardware/usability gates: storage read-only qualification, installer rehearsal, a separately authorized installation, then cold installed-system and recovery checks. No internal-storage write is currently authorized.
@@ -83,9 +83,9 @@ IDs identify milestones, not a guaranteed one-DFU-per-row schedule. Batches may 
 | Workstream | Prepare before the relevant DFU | Current evidence / unresolved work |
 | --- | --- | --- |
 | Input and desktop | Packet parser, contact-state checks, libinput orientation, Home binding, keyboard, service startup and teardown. | Native touch, menus, window dragging and keyboard entry work; native Home passed; revised keyboard cold startup remains open. |
-| Battery and charging | Audit the HDQ UART implementation, J72 clock/pin mapping, read-only gauge commands, charger telemetry and recording tools. | J72 identifies a BQ27540-family HDQ gauge under UART5. Air 2 work is reusable protocol research, with different board wiring. J72's D2089 PMU needs its own charger audit. |
+| Battery and charging | Audit the HDQ UART implementation, J72 clock/pin mapping, read-only gauge commands, charger telemetry and recording tools. | J72's UART5 gauge returned DEVICE_TYPE `0x0545` (BQ27545) and plausible voltage, charge level and temperature. The guarded Linux frontend is built but untested. Air 2 protocol work is reusable with different board wiring. J72's D2089 PMU needs its own charger audit. |
 | WLAN and Bluetooth | Map J72 HSIC/PHY/UART power dependencies, audit transport compatibility and privately stage matching firmware/board inputs. | The captured iOS tree places WLAN under EHCI/HSIC; an observed internal device has VID:PID `0a5c:bd1c`. This is not evidence that the current Linux USB WLAN driver supports it. |
-| Display and power | Prepare backlight read/restore tools, thermal/idle logging, and display/input rotation configuration. | The existing PMIC backlight driver passed a visible three-second dim/restore check and read back the original value. Battery and thermal telemetry remain absent. |
+| Display and power | Prepare backlight read/restore tools, thermal/idle logging, and display/input rotation configuration. | The existing PMIC backlight driver passed a visible three-second dim/restore check and restored the original value. Battery voltage and temperature were read through the UART diagnostic; the Linux battery interface is ready for device qualification. CPU thermal and wider power management remain open. |
 | Root filesystem | Preserve the existing image; prepare an isolated host-backed writable copy, package cache, service definitions and reproducible image recipe. | This can establish persistence and update behavior before internal storage. |
 | Orchard | Split general SPI/input fixes from exact J72 activation, retain build hashes and module ABI, prepare an experimental profile and recovery instructions. | A focused contribution can be reviewed before an internal installer exists. Do not present the experimental worktree as a completed port. |
 | Storage | Audit ANS1 command submission and write refusal; model layouts on disposable disk images; research the iOS 12 APFS APIs and recovery requirements. | Existing sources contain real protocol and error-path gaps. No storage driver or resizer has been qualified on this J72. |
