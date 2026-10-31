@@ -238,3 +238,10 @@ DFU is requested until a concrete source-qualified test is ready.
 The hub/iPad-only cable-move hang remains unexplained; previous-boot logs are
 unavailable. Keep the present wiring fixed. This short data-retained test
 precedes longer charging qualification. One new DFU is required for the batch.
+
+**First hub boot attempt:** exploit setup/Checkmate passed, but download-mode
+USB did not return. No Pongo/Linux or charging trial ran. Recover iOS first,
+then use the prepared exact-iPad-port reconnect control during the loader
+handoff, with all other wiring unchanged. This is a new transport control,
+not another unchanged attempt. Charging and stable Linux data remain untested
+on the hub.

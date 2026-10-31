@@ -443,3 +443,19 @@ are prepared; native build and policy/topology/refusal tests pass. No Linux
 hub current trial has run yet, no charger setting was changed during this
 preparation, and the next test keeps all cables fixed. See
 [the Pi charging plan](PI-CHARGING-PLAN.md).
+
+## First powered-hub boot attempt: download handoff did not return
+
+The exact J72 DFU identity and pinned assets passed. One isolated checkra1n
+attempt reported successful exploit setup and Checkmate, but no download-mode
+USB device reappeared within the loader's 20-second wait. The launcher stopped
+and reaped its whole process group. Pongo and Linux did not start; the hub
+charging worker never loaded and no charging control was written.
+
+Normal iOS recovery has been requested on the same hub connection. The
+prepared next control uses the existing launcher's narrow, dynamically
+discovered iPad-port reconnect after Checkmate, matching the loader's stated
+replug workaround. Only the target port would be cycled, before Linux starts.
+This control has not run on this Pi/hub setup, and an unchanged DFU retry is
+not planned. The hub's iOS charging/data result remains separate from Linux
+boot and charging qualification.
