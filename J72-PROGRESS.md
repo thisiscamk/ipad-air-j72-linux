@@ -219,3 +219,12 @@ A source-built, pinned wvkbd v0.20 keyboard with the existing Omarchy patch is n
 ### On-screen typing confirmed
 
 The owner confirmed that the on-screen keyboard works in Foot and its top-bar toggle works. Touch, desktop menu selection, application launch and text entry have now been exercised in one RAM boot. The keyboard binary and controller remain in temporary RAM storage; integrating reproducible startup and independently verifying it after a fresh boot are the next touch milestones. Native Home handling still needs an explicit physical confirmation. The owner is taking a charging break; no internal-storage work is authorized.
+
+
+## Charging-break preparation after the touch milestone
+
+The owner confirms the iPad is charging in iOS. A private 11.7 MB RAM bundle is built for the next owner-confirmed DFU. It adds an initramfs overlay while preserving the exact successful kernel, original boot image and original read-only desktop image. The overlay includes automatic touch start/stop/restart checks, a reusable worker, separate bounded anomaly buffers, corrected DRM/libinput startup, keyboard packaging, native Home binding and orderly teardown scripts.
+
+The matching module builds without warnings under the additional kernel warning checks. The contact decoder accepts all 1,801 earlier native reports and passes malformed-input checks; six anomaly-ring tests and twenty existing audit tests pass. No device was contacted during preparation. These are offline results: the new worker, external-initramfs handoff and automatic desktop startup still need the next hardware test.
+
+A read-only platform inventory and a guarded three-second backlight dim/restore tool are staged for later use in the same boot. They do not enable or qualify the J72 HDQ battery gauge, Linux charging or HSIC Wi-Fi. The next hardware gates and remaining storage prerequisites are in [the DFU plan](DFU-PLAN.md). No internal-storage installation is authorized.

@@ -15,7 +15,7 @@ The [DFU session plan](DFU-PLAN.md) expands these milestones into proposed boot 
 - [x] Apply the exact N1 setup and validate running firmware device information against iOS.
 - [x] Read checksum-valid screen metrics and normal operating mode matching iOS.
 - [x] Validate a bounded attention-gated reader at idle: one initial status frame passed both checksums, with no malformed frames.
-- [ ] Capture repeated finger frames and verify their layout and checksums.
+- [x] Capture repeated finger frames and verify their layout and checksums (1,801 valid native reports, including one and two fingers).
 - [x] Run the first owner tap-and-swipe capture: only startup status, no finger reports.
 - [x] Compare polling both attention levels and alternating counters: no additional packets; owner participation in this second window is unconfirmed.
 - [x] Trace the missing J72 display-sync setup, validate a guarded idle test, and observe an active sync-pad signal with full cleanup.
@@ -39,13 +39,14 @@ The [DFU session plan](DFU-PLAN.md) expands these milestones into proposed boot 
 - [x] Test confirmed owner gestures with C8 enabled: all 5,297 valid native frames contain zero fingers; health and restoration pass.
 - [x] Review current Orchard touch PRs and add bounded classic-layout analysis; 18 offline checks pass.
 - [x] Identify a missing shared analog-control dependency through the A7 J86 reference and independently verify it in the exact J72 iOS driver.
-- [ ] **Next RAM session:** qualify corrected-analog native idle/contact probes; use corrected-analog earlier images if needed, then integrate actual contacts.
-- [ ] Establish actual scan/report enablement and attention behavior from finger packets.
-- [ ] Read bounded touch reports and implement evdev input, including contact tracking, orientation and edges.
-- [ ] Verify touch in the unprivileged desktop with owner screen checks.
+- [x] Correct analog enable to `0x07`: owner gestures produce contacts; firmware health and full cleanup pass.
+- [x] Establish actual native finger reporting under the corrected analog power and C8 settings.
+- [x] Decode bounded native contacts into Linux MT slots; owner confirms full-screen mapping and multi-finger traces.
+- [x] Verify touch menus, launching Foot and on-screen keyboard typing/toggle in the unprivileged desktop.
+- [ ] Explicitly confirm native Home and window dragging in the next integrated session.
 - [ ] Repeat cold RAM boots and verify cleanup and return to iOS.
 
-The current driver correction starts every explicit transfer before queuing bytes, enables AUTO_TX only for receive-only transfers, drains the receive side within the FIFO window, and fixes the reversed Linux bit-order flag mapping. The GPIO path is a working upload fallback. Several distinct modules can run in one RAM session; these milestones are not necessarily one DFU each. Native touch input remains unproven until reports reach the desktop.
+The current driver correction starts every explicit transfer before queuing bytes, enables AUTO_TX only for receive-only transfers, drains the receive side within the FIFO window, and fixes the reversed Linux bit-order flag mapping. The GPIO path is a working upload fallback. Several distinct modules can run in one RAM session; these milestones are not necessarily one DFU each. Native touch input and text entry now reach the desktop. The reusable worker and automatic startup bundle are built and offline-checked; cold device qualification is next.
 
 **Pass:** repeated cold RAM boots give usable touch in an unprivileged Omarchy A session, with clean return to iOS.
 

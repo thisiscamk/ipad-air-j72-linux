@@ -9,3 +9,5 @@ The present desktop uses software rendering and a read-only Arch Linux ARM files
 **Touch milestone:** correcting an omitted shared analog-power enable changed the result from zero-contact reports to real native touch: 542 one-finger and 50 two-finger reports during the owner's gestures, with nine matched press/release lifecycles and no contacts left down. The capture passed firmware health and hardware restoration checks. A Linux multitouch device now drives a visual target/trace test; the owner confirmed accurate mapping across the screen. The owner has also opened desktop menus and launched Foot by touch. On-screen keyboard typing and its bar toggle also work. Integrated cold boot is the next touch milestone.
 
 Private firmware, device calibration, identifying logs, and local disk images are intentionally excluded.
+
+**Next test prepared:** automatic touch and desktop startup, a reusable touch worker, packaged keyboard and recovery logging are built and checked offline. The kernel and original read-only root are preserved. Device validation awaits the next owner-confirmed DFU.
