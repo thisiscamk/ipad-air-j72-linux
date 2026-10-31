@@ -11,3 +11,6 @@ The present desktop uses software rendering and a read-only Arch Linux ARM files
 Private firmware, device calibration, identifying logs, and local disk images are intentionally excluded.
 
 **Current session:** automatic touch self-check, full cleanup, restart and read-only desktop startup passed on the device. A longer touch cycle also stopped cleanly, and the same worker restarted without DFU. The keyboard now uses automatic text focus; its revised startup package still needs an independent cold confirmation. Native Home opens/closes the menu, and the owner confirmed a three-second brightness dim followed by restoration. Battery telemetry, charging and Wi-Fi remain unqualified.
+
+
+**Next DFU prepared:** cold confirmation of automatic keyboard behavior, then UART5 registration and one bounded battery-voltage read trial. The exact-board device-tree change preserves the kernel; no battery commands run automatically. The reader has passed offline protocol and timeout checks. Actual battery communication is still untested.

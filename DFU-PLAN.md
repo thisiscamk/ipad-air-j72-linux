@@ -13,7 +13,7 @@ Earlier zero-contact results below are historical. The corrected-power gesture t
 
 Updated 31 October 2026. This is a work queue for this exact J72, not a promise of a fixed number of DFUs. Each row groups work that can share a RAM boot. A failed hardware milestone can require more boots; working modules and userspace changes should be tested within the existing boot wherever possible.
 
-**Current position:** native multitouch, full-screen mapping, desktop menus, launching Foot, on-screen typing and keyboard show/hide have passed owner checks. The analog enable correction is `0x07`; the voltage setting is unchanged. The current RAM session passed automatic touch self-check, full cleanup, restart and desktop startup using the same kernel. The owner confirmed menus, window dragging and keyboard reopening/typing after live keyboard changes. A revised keyboard startup bundle is prepared; native Home and visible brightness dim/restore have also passed in this boot.
+**Current position:** native multitouch, full-screen mapping, desktop menus, launching Foot, on-screen typing and keyboard show/hide have passed owner checks. The analog enable correction is `0x07`; the voltage setting is unchanged. The completed RAM session passed automatic touch self-check, full cleanup, restart and desktop startup using the same kernel. The owner confirmed menus, window dragging and keyboard reopening/typing after live keyboard changes. A revised keyboard startup bundle is prepared; native Home and visible brightness dim/restore have also passed in this boot.
 
 ## How we will reduce button sequences
 
@@ -25,23 +25,30 @@ Updated 31 October 2026. This is a work queue for this exact J72, not a promise 
 - Request a new boot when a kernel/DT/loader change or an independent cold-start check actually needs it.
 - Record a physical screen/gesture/charger check only when the owner performs it. An automated protocol check is not a substitute.
 
-## Current boot: integrated startup and remaining input checks
+## Completed in this boot
 
-The concrete change is a private initramfs overlay on the exact successful kernel. The original boot image and read-only desktop image are preserved.
+- Automatic touch self-check, full cleanup, restart and read-only desktop startup passed.
+- Owner checks passed: menus, window dragging, on-screen typing/reopening, keyboard icon, native Home open/close, and visible brightness dim/restore.
+- A longer cycle and another same-boot restart passed. The final cycle emitted 38,237 frames with zero layout rejects, timeouts, recoveries or SPI errors; common rejected wire replies remained filtered. Final firmware health and full cleanup passed.
+- Desktop teardown exposed an executable-symlink check issue; it was fixed and verified in this boot. The original root was unmounted, NBD detached and the host export stopped.
 
-1. Verify the exact J72 DFU/Pongo identity and pinned payload. Keep both USB recovery shells available.
-2. Automatically load the small touch worker, start it, check native output for five seconds, stop it and require firmware health plus complete rail/pin/clock restoration. Retain the first cycle's anomaly buffers before restarting it in the same boot.
-3. Restart touch, connect the original host desktop read-only and launch the unprivileged Omarchy A session with both DRM and libinput enabled. Include the keyboard, its toggle and the native Home binding.
-4. Ask the owner to check the desktop, tap the menu, type in Foot, drag its window, press/release near edges, try two fingers and lift both, then test Home twice. These complete the remaining B02 checks and independently verify the integrated B03 startup.
-5. Save contact-layout anomalies separately from rejected wire replies. The previous working session rejected five layouts; those packets were not retained late in that capture. Do not label that cause as solved. The new decoder keeps its existing refusal rules and records evidence for analysis.
-6. In the same boot, collect the read-only power/display/USB inventory. If the exact backlight interface passes its guards, arrange one visible three-second dim-and-restore check. This begins B04; it does not qualify battery telemetry or charging.
-7. Finish any remaining software work in that boot. On a charging break, stop desktop processes, unmount the read-only root, detach NBD, verify touch cleanup, stop the host export, then reboot to iOS.
+## Next DFU: keyboard cold confirmation and first battery voltage trial
 
-**Verification:** the worker compiles for the matching ABI; the C decoder passes all 1,801 earlier captured native reports plus malformed-input checks; six new anomaly-format checks and twenty existing audit checks pass. Boot scripts, the keyboard source/binary, payload and original desktop are pinned. The overlay and reusable worker have now passed hardware startup and same-boot reuse; revised keyboard cold startup remains pending.
+The next private image adds the exact J72 UART5 description to the device tree. It preserves the kernel and includes the automatic keyboard mode and corrected teardown script. UART5 is absent from the running tree used in the completed boot, so this test needs a fresh boot. No battery command runs automatically.
+
+1. Verify exact J72 identity and pinned image, then boot the integrated touch/desktop session.
+2. Confirm automatic startup and the revised keyboard behavior without live repairs.
+3. Inspect UART5 registration at its exact J72 address/interrupt and confirm external USB debugging still works.
+4. Take a passive pad/domain snapshot. Refuse the voltage trial unless the inherited GPIO44 state and UART5 tty provider match the verified guards; leave the separate PMU GPIO control untouched.
+5. Run one bounded diagnostic for three voltage samples. It sends only the two voltage register read addresses, checks command echo and response layout, and restores/readback-checks UART settings. No gauge reset, Control subcommand, firmware or data-flash write is implemented.
+6. If successful, use this same boot to prepare further read-only telemetry checks. Voltage alone does not identify the exact gauge or qualify battery reporting or charging. A failed trial saves its evidence and stops without automatic retries.
+7. Finish with orderly desktop/root teardown, touch health/restoration checks and a return to iOS.
+
+**Offline readiness:** the new DT variant changes only the UART5 node and a reference to its existing power domain; all original properties compare byte for byte. The actual reader passes 256 encode/decode cases and pseudo-terminal tests for leading noise, bad echo, malformed or short responses, disallowed commands and bounded timeouts with runtime bounds checks. Its loader/self-test and wrong-controller refusal also passed in the existing Arch RAM environment without opening a UART. The first real UART5/HDQ result remains pending.
 
 ## Subsequent DFUs and dependencies
 
-- **B04:** finish exact J72 HDQ pin/clock validation, build the read-only gauge path, compare plausible battery readings with iOS and qualify backlight controls. An inventory script is ready; the gauge driver is not yet device-ready.
+- **B04:** finish exact J72 HDQ pin/clock validation, build the read-only gauge path, compare plausible battery readings with iOS and qualify backlight controls. Brightness passed. The UART5 DT variant and bounded voltage-only diagnostic are built and checked; actual gauge communication remains untested.
 - **B05–B06:** build and qualify the A7 internal HSIC/EHCI bus, enumerate the WLAN device, then validate matching firmware and the USB driver protocol, association and traffic. These are separate risks and may need several boots.
 - **B07–B11:** host persistence and Bluetooth, measured charging/cable changes, audio and rotation, power and remaining hardware, then integrated daily-use tests. Reuse a boot for userspace and runtime changes wherever possible.
 - **B12–B15:** only after the required hardware/usability gates: storage read-only qualification, installer rehearsal, a separately authorized installation, then cold installed-system and recovery checks. No internal-storage write is currently authorized.
@@ -56,7 +63,7 @@ IDs identify milestones, not a guaranteed one-DFU-per-row schedule. Batches may 
 | --- | --- | --- |
 | **B01 — passed: contact detection** | Corrected the missing shared analog enable. Native one- and two-finger reports, coordinates and matched release lifecycles now pass. | Owner gesture capture, final firmware health and full hardware restoration passed. |
 | **B02 — passed: Linux input** | Linux MT slots, screen mapping, menus, Foot launch, typing and the keyboard toggle passed. | Window dragging and native Home menu open/close passed. |
-| **B03 — partly passed: integrated cold start** | Automatic self-check, full cleanup, touch restart and desktop startup passed a fresh boot; a longer cycle and another same-boot restart also passed. | Confirm the revised automatic keyboard startup independently after a later cold boot; verify final desktop teardown and return to iOS. |
+| **B03 — partly passed: integrated cold start** | Automatic self-check, full cleanup, touch restart and desktop startup passed a fresh boot; a longer cycle and another same-boot restart also passed. | Confirm the revised automatic keyboard startup independently after a later cold boot; Revised teardown passed after fixing a symlink check; return to iOS has been requested. |
 | **B04 — partly passed: battery and display controls** | Owner confirmed PMIC brightness dim/restore. Bring up the J72 UART5/HDQ gauge using exact board wiring; begin with identification and telemetry. Read brightness through the existing PMIC backlight driver, then test bounded changes and restore the starting value. | Plausible battery voltage, temperature, state of charge and current; compare with an iOS baseline. Owner confirms brightness changes. Battery reporting alone does not establish charging. |
 | **B05 — Wi-Fi bus and device** | Qualify the internal EHCI/HSIC host, PHY, clocks, rails and reset without disturbing the external USB gadget. Read descriptors before selecting a WLAN transport driver. | The internal WLAN USB device enumerates and remains stable; external USB debug still works. Firmware startup and association are separate checks. |
 | **B06 — Wi-Fi firmware and networking** | Use the matching local WLAN firmware and board data, validate the driver protocol, then test scan, association, DHCP, DNS and traffic. Keep credentials and identifiers private. | Owner's network works reliably under load; reconnect after a controlled disconnect. No driver-probe-only success claim. This is a separate driver risk from touch. |
