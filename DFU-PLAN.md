@@ -177,7 +177,7 @@ Current batch checklist:
 - [x] Save battery baseline; stop desktop/input/root/export cleanly.
 - [x] Load both modules unarmed; verify the original input setting.
 - [x] Owner confirms the new screen and ready/unarmed/unused values.
-- [ ] Wait for battery at or below 95%; arm with all guards passing.
+- [x] Wait for battery at or below 95%; arm with all guards passing. The owner paused before the wall move; the test was disarmed without a control write. The same boot later resumed at 83%, the recorder restarted, and arming passed again with the original input setting unchanged.
 - [ ] Owner confirms wall attachment, then triggers one Home press.
 - [ ] Compare current response and photograph verified restoration.
 - [ ] Return to iOS on the charger and confirm charging.
