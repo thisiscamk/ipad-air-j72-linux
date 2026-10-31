@@ -10,7 +10,7 @@ The present desktop uses software rendering and a read-only Arch Linux ARM files
 
 Private firmware, device calibration, identifying logs, and local disk images are intentionally excluded.
 
-**Latest charging milestone:** a guarded 850 mA / 30-second wall trial produced **+20…+51 mA net battery current**, with successful automatic restoration and return to iOS. Sustained charging remains unqualified.
+**Latest charging milestone:** the powered-hub 850 mA / 30-second trial retained live USB data and reached **−10…+37 mA** battery current, from −773 mA baseline. Rollback passed; sustained charging remains unqualified. The iPad is back in iOS and reports charging on the same hub. See the [current result](PI-CHARGING-PLAN.md#31-october-powered-hub-trial-completed-back-in-ios).
 
 **Working source:** [code/](code/) now contains the measured SPI driver, touch worker and decoder, HDQ battery frontend, bounded charging diagnostics, desktop changes and offline tests. Private firmware/calibration are supplied separately. [Native Orchard integration work](code/UPSTREAM-PLAN.md) remains before resubmission.
 

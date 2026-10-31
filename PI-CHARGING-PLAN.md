@@ -1,5 +1,33 @@
 # Charging while connected to the Pi
 
+## 31 October: powered-hub trial completed; back in iOS
+
+The direct Pi RAM boot and controlled transfer to the powered JCH377's
+marked charging/data port passed. The desktop, USB-backed root, NBD and
+touch worker were stopped before the cable move. Native NCM data remained
+available throughout the subsequent fixed 850 mA / 30-second trial and
+rollback: 49 successful host reads over about 101 seconds, with no read
+errors.
+
+Battery current was −773 mA before the trial. The worker retained 12 trial
+samples spanning **−10 to +37 mA**. This is near break-even with brief
+positive readings, **not sustained net charging**. Host gauge snapshots use
+a different sampling schedule and can retain an older reading; they must
+not replace the worker's mixed-current range.
+
+Automatic restoration passed: `used=1`, `active=0`, `armed=0`, `restored=1`,
+`restore_failed=0`, `error=0`, and separate PMIC readback confirmed
+`0x04c0=0x02`. Data remained usable after restoration. The recorder was
+stopped and a normal reboot returned the device to iOS on the same hub.
+iOS diagnostics confirmed external power and `BatteryIsCharging=true`.
+No further DFU is planned tonight. Internal storage and the Pi kernel are
+unchanged.
+
+Next: finish J72 source/controller mapping and adapt the existing
+[Orchard charging architecture](ORCHARD-POWER-PLAN.md), then qualify source
+transitions, sustained positive current and charging with the desktop.
+A new DFU will be requested only after a concrete changed test is prepared.
+
 Goal: keep USB networking, shell and the desktop root available while the
 iPad charges, without moving between the Pi and wall charger. This is a plan;
 no Pi-powered charging test has been performed.
@@ -92,10 +120,10 @@ longer or desktop-loaded trials.
 - [x] Identify the generic-PHY/current-request integration gap as a candidate.
 - [x] Confirm official Pi 4 supply, JCH377 model photo and owner-rated 5 V / 4 A hub adapter.
 - [x] Verify self-powered hub, paired iOS data and repeated iOS charging/source reports; build/check a separate guarded hub trial.
-- [ ] Request a changed, prepared DFU and measure current plus stable data.
+- [x] Direct RAM boot, controlled hub transfer, bounded current trial and stable NCM data.
 - [ ] Qualify sustained net charging, source transitions and desktop workload.
 
-The iPad remains charging in iOS through the hub. The next guarded hub test is prepared. The host kernel
+The iPad is back in iOS and machine diagnostics confirm charging through the hub. The bounded trial is complete; the next automatic-policy test is not ready yet. The host kernel
 and iPad internal storage remain unchanged.
 
 ## Owner's available hub: JCH377 confirmed
@@ -195,7 +223,7 @@ been device tested.** It requires one new direct-connected DFU for the whole
 transfer/current batch, if the transfer succeeds. This is one initial cable
 move to qualify the hub path, followed by fixed cabling during charging.
 
-## Current RAM handoff result and Orchard reuse
+## Earlier checkpoint: RAM handoff and unarmed worker
 
 The direct Pi boot passed. After healthy desktop/root/NBD/input teardown,
 the one-shot gadget handoff reached the JCH377 marked port: native NCM

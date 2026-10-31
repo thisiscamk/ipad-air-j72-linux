@@ -4,9 +4,11 @@
 - [x] B02: Linux multitouch slots, evdev and visual orientation passed (owner target/trace confirmation; 21 matched presses/releases). Compositor/libinput, touch menus and launching Foot now pass. Keyboard text entry and the top-bar toggle now pass too. Window dragging also passes. Native Home also opens and closes the menu without the earlier bridge. No new DFU requested.
 - [x] B03: automatic self-check, full cleanup, touch restart and read-only desktop startup passed. The owner confirmed repeated keyboard hide/tap/type after the combined image's fresh boot.
 - [ ] B04: brightness, Linux power-supply registration/readings and the corrected remaining/full capacity pairing passed. A fresh iOS comparison and battery UI remain; battery-health estimates are unqualified.
-- [ ] B04C: brief net charging now passed: one 850 mA / 30-second wall test retained 12 samples at +20…+51 mA, from −766 mA baseline; automatic restoration passed and current returned to −765 mA. iOS recovery and charging are confirmed. Sustained charging, source detection/protections and USB recovery remain open before Wi-Fi.
+- [ ] B04C: powered-hub data continuity now passed during a 30-second 850 mA trial (12 samples −10…+37 mA; baseline −773 mA), with verified rollback and iOS charging recovery. Sustained hub charging remains open. Earlier brief wall charging passed: one 850 mA / 30-second wall test retained 12 samples at +20…+51 mA, from −766 mA baseline; automatic restoration passed and current returned to −765 mA. iOS recovery and charging are confirmed. Sustained charging, source detection/protections and USB recovery remain open before Wi-Fi.
 - [ ] B05–B11: Wi-Fi, persistence/Bluetooth, charging regression with the desktop, audio/rotation, power/remaining hardware, integrated use.
 - [ ] B12–B15: storage read-only qualification, installer rehearsal, separately authorized installation, installed-system verification.
+
+**End of session:** normal iOS charging is confirmed on the powered hub. No further DFU tonight; the next changed charging-policy test needs preparation.
 
 Earlier zero-contact results below are historical. The corrected-power gesture test now passes B01.
 

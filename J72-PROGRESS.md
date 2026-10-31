@@ -2,6 +2,34 @@
 
 Progress report as of 31 October 2026. This is a hardware bring-up report for one iPad, not a general installation guide or an Orchard hardware profile.
 
+## 31 October: powered-hub trial completed; back in iOS
+
+The direct Pi RAM boot and controlled transfer to the powered JCH377's
+marked charging/data port passed. The desktop, USB-backed root, NBD and
+touch worker were stopped before the cable move. Native NCM data remained
+available throughout the subsequent fixed 850 mA / 30-second trial and
+rollback: 49 successful host reads over about 101 seconds, with no read
+errors.
+
+Battery current was −773 mA before the trial. The worker retained 12 trial
+samples spanning **−10 to +37 mA**. This is near break-even with brief
+positive readings, **not sustained net charging**. Host gauge snapshots use
+a different sampling schedule and can retain an older reading; they must
+not replace the worker's mixed-current range.
+
+Automatic restoration passed: `used=1`, `active=0`, `armed=0`, `restored=1`,
+`restore_failed=0`, `error=0`, and separate PMIC readback confirmed
+`0x04c0=0x02`. Data remained usable after restoration. The recorder was
+stopped and a normal reboot returned the device to iOS on the same hub.
+iOS diagnostics confirmed external power and `BatteryIsCharging=true`.
+No further DFU is planned tonight. Internal storage and the Pi kernel are
+unchanged.
+
+Next: finish J72 source/controller mapping and adapt the existing
+[Orchard charging architecture](ORCHARD-POWER-PLAN.md), then qualify source
+transitions, sustained positive current and charging with the desktop.
+A new DFU will be requested only after a concrete changed test is prepared.
+
 **Latest:** the corrected D2089 analog enable (`0x84: 0x00 → 0x07`, preserving voltage setting `0x398 = 0x14`) produced real native finger reports during owner gestures. Of 1,801 checksum-valid native `0x44` frames, 542 contained one finger and 50 contained two. The decoded stream has nine matched press/release lifecycles, coordinates covering most of the panel, and no contacts remaining at the end. No malformed layouts, SPI errors or dropped records occurred; final firmware health, zero global status flags and full hardware restoration passed. Linux evdev and visual orientation have since passed an owner target/trace test, including multiple fingers and 21 matched presses/releases. The owner subsequently opened desktop menus and launched Foot by touch. The owner has now confirmed on-screen keyboard typing and the bar toggle too. Automatic touch and desktop startup have now passed a fresh RAM boot. The owner confirms window dragging and keyboard reopening in both Foot windows after live keyboard changes; the revised keyboard startup package still needs a cold confirmation.
 
 ## Device and approach
