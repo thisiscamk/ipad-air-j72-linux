@@ -2,9 +2,9 @@
 
 - [x] B01: real native one- and two-finger contacts, matched presses/releases, firmware health and full cleanup. Corrected analog enable is `0x07`; voltage setting is unchanged.
 - [x] B02: Linux multitouch slots, evdev and visual orientation passed (owner target/trace confirmation; 21 matched presses/releases). Compositor/libinput, touch menus and launching Foot now pass. Keyboard text entry and the top-bar toggle now pass too. Window dragging also passes. Native Home also opens and closes the menu without the earlier bridge. No new DFU requested.
-- [ ] B03: automatic self-check, full cleanup, touch restart and read-only desktop startup passed a fresh boot. Same-worker reuse also passed. Revised automatic keyboard startup still needs independent cold confirmation.
-- [ ] B04: brightness dim/restore and UART5 gauge transport passed. BQ27545 identity, voltage, charge level and temperature now read in RAM. Linux power-supply integration, iOS comparison and charging qualification remain open.
-- [ ] B04C: Linux charging bring-up immediately after battery reporting, before Wi-Fi. Use a RAM-only recorder for charger tests.
+- [x] B03: automatic self-check, full cleanup, touch restart and read-only desktop startup passed. The owner confirmed repeated keyboard hide/tap/type after the combined image's fresh boot.
+- [ ] B04: brightness and Linux power-supply registration/readings passed. Correct the exported capacity pairing and compare with iOS; battery-health estimates remain unqualified.
+- [ ] B04C: RAM-only wall-charger observation attempted after desktop/export teardown. USB re-enumeration failed, and the Pi needed a restart after the cable/port move. Wall-charger data was not retrieved; measured charging and reliable reconnection remain open. This precedes Wi-Fi.
 - [ ] B05–B11: Wi-Fi, persistence/Bluetooth, charging regression with the desktop, audio/rotation, power/remaining hardware, integrated use.
 - [ ] B12–B15: storage read-only qualification, installer rehearsal, separately authorized installation, installed-system verification.
 
@@ -26,7 +26,7 @@ Updated 31 October 2026. This is a work queue for this exact J72, not a promise 
 - Request a new boot when a kernel/DT/loader change or an independent cold-start check actually needs it.
 - Record a physical screen/gesture/charger check only when the owner performs it. An automated protocol check is not a substitute.
 
-## Latest boot results
+## Previous UART-only boot results
 
 - Automatic touch self-check, cleanup, restart and read-only desktop startup passed.
 - UART5 registered and the bounded voltage trial returned three matching 3.824 V samples. The gauge identified as BQ27545 (`0x0545`); charge, temperature and cycle data also read successfully.
@@ -34,9 +34,13 @@ Updated 31 October 2026. This is a work queue for this exact J72, not a promise 
 - The owner confirmed keyboard hide → tap → type twice in patched Foot; logs independently recorded the tap requests. Combined cold qualification remains open.
 - Desktop/root unmounted, NBD detached and the owned export stopped. The owner confirms normal iOS is visible and wall charging.
 
-## Next charged DFU ready: Linux battery interface plus input fixes
+## Latest combined boot: battery interface and cold input passed
 
-The separate target kernel has built with the HDQ/UART frontend and two-stop-bit serdev API, adapted to verified J72 wiring and BQ27545 identity. The combined image packages the Foot tap fix and bounded touch status retries. Offline driver tests, module/export checks and pinned-artifact preflight passed. The Pi kernel and original desktop image are unchanged. The owner confirms iOS is visible and wall charging; begin only when the owner supplies the next charged DFU.
+The combined image booted and registered the guarded BQ27545 Linux power supply. Automatic touch/desktop startup passed, and the owner confirmed repeated keyboard hide/tap/type without live repairs. Three initial battery samples reported 78%, about 4.09 V and 34.6°C, with discharge current on the Pi link. The Pi kernel and original desktop image are unchanged.
+
+The desktop/root, NBD export and touch worker were then stopped cleanly. A RAM-only recorder was started before the owner moved to the wall charger. USB failed to enumerate on return to the Pi. During the cable/port move the owner reported that the Pi hung and needed restarting. The wall-charger recording was not retrieved. The iPad is back on its charger; no wall-charging success is claimed. The previous host boot's crash journal is unavailable, so the cause of the host hang is not established.
+
+The completed boot's test sequence was:
 
 1. Verify exact J72 identity and pinned artifacts, then boot the combined image.
 2. Check the battery driver identifies `0x0545` and registers a Linux power supply; keep both USB debug paths available.
@@ -46,7 +50,15 @@ The separate target kernel has built with the HDQ/UART frontend and two-stop-bit
 6. After battery reporting passes, prioritize B04C charging bring-up. Continue in this boot if the recorder and required driver changes can run from RAM; otherwise prepare a concrete changed image for a later DFU. Stop and detach the USB-backed desktop root before any cable change.
 7. Stop desktop/input, export evidence, detach the root/export and return to iOS.
 
-**Current preparation:** UART transport and identity have passed on the device. The proper Linux battery frontend and newly packaged input fixes are built and offline checked, but remain untested together. Signed UPower packages are staged for a possible same-boot indicator trial after the kernel interface passes; no indicator is included in the automatic startup yet. The prepared image performs no battery NVM or charger-control writes. No iPad storage write is authorized.
+**Remaining battery work:** a fixed read-only audit showed that the compensated remaining/full pair agrees with the gauge percentage, while Linux's exported `charge_now` uses uncompensated capacity. Correct that pairing and compare with iOS before displaying health estimates. Signed UPower packages remain staged; their UI trial is deferred. The current image performs no battery NVM or charger-control writes. No iPad storage write is authorized.
+
+### Prepare before the next charging attempt
+
+- Correct the exported remaining/full capacity pairing and retain the working image as a fallback.
+- Reduce verbose per-transfer SPI logging so startup and USB diagnostics remain available.
+- Show the RAM recorder's readings on the iPad as well as retaining its log, allowing an owner photo or reading if USB cannot return.
+- Prepare a bounded local USB-recovery action, guarded by desktop/root/export teardown. Qualify it while still attached to the Pi before another charger transition; it is an untested recovery candidate.
+- Capture host and target USB diagnostics before a transition. Keep the Pi kernel unchanged. Request another charged DFU only once the concrete revised test is built and checked.
 
 ## Immediately after battery reporting: B04C charging bring-up
 
@@ -61,7 +73,7 @@ Reuse the battery-test RAM boot when possible. New kernel/DT requirements may ne
 
 ## Subsequent DFUs and dependencies
 
-- **B04:** qualify the new Linux battery interface, compare plausible readings with iOS and assess current/capacity interpretation. Brightness and actual UART5 gauge communication passed. The Linux battery image is ready for its first device test; charging remains untested.
+- **B04:** Linux battery registration, repeated telemetry, current sign and a raw capacity comparison passed. Correct the exported capacity pairing and obtain a fresh iOS comparison. Brightness already passed.
 - **B04C, next after B04:** bring up and measure Linux charging using a RAM-only diagnostic environment, before Wi-Fi work. The current image adds reporting only; charging diagnostics/control still need preparation and qualification.
 - **B05–B06:** build and qualify the A7 internal HSIC/EHCI bus, enumerate the WLAN device, then validate matching firmware and the USB driver protocol, association and traffic. These are separate risks and may need several boots.
 - **B07–B11:** host persistence and Bluetooth, full-desktop charging/cable regression, audio and rotation, power and remaining hardware, then integrated daily-use tests. Reuse a boot for userspace and runtime changes wherever possible.
@@ -77,7 +89,7 @@ IDs identify milestones, not a guaranteed one-DFU-per-row schedule. Batches may 
 | --- | --- | --- |
 | **B01 — passed: contact detection** | Corrected the missing shared analog enable. Native one- and two-finger reports, coordinates and matched release lifecycles now pass. | Owner gesture capture, final firmware health and full hardware restoration passed. |
 | **B02 — passed: Linux input** | Linux MT slots, screen mapping, menus, Foot launch, typing and the keyboard toggle passed. | Window dragging and native Home menu open/close passed. |
-| **B03 — partly passed: integrated cold start** | Automatic self-check, full cleanup, touch restart and desktop startup passed a fresh boot; a longer cycle and another same-boot restart also passed. | Confirm the revised automatic keyboard startup independently after a later cold boot; Revised teardown passed after fixing a symlink check; return to iOS has been requested. |
+| **B03 — passed: integrated cold start** | Automatic self-check, full cleanup, touch restart and desktop startup passed. The combined image includes the touch retry and Foot focus fixes. | Owner confirmed repeated keyboard hide/tap/type after the fresh boot. Final touch health/cleanup and desktop/export teardown also passed. |
 | **B04 — partly passed: battery and display controls** | Owner confirmed PMIC brightness dim/restore. Bring up the J72 UART5/HDQ gauge using exact board wiring; begin with identification and telemetry. Read brightness through the existing PMIC backlight driver, then test bounded changes and restore the starting value. | Plausible battery voltage, temperature, state of charge and current; compare with an iOS baseline. Owner confirms brightness changes. Battery reporting alone does not establish charging. |
 | **B04C — next after battery reporting: charging bring-up** | Audit J72 charger/source detection and limits; measure the Pi arrangement, then use a fully RAM-resident recorder for wall-charger attach/detach. Qualify any required charger-driver changes. This precedes Wi-Fi work. | Sustained measured net charging, consistent charge trend, qualified temperature/current limits and recovery of USB debugging/iOS. Owner changes cables only after the desktop root/export is detached. |
 | **B05 — Wi-Fi bus and device** | Qualify the internal EHCI/HSIC host, PHY, clocks, rails and reset without disturbing the external USB gadget. Read descriptors before selecting a WLAN transport driver. | The internal WLAN USB device enumerates and remains stable; external USB debug still works. Firmware startup and association are separate checks. |
@@ -97,7 +109,7 @@ IDs identify milestones, not a guaranteed one-DFU-per-row schedule. Batches may 
 | Workstream | Prepare before the relevant DFU | Current evidence / unresolved work |
 | --- | --- | --- |
 | Input and desktop | Packet parser, contact-state checks, libinput orientation, Home binding, keyboard, service startup and teardown. | Native touch, menus, window dragging and keyboard entry work; native Home passed; revised keyboard cold startup remains open. |
-| Battery and charging | Audit the HDQ UART implementation, J72 clock/pin mapping, read-only gauge commands, charger telemetry and recording tools. | J72's UART5 gauge returned DEVICE_TYPE `0x0545` (BQ27545) and plausible voltage, charge level and temperature. The guarded Linux frontend is built but untested. Air 2 protocol work is reusable with different board wiring. J72's D2089 PMU needs its own charger audit. |
+| Battery and charging | Audit the HDQ UART implementation, J72 clock/pin mapping, read-only gauge commands, charger telemetry and recording tools. | The guarded BQ27545 Linux frontend now runs on J72. Voltage, current, charge level and temperature read successfully; capacity pairing needs correction. Charger observation needs log recovery after USB re-enumeration failed. No charger-control write was made. |
 | WLAN and Bluetooth | Map J72 HSIC/PHY/UART power dependencies, audit transport compatibility and privately stage matching firmware/board inputs. | The captured iOS tree places WLAN under EHCI/HSIC; an observed internal device has VID:PID `0a5c:bd1c`. This is not evidence that the current Linux USB WLAN driver supports it. |
 | Display and power | Prepare backlight read/restore tools, thermal/idle logging, and display/input rotation configuration. | The existing PMIC backlight driver passed a visible three-second dim/restore check and restored the original value. Battery voltage and temperature were read through the UART diagnostic; the Linux battery interface is ready for device qualification. CPU thermal and wider power management remain open. |
 | Root filesystem | Preserve the existing image; prepare an isolated host-backed writable copy, package cache, service definitions and reproducible image recipe. | This can establish persistence and update behavior before internal storage. |

@@ -45,9 +45,10 @@ The [DFU session plan](DFU-PLAN.md) expands these milestones into proposed boot 
 - [x] Verify touch menus, launching Foot and on-screen keyboard typing/toggle in the unprivileged desktop.
 - [x] Confirm window dragging in the integrated session.
 - [x] Confirm native Home menu open/close in the integrated session.
-- [ ] Repeat cold RAM boots and verify cleanup and return to iOS.
+- [x] Qualify the combined touch/keyboard image after a fresh RAM boot and verify final touch cleanup.
+- [ ] Repeat longer integrated sessions and qualify USB reconnect and return to iOS with the new battery image.
 
-The current driver correction starts every explicit transfer before queuing bytes, enables AUTO_TX only for receive-only transfers, drains the receive side within the FIFO window, and fixes the reversed Linux bit-order flag mapping. The GPIO path is a working upload fallback. Several distinct modules can run in one RAM session; these milestones are not necessarily one DFU each. Native touch input and text entry now reach the desktop. The reusable worker and automatic touch/desktop startup passed a cold RAM boot and same-boot reuse. Live keyboard focus changes work; their revised startup package still needs independent cold confirmation.
+The current driver correction starts every explicit transfer before queuing bytes, enables AUTO_TX only for receive-only transfers, drains the receive side within the FIFO window, and fixes the reversed Linux bit-order flag mapping. The GPIO path is a working upload fallback. Several distinct modules can run in one RAM session; these milestones are not necessarily one DFU each. Native touch input and text entry now reach the desktop. The reusable worker and automatic touch/desktop startup passed a cold RAM boot and same-boot reuse. The combined keyboard focus and touch retry fixes also passed an owner check after a fresh boot.
 
 **Pass:** repeated cold RAM boots give usable touch in an unprivileged Omarchy A session, with clean return to iOS.
 
