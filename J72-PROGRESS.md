@@ -293,3 +293,14 @@ Automatic touch self-check, full cleanup, restart and desktop startup passed. Th
 The owner confirmed the red live readings screen and an advancing uptime counter. The first physical Home request rebound the USB gadget and restored network collection without new host USB descriptor errors. A serial-shell check then failed, and subsequent network traffic also stopped responding. This sequence does not establish the cause. The second Home request restored network access; four successive network queries over 30 seconds passed without opening serial. Thus local USB recovery is **partial**, not a demonstrated fix for both debugging paths or the earlier host hang.
 
 A fresh RAM recorder now reports voltage, current, temperature and percentage on screen. Its Pi baseline was 90%, 4.053 V, approximately −744 mA and 34.9°C. The Home recovery watcher was stopped so it cannot change USB state during the wall measurement. The owner has been asked for screen readings/photos after about one and five minutes on the usual wall charger, leaving Linux running and the iPad on that charger. Results are pending; **no Linux wall-charging success is claimed**. Return to iOS on the charger is required before another Pi connection in this trial. No charger-control, battery-NVM or internal-storage write was made.
+
+### Wall-charger photos: net discharge observed
+
+The owner supplied two screen photos and explicitly confirmed both were taken while connected to the wall charger, after disconnecting from the Pi. Ordered by displayed uptime, the readings are:
+
+| Uptime | Battery | Voltage | Current | Temperature | Status |
+| --- | --- | --- | --- | --- | --- |
+| 1,017.95 s | 88% | 4,046 mV | −743 mA | 34.0°C | Discharging |
+| 1,179.34 s | 86% | 4,037 mV | −746 mA | 34.5°C | Discharging |
+
+The 161.39-second interval shows **net battery discharge on the wall charger in this Linux session**. It does not identify the missing charger/source-control behavior or establish a full charger policy. The screen continued to say USB `configured` after the physical change; that value does not prove current source detection. The complete wall RAM log has not been retrieved. No charger control was changed. The owner returned to iOS while the iPad stayed on the wall charger and confirmed that iOS is visible and charging. The photos and identifying raw evidence remain private.
