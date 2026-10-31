@@ -153,3 +153,41 @@ A separate pair of diagnostics is built but **not run** for C8 = `0x09`: contact
 Per-frame status `0x1000` occurs in 5,187 of the 5,297 native frames and 1,037 of the 1,089 raw hold frames. One producer derives those high status bits from a difference between frame and selected-channel masks. This does not establish a fatal error or a defective sensor. The separately queried global status flags were zero. Full interpretation remains open.
 
 All four prepared modules pass local source/hash/ARM64/ABI preflight. Twenty offline wire, parser, transfer and sample-stage checks pass; a later-stage image cannot silently pass the earlier-stage trial. The next boot can qualify the short probes first, then select the justified owner test without another DFU between modules. Firmware, disassembly, calibration and captures remain private. The reusable diagnostic redesign remains planned; these prepared probes use the existing one-shot guards.
+
+## Controller identity and reusable research — 31 October
+
+### Identity and related Apple devices
+
+The [iFixit iPad Air LTE teardown, step 18](https://www.ifixit.com/Teardown/iPad+Air+LTE+Teardown/18907) identifies **two Broadcom BCM5976C1KUB6G** touchscreen controllers. That is physical evidence for the model, not an inspection of this owner's unopened board. On this J72, the measured ROM identity is `0x434d15c1`, while the working iOS driver identifies the N1 path and personality `C1F15,1`. These software identifiers are not interchangeable with a package part number, nor do they identify the role of both physical chips.
+
+| Device | Evidence of relationship | Porting relevance |
+| --- | --- | --- |
+| iPad Air 1 LTE | Two BCM5976C1KUB6G parts in the teardown above; exact J72 software measurements recorded here. | Target board. |
+| [iPad Air 2](https://www.ifixit.com/Teardown/iPad+Air+2+Teardown/30592) | BCM5976 digitizer controller identified; also a TI part. | Related silicon, different A8X SPI/power/board wiring. |
+| [iPad 5, 2017](https://www.ifixit.com/Teardown/iPad+5+Teardown/85098) | Two BCM5976 controllers identified. | Its working Orchard N1 port is already a close protocol reference. |
+| [iPad mini 4](https://www.ifixit.com/Teardown/iPad+Mini+4+Teardown/48891) | BCM5976 digitizer controller identified. | Related hardware; no interchangeable firmware/profile assumption. |
+| iPhone 5/5c/5s/6/6 Plus/first SE | The iPad 5 teardown explicitly identifies the family across these models; [first-generation SE teardown](https://www.ifixit.com/Teardown/iPhone+SE+Teardown/60902) also lists BCM5976. | Useful older Z2/N1 comparisons; screen geometry, silicon revisions and power controls vary. |
+| A7 iPad mini 2 J86 | [Native driver and board notes](https://github.com/perryraskin/ipad-mini2-linux/blob/e23198d54211ac46a7a9dc14d11100a308555543/HARDWARE.md) report a working N1 implementation. Its source expects ROM `0x434d15c0` and firmware personality `C1F14,3`. | Closest new software reference, with a different ROM revision, firmware and GPIO/SPI mapping. Exact BCM package marking is not established by this software source. |
+| MacBook trackpads / Touch Bars | The Air teardown identifies a related BCM5976 MacBook part; Linux also has `bcm5974`, `applespi` and `apple_z2` input drivers. | Report/slot/coordinate ideas only; related silicon or formats do not imply the same transport, startup or record stride. |
+
+### GitHub references ranked for this problem
+
+| Project | What is useful now | Qualification limit |
+| --- | --- | --- |
+| [perryraskin/ipad-mini2-linux](https://github.com/perryraskin/ipad-mini2-linux/tree/e23198d54211ac46a7a9dc14d11100a308555543) | Same A7 generation, N1 startup, resident stop/restart design, and a concrete D2089 analog-control difference. The README reports owner-confirmed aligned app taps. | Different exact board/ROM/firmware. Inspect source and independently verify J72 values. |
+| [jacopone/ipad-nixos BCM5976 research](https://github.com/jacopone/ipad-nixos/blob/a5a92b3921e01b0a6a22991829531cd8e13aa7e9/research/touch-deep-dive.md) and [mattonik's developed work](https://github.com/mattonik/ipad-nixos/blob/b94d42f78e04c5465e290340a5b6879bbc5956b6/research/touch-deep-dive.md) | Useful Air 2 research index, SPI/FIFO investigations, firmware framing and board-evidence workflow; the developed tree has already informed this project. | The mattonik copy explicitly corrects early drop-in-driver claims. Neither the research title nor selecting `CONFIG_TOUCHSCREEN_APPLE_Z2` proves working J81 touch. Our observed 30-byte contact stride also prevents blindly copying a 32-byte structure. |
+| [Orchard J71t/N61 work](https://github.com/OrchardLinux/orchard/pull/28) | Physically tested N1 control framing, bounded classic reports and input handling; see the PR review above. | Device power, firmware and calibration stay model-specific. |
+| [Project Cascadia P105 N1 analysis](https://github.com/rzxvx/Project-Cascadia/blob/9e299e4af773cdb43a1206c5051f5d3964769acc/docs/research/p105-z2-boot.md) | Exact-stock N1 defaults, live calibration, and the distinction between responding firmware and active scanning. | A5/P105, not A7/J72. |
+| [Corellium hx-touchd](https://github.com/corellium/projectsandcastle/blob/03db9c6ae04141eb940f3b9f56d446f50d57fadf/hx-touchd/mtfw/mtfw.c) | Historical Z2/HBPP framing, checksums and firmware conversion; already used as a reference. | Generic loader behavior does not replace the exact N1 personality/defaults. |
+| [lemonjesus/ipad-touch-screen](https://github.com/lemonjesus/ipad-touch-screen/tree/1f8a12e562c358356dfa171e3989f7bc53e37ace) | Demonstrated iPad 3 initialization capture/replay and USB multitouch conversion; useful methodology and report handling. | Its physical Pico/soldering path is outside this owner's software-only scope, and its README explicitly excludes direct Air/Mini compatibility. |
+| [modpunk's iPhone 6s touch research](https://github.com/modpunk/Omarchy-iPhone6s/blob/ed2a4584caa8bcf908d1958d791242932da8e26c/docs/drivers/touch.md) | Documents a real coarse-report failure despite working firmware/IRQ/SPI, reinforcing the need to inspect actual packet content. | That revision explicitly parks full-resolution touch; it is not a working replacement driver. |
+
+Mainline [apple_z2](https://github.com/torvalds/linux/blob/master/drivers/input/touchscreen/apple_z2.c), [bcm5974](https://github.com/torvalds/linux/blob/master/drivers/input/mouse/bcm5974.c), [openiBoot](https://github.com/iDroid-Project/openiBoot) and [Asahi's firmware extraction](https://github.com/AsahiLinux/asahi-installer/blob/main/asahi_firmware/multitouch.py) remain supporting references. Their packet and transport assumptions must be checked individually.
+
+### Concrete finding: an omitted analog dependency
+
+The [J86 driver](https://github.com/perryraskin/ipad-mini2-linux/blob/e23198d54211ac46a7a9dc14d11100a308555543/touch/native/j86_touch.c) enabled bits `0..2` of D2089 register `0x84`; our J72 probes enabled only bit 2. Re-reading the **exact J72 iOS 12.5.7 driver** independently confirms the missing dependency: after applying the table's rail bit, its special handling also sets the two shared control bits. For our guarded idle baseline, the intended transition is therefore `0x00 → 0x07`, not `0x00 → 0x04`.
+
+This is a demonstrated mismatch to the stock software sequence, **not yet proof of the entire touch failure's cause**. Firmware communication can be healthy while an analog prerequisite is missing. The programmed voltage code is retained; no new voltage is selected. The new probes require the exact initial register values, verify the corrected enabled values, and restore all three owned bits along with the existing LDO/pin/clock state.
+
+The next priority is now the corrected-analog native idle probe, followed by a confirmed owner contact/release capture if health and restoration pass. Corrected-analog earlier-image idle/live probes are also built as a fallback in the same RAM boot. All four pass offline hash/ARM64/ABI preflight; the existing 20 offline checks pass. **None of the corrected-power probes has run.** The earlier contact-mask/sample-stage probes remain controls, but their old analog setup must not be mistaken for the corrected baseline. The iPad remains on its charging break; no new DFU has been requested.
