@@ -12,7 +12,7 @@ Private firmware, device calibration, identifying logs, and local disk images ar
 
 **Working source:** [code/](code/) now contains the measured SPI driver, touch worker and decoder, HDQ battery frontend, bounded charging diagnostics, desktop changes and offline tests. Private firmware/calibration are supplied separately. [Native Orchard integration work](code/UPSTREAM-PLAN.md) remains before resubmission.
 
-**Interim upstream contribution:** [draft Orchard PR #43](https://github.com/OrchardLinux/orchard/pull/43) records the interim J72 report. Review is on hold while an implementation contribution is prepared.
+**Interim upstream contribution:** [draft Orchard PR #43](https://github.com/OrchardLinux/orchard/pull/43) now includes the working SPI, touch, battery and tested 425 mA development sources under `experiments/j72/`, plus the J72 report. Review remains on hold pending native Orchard integration and exact-revision hardware qualification.
 
 **Latest session:** the revised kernel booted and corrected the exported remaining/full capacity pairing. The two values agreed with 100% charge at startup; later readings also followed the reported percentage. Automatic touch and desktop startup passed again. The touch worker stopped after 2,619 emitted frames with no rejected layouts, SPI errors, timeouts or recoveries, and passed firmware health and hardware cleanup. The previous cold boot already passed the owner's repeated keyboard hide/tap/type check.
 
