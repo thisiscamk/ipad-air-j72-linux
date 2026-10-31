@@ -225,3 +225,16 @@ The wall-only 850 mA trial must not be run unchanged on a direct Pi port.
 
 This work precedes another longer wall-only test where practical. No new
 DFU is requested until a concrete source-qualified test is ready.
+
+### Next DFU ready: verified powered JCH377, data retained
+
+- [x] Owner model/marked port confirmed; adapter 5 V / 4 A, official Pi supply.
+- [x] Paired iOS data and repeated charging reports pass; iOS reports 5 V / 1.5 A source.
+- [x] Separate fixed 850 mA / 30-second worker built, source-gated and tested offline; original wall assets unchanged.
+- [ ] Boot the unchanged RAM image through this hub and verify baseline, startup and clean teardown.
+- [ ] Run one guarded current/data comparison without any cable move; verify automatic restoration and USB stability.
+- [ ] Return to iOS on the same connection and confirm charging/data recovery.
+
+The hub/iPad-only cable-move hang remains unexplained; previous-boot logs are
+unavailable. Keep the present wiring fixed. This short data-retained test
+precedes longer charging qualification. One new DFU is required for the batch.

@@ -90,30 +90,41 @@ longer or desktop-loaded trials.
 
 - [x] Audit Pi power specification, attached SSD descriptor and target source.
 - [x] Identify the generic-PHY/current-request integration gap as a candidate.
-- [ ] Obtain Pi supply rating and any existing powered hub's model/rating.
-- [ ] Select and qualify the power/data path; prepare guarded test artifacts.
+- [x] Confirm official Pi 4 supply, JCH377 model photo and owner-rated 5 V / 4 A hub adapter.
+- [x] Verify self-powered hub, paired iOS data and repeated iOS charging/source reports; build/check a separate guarded hub trial.
 - [ ] Request a changed, prepared DFU and measure current plus stable data.
 - [ ] Qualify sustained net charging, source transitions and desktop workload.
 
-The iPad remains charging in iOS. No DFU is requested yet. The host kernel
+The iPad remains charging in iOS through the hub. The next guarded hub test is prepared. The host kernel
 and iPad internal storage remain unchanged.
 
-## Owner's available hub: model confirmation pending
+## Owner's available hub: JCH377 confirmed
 
-The owner reports an external hub with a **5 V / 4 A** adapter and an
-uncertain model reading of **JCH337**, plus the official Pi 4 power supply.
-The closest documented candidate is **j5create JCH377**, not a confirmed
-identification. Its [manufacturer specification](https://en.j5create.com/pages/jch377-specifications)
-lists the same adapter rating and one 2.4 A fast-charging USB-A port plus
-six other data ports. The [manufacturer quick guide](https://download.j5create.com/qig/JUH377_JCH377_qig.pdf)
-identifies the marked charging port. These documents do not by themselves
-prove which charging mode operates simultaneously with data on this unit.
+The owner supplied a photo confirming **j5create JCH377**, confirmed the
+marked charging port and reports a **5 V / 4 A** adapter. The Pi uses its
+official Pi 4 supply. The [manufacturer specification](https://en.j5create.com/pages/jch377-specifications)
+lists one 2.4 A fast-charging USB-A port plus six other data ports; the
+[quick guide](https://download.j5create.com/qig/JUH377_JCH377_qig.pdf) identifies
+the marked charging port. Raw owner photos and identifying label data stay
+private.
 
-A photo of the actual label/ports/data cable is requested. If confirmed,
-use the hub's own adapter and its proper upstream data cable to a Pi USB-A
-host port. The Pi retains its official supply; its attached SSD stays in
-place. Initial topology is Pi data -> powered hub -> marked port -> iPad.
-Charging power should come from the hub adapter, subject to verification.
+The connected hub enumerates as self-powered. The iPad enumerates through
+its marked port at 480 Mbit/s, pairing validates, and three repeated normal
+iOS diagnostic reads report `IsCharging=true`, `ExternalConnected=true`,
+`ExternalChargeCapable=true` and adapter details of **5 V / 1.5 A**. This
+establishes simultaneous iOS charging reports and working data access;
+it does not measure physical USB input current or independently identify the
+charging protocol. The iOS USB descriptor still declares 500 mA, distinct
+from its reported charging-source allowance.
+
+The owner reported a Pi hang while changing only the hub/iPad cables; the
+SSD was not moved. After restart the hub/iPad enumerate and diagnostic reads
+work. Only the current boot's journal is available, so the hang's cause is
+unresolved. The SSD remains attached directly and holds the Pi's running root
+filesystem. Keep the current cables fixed for the next test.
+
+The verified topology is Pi data -> powered JCH377 -> marked charging port
+-> iPad, with the hub's own adapter and the Pi's own official supply.
 
 Before requesting a DFU:
 
@@ -131,3 +142,27 @@ Before requesting a DFU:
    duration or add the desktop workload.
 
 No new hardware purchase is proposed before checking the available hub.
+
+## Prepared next DFU: short Linux test with data retained
+
+The separate hub-source worker keeps the measured 850 mA ceiling, 30-second
+independent rollback and battery guards. It changes the source arming token
+and parameter, preserving the measured wall variant. It performs no current
+write at load or arm; one instructed physical Home press triggers one trial.
+The host checks the dynamically discovered, iOS-qualified physical port, hub
+identity/revision, self-powered descriptor and current host boot before
+staging or arming. Rebooting the host requires source requalification. These
+checks are not continuous electrical source detection.
+
+Native ARM64 `W=1` build/modpost, 15 policy fault/normal cases, ten battery
+guards, 12 synthetic topology tests and three invalid CLI/source refusals
+passed. The policy core and kernel import list match the wall-tested worker.
+The original #33 target image and host kernel are unchanged. **The hub Linux
+trial is not yet device tested.**
+
+In the next RAM boot, verify baseline configuration/current and clean desktop
+input/root teardown, then monitor USB and battery before/during/after the
+bounded test without moving cables. If the inherited PMIC ceiling differs
+from the worker's required 100 mA baseline, preserve that boot and inspect it
+read-only instead of forcing a setting. Require final restoration, stable
+data and iOS recovery before extending duration or adding desktop load.

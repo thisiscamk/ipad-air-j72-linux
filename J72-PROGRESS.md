@@ -427,3 +427,19 @@ the 850 mA variant used for this result is not bundled in that snapshot.
 Next: implement source-aware bounded charging, qualify a longer guarded
 measurement and recovery, then proceed to Wi-Fi. No internal-storage writes
 or host-kernel changes were performed.
+
+## Powered hub identified and iOS charging/data verified
+
+The owner-confirmed JCH377 with a 5 V / 4 A adapter enumerates as self-powered.
+The iPad is reachable through its marked charging port at 480 Mbit/s; pairing
+and three diagnostic reads pass while iOS reports charging and a 5 V / 1.5 A
+adapter allowance. Actual USB current and the precise detection protocol were
+not independently measured. The owner reports a Pi hang during changes to
+only hub/iPad cables; the SSD stayed connected. The cause is unresolved
+because the previous boot's journal was not retained.
+
+A separate hub-source 850 mA / 30-second worker and source-gated host helper
+are prepared; native build and policy/topology/refusal tests pass. No Linux
+hub current trial has run yet, no charger setting was changed during this
+preparation, and the next test keeps all cables fixed. See
+[the Pi charging plan](PI-CHARGING-PLAN.md).
