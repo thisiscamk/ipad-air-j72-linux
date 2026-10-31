@@ -1,3 +1,21 @@
+# 1 November: five-minute powered-hub charging passed
+
+The fixed 1,050 mA test completed **300.006 seconds**, retaining **140 positive
+samples at +153..+209 mA**, from -830 mA baseline. USB data stayed connected;
+the host made 529 active-phase status reads. Maximum recorded temperature was
+37.2 C and guard voltage 4.139 V. No battery/source faults occurred. Automatic
+rollback passed with independent 0x04c0=0x02 readback, and the recorder stopped.
+
+This qualifies the five-minute diagnostic workload on the source-qualified
+powered JCH377 port. Autonomous charger detection, source transitions and
+full desktop charging remain open. Battery percentage jumped under load
+changes, so a percentage increase is not claimed as charge gained.
+
+The [measured five-minute worker source](code/charging/hub1050-long/) is now
+included beside the [short worker](code/charging/hub1050/). Both are also in
+Orchard PR #43 for interim implementation review. Wi-Fi will be a separate
+follow-up once it works. No internal-storage write is authorized.
+
 # 1 November: 1,050 mA / 30-second powered-hub test passed
 
 All **12 retained worker samples** were positive at **+177..+213 mA** battery

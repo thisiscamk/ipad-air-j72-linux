@@ -8,7 +8,7 @@
 - [ ] B05–B11: Wi-Fi, persistence/Bluetooth, charging regression with the desktop, audio/rotation, power/remaining hardware, integrated use.
 - [ ] B12–B15: storage read-only qualification, installer rehearsal, separately authorized installation, installed-system verification.
 
-**Current session:** Linux #33 remains running on the powered hub. EHCI capabilities/domain restoration passed. The 1,050 mA / 30-second test then passed with 12 samples at +177…+213 mA, USB data retained and verified rollback. A guarded five-minute test at the same setting is staged in the same RAM boot. The earlier 1,250 mA pack-guard stop remains a separate failed qualification.
+**Current session:** Linux #33 remains running on the powered hub. The 1,050 mA short and five-minute tests passed; the long test retained 140 positive samples at +153…+209 mA with USB data and verified rollback. Autonomous source policy and desktop charging remain open. The separate Wi-Fi kernel build completed; HSIC/firmware integration is still pending.
 
 ## Power and Wi-Fi work queue — 1 November
 
@@ -20,7 +20,7 @@
 - [x] Prepare an EHCI capability diagnostic using the existing Linux power-domain owner and a temporary node; no radio, PHY, GPIO or PMIC programming.
 - [x] Boot directly from the Pi; qualify EHCI capabilities and domain restoration, then use the proven controlled transfer to the hub. EHCI 1.0 / three ports read successfully; domain restored. The observer code remains resident because module unloading is disabled.
 - [x] Complete the short charging comparison: 1,050 mA / 30 seconds passed, with 12 retained samples at +177…+213 mA, USB data live, no guard faults and verified rollback. The earlier 1,250 mA comparison aborted and remains unqualified.
-- [ ] If the short test passes, measure sustained charging in the same RAM boot.
+- [x] Measure five-minute charging in the same RAM boot: 140 positive samples, USB data retained, maximum 37.2 C, error-free rollback. Diagnostic workload/known powered hub only.
 - [ ] Implement and qualify autonomous J72 source detection, fault handling and source withdrawal; host-qualified experiments are an interim step.
 - [ ] Implement internal HSIC/WLAN power, clock and reset sequencing; enumerate the actual USB device before selecting its transport changes.
 - [ ] Start matching Wi-Fi firmware/driver, then test scan, association, DHCP, DNS, traffic and reconnects.

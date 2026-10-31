@@ -13,8 +13,8 @@ exact-board guards and direct hardware access. Review them before reuse.
 | [charging](charging/) | Read-only PMIC observer and the tested 425 mA one-shot kernel worker/policy core | -764 mA baseline, -423…-400 mA trial, automatic restoration and -767 mA afterward |
 | [desktop](desktop/) | wvkbd v0.20 changes, keyboard controller and experimental Foot 1.28 tap patch | Repeated keyboard hide/tap/reopen/type in the tested desktop combination |
 
-The later 850 mA / 30-second follow-up produced +20…+51 mA net battery
-current and verified restoration; sustained charging remains unqualified.
+The earlier 850 mA / 30-second follow-up produced +20…+51 mA net battery
+current and verified restoration. The five-minute hub result below is newer.
 This source snapshot contains the 425 mA worker, not that 850 mA variant.
 The Foot patch's independent contribution was not isolated from the other
 keyboard/input fixes. See [the evidence report](../J72-PROGRESS.md).
@@ -26,6 +26,14 @@ policy, source guard tests and sanitized validation. Its 30-second test
 retained 12 samples at +177..+213 mA, kept USB data and restored the original
 input limit. Sustained charging and autonomous source policy remain open.
 This is an additional source snapshot; the original 425 mA worker is retained.
+
+## Five-minute hub result and code
+
+The [five-minute worker](charging/hub1050-long/) completed 300 seconds with
+140 positive samples at +153..+209 mA, USB data retained and verified rollback.
+This qualifies that diagnostic workload on the known powered hub. Automatic
+source policy, cable transitions and desktop charging remain open. Wi-Fi
+implementation is reserved for a separate contribution after it works.
 
 ## Run tests without an iPad
 
@@ -107,4 +115,5 @@ This source release does not reproduce the entire boot image or desktop
 filesystem. An Orchard implementation still needs the bindings, normal
 clock/regulator ownership, firmware recipe and host/runtime integration
 listed in [UPSTREAM-PLAN.md](UPSTREAM-PLAN.md), followed by exact-revision
-hardware testing. Keep PR #43 in draft while that work is prepared.
+hardware testing. PR #43 is submitted for interim implementation review;
+normal Orchard integration remains follow-up work.
