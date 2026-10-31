@@ -1,0 +1,29 @@
+diff --git a/input.c b/input.c
+index f6ba9de..da15737 100644
+--- a/input.c
++++ b/input.c
+@@ -1,4 +1,5 @@
+ #include "input.h"
++#include "ime.h"
+ 
+ #include <string.h>
+ #include <unistd.h>
+@@ -3595,6 +3596,18 @@ wl_touch_up(void *data, struct wl_touch *wl_touch, uint32_t serial,
+ 
+     switch (seat->touch.state) {
+     case TOUCH_STATE_HELD:
++        /* A short grid tap is an explicit request for text input, including
++         * when the keyboard was manually hidden while this terminal retained
++         * focus. Re-enable in a separate committed transaction so Labwc's
++         * input-method relay delivers a fresh activation. Scroll/drag paths
++         * and physical mouse clicks do not enter this branch.
++         */
++        if (seat->ime_focus == term &&
++            seat->touch.surface_kind == TERM_SURF_GRID) {
++            ime_disable(seat);
++            ime_enable(seat);
++            LOG_INFO("touch tap requested input method");
++        }
+         wl_pointer_button(seat, NULL, seat->touch.serial, time, BTN_LEFT,
+                           WL_POINTER_BUTTON_STATE_PRESSED);
+         /* fallthrough */

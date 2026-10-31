@@ -10,3 +10,16 @@ logs/
 *.mon
 *.pcap
 *.pcapng
+
+# Generated private packet includes and kernel build products.
+*.inc
+*.ko
+*.o
+*.mod
+*.mod.c
+*.cmd
+Module.symvers
+modules.order
+__pycache__/
+code/**/private/
+code/**/build/

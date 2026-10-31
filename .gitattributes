@@ -1,0 +1,2 @@
+# Unified-diff context carries significant prefix whitespace.
+code/**/*.patch -whitespace

@@ -10,6 +10,8 @@ The present desktop uses software rendering and a read-only Arch Linux ARM files
 
 Private firmware, device calibration, identifying logs, and local disk images are intentionally excluded.
 
+**Working source:** [code/](code/) now contains the measured SPI driver, touch worker and decoder, HDQ battery frontend, bounded charging diagnostics, desktop changes and offline tests. Private firmware/calibration are supplied separately. [Native Orchard integration work](code/UPSTREAM-PLAN.md) remains before resubmission.
+
 **Interim upstream contribution:** [draft Orchard PR #43](https://github.com/OrchardLinux/orchard/pull/43) records the interim J72 report. Review is on hold while an implementation contribution is prepared.
 
 **Latest session:** the revised kernel booted and corrected the exported remaining/full capacity pairing. The two values agreed with 100% charge at startup; later readings also followed the reported percentage. Automatic touch and desktop startup passed again. The touch worker stopped after 2,619 emitted frames with no rejected layouts, SPI errors, timeouts or recoveries, and passed firmware health and hardware cleanup. The previous cold boot already passed the owner's repeated keyboard hide/tap/type check.
