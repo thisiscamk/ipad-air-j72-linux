@@ -365,3 +365,13 @@ The final screen reports `used=1`, `active=0`, `restored=1`, `restore_failed=0`,
 This reversible response supports a substantial input-limit contribution to the discharge: its magnitude fell by approximately 45–48% during the trial. It does not measure actual USB input current. **Net battery current remained negative throughout the retained samples, so Linux charging has not passed.** No higher-current step, charge-timer reset, GPIO/ADC change, battery NVM operation or internal-storage write was performed.
 
 The owner returned to iOS while keeping the iPad on the charger and confirmed iOS is visible and charging. The next experiment requires a USB source with a readable output rating before selecting a higher bounded setting. The powerboard's blurred label remains unconfirmed. Charging policy/source detection, sustained net charging and the later desktop regression remain open.
+
+### Next test prepared: 850 mA with the separate 5 V / 1 A charger
+
+The owner supplied a separate USB charger photograph and explicitly confirmed its 5 V / 1 A label rating. This establishes the stated rating for the planned test; actual source capacity has not been independently measured. The next comparison will use this specific charger for the baseline, trial and restored readings. The earlier powerboard's rating remains unconfirmed.
+
+An isolated variant preserves the successful 425 mA artifacts and changes the fixed trial target to nominal 850 mA, 150 mA below the source's stated maximum. The one-attempt policy, 30-second timer, independent rollback queue and battery guards remain the same. Source-specific arming is required, and physical Home triggering happens only after the owner confirms the wall connection. Loading and arming perform no PMIC writes. The existing target image, read-only desktop and Pi kernel are unchanged.
+
+Native compilation with additional warnings passed, with the same 46 exact-kernel imports as the measured variant. The actual policy core passed 15 normal/failure cases, 10 battery-guard cases and four fixed encoding/timer assertions. Two incorrect source-flag invocations were rejected before device contact. Shell/Python syntax and pinned-artifact preflight passed; the original 425 mA artifact preflight also remains intact. **The 850 mA experiment has not been device tested.**
+
+One new DFU will cover baseline, the single 850 mA trial, restored-state photographs and return to iOS on the charger. A positive reading would demonstrate short observed net charging; sustained charging, source policy/protections and the later desktop regression remain separate qualification gates.
