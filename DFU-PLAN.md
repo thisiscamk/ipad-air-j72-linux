@@ -3,8 +3,8 @@
 - [x] B01: real native one- and two-finger contacts, matched presses/releases, firmware health and full cleanup. Corrected analog enable is `0x07`; voltage setting is unchanged.
 - [x] B02: Linux multitouch slots, evdev and visual orientation passed (owner target/trace confirmation; 21 matched presses/releases). Compositor/libinput, touch menus and launching Foot now pass. Keyboard text entry and the top-bar toggle now pass too. Window dragging also passes. Native Home also opens and closes the menu without the earlier bridge. No new DFU requested.
 - [x] B03: automatic self-check, full cleanup, touch restart and read-only desktop startup passed. The owner confirmed repeated keyboard hide/tap/type after the combined image's fresh boot.
-- [ ] B04: brightness and Linux power-supply registration/readings passed. Correct the exported capacity pairing and compare with iOS; battery-health estimates remain unqualified.
-- [ ] B04C: RAM-only wall-charger observation attempted after desktop/export teardown. USB re-enumeration failed, and the Pi needed a restart after the cable/port move. Wall-charger data was not retrieved; measured charging and reliable reconnection remain open. This precedes Wi-Fi.
+- [ ] B04: brightness, Linux power-supply registration/readings and the corrected remaining/full capacity pairing passed. A fresh iOS comparison and battery UI remain; battery-health estimates are unqualified.
+- [ ] B04C: the owner confirmed live on-screen readings. Home USB rebind restored network access, but serial recovery and the earlier host hang remain unresolved. A fresh RAM-only wall observation is awaiting screen readings/photos; no Linux charging success is claimed. This precedes Wi-Fi.
 - [ ] B05–B11: Wi-Fi, persistence/Bluetooth, charging regression with the desktop, audio/rotation, power/remaining hardware, integrated use.
 - [ ] B12–B15: storage read-only qualification, installer rehearsal, separately authorized installation, installed-system verification.
 
@@ -50,7 +50,7 @@ The completed boot's test sequence was:
 6. After battery reporting passes, prioritize B04C charging bring-up. Continue in this boot if the recorder and required driver changes can run from RAM; otherwise prepare a concrete changed image for a later DFU. Stop and detach the USB-backed desktop root before any cable change.
 7. Stop desktop/input, export evidence, detach the root/export and return to iOS.
 
-**Remaining battery work:** a fixed read-only audit showed that the compensated remaining/full pair agrees with the gauge percentage, while Linux's exported `charge_now` uses uncompensated capacity. Correct that pairing and compare with iOS before displaying health estimates. Signed UPower packages remain staged; their UI trial is deferred. The current image performs no battery NVM or charger-control writes. No iPad storage write is authorized.
+**Remaining battery work:** the revised image's compensated remaining/full pairing now agrees with the gauge percentage on the device. Obtain a fresh iOS comparison before displaying health estimates. Signed UPower packages remain staged; their UI trial is deferred. The current image performs no battery NVM or charger-control writes. No iPad storage write is authorized.
 
 ### Revised next DFU prepared: capacity and recoverable observation
 
@@ -63,6 +63,8 @@ The completed boot's test sequence was:
 In the next charged session, first qualify the visible readings and one Home recovery **while still attached to the Pi**. Capture host/target diagnostics before that action. If it fails, stop the batch. If it passes, observe the wall charger from the screen and take readings/photos at intervals. Return the iPad to iOS while it is still on the wall charger **before another Pi connection**; do not repeat the live Linux charger-to-Pi return in this trial. USB/source isolation and the host hang remain separate unresolved work. The Pi kernel stays unchanged.
 
 ## Immediately after battery reporting: B04C charging bring-up
+
+**Current observation:** the revised image booted; corrected capacity fields, automatic input startup and clean teardown passed. The owner confirmed visible readings and advancing uptime. The first Home rebind restored network access, followed by a failed serial check and loss of network responses; cause remains unknown. A second rebind restored four network queries over 30 seconds without serial access. This qualifies that limited network recovery only. Both debugging paths and live Linux charger-to-Pi return remain unqualified. A fresh recorder is running with the Home watcher disabled; the owner has been asked for one- and five-minute wall-charger screen readings/photos. Return to iOS on the wall charger before any Pi connection. No wall measurement has been reported yet.
 
 1. Verify stable Linux voltage, temperature, state-of-charge and current readings, including current sign and units. Record a baseline under a known workload.
 2. Audit the exact J72 D2089 charger path, inherited state, USB source detection, current limits and temperature protections. Prepare bounded diagnostics and any required driver changes before hardware testing.
