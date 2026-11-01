@@ -7,6 +7,22 @@ verified. HSIC register/domain observation passed in the same boot.** The
 owner accepts a Pi-assisted start followed by unplugged use as the first
 independence milestone. Fully independent startup remains a later goal.
 
+## Latest Wi-Fi session
+
+- [x] Boot #34 and pass its initial touch self-check.
+- [x] Repair matching NCM/FunctionFS/NBD/evdev recovery modules and indexes in RAM; both USB shells respond.
+- [x] Enumerate the internal radio: high-speed USB `0a5c:bd1c`.
+- [x] Read a complete ROM identity: chip `0x4324` (BCM43241), revision 6, 576 KiB RAM.
+- [x] Review current Orchard main, PRs and the P105-pinned Cascadia USB transport.
+- [x] Use standard-driver shutdown to verify halt before removing the USB bus in the same boot.
+- [ ] Complete original power/GPIO/device cleanup in the revised diagnostic; those owners remain retained until reboot.
+- [ ] Correct the cold-boot recovery dependency closure and power-domain binding order.
+- [ ] Adapt exact USB firmware mapping/transport and private J72 NVRAM, then qualify radio startup.
+- [ ] Scan, association, DHCP, DNS, HTTPS and Wi-Fi SSH.
+
+No new DFU is needed for this source review. No radio firmware has been uploaded.
+See [Wi-Fi findings and reuse plan](WIFI-PLAN.md).
+
 ## Completed on this J72
 
 - [x] RAM Linux and read-only Pi-served desktop; software rendering.
@@ -14,7 +30,7 @@ independence milestone. Fully independent startup remains a later goal.
 - [x] Menus, Foot dragging, keyboard hide/tap/type and Home menu toggle.
 - [x] Automatic touch self-check, cleanup/restart and desktop startup after a fresh boot.
 - [x] Linux battery reporting, corrected capacity pairing, visible brightness control and top-bar battery/charging indicator.
-- [x] Read-only EHCI capability observation and power-domain restoration; no WLAN enumeration yet.
+- [x] Read-only EHCI capability observation and power-domain restoration; later USB/ROM results and separate cleanup limit are recorded above.
 - [x] Powered-hub USB data and five-minute desktop charging: 140 positive readings, +178…+216 mA, verified rollback.
 - [x] Charging remained active through a controlled touch stop/restart after removing the monitor's touch dependency.
 - [x] Return to iOS for charging; host export and monitor stopped.
@@ -61,12 +77,12 @@ input and sustained charging remain open.
   measured and all state/ownership restored, in the same RAM boot.
 - [x] Read halted EHCI registers during the ready handshake; all state restored.
 - [x] Audit remap `0x108` and live OF DMA range, noncoherent DMA and AIC translation.
-- [ ] Correct controller-driver binding after an unresponsive enumeration probe;
-  capture the screen error, then qualify USB descriptors, ROM identity and cleanup.
+- [x] Correct controller-driver binding and capture USB descriptors/ROM identity on #34.
+- [ ] Integrate the measured standard-shutdown repair and qualify full cleanup.
 - [x] Compose matched #34 kernel/touch/wireless/vendor payload with a real
-  controller driver and phase capture; 83 synthetic API cases pass, unbooted.
-- [ ] Boot-qualify #34; enumerate USB and confirm ROM identity with verified
-  cleanup; adapt firmware transport, then scan/associate.
+  controller driver and phase capture; 83 synthetic API cases pass; now booted with USB/ROM success and teardown failure recorded above.
+- [x] Boot #34 and confirm USB/ROM identity; recovery packaging needed a same-boot repair.
+- [ ] Qualify a corrected cold-boot payload, full cleanup and adapted firmware transport, then scan/associate.
 
 ## Remaining boot batches
 

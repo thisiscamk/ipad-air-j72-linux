@@ -1,29 +1,71 @@
 # J72 Wi-Fi preparation
 
-## Latest: native PHY/reset and HOST_READY response measured
+## Latest: J72 Wi-Fi USB enumeration and ROM identity measured
 
-The native PHY sequence and exact restoration passed. Releasing PMU GPIO3
-reset with HOST_READY low gave no DEVICE_READY high samples. With a standard
-exclusive GPIO163 consumer claim and unchanged direction/mux, low/high/low
-windows then produced **0 / 45 / 50** DEVICE_READY high samples out of 50 each.
-After resetting the radio, both lines returned low; reset, PHY, domains and
-GPIO ownership restored. [Tested source, reporting correction and limits](code/wifi/host-ready/).
+The matched #34 RAM kernel enumerated the internal radio at high speed as
+**USB `0a5c:bd1c`**. A strict, complete 24-byte ROM query returned chip
+**`0x4324`, revision 6**, **576 KiB RAM**, remap base `0x60000000`.
+Linux calls chip `0x4324` **BCM43241**; the owner-local Apple firmware uses
+the `4324b5/dureza` naming. Do not replace the observed revision with a
+revision inferred from that filename.
 
-The halted EHCI snapshot also passed: no active schedules or interrupts; port3
-was unpowered and companion-owned. [Measured code and result](code/wifi/ehci-observer/).
-A subsequent enumeration probe stopped responding; USB descriptors and cleanup
-were not captured. A missing controller-driver binding was found in source
-review; the new candidate uses a real platform driver. The screen photo shows
-EHCI startup and a three-port root hub, with no WLAN descriptor or backtrace.
-This narrows the observed stopping point but does not establish the cause.
+No radio firmware has been uploaded. Scan, association and Wi-Fi SSH on this
+J72 remain untested. The host stop guard failed and retained its HCD, IRQ,
+DMA allocations, GPIO and power owners. Both external USB recovery shells
+remained usable. A read-only audit then found RUN still set in the hardware
+and cached EHCI command, with its frame counter advancing and interrupts
+disabled. The original stop code bypassed the EHCI driver's lock and cached
+command; this is a concrete lifecycle defect to fix before firmware testing.
+A separate same-boot rescue then called the standard HCD shutdown callback,
+verified hardware halt **before** removal, and removed the USB bus. Independent
+readback showed RUN clear, HALT set, interrupts disabled and all three ports
+companion-owned. The original GPIO/power/device allocations remain retained
+until reboot, so full original-state restoration has **not** passed.
 
-Next: qualify corrected host enumeration and teardown, confirm the radio's
-ROM identity, qualify matching firmware/USB adaptation, scan and associate.
-A matched #34 payload is now composed with continuous touch, wireless/vendor
-modules and a corrected probe bound to a real platform driver. Its 83 host-only
-fault cases and payload/module checks pass; the image remains unbooted.
-The probe and Wi-Fi modules are opt-in, and no WLAN firmware is packaged. No firmware upload or Wi-Fi completion is claimed.
+The boot also exposed an incomplete recovery-module index in the new overlay.
+Matching #34 NCM, FunctionFS, NBD and evdev modules and combined dependency
+indexes were supplied in RAM through serial. NCM and serial then both worked,
+without another DFU. A future cold-boot payload must include that recovery
+closure from the start. The desktop subsequently reported ready with continuous touch active; the owner screen/input check is pending for this #34 boot.
 
+The earlier native PHY, reset and HOST_READY observations remain useful:
+HOST_READY high made DEVICE_READY rise, and the standalone handshake diagnostic
+restored its original state. That earlier cleanup success does not establish
+cleanup of the later enumeration probe.
+
+## Orchard reuse review after the ROM identification
+
+Rechecked current Orchard main at
+[`824bf034`](https://github.com/OrchardLinux/orchard/tree/824bf0346ae4c3debd208cd34b053130576af60c),
+including current pull requests and relevant issue discussions. The old
+`OrchardLinux/hardware` URL redirects to `OrchardLinux/orchard`.
+
+| Existing work | What to reuse | J72 boundary |
+| --- | --- | --- |
+| [P105 contribution, PR #10](https://github.com/OrchardLinux/orchard/pull/10), source head `407c9101` | Its source-pinned Cascadia USB/HSIC firmware path is the closest transport reference. | P105 is A5/BCM4334, USB `0a5c:bd1a`; its platform addresses, firmware and power sequence are different. This closed PR's code is not present in the reviewed main tree. |
+| [Cascadia USB patch at the P105 pin](https://github.com/rzxvx/Project-Cascadia/blob/c20b85ebb951c704d7e3a664c378dde8276e3928/patches/tree/0001-cascadia.patch) | Boot commands with `wValue=1`, HOST_READY around startup, skipping the incompatible reset-config path, USB reset/re-enumeration, interrupt notification draining and appended-NVRAM download length. | These are adaptation candidates, not measured BCM43241 firmware behavior. J72's strict GETVER with `wValue=1` has now passed. Preserve attribution and narrow quirks to the observed device. |
+| [Cascadia TRX/NVRAM packer](https://github.com/rzxvx/Project-Cascadia/blob/c20b85ebb951c704d7e3a664c378dde8276e3928/scripts/trx-add-nvram.py) | Board settings as NUL-separated, aligned NVRAM with length token; update TRX lengths and CRC; use the owner's actual MAC. | Use matching private J72 firmware and board inputs. Do not use P105's firmware, reference MAC or calibration. Bounds and malformed-input refusals need strengthening before use. |
+| [A7 J85 field report](https://github.com/OrchardLinux/orchard/blob/824bf0346ae4c3debd208cd34b053130576af60c/docs/bring-up/j85.md) and [PR #5 discussion](https://github.com/OrchardLinux/orchard/pull/5) | Another A7 device reportedly reached brcmfmac, wlan0, DHCP and Wi-Fi SSH. Useful feasibility evidence. | The merged contribution is documentation. No reproducible J85 Wi-Fi implementation is included, and it does not establish this J72's chip/revision or settings. |
+| [Common Orchard Wi-Fi patches](https://github.com/OrchardLinux/orchard/tree/824bf0346ae4c3debd208cd34b053130576af60c/kernel/patches/drivers/wifi) | Review reset-work cleanup and firmware-handshake port authorization for our kernel. | Source versions differ; these do not add the missing J72 USB ID/firmware mapping. |
+| [OTP/NVRAM selection, PR #3](https://github.com/OrchardLinux/orchard/pull/3) | Exact board/vendor selection and refusal of unrelated fallback firmware. | Its implementation is PCIe. Our radio is USB/HSIC. |
+| [Firmware-specific P2P exclusions, PR #20](https://github.com/OrchardLinux/orchard/pull/20), and [issue #22](https://github.com/OrchardLinux/orchard/issues/22) | Match quirks by actual firmware identity; load the vendor helper before first bind. | Their BCM4355 IDs and failed PCIe re-probe are not J72 measurements. |
+
+No ready-made J72 `0a5c:bd1c` / BCM43241 USB implementation was found in the
+reviewed main tree or listed PRs. Mainline names the chip and has BCM43241
+**SDIO** firmware mappings, including revision 6 in its B5 range; those SDIO
+files are not a USB firmware solution.
+
+### Next implementation batch
+
+1. Fix EHCI shutdown through the owning driver's synchronized lifecycle,
+   and attach its power domain before binding the platform driver.
+2. Include the complete matching recovery-module closure in the next payload.
+3. Adapt a narrowly matched USB ID and chip/revision firmware mapping from
+   the reviewed Cascadia transport, preserving strict transfer-length checks.
+4. Build a validated private J72 TRX/NVRAM image using the owner's board data
+   and MAC. Retain CRC, bounds and length-token checks.
+5. Qualify download, startup, re-enumeration and clean failure in one boot;
+   only then scan, associate, obtain DHCP and test Wi-Fi SSH/HTTPS.
 
 ## Earlier: HSIC register and power-owner observation passed
 
@@ -42,7 +84,7 @@ has been published; this observation did not enable the radio.
 
 Reviewed 1 November 2026 against Orchard
 [`824bf0346ae4c3debd208cd34b053130576af60c`](https://github.com/OrchardLinux/orchard/tree/824bf0346ae4c3debd208cd34b053130576af60c).
-This is an offline preparation record. No WLAN firmware was uploaded.
+This includes offline preparation and explicitly bounded live observations. No WLAN firmware was uploaded.
 See the [current session plan](DFU-PLAN.md) for N1 boot readiness; the
 Wi-Fi bus/transport work below remains unfinished.
 
@@ -51,12 +93,12 @@ Wi-Fi bus/transport work below remains unfinished.
 - iPad Air 1 Cellular, J72 / iPad4,2, A7, iOS 12.5.7.
 - Owner-local iOS records identify BCM4324B5, module `dureza`, vendor USI,
   on internal EHCI/HSIC. The iOS-observed USB identity is `0a5c:bd1c`;
-  Linux descriptors are not yet captured.
+  Linux now confirms the same USB identity; ROM chip `0x4324`, revision 6.
 - A read-only EHCI capability observation passed: EHCI 1.0, three ports,
   with the Linux-owned power domain restored afterward. This did not start
   the host or enumerate WLAN.
 - The separate #34 target kernel enables cfg80211, rfkill and USB brcmfmac.
-  It is built, not boot-qualified. The tested #33 image disables wireless.
+  It has booted and performed the USB/ROM query above. Its desktop packaging still needs correction. The earlier #33 image disables wireless.
 - Matching owner firmware and board data passed a local TRX CRC/format check.
   They remain private. No radio firmware startup, scan or connection is claimed.
 
