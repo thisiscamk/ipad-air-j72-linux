@@ -1,3 +1,18 @@
+# 1 November: Wi-Fi full shutdown and restoration pass
+
+After the unplugged demonstration, the iPad returned to its powered hub.
+USB required a same-controller software rebind. Its one-shot serial shell had
+exited on disconnect; respawning it restored ACM recovery. Both USB shells
+then answered before and after the deliberate radio shutdown.
+
+Network daemons stopped, the internal USB host halted, and the provider
+released its controller, GPIO and power-domain ownership. Independent reads
+confirmed reset, GPIO and baseline input-limit restoration. The touch worker
+also stopped with healthy firmware and clean hardware restoration. No reboot
+or new DFU was needed for these checks. [Sanitized result](code/wifi/usb-hsic/FULL-STOP-RESULT.json).
+
+Repeat cold startup and autonomous charging/source policy remain open.
+
 # 1 November: first unplugged Omarchy A desktop
 
 The owner disconnected the Lightning cable and confirmed that terminal typing,

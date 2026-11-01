@@ -1,0 +1,30 @@
+{
+  "date": "2026-11-01",
+  "device": "iPad4,2 / J72AP",
+  "provider": "j72_wlan_transport_v3",
+  "full_stop_pass": true,
+  "result": 0,
+  "restored": true,
+  "consumer_removed": true,
+  "gpio_released": true,
+  "phy_restored": true,
+  "reset_restored": true,
+  "hcd_stopped": true,
+  "controller_restored": true,
+  "retain_controller": false,
+  "independent_reset_restored": true,
+  "independent_input_limit_restored": true,
+  "independent_gpio_baselines_restored": true,
+  "ncm_recovery_after_stop": true,
+  "acm_recovery_after_stop": true,
+  "touch_final_frames": 47821,
+  "touch_rejected_layouts": 3,
+  "touch_timeouts": 0,
+  "touch_transfer_errors": 0,
+  "touch_firmware_health_and_cleanup": true,
+  "limitations": [
+    "One cold boot qualified; repetition pending",
+    "Radio restart within the same boot is not supported by this one-shot module",
+    "Autonomous charging/source policy remains open"
+  ]
+}
