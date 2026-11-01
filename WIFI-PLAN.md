@@ -13,8 +13,9 @@ The halted EHCI snapshot also passed: no active schedules or interrupts; port3
 was unpowered and companion-owned. [Measured code and result](code/wifi/ehci-observer/).
 A subsequent enumeration probe stopped responding; USB descriptors and cleanup
 were not captured. A missing controller-driver binding was found in source
-review; the next candidate will use a real platform driver, with screen evidence
-needed to confirm the failure.
+review; the new candidate uses a real platform driver. The screen photo shows
+EHCI startup and a three-port root hub, with no WLAN descriptor or backtrace.
+This narrows the observed stopping point but does not establish the cause.
 
 Next: qualify corrected host enumeration and teardown, confirm the radio's
 ROM identity, qualify matching firmware/USB adaptation, scan and associate.

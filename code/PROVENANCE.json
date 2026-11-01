@@ -299,7 +299,7 @@
       "status": "Measured read-only J72 EHCI snapshot/qualified cleanup; portable synthetic-API host test; later enumeration failure explicitly separate"
     },
     "wifi/ehci-observer/README.md": {
-      "sha256": "31c61d70d4b3686bbe47e391f46ceae06f75e86df8c7e19baafff53e3dde8ddd",
+      "sha256": "65174a33a3ff5f4c89e717731a0b5072b80f7369285d9b0216aaba19290f7735",
       "status": "Measured read-only J72 EHCI snapshot/qualified cleanup; portable synthetic-API host test; later enumeration failure explicitly separate"
     },
     "wifi/ehci-observer/Makefile": {

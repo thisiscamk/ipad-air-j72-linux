@@ -24,6 +24,7 @@ the external USB gadget remained enumerated. USB descriptors and ROM identity
 are **not qualified**. Source review found that an unbound HCD controller is
 invalid here: Linux USB hub code falls back to `sysdev->driver->name` when the
 controller has no driver. The next candidate must bind a real platform driver
-and retain it through HCD removal. A screen error is needed to establish whether
-this was the actual failure. Synthetic API fault tests did not cover that real
+and retain it through HCD removal. The subsequent screen photo shows EHCI startup and a three-port USB root hub,
+with no WLAN descriptor or oops/backtrace visible. Both shell checks still fail;
+the actual stall cause remains unconfirmed. Synthetic API fault tests did not cover that real
 USB-core lifecycle requirement. Do not repeat the original enumeration probe.
