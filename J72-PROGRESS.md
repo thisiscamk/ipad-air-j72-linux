@@ -1,3 +1,13 @@
+## 2 November: active charging lease and hold results
+
+The new maintenance controller started charging automatically after its full-pack
+hold. First-window settled readings were +236..+378 mA, with a negative activation
+transient. Deliberate source-lease withdrawal during charging independently restored
+the original limit within 2.27 seconds and latched the controller off. Separate
+requalification/start passed; automatic voltage and cooldown holds were observed.
+The longer desktop/Wi-Fi observation is still running. Full-duration, automatic
+cooldown resume and autonomous source detection remain open. No storage writes.
+
 # 2 November: charging maintenance candidate in live testing
 
 The owner requested another hub DFU trial. It reached checkm8 but again

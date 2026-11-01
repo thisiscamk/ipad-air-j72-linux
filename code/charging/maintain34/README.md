@@ -70,16 +70,23 @@ Private source receipts, network credentials, firmware and logs are excluded.
 
 ## Remaining live gates
 
-The module has loaded disabled with unchanged input limits. Real direct-Pi
+The module loaded disabled with unchanged input limits. Real direct-Pi
 source refusal, full-pack waiting, lease withdrawal during a hold, fault
-latching and explicit requalification passed. A longer observation with the
-RAM desktop and Wi-Fi is underway at brightness 1203/2047.
+latching and explicit requalification passed. It then started charging
+automatically when the pack reached its restart thresholds. Settled readings
+in the first window were +236..+378 mA; the activation transient was negative.
 
-Still to measure: a positive-current cycle on this controller, restoration
-and restart at a hold, withdrawal during an active-current window, longer
-interactive operation and final independent restoration. Temperature/voltage
-stops remain possible; a one-hour wall clock is not one hour charging. Do not
-infer all-day/overnight safety or standalone charging from the shorter tests.
+Deliberately withdrawing the source lease during active charging latched the
+controller off and independently restored register `0x04c0` to `0x02` within
+2.27 seconds. Renewing the lease alone did not restart it. Fresh explicit
+requalification followed by a separate start opened another charging window.
+That window paused automatically at the voltage limit, then stayed off in its
+cooldown hold. The desktop/Wi-Fi observation continues at brightness 1203/2047.
+
+Still to measure: automatic restart after the cooldown hold, completion of
+the longer observation and its final independent restoration. A one-hour
+wall clock is not one hour charging. Do not infer all-day/overnight safety or
+standalone charging from these bounded tests.
 
 ## Orchard reuse
 

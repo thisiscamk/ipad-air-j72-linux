@@ -7,7 +7,8 @@
 - [x] Return to the same hub with Wi-Fi alive; same-UDC USB rebind restores data.
 - [x] Build/load the new maintenance controller disabled; direct Pi source refusal passes.
 - [x] Observe full-pack hold, held-source lease loss, fault latch and explicit requalification.
-- [ ] Complete the longer maintenance observation and active-current/pause/resume/source-loss gates.
+- [x] Observe positive charging, active-source lease withdrawal/restoration in 2.27 seconds, explicit restart and automatic voltage/cool holds.
+- [ ] Complete the longer observation, automatic cooldown resume and final independent restoration.
 - [ ] Finish J72 ANS1 read-only kernel/firmware integration before another storage DFU.
 - [ ] Capture fresh layout, qualify safe space creation and native root, then review exact install changes.
 

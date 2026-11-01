@@ -14,9 +14,9 @@
   "held_lease_withdrawal_latched_off": true,
   "renewed_lease_alone_did_not_restart": true,
   "explicit_requalification_remained_disabled": true,
-  "positive_charging_cycle_observed_on_new_controller": false,
+  "positive_charging_cycle_observed_on_new_controller": true,
   "hardware_restart_after_hold_tested": false,
-  "active_current_source_withdrawal_tested": false,
+  "active_current_source_withdrawal_tested": true,
   "full_hour_tested": false,
   "autonomous_source_detection": false,
   "internal_storage_changes": false,
@@ -27,5 +27,10 @@
     "module/j72-maintain-core.h": "2d7aa393d178775c67fdabd43b1489bc86a50da2f6f31bdbd1a5e375dc37a522",
     "module/j72-limit-core.h": "6c37efdd866d011d7f8a8879d7b99908d30176c193d3e253267790f2121e0526",
     "module/j72_charge_maintain34.c": "5e90dee4b26b33d208584e1c031d3cc2410ebb1da50911facc0f2c0c386f4c2e"
-  }
+  },
+  "active_lease_withdrawal_restoration_s": 2.27,
+  "active_lease_withdrawal_fault_latched": true,
+  "post_fault_explicit_restart_observed": true,
+  "automatic_voltage_hold_observed": true,
+  "automatic_cool_hold_observed": true
 }
