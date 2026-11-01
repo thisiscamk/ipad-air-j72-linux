@@ -3,12 +3,12 @@
 - [x] B01: real native one- and two-finger contacts, matched presses/releases, firmware health and full cleanup. Corrected analog enable is `0x07`; voltage setting is unchanged.
 - [x] B02: Linux multitouch slots, evdev and visual orientation passed (owner target/trace confirmation; 21 matched presses/releases). Compositor/libinput, touch menus and launching Foot now pass. Keyboard text entry and the top-bar toggle now pass too. Window dragging also passes. Native Home also opens and closes the menu without the earlier bridge. No new DFU requested.
 - [x] B03: automatic self-check, full cleanup, touch restart and read-only desktop startup passed. The owner confirmed repeated keyboard hide/tap/type after the combined image's fresh boot.
-- [ ] B04: brightness, Linux power-supply registration/readings and the corrected remaining/full capacity pairing passed. A fresh iOS comparison and battery UI remain; battery-health estimates are unqualified.
+- [ ] B04: brightness, Linux power-supply registration/readings and the corrected remaining/full capacity pairing passed. The owner confirmed the top-bar battery percentage and charging symbol. A fresh iOS comparison remains; battery-health estimates are unqualified.
 - [ ] B04C: powered-hub data continuity now passed during a 30-second 850 mA trial (12 samples −10…+37 mA; baseline −773 mA), with verified rollback and iOS charging recovery. Sustained hub charging remains open. Earlier brief wall charging passed: one 850 mA / 30-second wall test retained 12 samples at +20…+51 mA, from −766 mA baseline; automatic restoration passed and current returned to −765 mA. iOS recovery and charging are confirmed. Sustained charging, source detection/protections and USB recovery remain open before Wi-Fi.
 - [ ] B05–B11: Wi-Fi, persistence/Bluetooth, charging regression with the desktop, audio/rotation, power/remaining hardware, integrated use.
 - [ ] B12–B15: storage read-only qualification, installer rehearsal, separately authorized installation, installed-system verification.
 
-**Current session:** Linux #33 remains running on the powered hub. The 1,050 mA short and five-minute tests passed; the long test retained 140 positive samples at +153…+209 mA with USB data and verified rollback. Autonomous source policy and desktop charging remain open. The separate Wi-Fi kernel build completed; HSIC/firmware integration is still pending.
+**Current session:** Linux #33 remains running on the powered hub. The 1,050 mA short and five-minute tests passed; the long test retained 140 positive samples at +153…+209 mA with USB data and verified rollback. A separate five-minute desktop-loaded run then passed with 140 samples at +178…+216 mA and verified restoration; the battery widget and charging symbol are owner-confirmed. A longer dimmed-display continuation is being evaluated. Autonomous source policy remains open. The separate Wi-Fi kernel build completed; HSIC/firmware integration is still pending.
 
 ## Power and Wi-Fi work queue — 1 November
 
@@ -21,6 +21,8 @@
 - [x] Boot directly from the Pi; qualify EHCI capabilities and domain restoration, then use the proven controlled transfer to the hub. EHCI 1.0 / three ports read successfully; domain restored. The observer code remains resident because module unloading is disabled.
 - [x] Complete the short charging comparison: 1,050 mA / 30 seconds passed, with 12 retained samples at +177…+213 mA, USB data live, no guard faults and verified rollback. The earlier 1,250 mA comparison aborted and remains unqualified.
 - [x] Measure five-minute charging in the same RAM boot: 140 positive samples, USB data retained, maximum 37.2 C, error-free rollback. Diagnostic workload/known powered hub only.
+- [x] Qualify five-minute net charging with the desktop and USB data live: 140 positive samples at +178…+216 mA, maximum 37.8 C, error-free rollback. Battery percentage and charging symbol confirmed on screen.
+- [ ] Finish a longer dimmed-display charging continuation; retain the same battery/source limits.
 - [ ] Implement and qualify autonomous J72 source detection, fault handling and source withdrawal; host-qualified experiments are an interim step.
 - [ ] Implement internal HSIC/WLAN power, clock and reset sequencing; enumerate the actual USB device before selecting its transport changes.
 - [ ] Start matching Wi-Fi firmware/driver, then test scan, association, DHCP, DNS, traffic and reconnects.

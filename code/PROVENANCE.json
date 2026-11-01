@@ -119,8 +119,40 @@
       "status": "new J72 battery widget; loaded in live RAM desktop; visual and charging transition checks pending"
     },
     "desktop/battery/README.md": {
-      "sha256": "d5a0910d4d5e9df34219a1b19d09bad8793988cca2866619e539113bda54567b",
-      "status": "new J72 battery widget; loaded in live RAM desktop; visual and charging transition checks pending"
+      "sha256": "26a5976db7e728c8d657483db827100f055265b6041416117d1d8602bc6ea441",
+      "status": "measured five-minute desktop charging and owner-confirmed battery widget; longer continuation not yet qualified"
+    },
+    "charging/hub1050-desktop/test-guard-faults.c": {
+      "sha256": "b1b530d029aa61092eb95456864da823beaa15ec64a967247ce58b9ef2dd8b82",
+      "status": "measured five-minute desktop charging and owner-confirmed battery widget; longer continuation not yet qualified"
+    },
+    "charging/hub1050-desktop/VALIDATION.json": {
+      "sha256": "42150ddbc57c4202027424251a1780429381b366d0ef6ccceb2ed3dd65b4245e",
+      "status": "measured five-minute desktop charging and owner-confirmed battery widget; longer continuation not yet qualified"
+    },
+    "charging/hub1050-desktop/README.md": {
+      "sha256": "665f6595b28b758f396d5c28761c4ff34c3150dcf5dcd1a7f4fe2bcdc177b508",
+      "status": "measured five-minute desktop charging and owner-confirmed battery widget; longer continuation not yet qualified"
+    },
+    "charging/hub1050-desktop/test-worker-source.py": {
+      "sha256": "7c58d20016e4895ed0e9170a54fadd80e93403b42b5963660979ca59630eb865",
+      "status": "measured five-minute desktop charging and owner-confirmed battery widget; longer continuation not yet qualified"
+    },
+    "charging/hub1050-desktop/test-core.c": {
+      "sha256": "1b0efb350da23b039aaf598f4d031db07b1f1ec28b50fdca6fb3bd595f7f359e",
+      "status": "measured five-minute desktop charging and owner-confirmed battery widget; longer continuation not yet qualified"
+    },
+    "charging/hub1050-desktop/module/Makefile": {
+      "sha256": "5ee057aacfe867c58c750f3e23126a5581f096726f2888584b4c029fc2f2751e",
+      "status": "measured five-minute desktop charging and owner-confirmed battery widget; longer continuation not yet qualified"
+    },
+    "charging/hub1050-desktop/module/j72-limit-core.h": {
+      "sha256": "d4fa6f5ec45a383e0987b01665f6f8f23fe476090415be0e7c0a6a58048df657",
+      "status": "measured five-minute desktop charging and owner-confirmed battery widget; longer continuation not yet qualified"
+    },
+    "charging/hub1050-desktop/module/j72_input_limit_trial1050_desktop.c": {
+      "sha256": "fc018288c0bb5850491cf5b8949dbcdbe2c39689f3e0e74bd7ab80cd54db8158",
+      "status": "measured five-minute desktop charging and owner-confirmed battery widget; longer continuation not yet qualified"
     }
   },
   "upstream_reference": {

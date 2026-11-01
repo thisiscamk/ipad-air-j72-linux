@@ -1,3 +1,16 @@
+# 1 November: desktop charging and battery indicator
+
+A five-minute 1,050 mA powered-hub run passed with the desktop and USB data
+live: 140 retained positive readings at +178…+216 mA, maximum 37.8 C,
+no guard faults, and verified restoration of the original input setting.
+The owner confirmed the top-bar battery percentage and charging symbol.
+[Measured desktop charging implementation](code/charging/hub1050-desktop/)
+and [battery widget](code/desktop/battery/) are published.
+
+A longer dimmed-display continuation is under evaluation; autonomous source
+policy and Wi-Fi are still open. The existing Orchard interim PR remains
+ready for review; these newer desktop additions remain in the companion lab.
+
 # Linux and Omarchy A on an iPad Air 1 Cellular (J72)
 
 Progress report as of 31 October 2026. This is a hardware bring-up report for one iPad, not a general installation guide or an Orchard hardware profile.

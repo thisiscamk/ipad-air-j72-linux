@@ -17,5 +17,5 @@ Orchard's hardware PR. See the included source licenses and `../NOTICE.md`.
 
 [`battery/`](battery/) contains a live-loaded Quickshell top-bar indicator
 for the J72 battery percentage and charging state, with integration steps.
-It reads the kernel power supply interface every five seconds. Visual and
-charging-transition confirmation are still pending.
+It reads the kernel power supply interface every five seconds. The owner confirmed its
+percentage display and charging-state transition in the live desktop.

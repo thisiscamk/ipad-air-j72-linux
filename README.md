@@ -10,7 +10,7 @@ The present desktop uses software rendering and a read-only Arch Linux ARM files
 
 Private firmware, device calibration, identifying logs, and local disk images are intentionally excluded.
 
-**Latest charging milestone:** the 1,050 mA powered-hub test completed **five minutes**, with **140 positive samples at +153…+209 mA**, USB data retained and verified rollback. The [tested source](code/charging/hub1050-long/) and [result](PI-CHARGING-PLAN.md) are published. Autonomous charger policy and desktop charging remain open.
+**Latest charging milestone:** the 1,050 mA powered-hub test now completed **five minutes with the desktop running**, with **140 positive samples at +178…+216 mA**, USB data retained and verified rollback. The owner confirmed the new [top-bar battery indicator](code/desktop/battery/) and charging symbol. [Measured desktop charging source](code/charging/hub1050-desktop/) is published. A longer, dimmed-display session is being evaluated; autonomous charger policy remains open.
 
 **Working source:** [code/](code/) now contains the measured SPI driver, touch worker and decoder, HDQ battery frontend, bounded charging diagnostics, desktop changes and offline tests. Private firmware/calibration are supplied separately. [Native Orchard integration work](code/UPSTREAM-PLAN.md) remains as follow-up.
 

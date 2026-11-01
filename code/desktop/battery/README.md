@@ -35,9 +35,9 @@ until the plugin is included in a new pinned boot overlay.
 
 Loaded in the live Quickshell desktop without restarting the compositor.
 The widget's IPC returned the actual kernel-reported percentage and
-`Discharging`, and refreshed as the percentage changed. The charging trial
-remained unarmed and unused. Owner visual confirmation and an actual
-charging-state transition with the widget running are pending.
+`Discharging`, and refreshed as the percentage changed. The owner confirmed the widget on screen and its charging symbol during
+the subsequent five-minute desktop charging session, which completed with
+verified restoration.
 
 New QML source is GPL-2.0-only; see the companion lab's
 `code/LICENSES/GPL-2.0.txt`.

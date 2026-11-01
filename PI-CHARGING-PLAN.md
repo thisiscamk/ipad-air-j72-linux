@@ -1,3 +1,19 @@
+# 1 November: five-minute desktop charging passed
+
+The desktop-loaded fixed 1,050 mA session completed **300.002214 seconds**
+with **140 positive retained readings at +178…+216 mA**, versus a −849 mA
+baseline. USB data remained attached, all guards were clear, maximum
+recorded temperature was **37.8 C**, and original `04c0=02` restoration
+was verified. The owner confirmed the new battery percentage indicator
+and charging symbol. [Exact source and validation](code/charging/hub1050-desktop/).
+
+A separate continuation is running with display brightness reduced from
+1604 to 802 out of 2047. Initial live gauge reads are approximately
++470 mA net charging at 37.3 C. This longer duration is **not yet qualified**;
+it is timed and retains battery, source, USB and restoration guards.
+Neither experiment establishes autonomous charger detection or reliable
+percentage gain under changing loads. The reviewing Orchard PR is unchanged.
+
 # 1 November: five-minute powered-hub charging passed
 
 The fixed 1,050 mA test completed **300.006 seconds**, retaining **140 positive
