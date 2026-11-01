@@ -269,6 +269,26 @@
     "wifi/hsic-phy-observer/j72_hsic_phy_observer_v2.c": {
       "sha256": "b95a00169680dd770555e8bb4f51f34371ae9aa3811119182a1d53ecbde0635d",
       "status": "measured same-boot J72 diagnostic or sanitized result; source byte copy except portable host test paths; no radio enumeration"
+    },
+    "wifi/host-ready/VALIDATION.json": {
+      "sha256": "dff82d7dd824c9b1a61fbccd173803ec6bc83f3bc7f55eb0191214cc397503fb",
+      "status": "measured J72 reset/HOST_READY diagnostic; published C changes only duplicate GPIO report label; host fault scaffolding flattened; no USB/Wi-Fi enumeration"
+    },
+    "wifi/host-ready/README.md": {
+      "sha256": "07778652ccfc7a178443a4ce6966bb2caf8d381cc8fadb8157c716a276a0c284",
+      "status": "measured J72 reset/HOST_READY diagnostic; published C changes only duplicate GPIO report label; host fault scaffolding flattened; no USB/Wi-Fi enumeration"
+    },
+    "wifi/host-ready/Makefile": {
+      "sha256": "b106dc011eac3205dadc9fabcc8b8ac3290ecb4861fcef9c158d3a7b7af66b61",
+      "status": "measured J72 reset/HOST_READY diagnostic; published C changes only duplicate GPIO report label; host fault scaffolding flattened; no USB/Wi-Fi enumeration"
+    },
+    "wifi/host-ready/j72_wlan_host_ready_probe.c": {
+      "sha256": "775cb699b57f332f062b3e466d5ad93d7a0519da6e443badaa6d14331725045d",
+      "status": "measured J72 reset/HOST_READY diagnostic; published C changes only duplicate GPIO report label; host fault scaffolding flattened; no USB/Wi-Fi enumeration"
+    },
+    "wifi/host-ready/test-host-ready.py": {
+      "sha256": "dac08ef3a923f04e674b217385c07a84a15e807a07d7576d1d8f60ecd308861d",
+      "status": "measured J72 reset/HOST_READY diagnostic; published C changes only duplicate GPIO report label; host fault scaffolding flattened; no USB/Wi-Fi enumeration"
     }
   },
   "upstream_reference": {

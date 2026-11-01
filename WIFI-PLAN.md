@@ -1,6 +1,22 @@
 # J72 Wi-Fi preparation
 
-## Latest: HSIC register and power-owner observation passed
+## Latest: native PHY/reset and HOST_READY response measured
+
+The native PHY sequence and exact restoration passed. Releasing PMU GPIO3
+reset with HOST_READY low gave no DEVICE_READY high samples. With a standard
+exclusive GPIO163 consumer claim and unchanged direction/mux, low/high/low
+windows then produced **0 / 45 / 50** DEVICE_READY high samples out of 50 each.
+After resetting the radio, both lines returned low; reset, PHY, domains and
+GPIO ownership restored. [Tested source, reporting correction and limits](code/wifi/host-ready/).
+
+Next: read the halted EHCI controller's state and audit DMA/address translation
+and teardown before starting a host. Then enumerate the radio, confirm its
+ROM identity, qualify matching firmware/USB adaptation, scan and associate.
+The #34 wireless kernel and modules remain unbooted; their matching payload
+has not yet been composed. No firmware upload or Wi-Fi completion is claimed.
+
+
+## Earlier: HSIC register and power-owner observation passed
 
 A same-boot diagnostic read control `0x4`, configuration `0x153`, and four
 USB clock configuration words already set to `0x108`. The existing kernel

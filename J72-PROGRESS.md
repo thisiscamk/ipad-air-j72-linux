@@ -1,3 +1,20 @@
+# 1 November: the Wi-Fi radio responds to HOST_READY
+
+The J72 radio now raises **DEVICE_READY after HOST_READY is asserted**.
+A bounded test recorded 0 / 45 / 50 high samples in three 50-sample
+HOST_READY low / high / low windows. DEVICE_READY returned low after radio
+reset was restored. The native PHY/reset sequence, HOST_READY pin state,
+both power domains and GPIO ownership all restored, with independent
+post-test snapshots. No USB host, DMA or firmware upload was started;
+USB enumeration and actual Wi-Fi remain open.
+
+The tested source and 40 portable fault tests are in
+[code/wifi/host-ready](code/wifi/host-ready/). The original status had two
+`host_after` labels and the host harness exited on its last field assertion;
+ordered-record analysis verified both and all cleanup. The public source
+changes only the GPIO report label; that metadata fix has not been reloaded
+on hardware. All tests so far used the same RAM boot, with no new DFU.
+
 # 1 November: 27.2-minute charging result and HSIC observation
 
 The continuous-input desktop ran on the powered hub at 802/2047 brightness.

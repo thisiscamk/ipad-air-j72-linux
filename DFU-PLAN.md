@@ -56,8 +56,11 @@ input and sustained charging remain open.
   original-limit restoration. Full hour remains unqualified.
 - [x] Observe HSIC PHY registers through the existing Linux power owner, with
   automatic clock gating handled and both domains restored. No radio enable.
-- [ ] Prepare a bounded native PHY transition with exact baseline restoration;
-  radio reset/ready, USB enumeration and firmware/association follow.
+- [x] Bounded native PHY transition with exact baseline restoration.
+- [x] Radio reset and GPIO-owned HOST_READY handshake; DEVICE_READY response
+  measured and all state/ownership restored, in the same RAM boot.
+- [ ] Halted EHCI state, DMA/address-translation audit, then USB enumeration.
+- [ ] Matched #34 wireless payload, ROM/firmware adaptation and scan/association.
 
 ## Remaining boot batches
 

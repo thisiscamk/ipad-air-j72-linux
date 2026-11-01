@@ -1,0 +1,40 @@
+{
+  "date": "2026-11-01",
+  "kernel_build": 33,
+  "scope": "Bounded radio reset and GPIO-owned ready handshake; no USB enumeration/firmware upload",
+  "result": 0,
+  "all_restoration_checks_passed": true,
+  "host_ready_cfg_sequence": [
+    "00072602",
+    "00072603",
+    "00072602"
+  ],
+  "device_ready_high_counts": [
+    0,
+    45,
+    50
+  ],
+  "samples_per_phase": 50,
+  "device_ready_after_reset": 0,
+  "pmu_reset_sequence": [
+    "09",
+    "0b",
+    "09"
+  ],
+  "phy_control_sequence": [
+    "00000004",
+    "00000000",
+    "00000004"
+  ],
+  "phy_domain_restored": true,
+  "host_domain_restored": true,
+  "gpio_claim_released": true,
+  "clock_config_unchanged": true,
+  "independent_charger_04c0": "02",
+  "radio_usb_enumerated": false,
+  "firmware_uploaded": false,
+  "dma_started": false,
+  "reporting_correction": "Original hardware status reused host_after for GPIO and HOST0-domain values, so the host harness exited at its final field assertion. Saved ordered pairs and independent after-snapshots verify both. Published C changes only the GPIO field label to host_gpio_after; not reloaded on hardware.",
+  "original_measured_source_sha256": "840ca5abacac2692884a118ceabb877b978c098a75d9ec320d0924f07a241539",
+  "published_source_sha256": "775cb699b57f332f062b3e466d5ad93d7a0519da6e443badaa6d14331725045d"
+}
