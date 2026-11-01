@@ -1,0 +1,17 @@
+{
+  "schemaVersion": 1,
+  "id": "ipadlinux.wifi",
+  "name": "iPad Wi-Fi",
+  "version": "1.0.0",
+  "author": "iPad Linux",
+  "description": "J72 Wi-Fi connection and signal status.",
+  "kinds": ["bar-widget"],
+  "entryPoints": {"barWidget": "BarWidget.qml"},
+  "barWidget": {
+    "displayName": "iPad Wi-Fi",
+    "description": "Connection, signal and frequency",
+    "category": "Network",
+    "defaultSection": "right",
+    "allowMultiple": false
+  }
+}

@@ -331,12 +331,48 @@
       "status": "source copied byte-for-byte from local RAM networking preparation; offline DHCP/configuration/transfer and native localhost SSH checks pass; iPad network untested"
     },
     "wifi/network-userspace/tools/j72_network_userspace.py": {
-      "sha256": "5704251546f8eaff0f35db8ddeb705669b76167247397a0bf3964a43206d50f2",
-      "status": "source copied byte-for-byte from local RAM networking preparation; offline DHCP/configuration/transfer and native localhost SSH checks pass; iPad network untested"
+      "sha256": "4d02064bcc4c1a8ebff27368cee4d8166d5349bd45e15cc2502e5823d448fcc6",
+      "status": "RAM staging guard corrected and actual USB transfer/association/DHCP/HTTPS/SSH pass"
     },
     "wifi/network-userspace/tools/test-j72-network-prep.py": {
       "sha256": "e84eda960fd4fd05a74c523023c431616ff7b54dfe040aa3deabf7ac1298cc4b",
       "status": "source copied byte-for-byte from local RAM networking preparation; offline DHCP/configuration/transfer and native localhost SSH checks pass; iPad network untested"
+    },
+    "wifi/usb-hsic/module/j72_wlan_transport_v3.c": {
+      "sha256": "6a917cfdb568658f6ebfbbef48768ef339e11812c2a0538fc5222da2af7617a4",
+      "status": "exact measured J72/#34 persistent HSIC provider; firmware/scan/network pass; provider stop still unqualified"
+    },
+    "wifi/usb-hsic/module/j72-wlan-hcd.h": {
+      "sha256": "878e32e1ce09f96e5ac13e3f2c56256c499f34dec505f592c6ae93cdf87d94d3",
+      "status": "exact measured J72/#34 persistent HSIC provider; firmware/scan/network pass; provider stop still unqualified"
+    },
+    "wifi/usb-hsic/module/Makefile": {
+      "sha256": "7e22eaf574269a9ac5c43695af077505b3ff9a77df1497aec53a62878ce982cd",
+      "status": "exact measured J72/#34 persistent HSIC provider; firmware/scan/network pass; provider stop still unqualified"
+    },
+    "wifi/usb-hsic/brcmfmac/usb.c": {
+      "sha256": "b9ed0b645a417f911fd82262e16624734af78ce31aec70faf20cb3729a4eccb1",
+      "status": "exact measured USB firmware transport source; preserves ISC/Broadcom and Cascadia attribution"
+    },
+    "wifi/usb-hsic/j72-usb.patch": {
+      "sha256": "deab4306fc04c5180da188c1d858bcbb37f40e63a34fed25eb1559c69f2c47ed",
+      "status": "exact USB transport patch used before unchanged-USB v4 connection fix"
+    },
+    "wifi/usb-hsic/orchard-port-authorization.patch": {
+      "sha256": "ae70fd57c57322a90c6d62c6510680710a345743fe8826f63236370bdf5e8ac5",
+      "status": "Orchard common Wi-Fi patch at 824bf034; applied to measured #34 cfg80211"
+    },
+    "desktop/wifi/manifest.json": {
+      "sha256": "d71679af3f6be28b7e5dcce2d9f0103eb70ac5b3eedc5dfcb3baf55813598677",
+      "status": "Wi-Fi bar plugin/status collector installed in RAM; IPC and screenshot verified; owner opened status popup"
+    },
+    "desktop/wifi/BarWidget.qml": {
+      "sha256": "c6f01b376af0ed97de2b343813f73988145754b2c06f1a16fbdff4914e87e60a",
+      "status": "Wi-Fi bar plugin/status collector installed in RAM; IPC and screenshot verified; owner opened status popup"
+    },
+    "desktop/wifi/collect-status.sh": {
+      "sha256": "7ff3edead89313c735973bd1703e5164c8dc3e9570b0b7f9dc1de94f47e2e4ea",
+      "status": "Wi-Fi bar plugin/status collector installed in RAM; IPC and screenshot verified; owner opened status popup"
     }
   },
   "upstream_reference": {

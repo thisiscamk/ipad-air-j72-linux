@@ -1,6 +1,27 @@
 # J72 Wi-Fi preparation
 
-## Latest: J72 Wi-Fi USB enumeration and ROM identity measured
+## Latest: Wi-Fi connection, HTTPS and SSH passed
+
+The next cold boot succeeded with complete recovery and brighter startup.
+Private firmware loaded and re-enumerated; Linux created `wlan0`. Scanning,
+WPA2 association, DHCP, DNS, Wi-Fi-bound HTTPS (HTTP 200) and pinned-key Wi-Fi
+SSH all passed. Deliberate disconnect/reconnect and an explicit DHCP renewal
+also passed, with USB recovery still available. Wi-Fi SSH can control the live
+RAM system. The owner confirmed the brighter desktop, touch, menu and keyboard.
+
+The [actual HSIC provider and USB driver source/patches](code/wifi/usb-hsic/)
+are now shared with measured limits. The [Wi-Fi bar icon](code/desktop/wifi/)
+shows connection, signal and frequency in a tappable popup. Desktop-user HTTPS
+also passed after supplying the DHCP resolver through a RAM file bind; the
+original desktop image remains unchanged.
+
+The provider is still active: its full stop/restoration, sustained traffic,
+charging with Wi-Fi, suspend/resume and repeat cold boots remain unqualified.
+The desktop still uses USB/NBD and cannot yet be unplugged. No installation
+or internal-storage writes occurred. Earlier preparation and transport-stage
+records follow; their “not yet uploaded” statements describe those stages.
+
+## Earlier: J72 Wi-Fi USB enumeration and ROM identity measured
 
 The matched #34 RAM kernel enumerated the internal radio at high speed as
 **USB `0a5c:bd1c`**. A strict, complete 24-byte ROM query returned chip

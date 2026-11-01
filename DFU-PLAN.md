@@ -20,8 +20,11 @@ independence milestone. Fully independent startup remains a later goal.
 - [x] Build the exact USB/chip/revision transport candidate and validate private J72 TRX/NVRAM offline.
 - [x] Stage separate RAM Wi-Fi/DHCP/HTTPS/SSH tools and pass native localhost SSH, DHCP/configuration and bundle-transfer checks.
 - [x] Build Orchard’s port-authorization fix for exact #34; 16 actual-source offline combinations pass. Runtime update is ready before first driver load.
-- [ ] Next DFU: verify recovery and brighter startup, stage RAM network tools, then test firmware loading and re-enumeration; scan/association follow only if a wireless interface appears.
-- [ ] Scan, association, DHCP, DNS, HTTPS and Wi-Fi SSH.
+- [x] Fresh boot: recovery, brighter startup, RAM tools, firmware loading/re-enumeration and wlan0.
+- [x] Scan, WPA2 association, DHCP, DNS, HTTPS and pinned-key Wi-Fi SSH.
+- [x] Deliberate disconnect/reconnect, explicit DHCP renewal and desktop-user HTTPS.
+- [x] Owner confirms brighter desktop, menu and keyboard with Wi-Fi active; new Wi-Fi bar popup works.
+- [ ] Qualify new provider full stop/restoration, sustained traffic, repeat boot and Wi-Fi with charging.
 
 No new DFU is needed for this source review. No radio firmware has been uploaded.
 See [Wi-Fi findings and reuse plan](WIFI-PLAN.md).

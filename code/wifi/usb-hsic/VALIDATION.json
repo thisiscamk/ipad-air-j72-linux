@@ -1,0 +1,32 @@
+{
+  "device": "iPad4,2 / J72AP",
+  "kernel_build": "#34 SMP PREEMPT Sun Nov  1 07:40:27 +08 2026",
+  "usb_rom": "0a5c:bd1c; BCM43241 chip 0x4324 revision 6; 576 KiB RAM",
+  "firmware": "6.46.79 (r803787), FWID 01-603d3515",
+  "measured": {
+    "cold_recovery_complete_payload": true,
+    "firmware_start_and_usb_reenumeration": true,
+    "wireless_interface": "wlan0",
+    "scan": true,
+    "wpa2_association": true,
+    "dhcp_ipv4": true,
+    "explicit_renewal_hook": true,
+    "disconnect_reconnect": true,
+    "wifi_bound_https_http_code": 200,
+    "strict_pinned_key_ssh": true,
+    "wifi_ssh_system_control": true,
+    "usb_recovery_preserved": true,
+    "desktop_https_as_unprivileged_user": true,
+    "owner_bright_desktop_touch_menu_keyboard": true
+  },
+  "not_qualified": [
+    "provider full stop/restoration",
+    "sustained traffic",
+    "Wi-Fi plus charging",
+    "suspend/resume",
+    "repeat cold boot",
+    "unplugged desktop",
+    "native Orchard integration"
+  ],
+  "privacy": "No firmware, board calibration, network credentials, SSIDs, MACs, IPs or private captures included"
+}

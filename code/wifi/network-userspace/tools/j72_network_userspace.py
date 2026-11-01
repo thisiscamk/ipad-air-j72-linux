@@ -65,7 +65,10 @@ def serve(archive, address='10.0.0.1', port=10812, allowed='10.0.0.2'):
 
 def stage(command, m):
     # This root is the initramfs, not the NBD desktop or internal storage.
-    command("busybox sh -ec 'case \"$(busybox stat -f -c %T /)\" in tmpfs|ramfs|rootfs) ;; *) exit 1;; esac; test ! -e /opt/j72-network; test ! -e /opt/j72-network.next; test \"$(busybox awk '\''/MemAvailable:/ {print $2}'\'' /proc/meminfo)\" -gt 102400'", timeout=4)
+    assert command('busybox stat -f -c %T /', timeout=4).strip() in (b'tmpfs', b'ramfs', b'rootfs')
+    memory = command('busybox grep MemAvailable /proc/meminfo', timeout=4).split()
+    assert memory[0] == b'MemAvailable:' and memory[2] == b'kB' and int(memory[1]) > 102400
+    command('test ! -e /opt/j72-network && test ! -e /opt/j72-network.next', timeout=4)
     archive = WORK / 'network-root.tar.gz'
     with serve(archive) as url:
         command('busybox wget -Y off -q -T 15 -O /run/j72-network.tar.gz.part ' + shlex.quote(url), timeout=35)
