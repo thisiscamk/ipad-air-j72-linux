@@ -1,0 +1,32 @@
+{
+  "date": "2026-11-01",
+  "device": "iPad4,2 / J72AP",
+  "result": "Owner-confirmed unplugged RAM desktop with same-boot Wi-Fi management and verified HTTPS",
+  "startup_still_requires_host": true,
+  "internal_storage_written": false,
+  "persistent_root": false,
+  "owner_confirmed": [
+    "terminal typing",
+    "menu",
+    "native touch",
+    "on-screen keyboard"
+  ],
+  "nbd_disk_detached": true,
+  "host_export_stopped": true,
+  "host_usb_device_absent": true,
+  "same_boot_ssh_guard_passed": true,
+  "desktop_user_https_verified": true,
+  "short_watch": {
+    "elapsed_seconds": 121.548,
+    "samples": 5,
+    "all_checks_passed": true,
+    "minimum_available_memory_kib": 235808,
+    "swap_total_kib": 0
+  },
+  "limits": [
+    "Short demonstration; not a runtime endurance result",
+    "Full radio provider shutdown and another cold startup remain unqualified",
+    "Autonomous source/charging policy remains open",
+    "RAM data is lost on reboot"
+  ]
+}

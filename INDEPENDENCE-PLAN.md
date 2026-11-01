@@ -9,14 +9,14 @@ partition changes and iOS erasure are not authorized.
 
 | Dependency today | Required change |
 | --- | --- |
-| Pi serves a read-only desktop root over USB/NBD | A fully RAM-resident root, or a qualified internal root |
-| USB supplies debugging and network access | Working internal Wi-Fi and a recovery strategy |
+| Desktop root formerly served over USB/NBD | RAM-resident root now runs unplugged; persistent storage remains later work |
+| USB formerly supplied network/debug access | Internal Wi-Fi and pinned-key SSH now work unplugged; retain USB recovery for later diagnostics |
 | Input is a bounded diagnostic worker | Boot-qualified continuous input with explicit stop and fault handling |
 | Charging relies on a known hub and a host-renewed source lease | Autonomous source/protection policy and acceptable Linux power use |
 | Pi starts checkm8/Pongo/m1n1 after restart | Retain this for the first milestone; research a separate untethered boot chain later |
 
-Do not unplug the existing desktop on the assumption that Wi-Fi or cached
-files remove the NBD dependency. Storage must be detached cleanly first.
+The controlled unplug passed after the NBD root and host export were fully
+stopped. Future host-backed sessions still require that clean detachment.
 
 ## Milestones and planned boot batches
 
@@ -56,8 +56,10 @@ reconnect and renewal work. The powered-hub continuation passed 15 minutes:
 424 settled readings were positive, +239..+397 mA, with verified restoration.
 These guarded sessions are complete; autonomous charging remains open.
 The desktop has now started from RAM in the same boot, with NBD and the host
-export detached. Owner confirmation of this RAM desktop and its first unplugged
-test are pending. Storage remains planning only.
+export detached. The owner confirms terminal, menu, touch and keyboard work
+after unplugging. The Pi sees no iPad USB device, while the same Linux boot
+continues to answer pinned-key Wi-Fi SSH and desktop-user HTTPS. Storage
+remains planning only.
 
 ## RAM desktop candidate prepared after Wi-Fi/charging milestone
 
@@ -70,7 +72,8 @@ Wi-Fi widget and unprivileged Wi-Fi-bound HTTPS pass. All mounted filesystems
 are RAM or kernel interfaces, NBD is detached, and the host export is stopped.
 Approximately 235 MiB remained available after startup. No swap is enabled.
 
-The owner confirms touch and keyboard. Foot now displays a Bash prompt after
-the locale repair; its typing check and physical unplugged operation are
-**still pending**. This small desktop is not the full Omarchy A application set. RAM data is lost at reboot. No internal-storage
-writes or installation are authorized.
+The owner confirms terminal typing, menus, touch and keyboard after physical
+unplug. About 225 MiB remained available in the initial unplugged check.
+This small desktop is not the full Omarchy A application set. RAM data is lost
+at reboot, and a shutdown still requires Pi-assisted startup. No internal
+storage writes or installation are authorized.

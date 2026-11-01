@@ -1,10 +1,17 @@
 # iPad Air 1 Cellular (J72) Linux bring-up
 
-An experimental, tethered **RAM-only** Linux and Omarchy A desktop project for the iPad Air 1 Cellular (`iPad4,2` / `J72AP`). The iPad's iOS installation and internal storage remain intact.
+An experimental **RAM-only** Linux and Omarchy A desktop project with Pi-assisted startup and demonstrated unplugged use for the iPad Air 1 Cellular (`iPad4,2` / `J72AP`). The iPad's iOS installation and internal storage remain intact.
 
 Read the [progress report](J72-PROGRESS.md) for measured results and current limits, the [process guide](PROCESS.md) for the checks and RAM boot sequence, the [roadmap](ROADMAP.md) for milestones, the [DFU session plan](DFU-PLAN.md) for proposed test batches, the [Pi charging plan](PI-CHARGING-PLAN.md) for keeping USB data attached while charging, and the [internal-storage plan](INTERNAL-STORAGE-PLAN.md) for the later installation gates. The new [Wi-Fi preparation](WIFI-PLAN.md) and [independent-operation plan](INDEPENDENCE-PLAN.md) cover running unplugged after a Pi-assisted startup.
 
-The present desktop uses software rendering and a read-only Arch Linux ARM filesystem served by a Raspberry Pi over USB. Native multitouch now reaches Linux input, and the owner has confirmed full-screen touch mapping with a visual target test. This repository is a place to share reviewed notes while J72 support is developed; a focused hardware implementation may later be proposed to [OrchardLinux/orchard](https://github.com/OrchardLinux/orchard).
+The present desktop uses software rendering and a reduced Arch Linux ARM filesystem resident in RAM. The earlier desktop root was served by a Raspberry Pi over USB. Native multitouch now reaches Linux input, and the owner has confirmed full-screen touch mapping with a visual target test. This repository is a place to share reviewed notes while J72 support is developed; a focused hardware implementation may later be proposed to [OrchardLinux/orchard](https://github.com/OrchardLinux/orchard).
+
+**Unplugged desktop now works:** after detaching the NBD disk and stopping the
+host export, the owner unplugged the cable and confirmed terminal typing,
+menus, touch and keyboard. The same Linux boot remains reachable over internal
+Wi-Fi, with verified HTTPS from the desktop user. No internal storage is used
+for the desktop; data is lost on reboot, and startup after shutdown still
+requires the Pi. [Independence status and remaining work](INDEPENDENCE-PLAN.md).
 
 **Wi-Fi and charging together:** the latest #34 powered-hub continuation
 completed 15 minutes with 424 positive settled samples (+239..+397 mA,
@@ -14,7 +21,7 @@ five-minute interactive run averaged+211.332 mA with one brief negative
 sample. [Working worker, retry tests and limits](code/charging/wifi34-refresh/).
 Autonomous source policy, full-hour qualification and SOC trends remain open.
 
-**Wi-Fi now works:** firmware startup, scanning, WPA2 association, DHCP, DNS, Wi-Fi-bound HTTPS and pinned-key SSH pass on J72. Disconnect/reconnect and explicit DHCP renewal also pass. The owner confirmed touch, keyboard and brighter desktop with Wi-Fi active; a new Wi-Fi status icon is installed. [Actual driver/provider source and limits](code/wifi/usb-hsic/). Full provider cleanup, sustained traffic and Wi-Fi with charging remain open; the desktop still needs USB/NBD.
+**Wi-Fi now works:** firmware startup, scanning, WPA2 association, DHCP, DNS, Wi-Fi-bound HTTPS and pinned-key SSH pass on J72. Disconnect/reconnect and explicit DHCP renewal also pass. The owner confirmed touch, keyboard and brighter desktop with Wi-Fi active; a new Wi-Fi status icon is installed. [Actual driver/provider source and limits](code/wifi/usb-hsic/). Full provider cleanup, sustained traffic and repeated cold startup remain open; the reduced RAM desktop now works unplugged.
 
 **Touch milestone:** correcting an omitted shared analog-power enable changed the result from zero-contact reports to real native touch: 542 one-finger and 50 two-finger reports during the owner's gestures, with nine matched press/release lifecycles and no contacts left down. The capture passed firmware health and hardware restoration checks. A Linux multitouch device now drives a visual target/trace test; the owner confirmed accurate mapping across the screen. The owner has also opened desktop menus and launched Foot by touch. On-screen keyboard typing and its bar toggle also work. The latest cold RAM boot automatically started touch and the desktop; window dragging and tap-to-keyboard behavior now work in the live session.
 

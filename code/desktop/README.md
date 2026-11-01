@@ -19,3 +19,10 @@ Orchard's hardware PR. See the included source licenses and `../NOTICE.md`.
 for the J72 battery percentage and charging state, with integration steps.
 It reads the kernel power supply interface every five seconds. The owner confirmed its
 percentage display and charging-state transition in the live desktop.
+
+## Unplugged RAM desktop
+
+The [sanitized unplugged result](RAM-UNPLUGGED-RESULT.json) records owner UI
+confirmation and a two-minute same-boot Wi-Fi/HTTPS/process/input watch after
+USB/NBD detachment. This is a short RAM demonstration; startup still needs
+the Pi, and no internal-storage installation was performed.

@@ -1,11 +1,10 @@
 # J72 session plan: power, Wi-Fi and independent operation
 
-Updated 1 November 2026. **The continuous-input hub run and cleanup are
-complete: approximately 34 minutes of input, and 27.2 minutes of charging
-before the unchanged voltage guard stopped it. Restoration is independently
-verified. HSIC register/domain observation passed in the same boot.** The
-owner accepts a Pi-assisted start followed by unplugged use as the first
-independence milestone. Fully independent startup remains a later goal.
+Updated 1 November 2026. **The first unplugged RAM desktop test passed:**
+terminal, menu, touch and keyboard work, with Wi-Fi SSH and verified HTTPS.
+The host disk export is stopped. Wi-Fi plus guarded hub charging also passed
+a fifteen-minute continuation with verified restoration. Startup after a
+shutdown still requires the Pi; autonomous power policy remains open.
 
 ## Latest Wi-Fi session
 
@@ -42,7 +41,7 @@ See [Wi-Fi findings and reuse plan](WIFI-PLAN.md).
 - [x] Complete 900.447 seconds of continuation: 424 settled samples, all +239..+397 mA, time-weighted+306.965 mA, verified restoration.
 - [ ] Qualify complete Wi-Fi provider stop and another cold start.
 - [x] Start the reduced desktop from RAM; verify NBD/export detached, live processes, Wi-Fi HTTPS and about 235 MiB available.
-- [ ] Owner-confirm the RAM desktop, then test unplugged use.
+- [x] Owner confirms terminal, menu, touch and keyboard unplugged; same-boot Wi-Fi SSH and desktop-user HTTPS pass with the host USB device absent.
 
 The short result includes a brightness change from 1604 to 1203; it does not
 qualify SOC gain, autonomous charging policy or timeout recovery. See the

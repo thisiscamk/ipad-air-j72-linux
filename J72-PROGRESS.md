@@ -1,3 +1,24 @@
+# 1 November: first unplugged Omarchy A desktop
+
+The owner disconnected the Lightning cable and confirmed that terminal typing,
+menus, native touch and the on-screen keyboard still work. The desktop and its
+libraries/data now reside in RAM; the former USB/NBD disk and host export were
+stopped before unplugging. The Pi sees no iPad USB device. Pinned-key Wi-Fi SSH
+checks the same running boot, and verified HTTPS succeeds as the desktop user.
+About 225 MiB remained available in the initial unplugged check, with no swap.
+A two-minute watch then passed five same-boot process/input/HTTPS checks.
+[Sanitized result](code/desktop/RAM-UNPLUGGED-RESULT.json).
+
+The reduced desktop needed its shell symlink, trusted CA bundle, UTF-8 locale
+and compose data, and Foot menu entry restored after dependency selection.
+These fixes were applied in RAM and added to the preparation path.
+
+This is the accepted first independence milestone: **Pi-assisted startup,
+then unplugged RAM use**. It is not persistent storage or PC-free cold startup.
+Autonomous charging/source policy, complete radio cleanup and repeatability
+remain open. iOS and internal storage are unchanged. See the
+[independence plan](INDEPENDENCE-PLAN.md) and [current checklist](DFU-PLAN.md).
+
 # 1 November: the Wi-Fi radio responds to HOST_READY
 
 The J72 radio now raises **DEVICE_READY after HOST_READY is asserted**.

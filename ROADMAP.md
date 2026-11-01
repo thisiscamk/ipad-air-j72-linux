@@ -1,8 +1,8 @@
 # Roadmap to a usable J72 Omarchy A tablet
 
-This is a staged research plan, not an installation procedure. The current boot runs from RAM with a read-only root filesystem served by a Raspberry Pi. iOS and the iPad's internal storage remain intact. Each stage needs real-device evidence before it can be called working.
+This is a staged research plan, not an installation procedure. The current desktop runs from RAM and has passed its first owner-confirmed unplugged test with internal Wi-Fi; the Pi is still needed to start Linux after shutdown. iOS and the iPad's internal storage remain intact. Each stage needs real-device evidence before it can be called working.
 
-The [DFU session plan](DFU-PLAN.md) expands these milestones into proposed boot batches, work to prepare without the device, owner checks and installation dependencies. Several comparisons can share one RAM boot. The [independent-operation plan](INDEPENDENCE-PLAN.md) now tracks the accepted first goal: Pi-assisted startup followed by unplugged use. HSIC Wi-Fi, power policy, continuous input and internal storage still need engineering work.
+The [DFU session plan](DFU-PLAN.md) expands these milestones into proposed boot batches, work to prepare without the device, owner checks and installation dependencies. Several comparisons can share one RAM boot. The [independent-operation plan](INDEPENDENCE-PLAN.md) now tracks the accepted first goal: Pi-assisted startup followed by unplugged use. Wi-Fi and continuous input now work in the unplugged desktop. Repeatability, autonomous power policy and internal storage still need engineering work.
 
 ## 1. Finish native touch
 
