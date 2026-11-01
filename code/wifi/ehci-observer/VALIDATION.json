@@ -1,0 +1,66 @@
+{
+  "date": "2026-11-01",
+  "kernel_build": 33,
+  "scope": "Read-only halted EHCI state during qualified bounded reset/ready handshake",
+  "result": 0,
+  "restored": true,
+  "ready_counts": [
+    0,
+    45,
+    50
+  ],
+  "samples_per_phase": 50,
+  "register_order": [
+    "USBCMD",
+    "USBSTS",
+    "USBINTR",
+    "PERIODICLISTBASE",
+    "ASYNCLISTADDR",
+    "CONFIGFLAG",
+    "PORTSC3"
+  ],
+  "states": {
+    "ehci_initial": [
+      "00080b00",
+      "00001000",
+      "00000000",
+      "00000000",
+      "00000000",
+      "00000000",
+      "00002000"
+    ],
+    "ehci_high": [
+      "00080b00",
+      "00001000",
+      "00000000",
+      "00000000",
+      "00000000",
+      "00000000",
+      "00002000"
+    ],
+    "ehci_low": [
+      "00080b00",
+      "00001000",
+      "00000000",
+      "00000000",
+      "00000000",
+      "00000000",
+      "00002000"
+    ],
+    "ehci_reset": [
+      "00080b00",
+      "00001000",
+      "00000000",
+      "00000000",
+      "00000000",
+      "00000000",
+      "00002000"
+    ]
+  },
+  "radio_usb_enumerated": false,
+  "dma_started": false,
+  "firmware_uploaded": false,
+  "source_sha256": "3db23923c311c7eb55f22127b5596eebf3452fc41fb59e278954bf8dcab7c0dd",
+  "offline_test_cases": 44,
+  "offline_test_scope": "Actual diagnostic source against synthetic APIs under UBSan, not USB core or radio emulation"
+}

@@ -9,8 +9,14 @@ windows then produced **0 / 45 / 50** DEVICE_READY high samples out of 50 each.
 After resetting the radio, both lines returned low; reset, PHY, domains and
 GPIO ownership restored. [Tested source, reporting correction and limits](code/wifi/host-ready/).
 
-Next: read the halted EHCI controller's state and audit DMA/address translation
-and teardown before starting a host. Then enumerate the radio, confirm its
+The halted EHCI snapshot also passed: no active schedules or interrupts; port3
+was unpowered and companion-owned. [Measured code and result](code/wifi/ehci-observer/).
+A subsequent enumeration probe stopped responding; USB descriptors and cleanup
+were not captured. A missing controller-driver binding was found in source
+review; the next candidate will use a real platform driver, with screen evidence
+needed to confirm the failure.
+
+Next: qualify corrected host enumeration and teardown, confirm the radio's
 ROM identity, qualify matching firmware/USB adaptation, scan and associate.
 The #34 wireless kernel and modules remain unbooted; their matching payload
 has not yet been composed. No firmware upload or Wi-Fi completion is claimed.

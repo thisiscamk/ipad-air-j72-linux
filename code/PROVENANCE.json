@@ -289,6 +289,26 @@
     "wifi/host-ready/test-host-ready.py": {
       "sha256": "dac08ef3a923f04e674b217385c07a84a15e807a07d7576d1d8f60ecd308861d",
       "status": "measured J72 reset/HOST_READY diagnostic; published C changes only duplicate GPIO report label; host fault scaffolding flattened; no USB/Wi-Fi enumeration"
+    },
+    "wifi/ehci-observer/VALIDATION.json": {
+      "sha256": "2f568c3c94f42b64266f78dd4e40fbe7ae6c9dccc57b08f0abadcca4157fa1ad",
+      "status": "Measured read-only J72 EHCI snapshot/qualified cleanup; portable synthetic-API host test; later enumeration failure explicitly separate"
+    },
+    "wifi/ehci-observer/j72_wlan_ehci_observer.c": {
+      "sha256": "3db23923c311c7eb55f22127b5596eebf3452fc41fb59e278954bf8dcab7c0dd",
+      "status": "Measured read-only J72 EHCI snapshot/qualified cleanup; portable synthetic-API host test; later enumeration failure explicitly separate"
+    },
+    "wifi/ehci-observer/README.md": {
+      "sha256": "31c61d70d4b3686bbe47e391f46ceae06f75e86df8c7e19baafff53e3dde8ddd",
+      "status": "Measured read-only J72 EHCI snapshot/qualified cleanup; portable synthetic-API host test; later enumeration failure explicitly separate"
+    },
+    "wifi/ehci-observer/Makefile": {
+      "sha256": "5da2429e236dc84c000c37e829412884b0dcd921fe4d9bce4326785772fe52f2",
+      "status": "Measured read-only J72 EHCI snapshot/qualified cleanup; portable synthetic-API host test; later enumeration failure explicitly separate"
+    },
+    "wifi/ehci-observer/test-observer.py": {
+      "sha256": "cea063abbbf030d3cef482a5db9f205c35ef3e739f2ff86fc808d62c476cc3e1",
+      "status": "Measured read-only J72 EHCI snapshot/qualified cleanup; portable synthetic-API host test; later enumeration failure explicitly separate"
     }
   },
   "upstream_reference": {

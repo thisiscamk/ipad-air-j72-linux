@@ -59,7 +59,10 @@ input and sustained charging remain open.
 - [x] Bounded native PHY transition with exact baseline restoration.
 - [x] Radio reset and GPIO-owned HOST_READY handshake; DEVICE_READY response
   measured and all state/ownership restored, in the same RAM boot.
-- [ ] Halted EHCI state, DMA/address-translation audit, then USB enumeration.
+- [x] Read halted EHCI registers during the ready handshake; all state restored.
+- [x] Audit remap `0x108` and live OF DMA range, noncoherent DMA and AIC translation.
+- [ ] Correct controller-driver binding after an unresponsive enumeration probe;
+  capture the screen error, then qualify USB descriptors, ROM identity and cleanup.
 - [ ] Matched #34 wireless payload, ROM/firmware adaptation and scan/association.
 
 ## Remaining boot batches
