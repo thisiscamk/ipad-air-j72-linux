@@ -1,8 +1,8 @@
 # J72 session plan: power, Wi-Fi and independent operation
 
-Updated 1 November 2026. **The changed N1 image is running directly from the
-Pi. Continuous touch passed its short lifetime/cleanup/restart check; the
-desktop and battery widget started. Owner visual confirmation is pending.** The owner accepts a
+Updated 1 November 2026. **N1 boot and owner UI checks passed after a live
+bar-position repair. Desktop/root/input/export are now stopped, and a blue
+screen guides the controlled move to the powered hub in the same RAM boot.** The owner accepts a
 Pi-assisted start followed by unplugged use as the first independence
 milestone. Fully independent startup remains a later goal.
 
@@ -48,7 +48,13 @@ input and sustained charging remain open.
 - [x] Fresh N1 boot: continuous mode active beyond its three-second fallback;
   explicit stop/firmware health/cleanup and automatic restart pass. Desktop
   startup and battery-widget IPC pass at 802/2047 brightness.
-- [ ] Owner screen check and longer continuous-input/power qualification.
+- [x] Owner confirms battery/dimmer startup and repeated keyboard hide/tap/type
+  after restoring a changed side-bar setting to top; no new DFU.
+- [x] Clean input shutdown after about 26 minutes and 47,598 frames; firmware
+  health and cleanup pass. Longer reliability remains open.
+- [x] Prepare new-payload charging helper with unchanged worker/guards; actual
+  direct-Pi source refusal passes. Clean teardown and RAM hub handoff prepared.
+- [ ] Powered-hub data return, desktop restart and guarded lower-power charging.
 
 ## Remaining boot batches
 

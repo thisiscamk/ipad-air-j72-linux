@@ -20,9 +20,13 @@ The fresh #33 RAM boot loaded with `continuous=1` and a three-second finite
 fallback. Input remained active at five seconds, explicit stop returned to
 state 0 with firmware health and cleanup passing, and automatic restart
 entered session 2. The desktop started with 1,566 frames observed, zero bad
-layouts, input timeouts or SPI transfer errors at that snapshot. Owner visual
-confirmation is pending. This demonstrates timeout bypass and clean restart;
-it does not establish long-session reliability.
+layouts, input timeouts or SPI transfer errors at that snapshot. The owner
+later confirmed touch/keyboard after restoring the shell bar position to top;
+the left-bar configuration had caused keyboard-window recreation. At clean
+handoff shutdown there were 47,598 frames, eight layout rejects, four recoveries,
+zero input timeouts/SPI errors, and passing firmware health/cleanup. About
+26 minutes of use is observed. This demonstrates timeout bypass and clean
+restart; it does not establish longer-session reliability.
 
 For the previous RAM boot, `../desktop/j72-touch-renew.sh` was a temporary RAM
 bridge. It watches for a healthy natural timeout, then starts another

@@ -1,3 +1,26 @@
+# 1 November: bar/keyboard repaired in RAM; hub handoff prepared
+
+The owner confirmed the battery widget and dimmer screen, but reported a
+side bar and a keyboard that would not appear. The live shell configuration
+had changed to `left`; restoring it to `top` stopped repeated keyboard-window
+recreation. A private screenshot showed the top bar and visible keyboard.
+The owner then confirmed hide → tap → type worked twice. Display rotation
+was unchanged. General keyboard handling of restricted window geometry
+remains a follow-up.
+
+The resize loop had generated about 135 MB of verbose RAM logs. Useful tails,
+metadata and the screenshot were retained privately before reclaiming that
+space. The input worker later stopped cleanly after 47,598 frames: eight
+rejected layouts, four recoveries, zero SPI transfer errors/input timeouts,
+firmware health and cleanup passing. This was about 26 minutes of use;
+longer reliability is not claimed.
+
+Desktop/root/NBD/input and the owned read-only export are now stopped. The
+proven blue-screen hub handoff is prepared in the same RAM boot. A separate
+helper pins the new payload to the unchanged charging worker and source/
+temperature/rollback guards; it passed offline preflight and refused staging
+on the actual direct Pi connection. No new charging control trial has run.
+
 # 1 November: continuous-input image boots and passes its short self-check
 
 The changed #33 overlay booted directly from the Pi. Continuous input remained

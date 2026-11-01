@@ -51,7 +51,8 @@ do not sacrifice recovery or silently call a network-served root independent.
 - [Wi-Fi preparation and applicability](WIFI-PLAN.md) and
   [J72 storage gates and source map](INTERNAL-STORAGE-PLAN.md).
 
-**Now:** N1 RAM Linux is running directly from the Pi. Its short continuous
-input/cleanup/restart check, dimmer startup and battery-widget IPC passed;
-owner visual confirmation and long-session checks remain. Wi-Fi inputs are
-checked/staged, with HSIC unfinished. Storage remains planning only.
+**Now:** N1 boot checks passed and the owner confirmed the UI after a live
+bar-position repair. Desktop/root/input/export are stopped for the controlled
+blue-screen hub handoff in this same RAM boot. A new-payload charging helper
+is prepared; no new charging trial has run. Longer input/power qualification
+and HSIC Wi-Fi remain open. Storage remains planning only.
