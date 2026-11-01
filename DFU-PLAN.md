@@ -22,7 +22,11 @@
 - [x] Complete the short charging comparison: 1,050 mA / 30 seconds passed, with 12 retained samples at +177…+213 mA, USB data live, no guard faults and verified rollback. The earlier 1,250 mA comparison aborted and remains unqualified.
 - [x] Measure five-minute charging in the same RAM boot: 140 positive samples, USB data retained, maximum 37.2 C, error-free rollback. Diagnostic workload/known powered hub only.
 - [x] Qualify five-minute net charging with the desktop and USB data live: 140 positive samples at +178…+216 mA, maximum 37.8 C, error-free rollback. Battery percentage and charging symbol confirmed on screen.
-- [ ] Finish a longer dimmed-display charging continuation; retain the same battery/source limits.
+- [x] Observe 17.2 minutes of dimmed desktop charging with battery guards clear and verified rollback; the touch timer ended the coupled monitor, so this is not a full 30-minute pass.
+- [x] Separate charging from the touch-session lifetime; live charging survived a controlled touch stop and restart, and the owner confirmed touch/brightness again.
+- [ ] Complete the revised 60-minute charging continuation and verify restoration.
+- [x] Build opt-in continuous-touch candidates for both #33 and #34, preserving stop/fault handling.
+- [ ] Package and boot-qualify continuous touch with the three-second fallback/five-second live check.
 - [ ] Implement and qualify autonomous J72 source detection, fault handling and source withdrawal; host-qualified experiments are an interim step.
 - [ ] Implement internal HSIC/WLAN power, clock and reset sequencing; enumerate the actual USB device before selecting its transport changes.
 - [ ] Start matching Wi-Fi firmware/driver, then test scan, association, DHCP, DNS, traffic and reconnects.

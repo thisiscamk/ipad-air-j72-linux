@@ -1,0 +1,23 @@
+{
+  "full_60min_pass": false,
+  "active_at_capture": true,
+  "scope": "fixed known powered JCH377; RAM desktop; continuation still under evaluation",
+  "nominal_input_mA": 1050,
+  "timer_ms": 3600000,
+  "observed_worker_samples": 163,
+  "observed_current_min_uA": 162000,
+  "observed_current_max_uA": 209000,
+  "observed_guard_faults": 0,
+  "live_touch_stop_restart_preserved_charging": true,
+  "target_restoration_measured_for_this_worker": false,
+  "capacity_trend_qualified": false,
+  "files": {
+    "module/j72_input_limit_hub1050_session.c": "b9df0ab351d11d4c8062252ab10e6f0b183d6f2cc7676feadb0bf7cded303c5d",
+    "module/j72-limit-core.h": "6c37efdd866d011d7f8a8879d7b99908d30176c193d3e253267790f2121e0526",
+    "module/Makefile": "3a53016056041cd0738ad3dfb2f715176651e19bfbac16643ca6516302e3785c",
+    "test-core.c": "93d5585411a540ccfaf663dc012d7d2e62df7f908e5fd1b4aa15278ef134cde2",
+    "test-guard-faults.c": "b1b530d029aa61092eb95456864da823beaa15ec64a967247ce58b9ef2dd8b82",
+    "test-worker-source.py": "2cdf57b4de99371e64a390288fb2c29875fb82d6be719bb3cca24b62f7833051",
+    "test-begin.c": "5abf0188a80049452a3322f5d6f4a4f91dda9323218dc918defcea1cf414fc06"
+  }
+}

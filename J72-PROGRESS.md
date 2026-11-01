@@ -1,3 +1,17 @@
+# 1 November: live touch/charging lifetime repair
+
+The later charging run ended after 17.2 minutes because its host monitor
+was coupled to the finite touch diagnostic. Positive current and clean
+restoration were recorded. Touch was restarted and normal brightness
+restored; the owner confirmed both. A revised charging continuation
+remains active through a real touch stop/restart, with battery/source
+guards unchanged. The full 60-minute duration is not yet qualified.
+
+[Continuous touch candidates](code/touch/CONTINUOUS-INPUT.md) have built for
+both kernels but need packaging and a device test. A bounded temporary
+renewal bridge is watching in this boot; natural-expiry renewal is not yet
+observed. The reviewing Orchard PR remains unchanged.
+
 # 1 November: desktop charging and battery indicator
 
 A five-minute 1,050 mA powered-hub run passed with the desktop and USB data

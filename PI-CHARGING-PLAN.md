@@ -1,3 +1,20 @@
+# 1 November: charging decoupled from the touch-test timer
+
+The dimmed continuation charged for **1,033.724 seconds**, then stopped
+when the touch session naturally completed its diagnostic window.
+Restoration to `04c0=02` succeeded; no battery guard fault was recorded.
+485 unique settled host gauge readings were positive at **+438…+485 mA**,
+maximum **37.4 C**. It did not complete a full 30-minute run. Its worker
+sample counter retained only the final 295-second window, so that count
+remained zero; the host gauge logs provide the stated observations.
+
+A revised [60-minute continuation](code/charging/hub1050-session/) is active,
+with sampling timing fixed and charging independent of the touch window.
+A controlled touch stop/healthy cleanup/restart preserved charging. Full
+duration and restoration on this new worker remain pending. Touch and
+normal brightness are owner-confirmed again. The same battery and source
+limits remain; autonomous detection and capacity-trend qualification are open.
+
 # 1 November: five-minute desktop charging passed
 
 The desktop-loaded fixed 1,050 mA session completed **300.002214 seconds**

@@ -46,15 +46,22 @@ def main():
             ('hdq', build / 'test-hdq.c', []),
             ('rollback', ROOT / 'charging/test-core.c', []),
         ]
-        for folder in ('hub1050', 'hub1050-long', 'hub1050-desktop'):
+        for folder in ('hub1050', 'hub1050-long', 'hub1050-desktop', 'hub1050-session'):
             for test in ('test-core.c', 'test-guard-faults.c'):
                 cases.append((folder + '-' + test[:-2], ROOT / 'charging' / folder / test,
                               ['-Wno-unused-function']))
+        worker = (ROOT / 'charging/hub1050-session/module/j72_input_limit_hub1050_session.c').read_text()
+        begin_harness = (ROOT / 'charging/hub1050-session/test-begin.c').read_text()
+        a, b = function_span(worker, 'begin_set')
+        x, y = function_span(begin_harness, 'begin_set')
+        begin_harness = begin_harness[:x] + worker[a:b] + begin_harness[y:]
+        (build / 'test-begin.c').write_text(begin_harness)
+        cases.append(('hub1050-session-begin', build / 'test-begin.c', ['-Wno-unused-parameter']))
         for name, source, extra in cases:
             binary = build / name
             subprocess.run([cc, *flags, *extra, str(source), '-o', str(binary)], check=True)
             subprocess.run([str(binary)], stdin=subprocess.DEVNULL, check=True)
-        for folder in ('hub1050', 'hub1050-long', 'hub1050-desktop'):
+        for folder in ('hub1050', 'hub1050-long', 'hub1050-desktop', 'hub1050-session'):
             subprocess.run(['python3', str(ROOT / 'charging' / folder / 'test-worker-source.py')], check=True)
         subprocess.run(['python3', str(ROOT / 'touch/test-private-includes.py'), '-v'], check=True)
     print('PASS: all public-source offline checks; synthetic inputs only, no device contacted.')

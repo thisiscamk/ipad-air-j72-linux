@@ -1,0 +1,22 @@
+--- a/j72_touch_session.c
++++ b/j72_touch_session.c
+@@ -454,6 +454,10 @@
+ module_param_named(firmware_healthy,audit.info_end,uint,0400);
+ static unsigned int capture_seconds = 1800;
+ module_param(capture_seconds,uint,0400);
++/* Explicit opt-in for the desktop; stop_requested and all fault checks remain. */
++static bool continuous;
++module_param(continuous,bool,0444);
++MODULE_PARM_DESC(continuous,"Keep input active until requested stop or a controller error");
+ static bool stop_requested;
+ module_param(stop_requested,bool,0600);
+ 
+@@ -605,7 +609,7 @@
+  start=ktime_get_ns();end=jiffies+msecs_to_jiffies(capture_seconds*1000);
+  pr_info("j72_touch_session: AUDIT_READY seconds=%u cs_us=%u sync=%u stream=%u policy=%u\n",
+   capture_seconds,AUDIT_CS_US,AUDIT_SYNC,AUDIT_STREAM,AUDIT_POLICY);
+- while(time_before(jiffies,end) && !READ_ONCE(stop_requested)) {
++ while((READ_ONCE(continuous) || time_before(jiffies,end)) && !READ_ONCE(stop_requested)) {
+   bool prime=AUDIT_POLICY==2 && !previous_success;
+ read_again: ;
+   u8 tx[16]={0xeb},rx[16]={0};unsigned int length,wire,j;
