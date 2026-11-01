@@ -15,10 +15,12 @@ independence milestone. Fully independent startup remains a later goal.
 - [x] Read a complete ROM identity: chip `0x4324` (BCM43241), revision 6, 576 KiB RAM.
 - [x] Review current Orchard main, PRs and the P105-pinned Cascadia USB transport.
 - [x] Use standard-driver shutdown to verify halt before removing the USB bus in the same boot.
-- [ ] Complete original power/GPIO/device cleanup in the revised diagnostic; those owners remain retained until reboot.
+- [x] Return to iOS to release the previous boot’s retained owners; qualify the revised provider’s complete cleanup in the next boot.
 - [x] Build a new candidate with the complete recovery closure, earlier power-domain attachment, synchronized stop and brighter display; cold qualification pending.
 - [x] Build the exact USB/chip/revision transport candidate and validate private J72 TRX/NVRAM offline.
-- [ ] Next DFU: verify recovery and brighter startup, then test firmware loading and re-enumeration; scan/association follow only if a wireless interface appears.
+- [x] Stage separate RAM Wi-Fi/DHCP/HTTPS/SSH tools and pass native localhost SSH, DHCP/configuration and bundle-transfer checks.
+- [x] Build Orchard’s port-authorization fix for exact #34; 16 actual-source offline combinations pass. Runtime update is ready before first driver load.
+- [ ] Next DFU: verify recovery and brighter startup, stage RAM network tools, then test firmware loading and re-enumeration; scan/association follow only if a wireless interface appears.
 - [ ] Scan, association, DHCP, DNS, HTTPS and Wi-Fi SSH.
 
 No new DFU is needed for this source review. No radio firmware has been uploaded.

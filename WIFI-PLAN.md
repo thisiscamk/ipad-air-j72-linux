@@ -84,6 +84,31 @@ firmware startup with this candidate remain untested.**
 The owner confirmed the menu and on-screen keyboard in the repaired #34
 desktop; brightness was then raised from 802 to 1604 in that live session.
 
+## Same-boot network preparation completed
+
+The desktop image lacks Wi-Fi tools and an SSH server. A separate RAM-only
+userspace bundle is now staged privately, without modifying that image. Native
+ARM64 tool checks, pinned-key localhost SSH and exact-bootstrap BusyBox bundle
+transfer passed. The reusable [network scripts and offline checks](code/wifi/network-userspace/)
+are published; no archive, credentials, keys or firmware are included.
+
+Orchard's [firmware-handshake port-authorization fix](https://github.com/OrchardLinux/orchard/blob/824bf0346ae4c3debd208cd34b053130576af60c/kernel/patches/drivers/wifi/0004-wifi-brcmfmac-Report-port-authorized-after-the-firm.patch)
+now builds in a separate exact-#34 driver copy. Sixteen actual-source
+connection/authorization combinations pass under UBSan. Only `cfg80211.c`
+changed from our previous candidate; the USB implementation is identical.
+The updated module will replace its RAM file **before first load**; the
+already pinned cold-boot payload is unchanged. This fix reports successful
+firmware PSK/SAE handshakes to userspace; it is not evidence of association.
+
+Next boot: verify recovery and brighter startup, stage the RAM network tools,
+qualify firmware startup, then scan. If scanning succeeds, obtain the owner's
+network profile and test association, DHCP/renewal, DNS, Wi-Fi-bound HTTPS and
+pinned-key Wi-Fi SSH in the same boot. Keep USB recovery available. Original
+power/GPIO owners from the previous boot were released by restarting to iOS,
+which the host now confirms. Full cleanup of the new provider remains untested.
+**No radio firmware has yet been uploaded; none of these iPad network checks
+has passed.**
+
 ## Earlier: HSIC register and power-owner observation passed
 
 A same-boot diagnostic read control `0x4`, configuration `0x153`, and four

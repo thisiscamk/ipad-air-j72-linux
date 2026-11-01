@@ -321,6 +321,22 @@
     "wifi/usb-firmware/test-packer.py": {
       "sha256": "67638d50fbd64fd19f6f114c837b4939208c69d179a889221f9c21a4765df88e",
       "status": "offline candidate; source or synthetic tests; no radio firmware upload or Wi-Fi connection claimed"
+    },
+    "wifi/network-userspace/tools/j72-network-runtime.sh": {
+      "sha256": "e176fc9a55f073feded54d2147a12e76080f5ad1739ebe07001f264be3c9a908",
+      "status": "source copied byte-for-byte from local RAM networking preparation; offline DHCP/configuration/transfer and native localhost SSH checks pass; iPad network untested"
+    },
+    "wifi/network-userspace/tools/j72-network-dhcp-hook.sh": {
+      "sha256": "ed903b43ad9137fea7ab2ceb3b917996a7a9806b043a8a66329f8ed479e69dcb",
+      "status": "source copied byte-for-byte from local RAM networking preparation; offline DHCP/configuration/transfer and native localhost SSH checks pass; iPad network untested"
+    },
+    "wifi/network-userspace/tools/j72_network_userspace.py": {
+      "sha256": "5704251546f8eaff0f35db8ddeb705669b76167247397a0bf3964a43206d50f2",
+      "status": "source copied byte-for-byte from local RAM networking preparation; offline DHCP/configuration/transfer and native localhost SSH checks pass; iPad network untested"
+    },
+    "wifi/network-userspace/tools/test-j72-network-prep.py": {
+      "sha256": "e84eda960fd4fd05a74c523023c431616ff7b54dfe040aa3deabf7ac1298cc4b",
+      "status": "source copied byte-for-byte from local RAM networking preparation; offline DHCP/configuration/transfer and native localhost SSH checks pass; iPad network untested"
     }
   },
   "upstream_reference": {
