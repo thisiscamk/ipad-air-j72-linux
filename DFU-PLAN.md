@@ -47,7 +47,7 @@ See [Wi-Fi findings and reuse plan](WIFI-PLAN.md).
 - [x] Owner confirms menu, typing and keyboard in the fresh RAM desktop.
 - [x] Test serial respawn across a real cable cycle; ACM and NCM recover without a manual shell restart.
 - [x] Complete five minutes of RAM-desktop/Wi-Fi hub charging: mean +296.8 mA, two negative readings, independent restoration.
-- [ ] Confirm iOS charging on the same hub for the overnight break.
+- [x] Owner confirms iOS visible and charging on the same hub for the overnight break.
 - [x] Start the reduced desktop from RAM; verify NBD/export detached, live processes, Wi-Fi HTTPS and about 235 MiB available.
 - [x] Owner confirms terminal, menu, touch and keyboard unplugged; same-boot Wi-Fi SSH and desktop-user HTTPS pass with the host USB device absent.
 

@@ -31,5 +31,6 @@
     "No SOC gain or battery health qualification",
     "Five-minute test only; not unattended or overnight Linux charging qualification",
     "For overnight charging, return to iOS on the same hub"
-  ]
+  ],
+  "post_test_ios_charging": "Owner confirmed iOS visible and charging on the same hub after clean shutdown and reboot"
 }

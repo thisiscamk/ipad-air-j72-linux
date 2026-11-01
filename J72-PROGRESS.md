@@ -14,8 +14,9 @@ The final temperature was 34.7 C, with no gauge failures or worker error;
 independent readback confirmed restoration of the original input limit.
 Brightness was 1203/2047. [Sanitized result](code/charging/wifi34-refresh/RAM-DESKTOP-RESULT.json).
 
-The owner requested overnight charging. The bounded Linux test does not
-qualify that use; the plan is to return to iOS on the same powered hub.
+The owner requested overnight charging. After clean Linux shutdown and
+normal reboot, the owner confirmed iOS is visible and charging on the same
+powered hub. The bounded test does not qualify overnight Linux charging.
 Autonomous Linux source/protection policy remains open. No internal-storage
 changes were made.
 
