@@ -1,3 +1,23 @@
+# 1 November: internal-storage preparation while iOS charges
+
+The offline preparation now includes a strict GPT checker and free-space-only
+planner, with sixteen synthetic tests and CLI refusal checks; an inactive
+ANS1 loader command/geometry guard passes 280 actual-source host cases under
+UBSan. The previous duplicate-free regression also passes against the new
+Orchard source pin. No full loader build or J72 storage hardware test has run.
+
+A separate private 3 GiB host ext4 copy retains a canary after reopening and
+passes read-only e2fsck. The original image hash is unchanged. This checks
+filesystem persistence only; native-root boot, package updates and persistent
+network/desktop services remain untested.
+
+The [morning runbook](STORAGE-MORNING-PLAN.md) records the next batches and
+[remaining source audit](code/storage/ANS1-AUDIT.md). Key blockers are J72 ANS1
+integration/qualification and a verified iOS 12 space-creation/coexistence
+procedure. Cached iOS inventory suggests almost all the main disk is APFS;
+free capacity inside APFS is not a Linux partition gap. iOS remains intact
+and charging; there were no device operations for this preparation.
+
 # 1 November: RAM-desktop hub charging and serial recovery
 
 The revised serial-shell loop passed a real move from the direct Pi connection

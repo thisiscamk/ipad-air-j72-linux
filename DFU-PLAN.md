@@ -6,6 +6,10 @@ The host disk export is stopped. Wi-Fi plus guarded hub charging also passed
 a fifteen-minute continuation with verified restoration. Startup after a
 shutdown still requires the Pi; autonomous power policy remains open.
 
+## Next storage preparation
+
+The [morning runbook](STORAGE-MORNING-PLAN.md) lists the read-only inventory, implementation, backup, coexistence, rehearsal and later installation batches. Offline checks pass; no fully built ANS1 observer or installer is ready yet. Leave the iPad in iOS charging until a concrete changed test is ready. No storage writes are authorized.
+
 ## Latest Wi-Fi session
 
 - [x] Boot #34 and pass its initial touch self-check.

@@ -1,0 +1,101 @@
+diff --git a/src/ans1.c b/src/ans1.c
+--- a/src/ans1.c
++++ b/src/ans1.c
+@@ -191,6 +191,8 @@
+ static rtkit_dev_t *ans1_rtkit;
+ int ans1_ep = -1;
+ static bool ans1_initialized, ans1_ready;
++static bool ans1_geometry_valid;
++static u32 ans1_total_lbas;
+ 
+ static bool ans1_epmap_cb(rtkit_dev_t *rtk, u32 base, u32 bitmap)
+ {
+@@ -308,6 +310,22 @@
+ {
+     struct rtkit_message rtk_msg;
+ 
++    /* Positive allowlist at the last command boundary, before any DMA or
++     * mailbox operation. Setup messages never issue media opcodes here. */
++    if (!cmd || cmd->tag != 0)
++        return false;
++    if (cmd->op == ANS1_CMD_OP_IDENTIFY) {
++        if (cmd->flags || cmd->slba || cmd->length)
++            return false;
++    } else if (cmd->op == ANS1_CMD_OP_READ_USERAREA) {
++        if (!ans1_geometry_valid || !ans1_total_lbas ||
++            cmd->flags != ANS1_CMD_IO_FLAG_NO_ENCRYPTION ||
++            cmd->length != 1 || cmd->slba >= ans1_total_lbas)
++            return false;
++    } else {
++        return false;
++    }
++
+     dma_wmb();
+ 
+     rtk_msg.msg = FIELD_PREP(ANS1_SQ_DB_OP, ANS1_SQ_DB_OP_RING) | FIELD_PREP(ANS1_SQ_DB_TAG, 0) |
+@@ -327,10 +345,12 @@
+ 
+ bool ans1_read_main_storage(u64 lba, void *buffer)
+ {
+-    if (!ans1_initialized)
+-        return false;
+-
+-    if (((u64)buffer & 0xfff) != 0)
++    if (!ans1_initialized || !ans1_geometry_valid || !ans1_total_lbas)
++        return false;
++
++    /* Reject before narrowing LBA or encoding the single 32-bit page frame. */
++    if (lba > 0xffffffffULL || lba >= ans1_total_lbas || !buffer ||
++        ((u64)buffer & 0xfff) != 0 || ((u64)buffer >> 12) > 0xffffffffULL)
+         return false;
+ 
+     memset(cmd, '\0', ANS1_CMD_SIZE);
+@@ -348,6 +368,30 @@
+ 
+     dma_rmb();
+ 
++    return true;
++}
++
++static bool ans1_read_geometry(void)
++{
++    struct asp_identify identify;
++
++    /* IDENTIFY returns inline data after the command header. Only the
++     * existing single-page read format is supported in this first candidate. */
++    static_assert(sizeof(identify) <= ANS1_CMD_SIZE - ANS1_CMD_HDR_SIZE,
++                  "identify response does not fit inline command buffer");
++    ans1_geometry_valid = false;
++    ans1_total_lbas = 0;
++    memset(cmd, 0, ANS1_CMD_SIZE);
++    cmd->op = ANS1_CMD_OP_IDENTIFY;
++    if (!ans1_exec_command())
++        return false;
++    dma_rmb();
++    memcpy(&identify, cmd + 1, sizeof(identify));
++    if (!identify.util_formatted || identify.lba_size != SZ_4K ||
++        !identify.num_lba_formatted)
++        return false;
++    ans1_total_lbas = identify.num_lba_formatted;
++    ans1_geometry_valid = true;
+     return true;
+ }
+ 
+@@ -409,6 +453,9 @@
+             goto out_shutdown;
+     }
+ 
++    if (!ans1_read_geometry())
++        goto out_shutdown;
++
+     ans1_initialized = true;
+     printf("ANS1: Initialized\n");
+ 
+@@ -439,5 +486,7 @@
+ 
+     ans1_initialized = false;
+     ans1_ready = false;
++    ans1_geometry_valid = false;
++    ans1_total_lbas = 0;
+     printf("ANS1: shutdown done\n");
+ }

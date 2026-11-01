@@ -77,3 +77,7 @@ unplug. About 225 MiB remained available in the initial unplugged check.
 This small desktop is not the full Omarchy A application set. RAM data is lost
 at reboot, and a shutdown still requires Pi-assisted startup. No internal
 storage writes or installation are authorized.
+
+## Internal-storage preparation now available
+
+The [morning storage runbook](STORAGE-MORNING-PLAN.md) separates completed host tools and filesystem rehearsal from unproved ANS1 hardware, iOS 12 coexistence and persistent-root boot. The RAM desktop is already independent of the host disk during unplugged use; storage will add persistence once those gates pass. Autonomous charging and fully independent startup remain separate work.

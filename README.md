@@ -4,6 +4,8 @@ An experimental **RAM-only** Linux and Omarchy A desktop project with Pi-assiste
 
 Read the [progress report](J72-PROGRESS.md) for measured results and current limits, the [process guide](PROCESS.md) for the checks and RAM boot sequence, the [roadmap](ROADMAP.md) for milestones, the [DFU session plan](DFU-PLAN.md) for proposed test batches, the [Pi charging plan](PI-CHARGING-PLAN.md) for keeping USB data attached while charging, and the [internal-storage plan](INTERNAL-STORAGE-PLAN.md) for the later installation gates. The new [Wi-Fi preparation](WIFI-PLAN.md) and [independent-operation plan](INDEPENDENCE-PLAN.md) cover running unplugged after a Pi-assisted startup.
 
+**Internal-storage preparation:** the [morning runbook](STORAGE-MORNING-PLAN.md) now links a tested offline GPT checker/free-space planner, inactive ANS1 guard candidates and a host filesystem rehearsal. J72 storage hardware and iOS 12 coexistence remain unqualified; no installer or device writes are enabled.
+
 The present desktop uses software rendering and a reduced Arch Linux ARM filesystem resident in RAM. The earlier desktop root was served by a Raspberry Pi over USB. Native multitouch now reaches Linux input, and the owner has confirmed full-screen touch mapping with a visual target test. This repository is a place to share reviewed notes while J72 support is developed; a focused hardware implementation may later be proposed to [OrchardLinux/orchard](https://github.com/OrchardLinux/orchard).
 
 **Unplugged desktop now works:** after detaching the NBD disk and stopping the

@@ -1,0 +1,78 @@
+{
+  "date": "2026-11-01",
+  "scope": "Offline host preparation; not an installable J72 release",
+  "device_contacted": false,
+  "device_writes": false,
+  "writes_authorized": false,
+  "orchard_commit": "97dccd13fc4af182a48d4e59198ad72acbfc201c",
+  "ans1_import_sha256": "9522985e68957b0906d8ef1b7b0fb224ec54cb4e7132ab2bb6cad110b7548b40",
+  "j81_reference_commit": "e2203b83f45726c825b39dd17fbab405c2a90e5b",
+  "gpt_synthetic_unit_tests": {
+    "passed": 16,
+    "hardware_geometry_tested": false
+  },
+  "gpt_synthetic_cli": {
+    "occupied-apfs": {
+      "exit_code": 2,
+      "plan_status": "blocked",
+      "write_operations": [],
+      "approved_for_execution": false,
+      "existing_report_overwrite_refused": true
+    },
+    "free-gap": {
+      "exit_code": 0,
+      "plan_status": "dry_run_only",
+      "write_operations": [],
+      "approved_for_execution": false,
+      "existing_report_overwrite_refused": true
+    },
+    "corrupt-backup": {
+      "exit_code": 1,
+      "corrupt_capture_refused": true,
+      "report_created": false
+    }
+  },
+  "ans1_command_guard": {
+    "baseline_missing_command_allowlist_reproduced": true,
+    "candidate_actual_source_cases": 280,
+    "invalid_commands_blocked_before_dma_or_mailbox": true,
+    "read_geometry_and_narrowing_checks": true,
+    "ubsan_pass": true,
+    "full_loader_built": false,
+    "hardware_tested": false
+  },
+  "ans1_cleanup": {
+    "baseline_duplicate_free_reproduced": true,
+    "candidate_frees_each_allocation_once": true,
+    "repeat_shutdown_returns_without_extra_cleanup": true,
+    "ubsan_candidate_pass": true,
+    "hardware_tested": false,
+    "return_codes": {
+      "imported": -6,
+      "candidate": 0
+    }
+  },
+  "host_filesystem_rehearsal": {
+    "host_only": true,
+    "source_image_sha256": "a618fe86ba2f076434ee5a34bb3178aba593ab50f70ddcb17f5f289b697951e6",
+    "candidate_image_sha256": "d86927b04b0bbf35466e25c05505c5d9ecafed2ae48d172935c1dfc162658900",
+    "candidate_image_bytes": 3221225472,
+    "candidate_allocated_bytes": 1735290880,
+    "canary_reopened_and_matched": true,
+    "e2fsck_read_only_exit_code": 0,
+    "source_image_unchanged": true,
+    "full_system_boot_tested": false,
+    "device_writes": false,
+    "installable": false
+  },
+  "open_gates": [
+    "Loader init/error/DMA ownership and complete build",
+    "Exact J72 ANS1 hardware read-only qualification",
+    "Linux ASP driver port and failure/durability qualification",
+    "Fresh private GPT inventory and verified backups",
+    "Verified iOS 12 coexistence / safe space creation",
+    "Persistent-root boot and update qualification",
+    "Autonomous power/source protection",
+    "Separate approval of exact device write proposal"
+  ]
+}

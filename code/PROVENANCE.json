@@ -224,7 +224,7 @@
     },
     "storage/0001-ans1-Avoid-freeing-the-command-buffer-twice.patch": {
       "sha256": "860518a3a2659c0f6b0a5d81b0e301fa05185259e9c97fd65abfc7bc6053dfa4",
-      "status": "offline imported-ANS1 cleanup candidate/reproducer; narrow host test only, no full loader or device qualification"
+      "status": "Offline storage preparation/candidate only; no active loader or target storage qualification"
     },
     "storage/LICENSE-MIT": {
       "sha256": "24bcd54d72751375e5bd4eb3bec971a0ccfc53aaad5902858cf29cadedb16ee2",
@@ -232,7 +232,7 @@
     },
     "storage/verify-j72-ans1-cleanup.py": {
       "sha256": "993ca8fbe2a30ac0f9f2f6c05550d622d74199badfe33ab93e2c2262a816e7cd",
-      "status": "offline imported-ANS1 cleanup candidate/reproducer; narrow host test only, no full loader or device qualification"
+      "status": "Offline storage preparation/candidate only; no active loader or target storage qualification"
     },
     "run-offline-tests.py": {
       "sha256": "4c5417f6db86bb2212f9d6b415f669dbb38221b8c6dffdfac6ac4ab8f5a74db6",
@@ -389,11 +389,32 @@
     "charging/wifi34-refresh/module/j72-limit-core.h": {
       "sha256": "6c37efdd866d011d7f8a8879d7b99908d30176c193d3e253267790f2121e0526",
       "status": "measured #34 bounded Wi-Fi/desktop charging source; public synthetic retry tests; five-minute net-positive result with one negative sample; no physical retry recovery observed"
+    },
+    "storage/0002-ans1-Validate-read-only-commands-and-measured-geometry.patch": {
+      "sha256": "62de4ab2a594d6ab64598cf90ee2080d9fbe6b843b2cd29d7ac2fcbde9212a8f",
+      "status": "Offline storage preparation/candidate only; no active loader or target storage qualification"
+    },
+    "storage/j72_storage_preflight.py": {
+      "sha256": "432f68d7878f6913044af4dd037ba4b7dcb243119eee41c7be74f297f4b4cb2a",
+      "status": "Offline storage preparation/candidate only; no active loader or target storage qualification"
+    },
+    "storage/test_j72_storage_preflight.py": {
+      "sha256": "504303dd324c6eb652d9f1bd8cfadc0a05b515125833c8f32b95eb4147745e19",
+      "status": "Offline storage preparation/candidate only; no active loader or target storage qualification"
+    },
+    "storage/verify-j72-ans1-read-guard.py": {
+      "sha256": "5e70b12415c09be04b1abf37952c21723cc55a735574af78c2c486504e3542ea",
+      "status": "Offline storage preparation/candidate only; no active loader or target storage qualification"
     }
   },
   "upstream_reference": {
     "repo": "https://github.com/mattonik/ipad-nixos",
     "commit": "b94d42f78e04c5465e290340a5b6879bbc5956b6"
   },
-  "private_inputs": "Not distributed. No .inc, firmware, calibration, binary images or raw logs."
+  "private_inputs": "Not distributed. No .inc, firmware, calibration, binary images or raw logs.",
+  "storage_reference": {
+    "orchard_commit": "97dccd13fc4af182a48d4e59198ad72acbfc201c",
+    "ans1_import_sha256": "9522985e68957b0906d8ef1b7b0fb224ec54cb4e7132ab2bb6cad110b7548b40",
+    "j81_reference_commit": "e2203b83f45726c825b39dd17fbab405c2a90e5b"
+  }
 }

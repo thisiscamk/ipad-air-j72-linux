@@ -1,0 +1,75 @@
+# J72 internal storage: morning runbook
+
+Prepared 1 November 2026. **Preparation is ready; an on-device installer is not.**
+The iPad is left in iOS charging on its powered hub. No device communication,
+reboot, DFU, partition change or internal write was performed for this preparation.
+Preserve iOS by default. The host kernel stays unchanged.
+
+## Ready on the host
+
+- [GPT checker and free-space planner](code/storage/j72_storage_preflight.py):
+  validates both table copies, geometry, CRCs, ranges and overlaps; preserves
+  every existing partition. It operates on captured regular files only and
+  generates no write commands. Sixteen synthetic unit tests pass.
+- [ANS1 loader candidates and audit](code/storage/README.md): duplicate-free
+  fix plus a positive command allowlist, measured geometry and read bounds.
+  The second candidate passes 280 cases using actual extracted source with
+  host stubs and UBSan. No complete loader build or hardware qualification.
+- A private, separate 3 GiB ext4 host image: canary survives reopening and
+  read-only `e2fsck` passes. The original image hash is unchanged. This is a
+  filesystem rehearsal, not a bootable internal-root release.
+- Pinned Orchard/J81 reference material, historical J72 controller facts,
+  synthetic accepted/blocked/corrupt GPT captures and [sanitized results](code/storage/PREPARATION-RESULT.json).
+- Existing proven RAM boot, desktop, Wi-Fi and USB recovery path retained as
+  the rescue baseline. Private firmware and image contents stay local.
+
+## Sequence from here
+
+These are test batches, not a promise of one DFU each. Complete offline gates
+before requesting buttons. Compatible checks share a running boot.
+
+| Batch | Work | Gate before continuing |
+| --- | --- | --- |
+| 0 — iOS inventory and recovery | Confirm exact model/current layout, available space and backup status. If a new privileged iOS observation is needed, explain its temporary jailbreak/boot separately. Existing cached inventory needs no DFU to analyze. | Current private records, verified backup and a known normal-iOS return path. No resizing. |
+| 1 — finish read-only storage implementation | Audit init failure ownership, timeout/late completions and DMA quiescence; integrate exact J72 firmware/ADT handoff and build in isolation. Retain both recovery shells and the known RAM desktop. | Full build and injected-failure tests pass. Current loader candidates alone do not meet this gate. |
+| 2 — first storage DFU, only when batch 1 passes | Boot the changed read-only observer directly from the Pi. Identify namespace geometry; perform a few bounded aligned reads, repeat hashes, then capture both GPT headers/entry arrays and protective MBR privately. | Only Identify and bounded user-area reads reach command submission; no unlock, writes, auxiliary access, discard, flush or filesystem mount. Stop on the first error. Normal iOS return afterward. |
+| 3 — map and coexistence decision | Run the offline checker on the captured metadata. Measure image/update headroom. Investigate an iOS 12 supported capacity/shrink route without invoking resize. | A real unallocated gap or independently demonstrated iOS 12 coexistence method. If neither exists, installation stays blocked. |
+| 4 — persistent-root and driver qualification | Integrate the ANS1 Linux driver with this kernel/DT, initramfs and PARTUUID root. Qualify tag/SGL/DMA bounds, completion, timeout, flush and recovery. Add persistent desktop/network services and credentials handling. Exercise updates, reboot and recovery with disposable images/test media first. | Boot-tested native root, known failure behavior, protected Apple ranges and passing persistence/update checks. No owner-device write test is implied. |
+| 5 — concrete write proposal | Produce exact target identity, unchanged/changed ranges, both GPT backups/hashes, image hashes, backup checks, rollback limits and failure recovery. Review with the owner. | Separate explicit authorization for that exact proposal. This preparation request authorizes no installation or erase. |
+| 6 — later install and qualification | Write only the approved Linux areas, verify readback and filesystem integrity, boot internal root, check desktop/touch/Wi-Fi/power, then repeat cold starts and iOS recovery. | Persistent files, updates, normal recovery and agreed independent-use features pass. Keep the RAM rescue boot. |
+
+## Before any storage write
+
+1. Make an encrypted local iOS backup on the owner's Mac, confirm completion,
+   lock indicator and timestamp, and retain its password. Separately preserve
+   files/settings outside the backup. This has **not** been done by this work.
+   [Apple's encrypted-backup instructions](https://support.apple.com/en-us/108353)
+   explain what is included and how to check encryption.
+2. Check the currently accepted restore image for this exact model and a
+   practical recovery route. Acceptance has not been verified tonight. A
+   backup of user data is not a raw partition rollback or jailbreak backup.
+3. Save fresh layout metadata privately and a second offline copy. Do not
+   treat a GPT backup as a substitute for APFS data recovery.
+4. Preserve iOS. The cached 128 GB inventory reports almost the whole disk
+   allocated to APFS. Its free capacity cannot be treated as a Linux gap.
+5. Finish autonomous charging/source protection before an installed daily-use
+   milestone. Guarded hub charging and battery reporting work, but unattended
+   Linux charging remains unqualified. Storage will not fix that dependency.
+
+## Boundaries and likely blockers
+
+- Orchard's [current resizer](https://github.com/OrchardLinux/resize-apfs#requirements)
+  requires iOS 16 or later; this iPad runs iOS 12.5.7. Do not run its install or
+  resize flow here. J81/A8X success is a reference, not J72/A7 qualification.
+- The source snapshot contains an ANS1 loader import, not a drop-in Linux ASP
+  driver for our current build. More integration work is required before DFU.
+- The first installation goal is a persistent internal root with Pi-assisted
+  startup, followed by unplugged use. Internal storage alone does not provide
+  PC-free startup after shutdown.
+- No Linux partition size has been chosen. Planner defaults (1 GiB boot,
+  8 GiB root) follow current Orchard policy only; full application space,
+  update headroom and the measured map determine the eventual proposal.
+
+**First morning action:** leave iOS intact, review backup/layout status and
+the implementation gates above. A new DFU is requested only once there is a
+changed, fully built read-only observer with its recovery checks ready.

@@ -1,6 +1,14 @@
 # Internal-storage preparation for iPad Air J72
 
-This is a research plan for the iPad Air 1 Cellular (`iPad4,2` / `J72AP`, A7, iOS 12.5.7). **No internal-storage write, partition change, or iOS erase has been authorized.** The current Linux and Omarchy A work boots into RAM and uses a read-only root filesystem served by a Raspberry Pi over USB.
+This is a research plan for the iPad Air 1 Cellular (`iPad4,2` / `J72AP`, A7, iOS 12.5.7). **No internal-storage write, partition change, or iOS erase has been authorized.** The current Linux and reduced Omarchy A desktop run from RAM, with internal Wi-Fi and demonstrated unplugged use. Storage preparation is now active; the iPad remains in iOS charging overnight.
+
+## Prepared now
+
+See the [morning runbook](STORAGE-MORNING-PLAN.md) for the next actions, the [offline tools and ANS1 audit](code/storage/README.md), and [test receipts](code/storage/PREPARATION-RESULT.json). The metadata checker validates both GPT copies and makes a free-space-only dry run. An inactive loader guard passes 280 host cases; a separate 3 GiB host filesystem copy passes a canary reopening check and read-only e2fsck. None of these is a boot-qualified storage image or an installer.
+
+Cached iOS inventory reports a 128 GB main disk with APFS occupying almost all of it. This is historical inventory, not a fresh GPT map: free space inside APFS is not unallocated disk space. No usable gap or safe iOS 12 shrink path has been established.
+
+Current Orchard uses a boot partition read by m1n1 itself; the latest launch change removes the host fallback reader. Its 1 GiB boot / 8 GiB minimum root policy is a sizing reference, not an approved J72 layout. This reviewed tree has no Linux ASP implementation to enable for J72. The older J81 overlay needs porting and its submission/cleanup gaps need repair.
 
 ## When to start
 
@@ -16,16 +24,16 @@ device-side usability and write-authorization gates below still apply.
 ## 1 November source review: useful starting points
 
 Reviewed Orchard at
-[`824bf0346ae4c3debd208cd34b053130576af60c`](https://github.com/OrchardLinux/orchard/tree/824bf0346ae4c3debd208cd34b053130576af60c).
+[`97dccd13fc4af182a48d4e59198ad72acbfc201c`](https://github.com/OrchardLinux/orchard/tree/97dccd13fc4af182a48d4e59198ad72acbfc201c).
 
 | Source | What to reuse or investigate | J72 gap |
 | --- | --- | --- |
-| [m1n1 ANS1 import](https://github.com/OrchardLinux/orchard/blob/824bf0346ae4c3debd208cd34b053130576af60c/boot/m1n1/patches/hoolock/0032-Add-ANS1-storage.patch) | A7/A8/A8X mailbox/AKF startup, preloaded firmware and user-area reads. | Exact J72 firmware handoff, power/DMA, read bounds and cleanup need qualification. |
-| [Firmware handoff patch](https://github.com/OrchardLinux/orchard/blob/824bf0346ae4c3debd208cd34b053130576af60c/boot/m1n1/patches/hoolock/0034-kboot-Pass-ANS1-firmware-information-to-Linux.patch) | Loader fills the `asp` firmware reserved-memory information for Linux. | Our present DT has no active J72 ASP/mailbox integration; merely enabling a kernel option is insufficient. |
-| [J81 follow-up merged through PR #34](https://github.com/OrchardLinux/orchard/blob/824bf0346ae4c3debd208cd34b053130576af60c/docs/integration/j81-2026-10-29-followup/NATIVE-ROOT.md) | Experimental internal ext4, systemd/desktop, Wi-Fi and persistence after a fresh host-assisted boot. | Different A8X board and kernel. Orchard's standard J81 profile still has `install=false`. |
-| [Pinned J81 contributor code](https://github.com/micro23/ipadair2-omarchy/tree/11463ba09f5fbc0d1d5afb43d29f7ebe8c9eb3ce/experimental/j81-storage) | Read-only ASP overlay, write-range checks, GPT parser/tests, explicit native-tool selection, root guards and PID 1 handoff. | Do not copy its partition boundaries, 4096-byte assumptions, board identity, approvals or resize target. Its patch is for its pinned prepared source. |
-| [Orchard layout planner](https://github.com/OrchardLinux/orchard/blob/824bf0346ae4c3debd208cd34b053130576af60c/src/orchard/install_layout.py) and [boot contract](https://github.com/OrchardLinux/orchard/blob/824bf0346ae4c3debd208cd34b053130576af60c/docs/boot-contract.md) | Pure planning logic, preserving Apple ranges, pinned table hashes, PARTUUID roots and platform/kernel separation. | A future J72 layout must be based on measured geometry and a qualified installer. Existing allocation defaults are not our approved layout. |
-| [Latest boot-from-host fix](https://github.com/OrchardLinux/orchard/blob/824bf0346ae4c3debd208cd34b053130576af60c/boot/m1n1/patches/orchard/0006-storage-Release-the-NVMe-boot-from-host-strap-after-.patch) | Account for differences between normal and USB-started iBoot. | This patch addresses PCIe NVMe/J71b, not a J72 ANS1 solution. Do not copy the strap writes. |
+| [m1n1 ANS1 import](https://github.com/OrchardLinux/orchard/blob/97dccd13fc4af182a48d4e59198ad72acbfc201c/boot/m1n1/patches/hoolock/0032-Add-ANS1-storage.patch) | A7/A8/A8X mailbox/AKF startup, preloaded firmware and user-area reads. | Exact J72 firmware handoff, power/DMA, read bounds and cleanup need qualification. |
+| [Firmware handoff patch](https://github.com/OrchardLinux/orchard/blob/97dccd13fc4af182a48d4e59198ad72acbfc201c/boot/m1n1/patches/hoolock/0034-kboot-Pass-ANS1-firmware-information-to-Linux.patch) | Loader fills the `asp` firmware reserved-memory information for Linux. | Our present DT has no active J72 ASP/mailbox integration; merely enabling a kernel option is insufficient. |
+| [J81 follow-up merged through PR #34](https://github.com/OrchardLinux/orchard/blob/97dccd13fc4af182a48d4e59198ad72acbfc201c/docs/integration/j81-2026-10-29-followup/NATIVE-ROOT.md) | Experimental internal ext4, systemd/desktop, Wi-Fi and persistence after a fresh host-assisted boot. | Different A8X board and kernel. Orchard's standard J81 profile still has `install=false`. |
+| [Pinned J81 contributor code](https://github.com/micro23/ipadair2-omarchy/tree/e2203b83f45726c825b39dd17fbab405c2a90e5b/experimental/j81-storage) | Read-only ASP overlay, write-range checks, GPT parser/tests, explicit native-tool selection, root guards and PID 1 handoff. | Do not copy its partition boundaries, 4096-byte assumptions, board identity, approvals or resize target. Its patch is for its pinned prepared source. |
+| [Orchard layout planner](https://github.com/OrchardLinux/orchard/blob/97dccd13fc4af182a48d4e59198ad72acbfc201c/src/orchard/install_layout.py) and [boot contract](https://github.com/OrchardLinux/orchard/blob/97dccd13fc4af182a48d4e59198ad72acbfc201c/docs/boot-contract.md) | Pure planning logic, preserving Apple ranges, pinned table hashes, PARTUUID roots and platform/kernel separation. | A future J72 layout must be based on measured geometry and a qualified installer. Existing allocation defaults are not our approved layout. |
+| [Latest boot-from-host fix](https://github.com/OrchardLinux/orchard/blob/97dccd13fc4af182a48d4e59198ad72acbfc201c/boot/m1n1/patches/orchard/0006-storage-Release-the-NVMe-boot-from-host-strap-after-.patch) | Account for differences between normal and USB-started iBoot. | This patch addresses PCIe NVMe/J71b, not a J72 ANS1 solution. Do not copy the strap writes. |
 
 **Audit result:** the imported `ans1_shutdown()` frees its command buffer
 twice. No later patch in the reviewed series changes that function. The
@@ -43,7 +51,7 @@ flow on J72/iOS 12.
 
 ### Initial J72 read-only command policy to implement and audit
 
-This table is a design requirement, not an already-enforced J72 driver.
+This table is the required policy for a future J72 driver. The inactive loader candidate enforces command admission and read bounds in host tests only; no active J72 storage driver implements it yet.
 ANS1 commands are not the newer PCIe NVMe admin command set.
 
 | Path | Initial policy |
@@ -84,9 +92,9 @@ software guards, not hardware locks on each namespace.
 
 ## What “installed” would mean
 
-The first realistic outcome is **Linux stored on the iPad but launched from a host after each cold restart**. Orchard's current supported-device flow works this way. Internal storage removes the Pi-hosted root filesystem; it does not by itself remove the DFU/Pongo host requirement. A truly untethered power-on boot would need a separate, proven boot-chain design and is not included in this plan.
+The first realistic outcome is **Linux stored on the iPad but launched from a host after each cold restart**. Orchard's current supported-device flow works this way. The RAM desktop already avoids a Pi-hosted root during unplugged use; internal storage would add persistence. It does not by itself remove the DFU/Pongo host requirement. A truly untethered power-on boot would need a separate, proven boot-chain design and is not included in this plan.
 
-The current [Omarchy A README](https://github.com/OrchardLinux/omarchy-a#supported-devices) describes automatic login and unrestricted passwordless sudo in its experimental image. Before storing personal data on a J72 install, choose and validate login/access controls and a data-protection design. Encryption support and performance on this J72 remain unqualified; do not infer them from another device's image.
+The current [Omarchy A README](https://github.com/OrchardLinux/omarchy-a#supported-devices) describes automatic login, an installation password for sudo, a six-digit screen-lock PIN, and no disk encryption. Our experimental RAM image has not been migrated to that installed-system setup. Before storing personal data, validate the chosen login, lock and data-protection configuration on J72; encryption support and performance remain unqualified.
 
 ## Concrete preparation before the write decision
 
