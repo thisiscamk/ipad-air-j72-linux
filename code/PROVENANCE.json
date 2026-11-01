@@ -109,6 +109,18 @@
     "charging/hub1050-long/test-worker-source.py": {
       "sha256": "b0057300d1e96ac473d5d015c300ec8bdb54b5b4fb7ca27b7ae398c32e282d2f",
       "status": "source copied byte-for-byte from measured1050mA300s implementation; validation charging/hub1050-long/VALIDATION.json"
+    },
+    "desktop/battery/BarWidget.qml": {
+      "sha256": "49ba8eae022f0560f1a5360bcb4a197b8c5b59bd53f0b02b7216633fee53fea9",
+      "status": "new J72 battery widget; loaded in live RAM desktop; visual and charging transition checks pending"
+    },
+    "desktop/battery/manifest.json": {
+      "sha256": "7d7366c36620ad37274f049af2c2c5e26289bfae5541b06ac7beeef287bde631",
+      "status": "new J72 battery widget; loaded in live RAM desktop; visual and charging transition checks pending"
+    },
+    "desktop/battery/README.md": {
+      "sha256": "d5a0910d4d5e9df34219a1b19d09bad8793988cca2866619e539113bda54567b",
+      "status": "new J72 battery widget; loaded in live RAM desktop; visual and charging transition checks pending"
     }
   },
   "upstream_reference": {

@@ -1,0 +1,17 @@
+{
+  "schemaVersion": 1,
+  "id": "ipadlinux.battery",
+  "name": "iPad battery",
+  "version": "1.0.0",
+  "author": "iPad Linux",
+  "description": "Battery percentage and charging state from the J72 Linux power supply driver.",
+  "kinds": ["bar-widget"],
+  "entryPoints": {"barWidget": "BarWidget.qml"},
+  "barWidget": {
+    "displayName": "iPad battery",
+    "description": "Battery percentage and charging state",
+    "category": "Power",
+    "defaultSection": "right",
+    "allowMultiple": false
+  }
+}
