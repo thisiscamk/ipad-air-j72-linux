@@ -1,0 +1,38 @@
+{
+  "device": "J72 / iPad4,2",
+  "kernel_build": "#34 SMP PREEMPT Sun Nov  1 07:40:27 +08 2026",
+  "qualified_source": "powered JCH377 charging/data port, previously measured iOS 5V/1500mA",
+  "nominal_input_setting_mA": 1050,
+  "observed_active_s": 300.273,
+  "settled_samples": 140,
+  "settled_coverage_s": 293.559,
+  "time_weighted_mean_mA": 211.332,
+  "minimum_mA": -140.0,
+  "maximum_mA": 394.0,
+  "negative_samples": 1,
+  "brightness_step": {
+    "before": 1604,
+    "after": 1203,
+    "reason": "cached guard temperature reached unchanged380 tenthC ceiling",
+    "watch_elapsed_s": 149.853,
+    "readback_verified": true
+  },
+  "result_type": "completed, net-positive interactive workload; not an all-positive idle run",
+  "owner_confirmed": [
+    "menu",
+    "keyboard hide/tap/reopen",
+    "charging icon"
+  ],
+  "wifi_https_during_charge_http_code": 200,
+  "worker_error": 0,
+  "original_input_limit_restored": true,
+  "guard_read_failures": 0,
+  "guard_refresh_recoveries": 0,
+  "limits": [
+    "one brief discharge sample",
+    "brightness changed during test",
+    "no SOC-gain or battery-health qualification",
+    "physical recovery from a gauge timeout not observed in this successful run",
+    "autonomous source policy remains open"
+  ]
+}

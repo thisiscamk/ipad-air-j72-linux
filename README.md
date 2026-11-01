@@ -6,6 +6,14 @@ Read the [progress report](J72-PROGRESS.md) for measured results and current lim
 
 The present desktop uses software rendering and a read-only Arch Linux ARM filesystem served by a Raspberry Pi over USB. Native multitouch now reaches Linux input, and the owner has confirmed full-screen touch mapping with a visual target test. This repository is a place to share reviewed notes while J72 support is developed; a focused hardware implementation may later be proposed to [OrchardLinux/orchard](https://github.com/OrchardLinux/orchard).
 
+**Wi-Fi and charging together:** the latest #34 powered-hub continuation
+completed 15 minutes with 424 positive settled samples (+239..+397 mA,
+time-weighted mean +306.965 mA) and independently verified restoration.
+Touch, keyboard and Wi-Fi were active; brightness was 1203/2047. An earlier
+five-minute interactive run averaged+211.332 mA with one brief negative
+sample. [Working worker, retry tests and limits](code/charging/wifi34-refresh/).
+Autonomous source policy, full-hour qualification and SOC trends remain open.
+
 **Wi-Fi now works:** firmware startup, scanning, WPA2 association, DHCP, DNS, Wi-Fi-bound HTTPS and pinned-key SSH pass on J72. Disconnect/reconnect and explicit DHCP renewal also pass. The owner confirmed touch, keyboard and brighter desktop with Wi-Fi active; a new Wi-Fi status icon is installed. [Actual driver/provider source and limits](code/wifi/usb-hsic/). Full provider cleanup, sustained traffic and Wi-Fi with charging remain open; the desktop still needs USB/NBD.
 
 **Touch milestone:** correcting an omitted shared analog-power enable changed the result from zero-contact reports to real native touch: 542 one-finger and 50 two-finger reports during the owner's gestures, with nine matched press/release lifecycles and no contacts left down. The capture passed firmware health and hardware restoration checks. A Linux multitouch device now drives a visual target/trace test; the owner confirmed accurate mapping across the screen. The owner has also opened desktop menus and launched Foot by touch. On-screen keyboard typing and its bar toggle also work. The latest cold RAM boot automatically started touch and the desktop; window dragging and tap-to-keyboard behavior now work in the live session.

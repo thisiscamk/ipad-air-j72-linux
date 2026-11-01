@@ -1,0 +1,14 @@
+{
+  "observed_active_s": 900.447,
+  "settled_samples": 424,
+  "settled_coverage_s": 893.61,
+  "time_weighted_mean_mA": 306.965,
+  "min_mA": 239.0,
+  "max_mA": 397.0,
+  "brightness": 1203,
+  "all_positive": true,
+  "read_failures": 0,
+  "fresh_refreshes": 0,
+  "restored_independently": true,
+  "no_SOC_gain_claim": true
+}

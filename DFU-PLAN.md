@@ -29,6 +29,22 @@ independence milestone. Fully independent startup remains a later goal.
 No new DFU is needed for this source review. No radio firmware has been uploaded.
 See [Wi-Fi findings and reuse plan](WIFI-PLAN.md).
 
+## Current Wi-Fi and charging batch
+
+- [x] Move the running #34 system to the qualified hub; Wi-Fi SSH survives.
+- [x] Recover USB data with a same-UDC software rebind; no extra DFU.
+- [x] Trace an initial early stop to an HDQ flags-read timeout; baseline restored.
+- [x] Build/test a bounded fresh-gauge retry worker without changing guard limits.
+- [x] Complete 300.273 seconds of Wi-Fi/interactive-desktop charging: time-weighted +211.332 mA, one -140 mA sample, verified restoration.
+- [x] Owner confirms menu, keyboard and charging indication; HTTPS passes during charging.
+- [x] Complete 900.447 seconds of continuation: 424 settled samples, all +239..+397 mA, time-weighted+306.965 mA, verified restoration.
+- [ ] Qualify complete Wi-Fi provider stop and another cold start.
+- [ ] Finish the reduced RAM desktop, measure runtime headroom, then test unplugged use.
+
+The short result includes a brightness change from 1604 to 1203; it does not
+qualify SOC gain, autonomous charging policy or timeout recovery. See the
+[actual worker, tests and bounded result](code/charging/wifi34-refresh/).
+
 ## Completed on this J72
 
 - [x] RAM Linux and read-only Pi-served desktop; software rendering.

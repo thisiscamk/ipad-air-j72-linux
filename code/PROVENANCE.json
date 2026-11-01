@@ -373,6 +373,22 @@
     "desktop/wifi/collect-status.sh": {
       "sha256": "7ff3edead89313c735973bd1703e5164c8dc3e9570b0b7f9dc1de94f47e2e4ea",
       "status": "Wi-Fi bar plugin/status collector installed in RAM; IPC and screenshot verified; owner opened status popup"
+    },
+    "charging/wifi34-refresh/test-fresh-gauge.py": {
+      "sha256": "d7ff3525f388917eb6ccf2b9639e83b8f284819ca4a752c8287511ccbf90a36b",
+      "status": "measured #34 bounded Wi-Fi/desktop charging source; public synthetic retry tests; five-minute net-positive result with one negative sample; no physical retry recovery observed"
+    },
+    "charging/wifi34-refresh/module/j72_input_limit_hub1050_refresh34.c": {
+      "sha256": "e2b608d34d78e7af4eb4201909e9d34a88d9c1e366988a1f1fad0ce43ddf81ab",
+      "status": "measured #34 bounded Wi-Fi/desktop charging source; public synthetic retry tests; five-minute net-positive result with one negative sample; no physical retry recovery observed"
+    },
+    "charging/wifi34-refresh/module/Makefile": {
+      "sha256": "8ae7080d6f06d423b436d765a104d80d5b7cd36ff0d7949bca571e8a512905ac",
+      "status": "measured #34 bounded Wi-Fi/desktop charging source; public synthetic retry tests; five-minute net-positive result with one negative sample; no physical retry recovery observed"
+    },
+    "charging/wifi34-refresh/module/j72-limit-core.h": {
+      "sha256": "6c37efdd866d011d7f8a8879d7b99908d30176c193d3e253267790f2121e0526",
+      "status": "measured #34 bounded Wi-Fi/desktop charging source; public synthetic retry tests; five-minute net-positive result with one negative sample; no physical retry recovery observed"
     }
   },
   "upstream_reference": {

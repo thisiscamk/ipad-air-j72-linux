@@ -58,3 +58,15 @@ power/domain/register observation passed in the same boot; radio enumeration
 remains open. The root still requires the host whenever the desktop is
 running. Autonomous power policy and HSIC Wi-Fi remain open; storage is
 planning only.
+
+
+## RAM desktop candidate prepared after Wi-Fi/charging milestone
+
+A host-only ELF/QML/font audit and read-only image extraction produced a
+private desktop subset around282 MB, compressed around100 MB. All selected
+image files match their source hashes; native labwc, Foot, Quickshell, fonts,
+UID1000 startup and D-Bus checks pass. The image and host kernel are unchanged.
+This is not yet a device result: runtime data/plugin completeness, live RAM
+headroom, input/keyboard behavior and an unplugged owner test remain open.
+The network/SSH tools already run from a separate RAM root. No internal
+storage writes or installation are authorized.
