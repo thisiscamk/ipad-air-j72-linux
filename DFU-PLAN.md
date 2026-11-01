@@ -1,8 +1,8 @@
 # J72 session plan: power, Wi-Fi and independent operation
 
-Updated 1 November 2026. **N1 boot and owner UI checks passed after a live
-bar-position repair. Desktop/root/input/export are now stopped, and a blue
-screen guides the controlled move to the powered hub in the same RAM boot.** The owner accepts a
+Updated 1 November 2026. **The hub handoff and desktop/input restart passed.
+The owner confirms desktop, charging symbol and input. A guarded charging
+test at reduced brightness has started; full duration remains open.** The owner accepts a
 Pi-assisted start followed by unplugged use as the first independence
 milestone. Fully independent startup remains a later goal.
 
@@ -54,7 +54,11 @@ input and sustained charging remain open.
   health and cleanup pass. Longer reliability remains open.
 - [x] Prepare new-payload charging helper with unchanged worker/guards; actual
   direct-Pi source refusal passes. Clean teardown and RAM hub handoff prepared.
-- [ ] Powered-hub data return, desktop restart and guarded lower-power charging.
+- [x] Powered-hub data return, desktop/input restart and owner UI confirmation.
+- [x] Start guarded lower-power charging with the unchanged worker/guards:
+  initial settled +449…+469 mA, 36.6 C, no faults. Full duration is not claimed.
+- [ ] Observe the bounded run, retain its endpoint and independently verify
+  original-limit restoration before any reboot.
 
 ## Remaining boot batches
 

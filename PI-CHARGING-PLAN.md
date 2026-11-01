@@ -1,3 +1,18 @@
+# 1 November: continuous-input, lower-brightness hub trial started
+
+The controlled RAM move to the known powered JCH377 returned USB data; the
+desktop and input restarted in the same boot. The new-payload helper retains
+the exact #33 charging worker, source qualification and all existing guards.
+At 802/2047 brightness, initial settled readings were **+449…+469 mA at
+36.6 C**, with no guard faults. The owner confirmed the desktop, charging
+symbol and input. This bounded test has started; its maximum is one hour,
+and a guard can stop it earlier. Full duration and final restoration are
+not yet qualified. Keep cables fixed; the host source lease remains required.
+
+The earlier side-bar/keyboard resize loop was stopped before this trial.
+That changed workload and brightness mean this is not an isolated comparison
+of screen brightness alone. SOC jumps still do not establish charge gained.
+
 # 1 November: temperature test cutoff; owner charging in iOS
 
 The revised continuation ended at **38.1 C**, exceeding its conservative

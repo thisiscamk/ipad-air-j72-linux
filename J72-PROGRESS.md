@@ -1,3 +1,13 @@
+# 1 November: hub data returned; lower-power charging trial started
+
+The same RAM boot returned through the qualified powered hub, with the
+transfer handler completed and desktop/input restarted. The unchanged #33
+charging worker began its bounded test with the new continuous-input image
+at 802/2047 brightness. Initial settled readings were +449…+469 mA at 36.6 C,
+with no guard faults. The owner confirmed the returned desktop, charging
+symbol and input. This is an initial result; full duration and independent
+final restoration remain open. Wi-Fi HSIC research continues offline.
+
 # 1 November: bar/keyboard repaired in RAM; hub handoff prepared
 
 The owner confirmed the battery widget and dimmer screen, but reported a

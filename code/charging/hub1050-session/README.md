@@ -1,5 +1,18 @@
 # Touch-independent guarded charging continuation
 
+## New continuous-input, reduced-brightness trial started
+
+The same pinned charging worker is now running with the new #33 continuous
+touch overlay at 802/2047 brightness. The controlled hub data handoff and
+desktop/input restart passed. Initial settled battery readings were
++449…+469 mA at 36.6 C with no guard faults, and the owner confirmed the
+desktop, charging symbol and input. The maximum is still one hour with the
+same source, battery, temperature and rollback guards. This is an
+[initial observation](CONTINUOUS-DESKTOP-START.json), not a full-duration
+or final-restoration result. Percentage gain remains unqualified.
+
+## Previous normal-brightness continuation
+
 **This continuation ended at the 38.1 C temperature test guard; it did not complete 60 minutes.**
 It follows the measured five-minute desktop run. Native build, ABI and
 offline policy/rollback/fault/USB tests passed. Charging remained active

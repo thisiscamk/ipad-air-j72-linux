@@ -1,0 +1,19 @@
+{
+  "date": "2026-11-01",
+  "scope": "Initial observation only; not a completed charging test",
+  "continuous_touch_image": true,
+  "brightness": 802,
+  "nominal_input_mA": 1050,
+  "maximum_duration_s": 3600,
+  "temperature_test_ceiling_C": 38.0,
+  "active_at_snapshot": true,
+  "retained_samples": 7,
+  "battery_current_min_uA": 449000,
+  "battery_current_max_uA": 469000,
+  "battery_temperature_tenthC": 366,
+  "guard_faults": 0,
+  "error": 0,
+  "owner_desktop_charging_symbol_and_input_confirmed": true,
+  "percentage_gain_qualified": false,
+  "full_duration_or_final_rollback_qualified": false
+}
