@@ -1,7 +1,8 @@
 # J72 session plan: power, Wi-Fi and independent operation
 
-Updated 1 November 2026. **The iPad is in iOS charging. No new DFU is
-requested and no complete next payload is ready.** The owner accepts a
+Updated 1 November 2026. **The iPad is fully charged and directly connected
+to the Pi in iOS. The changed N1 continuous-touch payload has passed offline
+preflight; a new DFU is the next physical step.** The owner accepts a
 Pi-assisted start followed by unplugged use as the first independence
 milestone. Fully independent startup remains a later goal.
 
@@ -41,6 +42,9 @@ input and sustained charging remain open.
 - [x] Review Orchard main at 824bf034 and J81 native-root contributor sources.
 - [x] Reproduce the imported ANS1 shutdown double-free with host stubs; prepare a one-line candidate and passing regression check.
 - [x] Expand local-root, internal installation and cold-start independence plans.
+- [x] Package N1 continuous touch, its five-second self-check, reduced initial
+  brightness and automatic battery widget. Original #33 kernel/DT/loader and
+  read-only desktop are retained; the new overlay is not yet boot-qualified.
 
 ## Remaining boot batches
 

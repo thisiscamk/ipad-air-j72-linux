@@ -2,8 +2,9 @@
 
 Reviewed 1 November 2026 against Orchard
 [`824bf0346ae4c3debd208cd34b053130576af60c`](https://github.com/OrchardLinux/orchard/tree/824bf0346ae4c3debd208cd34b053130576af60c).
-This is an offline preparation record. The iPad is in iOS charging;
-no WLAN firmware was uploaded and no new DFU is requested.
+This is an offline preparation record. No WLAN firmware was uploaded.
+See the [current session plan](DFU-PLAN.md) for N1 boot readiness; the
+Wi-Fi bus/transport work below remains unfinished.
 
 ## Exact device and present result
 

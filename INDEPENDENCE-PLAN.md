@@ -51,5 +51,7 @@ do not sacrifice recovery or silently call a network-served root independent.
 - [Wi-Fi preparation and applicability](WIFI-PLAN.md) and
   [J72 storage gates and source map](INTERNAL-STORAGE-PLAN.md).
 
-**Now:** iOS is charging. Offline Wi-Fi inputs are checked/staged; HSIC and the
-complete next payload are unfinished. No DFU or storage operation is requested.
+**Now:** the iPad is fully charged and directly connected in iOS. The changed
+N1 continuous-input/reduced-brightness/widget image passed offline preflight
+and is ready for a fresh DFU test. Wi-Fi inputs are checked/staged, with HSIC
+unfinished. Storage remains planning only.
