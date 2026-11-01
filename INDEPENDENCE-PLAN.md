@@ -51,7 +51,7 @@ do not sacrifice recovery or silently call a network-served root independent.
 - [Wi-Fi preparation and applicability](WIFI-PLAN.md) and
   [J72 storage gates and source map](INTERNAL-STORAGE-PLAN.md).
 
-**Now:** the iPad is fully charged and directly connected in iOS. The changed
-N1 continuous-input/reduced-brightness/widget image passed offline preflight
-and is ready for a fresh DFU test. Wi-Fi inputs are checked/staged, with HSIC
-unfinished. Storage remains planning only.
+**Now:** N1 RAM Linux is running directly from the Pi. Its short continuous
+input/cleanup/restart check, dimmer startup and battery-widget IPC passed;
+owner visual confirmation and long-session checks remain. Wi-Fi inputs are
+checked/staged, with HSIC unfinished. Storage remains planning only.

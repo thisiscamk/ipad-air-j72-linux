@@ -1,8 +1,8 @@
 # J72 session plan: power, Wi-Fi and independent operation
 
-Updated 1 November 2026. **The iPad is fully charged and directly connected
-to the Pi in iOS. The changed N1 continuous-touch payload has passed offline
-preflight; a new DFU is the next physical step.** The owner accepts a
+Updated 1 November 2026. **The changed N1 image is running directly from the
+Pi. Continuous touch passed its short lifetime/cleanup/restart check; the
+desktop and battery widget started. Owner visual confirmation is pending.** The owner accepts a
 Pi-assisted start followed by unplugged use as the first independence
 milestone. Fully independent startup remains a later goal.
 
@@ -44,7 +44,11 @@ input and sustained charging remain open.
 - [x] Expand local-root, internal installation and cold-start independence plans.
 - [x] Package N1 continuous touch, its five-second self-check, reduced initial
   brightness and automatic battery widget. Original #33 kernel/DT/loader and
-  read-only desktop are retained; the new overlay is not yet boot-qualified.
+  read-only desktop are retained.
+- [x] Fresh N1 boot: continuous mode active beyond its three-second fallback;
+  explicit stop/firmware health/cleanup and automatic restart pass. Desktop
+  startup and battery-widget IPC pass at 802/2047 brightness.
+- [ ] Owner screen check and longer continuous-input/power qualification.
 
 ## Remaining boot batches
 

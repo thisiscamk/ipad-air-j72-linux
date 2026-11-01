@@ -1,3 +1,14 @@
+# 1 November: continuous-input image boots and passes its short self-check
+
+The changed #33 overlay booted directly from the Pi. Continuous input remained
+active beyond a three-second finite fallback, then explicitly stopped with
+firmware health and cleanup passing. Automatic restart entered session 2.
+At a startup snapshot, 1,566 frames had no bad layouts, input timeouts or SPI
+transfer errors. The read-only desktop started at 802/2047 brightness; the
+packaged battery widget returned 100% through IPC. Owner visual confirmation
+and long-session qualification remain pending. The direct-port battery baseline
+is discharging; no new charging control trial has run. Wi-Fi remains offline.
+
 # 1 November: Wi-Fi staging and storage-source audit while charging
 
 The owner accepts Pi-assisted startup followed by unplugged operation as the

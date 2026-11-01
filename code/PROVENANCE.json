@@ -199,8 +199,8 @@
       "status": "charging lifetime repair observed; full60min and continuous-touch boot qualification pending"
     },
     "touch/CONTINUOUS-INPUT.md": {
-      "sha256": "04432720348f2213feb1cec22d885e87c321faf06d0d2af9aac1a358fc0f2dae",
-      "status": "charging lifetime repair observed; full60min and continuous-touch boot qualification pending"
+      "sha256": "d66b0b9dd5637cd541f24578b27984ca833062b2f9280fd1c057877650585169",
+      "status": "#33 fresh-boot short lifetime/stop/health/cleanup/restart passed; owner visual and long-duration pending; #34 unbooted"
     },
     "wifi/VALIDATION.json": {
       "sha256": "929b4736eb04dc12186ec4b5cb77d0b2ffdad46803aee6a50adb0e5bc792741c",

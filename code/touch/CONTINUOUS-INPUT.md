@@ -10,18 +10,21 @@ owner confirmed the menu and brightness again.
 It overrides the time condition while preserving `stop_requested`, every
 controller fault check and full shutdown cleanup. Default behavior remains
 bounded. Matching candidates have built against both local #33 and #34
-kernels, and actual exported-symbol/ABI checks passed. They are **not yet
-boot selected or device qualified**. A synthetic test of the actual loop
+kernels, and exported-symbol/build-provenance checks passed. The #33 candidate
+has now booted and passed the short lifetime/cleanup check below; #34 remains
+unbooted. Long uninterrupted use is not yet qualified. A synthetic test of the actual loop
 condition covers finite expiry, continuous operation past expiry, explicit
 stop and jiffies wrap.
 
-The planned fast device qualification loads with `continuous=1` and a
-three-second finite fallback, then requires input to remain active at five
-seconds before explicitly stopping and verifying health/cleanup. It then
-restarts for normal desktop use. No 30-minute wait is needed to detect an
-incorrect finite timeout. Packaging and this device check are pending.
+The fresh #33 RAM boot loaded with `continuous=1` and a three-second finite
+fallback. Input remained active at five seconds, explicit stop returned to
+state 0 with firmware health and cleanup passing, and automatic restart
+entered session 2. The desktop started with 1,566 frames observed, zero bad
+layouts, input timeouts or SPI transfer errors at that snapshot. Owner visual
+confirmation is pending. This demonstrates timeout bypass and clean restart;
+it does not establish long-session reliability.
 
-For that RAM boot, `../desktop/j72-touch-renew.sh` is a temporary RAM
+For the previous RAM boot, `../desktop/j72-touch-renew.sh` was a temporary RAM
 bridge. It watches for a healthy natural timeout, then starts another
 session and reconnects the input device. It refuses explicit stops and
 failed/unhealthy sessions, and is bounded to two renewals within 4,000
@@ -31,6 +34,8 @@ rebooted to iOS for charging. A short interruption remains possible at renewal.
 Stop its owned PID and wait for exit before desktop/USB teardown. It never
 sets charging current; charging uses its own battery/source guards.
 
-The running boot payload and host kernel are unchanged. The patch carries
+The new boot changes the private startup overlay while retaining the #33
+kernel, DT and loader. It packages the battery widget and starts at no more
+than 802/2047 brightness. No renewal bridge is needed in this boot. The patch carries
 the original source's GPL-2.0-only license; owner firmware/calibration remain
 private and are not included.
