@@ -1,3 +1,18 @@
+# 1 November: temperature test cutoff; owner charging in iOS
+
+The revised continuation ended at **38.1 C**, exceeding its conservative
+38.0 C test ceiling. It retained **526 positive readings at +36…+209 mA**.
+The worker reported restored=1, restore_failed=0 and a temperature guard
+fault. It did not finish an hour. The owner rebooted to iOS for charging
+before an independent final PMIC snapshot or remaining RAM logs could be
+retrieved. The host monitor and read-only export are stopped.
+
+Next, reduce Linux power use and qualify sustained operation within the
+existing limits. Earlier dimmed observations were cooler and had higher
+net current, but the conditions were not isolated as a controlled thermal
+comparison. Continuous touch is built/offline-tested and awaits a boot
+check. No internal-storage installation is authorized.
+
 # 1 November: charging decoupled from the touch-test timer
 
 The dimmed continuation charged for **1,033.724 seconds**, then stopped

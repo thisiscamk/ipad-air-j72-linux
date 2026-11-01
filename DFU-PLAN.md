@@ -1,3 +1,5 @@
+**Latest state:** owner back in iOS for charging; host monitor and read-only export stopped. No DFU requested. Continuous touch is built but needs matched packaging and a boot check; sustained Linux charging still needs power/thermal work.
+
 # Current checkpoint — 1 November 2026
 
 - [x] B01: real native one- and two-finger contacts, matched presses/releases, firmware health and full cleanup. Corrected analog enable is `0x07`; voltage setting is unchanged.
@@ -8,7 +10,7 @@
 - [ ] B05–B11: Wi-Fi, persistence/Bluetooth, charging regression with the desktop, audio/rotation, power/remaining hardware, integrated use.
 - [ ] B12–B15: storage read-only qualification, installer rehearsal, separately authorized installation, installed-system verification.
 
-**Current session:** Linux #33 remains running on the powered hub. The 1,050 mA short and five-minute tests passed; the long test retained 140 positive samples at +153…+209 mA with USB data and verified rollback. A separate five-minute desktop-loaded run then passed with 140 samples at +178…+216 mA and verified restoration; the battery widget and charging symbol are owner-confirmed. A longer dimmed-display continuation is being evaluated. Autonomous source policy remains open. The separate Wi-Fi kernel build completed; HSIC/firmware integration is still pending.
+**Completed RAM session:** Linux #33 ran on the powered hub. The 1,050 mA short and five-minute tests passed; the long test retained 140 positive samples at +153…+209 mA with USB data and verified rollback. A separate five-minute desktop-loaded run then passed with 140 samples at +178…+216 mA and verified restoration; the battery widget and charging symbol are owner-confirmed. A longer dimmed-display continuation is being evaluated. Autonomous source policy remains open. The separate Wi-Fi kernel build completed; HSIC/firmware integration is still pending.
 
 ## Power and Wi-Fi work queue — 1 November
 
@@ -24,7 +26,7 @@
 - [x] Qualify five-minute net charging with the desktop and USB data live: 140 positive samples at +178…+216 mA, maximum 37.8 C, error-free rollback. Battery percentage and charging symbol confirmed on screen.
 - [x] Observe 17.2 minutes of dimmed desktop charging with battery guards clear and verified rollback; the touch timer ended the coupled monitor, so this is not a full 30-minute pass.
 - [x] Separate charging from the touch-session lifetime; live charging survived a controlled touch stop and restart, and the owner confirmed touch/brightness again.
-- [ ] Complete the revised 60-minute charging continuation and verify restoration.
+- [ ] Qualify sustained charging after reducing Linux power use: the revised continuation stopped at the conservative 38.1 C test guard with 526 positive samples and worker-reported restoration. Full duration and an independent final snapshot remain unqualified.
 - [x] Build opt-in continuous-touch candidates for both #33 and #34, preserving stop/fault handling.
 - [ ] Package and boot-qualify continuous touch with the three-second fallback/five-second live check.
 - [ ] Implement and qualify autonomous J72 source detection, fault handling and source withdrawal; host-qualified experiments are an interim step.

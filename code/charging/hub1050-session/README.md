@@ -1,10 +1,14 @@
 # Touch-independent guarded charging continuation
 
-**This continuation is running; a complete 60-minute pass is not claimed.**
+**This continuation ended at the 38.1 C temperature test guard; it did not complete 60 minutes.**
 It follows the measured five-minute desktop run. Native build, ABI and
 offline policy/rollback/fault/USB tests passed. Charging remained active
 through a real touch stop, healthy cleanup and restart. See `VALIDATION.json`
-for the observed subset; restoration on this exact worker remains pending.
+for the observations. The worker reported successful restoration with no
+restore failure. The owner rebooted to iOS for charging before an independent
+final PMIC snapshot and the remaining RAM logs could be retrieved. There were
+526 retained positive readings, +36 to +209 mA. This is a conservative test
+cutoff, not an established device overtemperature threshold.
 
 The preceding dimmed-display run charged for 1,033.724 seconds (about 17.2
 minutes), then a touch diagnostic timeout caused its host lease to be

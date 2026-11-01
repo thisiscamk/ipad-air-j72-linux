@@ -1,6 +1,6 @@
 {
   "full_60min_pass": false,
-  "active_at_capture": true,
+  "active_at_capture": false,
   "scope": "fixed known powered JCH377; RAM desktop; continuation still under evaluation",
   "nominal_input_mA": 1050,
   "timer_ms": 3600000,
@@ -19,5 +19,15 @@
     "test-guard-faults.c": "b1b530d029aa61092eb95456864da823beaa15ec64a967247ce58b9ef2dd8b82",
     "test-worker-source.py": "2cdf57b4de99371e64a390288fb2c29875fb82d6be719bb3cca24b62f7833051",
     "test-begin.c": "5abf0188a80049452a3322f5d6f4a4f91dda9323218dc918defcea1cf414fc06"
-  }
+  },
+  "session_ended": true,
+  "stop_reason": "Temperature guard at38.1C; test maximum38.0C",
+  "worker_samples": 526,
+  "worker_current_min_uA": 36000,
+  "worker_current_max_uA": 209000,
+  "worker_reported_restored": true,
+  "worker_restore_failed": false,
+  "independent_final_pmic_read_available": false,
+  "owner_rebooted_to_ios_for_charging": true,
+  "restoration_evidence": "Worker reported readback restored; independent final snapshot unavailable after owner reboot"
 }

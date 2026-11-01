@@ -159,16 +159,16 @@
       "status": "charging lifetime repair observed; full60min and continuous-touch boot qualification pending"
     },
     "charging/hub1050-session/VALIDATION.json": {
-      "sha256": "908b0f00bdeb17ddbf341cee5e74c47def86b49804b80f18c729a433782f106e",
-      "status": "charging lifetime repair observed; full60min and continuous-touch boot qualification pending"
+      "sha256": "57382a1b9e8c0bf827f508d63cd0441586dea8d8778838850043131bd46ed9b7",
+      "status": "session ended at conservative temperature guard; worker reported restoration, independent final snapshot unavailable after owner iOS reboot"
     },
     "charging/hub1050-session/test-begin.c": {
       "sha256": "5abf0188a80049452a3322f5d6f4a4f91dda9323218dc918defcea1cf414fc06",
       "status": "charging lifetime repair observed; full60min and continuous-touch boot qualification pending"
     },
     "charging/hub1050-session/README.md": {
-      "sha256": "34faeb7a3efad7ad5c9dd61d7340de0e2483073a3c1d9f4b0b0a268296222380",
-      "status": "charging lifetime repair observed; full60min and continuous-touch boot qualification pending"
+      "sha256": "16fd0af88b9e23e6d881471ed1b7a34fc502cc0836dcd6f56c85da4ae480241a",
+      "status": "session ended at conservative temperature guard; worker reported restoration, independent final snapshot unavailable after owner iOS reboot"
     },
     "charging/hub1050-session/test-worker-source.py": {
       "sha256": "2cdf57b4de99371e64a390288fb2c29875fb82d6be719bb3cca24b62f7833051",
@@ -199,7 +199,7 @@
       "status": "charging lifetime repair observed; full60min and continuous-touch boot qualification pending"
     },
     "touch/CONTINUOUS-INPUT.md": {
-      "sha256": "4c1512924bb84b469dafc2f941ec4ba7b5716fd07c5dd3801e27c420096df3f2",
+      "sha256": "04432720348f2213feb1cec22d885e87c321faf06d0d2af9aac1a358fc0f2dae",
       "status": "charging lifetime repair observed; full60min and continuous-touch boot qualification pending"
     }
   },

@@ -21,13 +21,13 @@ seconds before explicitly stopping and verifying health/cleanup. It then
 restarts for normal desktop use. No 30-minute wait is needed to detect an
 incorrect finite timeout. Packaging and this device check are pending.
 
-For the current boot, `../desktop/j72-touch-renew.sh` is a temporary RAM
+For that RAM boot, `../desktop/j72-touch-renew.sh` is a temporary RAM
 bridge. It watches for a healthy natural timeout, then starts another
 session and reconnects the input device. It refuses explicit stops and
 failed/unhealthy sessions, and is bounded to two renewals within 4,000
 seconds. Eligibility passed one positive and nine refusal cases; a real
-manual stop was respected. Its first automatic natural-expiry renewal is
-still pending observation. A short interruption remains possible at renewal.
+manual stop was respected. Automatic natural-expiry renewal was not observed before the owner
+rebooted to iOS for charging. A short interruption remains possible at renewal.
 Stop its owned PID and wait for exit before desktop/USB teardown. It never
 sets charging current; charging uses its own battery/source guards.
 

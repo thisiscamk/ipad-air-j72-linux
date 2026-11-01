@@ -1,3 +1,12 @@
+# 1 November: iOS charging break after the temperature test cutoff
+
+The owner returned to iOS to charge. The last Linux continuation reached
+its conservative 38.1 C test cutoff after 526 positive retained readings
+at +36…+209 mA. The worker reported successful restoration; an independent
+final PMIC read was unavailable after reboot. Full-hour charging remains
+unqualified. The host monitor and read-only export are stopped. Next are
+lower-power Linux charging and boot qualification of continuous input.
+
 # 1 November: live touch/charging lifetime repair
 
 The later charging run ended after 17.2 minutes because its host monitor
