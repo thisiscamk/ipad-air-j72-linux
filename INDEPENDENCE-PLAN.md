@@ -63,14 +63,14 @@ test are pending. Storage remains planning only.
 
 A read-only image extraction produced a private subset around 282 MB,
 compressed around 100 MB. Selected image files match their source hashes.
-Live startup exposed two missing runtime requirements: the `sh -> bash` link
-and trusted HTTPS certificates. Both were supplied in RAM, and the launcher
-was corrected. Labwc, Quickshell, Foot and the keyboard are running; the
+Live startup exposed missing runtime requirements: the `sh -> bash` link,
+trusted HTTPS certificates, UTF-8 locale/compose data and the Foot menu entry.
+These were supplied in RAM, and the launcher was corrected. Labwc, Quickshell, Foot and the keyboard are running; the
 Wi-Fi widget and unprivileged Wi-Fi-bound HTTPS pass. All mounted filesystems
 are RAM or kernel interfaces, NBD is detached, and the host export is stopped.
 Approximately 235 MiB remained available after startup. No swap is enabled.
 
-The owner UI check and physical unplugged operation are **still pending**.
-Locale/compose data is incomplete, and this small desktop is not the full
-Omarchy application set. RAM data is lost at reboot. No internal-storage
+The owner confirms touch and keyboard. Foot now displays a Bash prompt after
+the locale repair; its typing check and physical unplugged operation are
+**still pending**. This small desktop is not the full Omarchy A application set. RAM data is lost at reboot. No internal-storage
 writes or installation are authorized.
