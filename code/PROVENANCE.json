@@ -309,6 +309,18 @@
     "wifi/ehci-observer/test-observer.py": {
       "sha256": "cea063abbbf030d3cef482a5db9f205c35ef3e739f2ff86fc808d62c476cc3e1",
       "status": "Measured read-only J72 EHCI snapshot/qualified cleanup; portable synthetic-API host test; later enumeration failure explicitly separate"
+    },
+    "wifi/usb-firmware/README.md": {
+      "sha256": "53aaba44aff0e8edf09a022a0ed7bc97a28b4e11497b3bb09e637c3c8b5070f3",
+      "status": "offline candidate; source or synthetic tests; no radio firmware upload or Wi-Fi connection claimed"
+    },
+    "wifi/usb-firmware/j72_pack_wifi_trx.py": {
+      "sha256": "03f01b90868f8e3bfbb4224a4972214f63233c90990785cdcd5239c127c1ab9c",
+      "status": "offline candidate; source or synthetic tests; no radio firmware upload or Wi-Fi connection claimed"
+    },
+    "wifi/usb-firmware/test-packer.py": {
+      "sha256": "67638d50fbd64fd19f6f114c837b4939208c69d179a889221f9c21a4765df88e",
+      "status": "offline candidate; source or synthetic tests; no radio firmware upload or Wi-Fi connection claimed"
     }
   },
   "upstream_reference": {

@@ -67,6 +67,23 @@ files are not a USB firmware solution.
 5. Qualify download, startup, re-enumeration and clean failure in one boot;
    only then scan, associate, obtain DHCP and test Wi-Fi SSH/HTTPS.
 
+## Next firmware test prepared
+
+The v3 candidate builds for the same exact #34 kernel. It incorporates the
+measured standard-driver shutdown path, attaches the power domain before
+binding, and can leave the radio host active for several same-boot checks.
+Firmware binding is explicitly disabled until the host has verified the ROM,
+private firmware and vendor-helper readiness. The next overlay includes the
+complete recovery-module set and starts at owner-requested brightness 1604/2047.
+
+Offline verification passes 84 actual-source HCD/lifecycle cases under UBSan,
+plus USB transfer/ROM/TRX checks and [18 synthetic packer cases](code/wifi/usb-firmware/).
+The private J72 image passes CRC/layout/size checks. **Cold boot and radio
+firmware startup with this candidate remain untested.**
+
+The owner confirmed the menu and on-screen keyboard in the repaired #34
+desktop; brightness was then raised from 802 to 1604 in that live session.
+
 ## Earlier: HSIC register and power-owner observation passed
 
 A same-boot diagnostic read control `0x4`, configuration `0x153`, and four
