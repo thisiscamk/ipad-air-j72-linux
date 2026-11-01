@@ -18,7 +18,7 @@
   "available_memory_kib_at_check": 250392,
   "swap_total_kib": 0,
   "internal_storage_written": false,
-  "owner_ui_confirmation": "pending for this fresh boot",
+  "owner_ui_confirmation": "PASS: menu, terminal typing and keyboard hide/tap/reopen",
   "limitations": [
     "Network and desktop files staged by Pi after boot",
     "New serial respawn loop not yet tested through a physical cable cycle",

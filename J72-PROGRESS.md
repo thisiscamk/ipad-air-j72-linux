@@ -11,7 +11,8 @@ bundle, UTF-8 locale/compose data and Foot menu entry already included. Labwc,
 Quickshell, the keyboard, Foot and its Bash child are running. A screenshot
 shows a normal prompt, and verified HTTPS works as the desktop user. At the
 check, about 244 MiB remained available with no swap. NBD and the host export
-remain detached. Owner UI confirmation for this fresh boot is pending.
+remain detached. The owner confirmed the menu, terminal typing and keyboard
+hide/tap/reopen in this fresh boot.
 [Sanitized result](code/desktop/RAM-COLD-BOOT-RESULT.json).
 
 The revised init also respawns the serial shell after it exits; a physical

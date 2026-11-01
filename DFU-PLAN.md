@@ -44,7 +44,8 @@ See [Wi-Fi findings and reuse plan](WIFI-PLAN.md).
 - [x] Qualify complete Wi-Fi provider stop, independent hardware restoration and both USB recovery shells.
 - [x] Repeat radio startup, association, HTTPS and Wi-Fi SSH in a fresh boot.
 - [x] Start the corrected RAM desktop with Foot/Bash and valid UTF-8 locale; no NBD export.
-- [ ] Owner-confirm this fresh desktop, then test the new serial respawn across a cable cycle.
+- [x] Owner confirms menu, typing and keyboard in the fresh RAM desktop.
+- [ ] Test the new serial respawn across a cable cycle, then guarded hub charging with the RAM desktop.
 - [x] Start the reduced desktop from RAM; verify NBD/export detached, live processes, Wi-Fi HTTPS and about 235 MiB available.
 - [x] Owner confirms terminal, menu, touch and keyboard unplugged; same-boot Wi-Fi SSH and desktop-user HTTPS pass with the host USB device absent.
 
