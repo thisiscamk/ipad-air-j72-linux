@@ -2,6 +2,10 @@
 
 This is a research plan for the iPad Air 1 Cellular (`iPad4,2` / `J72AP`, A7, iOS 12.5.7). **No internal-storage write, partition change, or iOS erase has been authorized.** The current Linux and reduced Omarchy A desktop run from RAM, with internal Wi-Fi and demonstrated unplugged use. Storage preparation is now active; the iPad remains in iOS charging overnight.
 
+## 2 November owner and live-state update
+
+The owner has no backup and states that no personal content needs preserving. A personal-data backup is therefore not a prerequisite they want to pursue. Preserve iOS and recovery metadata by default; this statement does not authorize an unreviewed erase or partition change. The current live RAM boot has no ANS device/firmware reservation, so storage needs a changed image. Native charging/source policy and ANS1 integration remain work in progress.
+
 ## Prepared now
 
 See the [morning runbook](STORAGE-MORNING-PLAN.md) for the next actions, the [offline tools and ANS1 audit](code/storage/README.md), and [test receipts](code/storage/PREPARATION-RESULT.json). The metadata checker validates both GPT copies and makes a free-space-only dry run. An inactive loader guard passes 280 host cases; a separate 3 GiB host filesystem copy passes a canary reopening check and read-only e2fsck. None of these is a boot-qualified storage image or an installer.

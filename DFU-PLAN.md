@@ -1,3 +1,21 @@
+# 2 November: leave-on power candidate and storage qualification
+
+- [x] Requalify the powered JCH377 using current paired iOS diagnostics.
+- [x] Try DFU through the hub as requested: checkm8 reached; download handoff failed, no Linux.
+- [x] Bypass the hub for boot: exact J72 Pongo and proven RAM desktop boot pass.
+- [x] Restore internal Wi-Fi, HTTPS, pinned SSH and RAM desktop; owner confirms menu/keyboard.
+- [x] Return to the same hub with Wi-Fi alive; same-UDC USB rebind restores data.
+- [x] Build/load the new maintenance controller disabled; direct Pi source refusal passes.
+- [x] Observe full-pack hold, held-source lease loss, fault latch and explicit requalification.
+- [ ] Complete the longer maintenance observation and active-current/pause/resume/source-loss gates.
+- [ ] Finish J72 ANS1 read-only kernel/firmware integration before another storage DFU.
+- [ ] Capture fresh layout, qualify safe space creation and native root, then review exact install changes.
+
+The owner has no backup and does not need the device's personal content.
+iOS preservation remains the layout default; erasure is not implied. Recovery
+metadata and exact write-plan review are still required. Internal installation
+is not enabled by this checklist. [Power candidate](code/charging/maintain34/).
+
 # J72 session plan: power, Wi-Fi and independent operation
 
 Updated 1 November 2026. **The first unplugged RAM desktop test passed:**

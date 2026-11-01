@@ -1,3 +1,30 @@
+# 2 November: charging maintenance candidate in live testing
+
+The owner requested another hub DFU trial. It reached checkm8 but again
+failed at the download-mode handoff; no Linux boot occurred through the hub.
+A direct-Pi boot succeeded, restoring the RAM desktop, internal Wi-Fi,
+HTTPS and pinned SSH. The owner confirmed menus/keyboard and moved the
+running system back to the marked hub port. Wi-Fi survived; a same-controller
+USB gadget rebind restored USB data.
+
+The new [maintenance controller](code/charging/maintain34/) passes 35 actual
+policy scenarios under UBSan and builds for the exact #34 target. It loaded
+disabled with unchanged PMIC input state and refused the direct Pi source.
+At the current high charge level it correctly waits without raising input
+current. Withholding the source lease latched it off; a renewed lease alone
+could not restart it. Explicit source/battery/restoration checks cleared the
+fault while leaving it disabled. A longer supervised observation is underway.
+Active-current restart, active source withdrawal and full duration remain
+unqualified. This does not provide general charger detection or unattended
+Linux charging qualification. Brightness is 1203/2047 for the longer test.
+
+Current upstream review also confirms our interim [PR #43](https://github.com/OrchardLinux/orchard/pull/43)
+was merged overnight. J72 native storage is not yet integrated: this live
+boot has no ANS device or firmware reservation in its device tree. Storage
+work is isolated from the running power test and requires a changed boot.
+The owner has no backup and does not need personal contents; iOS preservation
+and an exact reviewed partition proposal remain the installation default.
+
 # 1 November: internal-storage preparation while iOS charges
 
 The offline preparation now includes a strict GPT checker and free-space-only

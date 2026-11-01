@@ -405,6 +405,30 @@
     "storage/verify-j72-ans1-read-guard.py": {
       "sha256": "5e70b12415c09be04b1abf37952c21723cc55a735574af78c2c486504e3542ea",
       "status": "Offline storage preparation/candidate only; no active loader or target storage qualification"
+    },
+    "charging/maintain34/test-maintain.c": {
+      "sha256": "38be5e2d8c06050c3453d52716df444c331e0272acd12f926bb2f96298670fe5",
+      "status": "New #34 maintenance candidate: actual-core35 scenarios; target loaded disabled/hold+source-loss/requalification passed; longer charging observation pending"
+    },
+    "charging/maintain34/host-reference.py": {
+      "sha256": "764539d936ae587d03f2a079aaff9e2881bda9d7641a80a3610a508889fe10dc",
+      "status": "New #34 maintenance candidate: actual-core35 scenarios; target loaded disabled/hold+source-loss/requalification passed; longer charging observation pending"
+    },
+    "charging/maintain34/module/Makefile": {
+      "sha256": "3b1a5bc4439e1986981800e04646ff26a0a9fdae3d5e679bb292203ae18f4159",
+      "status": "New #34 maintenance candidate: actual-core35 scenarios; target loaded disabled/hold+source-loss/requalification passed; longer charging observation pending"
+    },
+    "charging/maintain34/module/j72-maintain-core.h": {
+      "sha256": "2d7aa393d178775c67fdabd43b1489bc86a50da2f6f31bdbd1a5e375dc37a522",
+      "status": "New #34 maintenance candidate: actual-core35 scenarios; target loaded disabled/hold+source-loss/requalification passed; longer charging observation pending"
+    },
+    "charging/maintain34/module/j72-limit-core.h": {
+      "sha256": "6c37efdd866d011d7f8a8879d7b99908d30176c193d3e253267790f2121e0526",
+      "status": "New #34 maintenance candidate: actual-core35 scenarios; target loaded disabled/hold+source-loss/requalification passed; longer charging observation pending"
+    },
+    "charging/maintain34/module/j72_charge_maintain34.c": {
+      "sha256": "5e90dee4b26b33d208584e1c031d3cc2410ebb1da50911facc0f2c0c386f4c2e",
+      "status": "New #34 maintenance candidate: actual-core35 scenarios; target loaded disabled/hold+source-loss/requalification passed; longer charging observation pending"
     }
   },
   "upstream_reference": {
