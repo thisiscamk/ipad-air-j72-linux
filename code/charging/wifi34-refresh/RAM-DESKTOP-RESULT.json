@@ -1,0 +1,35 @@
+{
+  "date": "2026-11-01",
+  "device": "iPad4,2 / J72AP",
+  "desktop": "RAM resident; no NBD/root disk export",
+  "source": "Qualified powered JCH377 charging/data port",
+  "nominal_input_limit_mA": 1050,
+  "brightness": 1203,
+  "brightness_max": 2047,
+  "evidence": {
+    "qualification_mode": "net_positive_interactive",
+    "samples": 140,
+    "observed_active_s": 300.405,
+    "settled_coverage_s": 293.69,
+    "max_sample_gap_s": 2.192,
+    "time_weighted_mean_uA": 296775.384,
+    "positive_sample_fraction": 0.9857142857142858,
+    "negative_samples": 2,
+    "min_uA": -222000,
+    "max_uA": 411000,
+    "estimated_net_mAh_over_coverage": 24.211101
+  },
+  "original_input_limit_independently_restored": true,
+  "restore_failed": false,
+  "worker_error": 0,
+  "read_failures": 0,
+  "fresh_refreshes": 0,
+  "final_temperature_c": 34.7,
+  "verified_desktop_user_https_during_charge": 200,
+  "limitations": [
+    "Two brief negative retained readings; net-positive interactive qualification, not all-positive idle",
+    "No SOC gain or battery health qualification",
+    "Five-minute test only; not unattended or overnight Linux charging qualification",
+    "For overnight charging, return to iOS on the same hub"
+  ]
+}

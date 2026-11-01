@@ -26,3 +26,8 @@ The [sanitized unplugged result](RAM-UNPLUGGED-RESULT.json) records owner UI
 confirmation and a two-minute same-boot Wi-Fi/HTTPS/process/input watch after
 USB/NBD detachment. This is a short RAM demonstration; startup still needs
 the Pi, and no internal-storage installation was performed.
+
+The [USB reconnect result](USB-RECONNECT-RESULT.json) records one tested cable
+move to the powered hub with the revised serial-shell respawn loop. Wi-Fi
+control survived and both USB shells recovered. The external USB gadget still
+needed a same-controller software rebind; this is not automatic USB recovery.

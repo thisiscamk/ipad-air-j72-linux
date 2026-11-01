@@ -1,3 +1,24 @@
+# 1 November: RAM-desktop hub charging and serial recovery
+
+The revised serial-shell loop passed a real move from the direct Pi connection
+to the powered hub: ACM restarted automatically, NCM recovered and remained
+responsive afterward. Wi-Fi control survived. The external USB gadget still
+needed a same-controller software rebind; automatic USB recovery remains open.
+[Reconnect result](code/desktop/USB-RECONNECT-RESULT.json).
+
+The RAM desktop and Wi-Fi then passed a 300.405-second guarded charging run.
+Its 140 unique settled samples covered 293.690 seconds, with time-weighted
+mean **+296.8 mA** and range -222..+411 mA. Two readings were negative, so this
+is a net-positive interactive result. Verified HTTPS worked during charging.
+The final temperature was 34.7 C, with no gauge failures or worker error;
+independent readback confirmed restoration of the original input limit.
+Brightness was 1203/2047. [Sanitized result](code/charging/wifi34-refresh/RAM-DESKTOP-RESULT.json).
+
+The owner requested overnight charging. The bounded Linux test does not
+qualify that use; the plan is to return to iOS on the same powered hub.
+Autonomous Linux source/protection policy remains open. No internal-storage
+changes were made.
+
 # 1 November: repeat Wi-Fi cold boot and corrected RAM desktop
 
 A changed boot candidate reached Linux from DFU on the direct Pi connection.

@@ -1,0 +1,28 @@
+{
+  "date": "2026-11-01",
+  "device": "iPad4,2 / J72AP",
+  "same_linux_boot_after_move": true,
+  "wifi_control_survived": true,
+  "ram_desktop_retained": true,
+  "usb_software_rebind_required": true,
+  "same_udc_rebound": true,
+  "ncm_shell_recovered": true,
+  "acm_shell_respawned_automatically": true,
+  "manual_serial_shell_restart_required": false,
+  "ncm_still_responds_after_acm": true,
+  "source_qualification": {
+    "hub_model": "JCH377",
+    "hub_vid_pid": "05e3:0610",
+    "hub_revision": "4427",
+    "self_powered": true,
+    "data_speed_mbps": 480,
+    "same_downstream_port": true,
+    "upstream_host_path_changed": true,
+    "original_ios_source_measurement_preserved": true
+  },
+  "limitations": [
+    "USB reconnect still requires a software rebind through Wi-Fi",
+    "Automatic serial-shell respawn is one tested cable cycle",
+    "Autonomous source classification and charging remain open"
+  ]
+}
