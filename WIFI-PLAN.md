@@ -18,8 +18,10 @@ needed to confirm the failure.
 
 Next: qualify corrected host enumeration and teardown, confirm the radio's
 ROM identity, qualify matching firmware/USB adaptation, scan and associate.
-The #34 wireless kernel and modules remain unbooted; their matching payload
-has not yet been composed. No firmware upload or Wi-Fi completion is claimed.
+A matched #34 payload is now composed with continuous touch, wireless/vendor
+modules and a corrected probe bound to a real platform driver. Its 83 host-only
+fault cases and payload/module checks pass; the image remains unbooted.
+The probe and Wi-Fi modules are opt-in, and no WLAN firmware is packaged. No firmware upload or Wi-Fi completion is claimed.
 
 
 ## Earlier: HSIC register and power-owner observation passed

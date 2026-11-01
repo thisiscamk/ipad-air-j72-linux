@@ -63,7 +63,10 @@ input and sustained charging remain open.
 - [x] Audit remap `0x108` and live OF DMA range, noncoherent DMA and AIC translation.
 - [ ] Correct controller-driver binding after an unresponsive enumeration probe;
   capture the screen error, then qualify USB descriptors, ROM identity and cleanup.
-- [ ] Matched #34 wireless payload, ROM/firmware adaptation and scan/association.
+- [x] Compose matched #34 kernel/touch/wireless/vendor payload with a real
+  controller driver and phase capture; 83 synthetic API cases pass, unbooted.
+- [ ] Boot-qualify #34; enumerate USB and confirm ROM identity with verified
+  cleanup; adapt firmware transport, then scan/associate.
 
 ## Remaining boot batches
 
