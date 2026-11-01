@@ -219,7 +219,7 @@
       "status": "offline input-staging helper, tests or sanitized preparation receipt; no radio/boot qualification"
     },
     "storage/README.md": {
-      "sha256": "220e9640da51e98c8fb814ba16fcaec1bd7d55f7504dd281e0bb051bf8efa778",
+      "sha256": "9aebc277907d3a3d5c7ce01df8f9735b089cd8b4ba8bb744073d0ceca393ebe4",
       "status": "offline imported-ANS1 cleanup candidate/reproducer; narrow host test only, no full loader or device qualification"
     },
     "storage/0001-ans1-Avoid-freeing-the-command-buffer-twice.patch": {
