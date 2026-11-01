@@ -25,7 +25,8 @@ shutdown still requires the Pi; autonomous power policy remains open.
 - [x] Owner confirms brighter desktop, menu and keyboard with Wi-Fi active; new Wi-Fi bar popup works.
 - [x] Qualify Wi-Fi with guarded charging: five-minute interactive and fifteen-minute continuation pass.
 - [x] Qualify new provider full stop/restoration and both USB recovery shells.
-- [ ] Qualify sustained traffic and repeat boot.
+- [x] Repeat Wi-Fi firmware startup, association and HTTPS/SSH after another DFU.
+- [ ] Qualify longer traffic and integrated recovery/charging policy.
 
 No new DFU is needed for the current RAM desktop work. Radio firmware has
 been loaded successfully in RAM; it remains private.
@@ -41,7 +42,9 @@ See [Wi-Fi findings and reuse plan](WIFI-PLAN.md).
 - [x] Owner confirms menu, keyboard and charging indication; HTTPS passes during charging.
 - [x] Complete 900.447 seconds of continuation: 424 settled samples, all +239..+397 mA, time-weighted+306.965 mA, verified restoration.
 - [x] Qualify complete Wi-Fi provider stop, independent hardware restoration and both USB recovery shells.
-- [ ] Qualify another cold start with the RAM desktop fixes.
+- [x] Repeat radio startup, association, HTTPS and Wi-Fi SSH in a fresh boot.
+- [x] Start the corrected RAM desktop with Foot/Bash and valid UTF-8 locale; no NBD export.
+- [ ] Owner-confirm this fresh desktop, then test the new serial respawn across a cable cycle.
 - [x] Start the reduced desktop from RAM; verify NBD/export detached, live processes, Wi-Fi HTTPS and about 235 MiB available.
 - [x] Owner confirms terminal, menu, touch and keyboard unplugged; same-boot Wi-Fi SSH and desktop-user HTTPS pass with the host USB device absent.
 

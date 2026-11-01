@@ -8,7 +8,7 @@ The present desktop uses software rendering and a reduced Arch Linux ARM filesys
 
 **Unplugged desktop now works:** after detaching the NBD disk and stopping the
 host export, the owner unplugged the cable and confirmed terminal typing,
-menus, touch and keyboard. The same Linux boot remains reachable over internal
+menus, touch and keyboard. The same Linux boot remained reachable over internal
 Wi-Fi, with verified HTTPS from the desktop user. No internal storage is used
 for the desktop; data is lost on reboot, and startup after shutdown still
 requires the Pi. [Independence status and remaining work](INDEPENDENCE-PLAN.md).

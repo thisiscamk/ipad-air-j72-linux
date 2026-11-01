@@ -1,3 +1,23 @@
+# 1 November: repeat Wi-Fi cold boot and corrected RAM desktop
+
+A changed boot candidate reached Linux from DFU on the direct Pi connection.
+Both USB recovery shells and the initial touch self-check passed. Radio
+firmware startup, association, DHCP, verified HTTPS and pinned-key Wi-Fi SSH
+passed again in a fresh boot. The measured connection-authorization driver is
+now included in the boot image.
+
+The Pi staged the reduced desktop into RAM with its shell link, trusted CA
+bundle, UTF-8 locale/compose data and Foot menu entry already included. Labwc,
+Quickshell, the keyboard, Foot and its Bash child are running. A screenshot
+shows a normal prompt, and verified HTTPS works as the desktop user. At the
+check, about 244 MiB remained available with no swap. NBD and the host export
+remain detached. Owner UI confirmation for this fresh boot is pending.
+[Sanitized result](code/desktop/RAM-COLD-BOOT-RESULT.json).
+
+The revised init also respawns the serial shell after it exits; a physical
+cable-cycle test of that loop remains pending. Network/desktop staging still
+uses the Pi, and no internal-storage changes were made.
+
 # 1 November: Wi-Fi full shutdown and restoration pass
 
 After the unplugged demonstration, the iPad returned to its powered hub.

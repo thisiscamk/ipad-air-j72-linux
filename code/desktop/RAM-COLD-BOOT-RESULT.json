@@ -1,0 +1,28 @@
+{
+  "date": "2026-11-01",
+  "device": "iPad4,2 / J72AP",
+  "successful_radio_cold_boots_observed": 2,
+  "candidate": "wifi-ram-desktop-v1",
+  "same_kernel_as_previous_boot": true,
+  "dfu_handoff_pass": true,
+  "recovery_ncm_and_acm_pass": true,
+  "initial_touch_selfcheck_pass": true,
+  "firmware_and_wlan0_pass": true,
+  "wifi_association_dhcp_https_ssh_pass": true,
+  "ram_desktop_staged_and_started": true,
+  "foot_bash_and_utf8_locale_pass": true,
+  "wifi_bar_widget_connected": true,
+  "desktop_user_verified_https": 200,
+  "nbd_attached": false,
+  "host_disk_export_running": false,
+  "available_memory_kib_at_check": 250392,
+  "swap_total_kib": 0,
+  "internal_storage_written": false,
+  "owner_ui_confirmation": "pending for this fresh boot",
+  "limitations": [
+    "Network and desktop files staged by Pi after boot",
+    "New serial respawn loop not yet tested through a physical cable cycle",
+    "Autonomous charging/source policy remains open",
+    "RAM data is lost on reboot"
+  ]
+}
