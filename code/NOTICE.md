@@ -2,7 +2,9 @@
 
 Existing source notices and SPDX identifiers are preserved. New J72 C/Python/shell
 code and tests are GPL-2.0-only; the wvkbd changes follow its GPL-3.0 license
-and the Foot patch follows Foot’s MIT license. GPL-2.0 material
+and the Foot patch follows Foot’s MIT license. The small ANS1 cleanup delta
+in `storage/` follows the original Nick Chan / Hoolock m1n1 MIT source;
+its reproducer is GPL-2.0-only. GPL-2.0 material
 is accompanied by [the kernel license text](LICENSES/GPL-2.0.txt). Foot's
 MIT notice and wvkbd's license are included in [desktop](desktop/).
 

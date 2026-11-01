@@ -2,7 +2,7 @@
 
 This is a staged research plan, not an installation procedure. The current boot runs from RAM with a read-only root filesystem served by a Raspberry Pi. iOS and the iPad's internal storage remain intact. Each stage needs real-device evidence before it can be called working.
 
-The [DFU session plan](DFU-PLAN.md) expands these milestones into proposed boot batches, work to prepare without the device, owner checks and installation dependencies. Several comparisons can share one RAM boot. The number of DFUs remains open because touch, HSIC Wi-Fi and internal-storage support still need engineering work.
+The [DFU session plan](DFU-PLAN.md) expands these milestones into proposed boot batches, work to prepare without the device, owner checks and installation dependencies. Several comparisons can share one RAM boot. The [independent-operation plan](INDEPENDENCE-PLAN.md) now tracks the accepted first goal: Pi-assisted startup followed by unplugged use. HSIC Wi-Fi, power policy, continuous input and internal storage still need engineering work.
 
 ## 1. Finish native touch
 
@@ -62,8 +62,8 @@ The current driver correction starts every explicit transfer before queuing byte
 
 ## 3. Bring up platform services individually
 
-- Qualify Linux battery reporting, then prioritize charging bring-up before Wi-Fi (B04C in the DFU plan). Measure net battery current and charge trend; audit the J72 charger path and qualify any driver changes. Use a RAM-only recorder for wall-charger tests after detaching the USB-backed desktop. The current battery image adds reporting; A 30-second 850 mA input-limit trial now shows +20…+51 mA net battery current and verified rollback. Sustained charging and source/protection policy remain unqualified.
-- Bring up Wi-Fi and Bluetooth using the J72 buses, power controls and required firmware. Keep USB networking available for recovery.
+- Battery readings and the top-bar indicator work. Five-minute powered-hub desktop charging passed, and later runs measured positive current but ended before their planned duration. The latest stopped at the conservative temperature guard. Reduce Linux power use and qualify autonomous source/protection policy; retain the current guards. See [power results](PI-CHARGING-PLAN.md).
+- Prepare Wi-Fi in parallel with power work: the #34 wireless kernel and matched modules/owner-local firmware inputs are built and staged offline. J72 HSIC/reset sequencing, USB transport adaptation and networking are unfinished. See [the source review and Wi-Fi plan](WIFI-PLAN.md). Bluetooth is a separate transport/firmware task. Keep USB networking available for recovery.
 - Qualify audio, brightness, cameras, cellular, GPU acceleration and suspend separately. There is no evidence yet that all will be available.
 
 **Pass:** each service works in use and survives repeated boot and shutdown cycles.
@@ -71,16 +71,16 @@ The current driver correction starts every explicit transfer before queuing byte
 ## 4. Integrate and share the port
 
 - Turn the local experimental J72 worktree into a reproducible build with a 4 KiB-page kernel, matching modules, exact `iPad4,2`/`J72AP` identification and a documented RAM boot path.
-- Propose an experimental J72 profile to [OrchardLinux/hardware](https://github.com/OrchardLinux/hardware) once core desktop and touch are reproducible. State support limits clearly; J72 differs from existing Orchard profiles.
+- [Orchard PR #43](https://github.com/OrchardLinux/orchard/pull/43) is ready for review of measured SPI, touch, battery and bounded charging code. Native profile integration remains open; working Wi-Fi is intended for a separate contribution.
 - Publish original code and sanitized evidence. Keep Apple firmware, calibration and raw device logs local.
 
 **Pass:** another owner can build and test the RAM-only path on the exact model, with recovery instructions.
 
-## 5. Consider independent operation later
+## 5. Prepare independent operation and persistent storage
 
-A persistent root filesystem on an external host can come before internal-storage work. A host-launched internal install would need J72 ANS1 write support, an iOS 12-compatible layout procedure, backup and recovery evidence, and explicit owner authorization. The current Orchard installer and APFS resizer do not support this J72/iOS 12 combination. See the [deferred internal-storage plan](INTERNAL-STORAGE-PLAN.md). Internal storage would not by itself eliminate the host needed for DFU/Pongo after a cold restart. That work is outside the current RAM-only scope.
+A small RAM-resident root may permit an earlier unplugged demonstration once Wi-Fi works, subject to measured memory headroom. Persistent host-backed Linux can test updates first. Internal installation needs qualified J72 ANS1 access, iOS 12 coexistence, backup/recovery evidence and separate write authorization. Current Orchard now documents an experimental Air 2 internal-root success; its code is a useful reference. See [the active offline storage preparation](INTERNAL-STORAGE-PLAN.md). The current standard installer/resizer does not support this J72/iOS 12 combination.
 
-Native touch is the main uncertainty. Firmware upload, calibration acceptance and application startup now pass; a reliable completion date still depends on scan/report enablement, report handling and real input validation.
+Native touch and text entry are demonstrated. The current input work is to remove the diagnostic lifetime limit safely and qualify long sessions. The larger remaining dependencies are HSIC Wi-Fi, autonomous power policy and local root storage. Internal storage would remove the Pi-served filesystem; fully independent startup is a separate boot-chain goal.
 
 ## Readiness for internal installation
 

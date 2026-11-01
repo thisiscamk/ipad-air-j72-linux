@@ -1,3 +1,21 @@
+# 1 November: Wi-Fi staging and storage-source audit while charging
+
+The owner accepts Pi-assisted startup followed by unplugged operation as the
+first independence milestone. Offline work can proceed while iOS charges.
+The [Wi-Fi plan](WIFI-PLAN.md) records Orchard applicability and the exact
+HSIC/BCM4324B5 gaps. A new helper verified/staged the #34 kernel's wireless
+modules, vendor helper, matched continuous-touch candidate and private inputs.
+It found the built USB aliases do not match the identity observed in iOS;
+no WLAN enumeration, firmware upload or association is claimed.
+
+The storage review found an imported ANS1 shutdown double-free. A one-line
+candidate passed a host reproducer against the extracted original function,
+including repeated shutdown and UBSan checks. The full loader is not built
+or device tested with it. The [storage plan](INTERNAL-STORAGE-PLAN.md) now maps
+Orchard's ANS1/firmware handoff, J81 native-root code and iOS 12 gaps; the
+[full independence plan](INDEPENDENCE-PLAN.md) covers RAM root through a later
+separately approved install. No new DFU or internal write is requested.
+
 # 1 November: iOS charging break after the temperature test cutoff
 
 The owner returned to iOS to charge. The last Linux continuation reached

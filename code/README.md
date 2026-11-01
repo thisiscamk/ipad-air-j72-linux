@@ -5,6 +5,11 @@ experiment, plus build/test helpers. Kernel and diagnostic implementations
 are preserved from the working lab copies. They are development code with
 exact-board guards and direct hardware access. Review them before reuse.
 
+Separately marked **offline preparation** now includes the
+[Wi-Fi input-staging helper](wifi/) and an
+[ANS1 loader cleanup candidate with a host reproducer](storage/).
+Neither establishes Wi-Fi or storage operation on J72.
+
 | Directory | Implementation | Measured evidence |
 | --- | --- | --- |
 | [spi](spi/) | Complete tested `spi-apple.c`, preserved pre-correction source and its exact patch | Correct wire order and explicit payload delivery; firmware ACK `0x4bc1` |

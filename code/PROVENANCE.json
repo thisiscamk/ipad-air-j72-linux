@@ -1,5 +1,5 @@
 {
-  "scope": "Measured J72 Linux7.0.12 RAM development code; not Orchard7.3 native integration",
+  "scope": "Measured J72 Linux 7.0.12 RAM development code plus explicitly marked offline candidates/preparation; not Orchard 7.3 native integration",
   "kernel_release": "7.0.12-j72spi2",
   "code": {
     "touch/j72_touch_session.c": {
@@ -201,6 +201,42 @@
     "touch/CONTINUOUS-INPUT.md": {
       "sha256": "04432720348f2213feb1cec22d885e87c321faf06d0d2af9aac1a358fc0f2dae",
       "status": "charging lifetime repair observed; full60min and continuous-touch boot qualification pending"
+    },
+    "wifi/VALIDATION.json": {
+      "sha256": "929b4736eb04dc12186ec4b5cb77d0b2ffdad46803aee6a50adb0e5bc792741c",
+      "status": "offline input-staging helper, tests or sanitized preparation receipt; no radio/boot qualification"
+    },
+    "wifi/README.md": {
+      "sha256": "d78fff48f781806ff78cefa1427183b85beb9e8ea59236be55adca4c715e76ff",
+      "status": "offline input-staging helper, tests or sanitized preparation receipt; no radio/boot qualification"
+    },
+    "wifi/test-j72-wifi-preparation.py": {
+      "sha256": "1c9a25d185fff07d83c95dd54c7fff656e2a92dbb84c240c0d70ba0ccc883d41",
+      "status": "offline input-staging helper, tests or sanitized preparation receipt; no radio/boot qualification"
+    },
+    "wifi/prepare-j72-wifi.py": {
+      "sha256": "81f799d911d70f9d2331dc7efd7eb1c99d60656c89cc6efdf3564bc431889e88",
+      "status": "offline input-staging helper, tests or sanitized preparation receipt; no radio/boot qualification"
+    },
+    "storage/README.md": {
+      "sha256": "220e9640da51e98c8fb814ba16fcaec1bd7d55f7504dd281e0bb051bf8efa778",
+      "status": "offline imported-ANS1 cleanup candidate/reproducer; narrow host test only, no full loader or device qualification"
+    },
+    "storage/0001-ans1-Avoid-freeing-the-command-buffer-twice.patch": {
+      "sha256": "860518a3a2659c0f6b0a5d81b0e301fa05185259e9c97fd65abfc7bc6053dfa4",
+      "status": "offline imported-ANS1 cleanup candidate/reproducer; narrow host test only, no full loader or device qualification"
+    },
+    "storage/LICENSE-MIT": {
+      "sha256": "24bcd54d72751375e5bd4eb3bec971a0ccfc53aaad5902858cf29cadedb16ee2",
+      "status": "offline imported-ANS1 cleanup candidate/reproducer; narrow host test only, no full loader or device qualification"
+    },
+    "storage/verify-j72-ans1-cleanup.py": {
+      "sha256": "993ca8fbe2a30ac0f9f2f6c05550d622d74199badfe33ab93e2c2262a816e7cd",
+      "status": "offline imported-ANS1 cleanup candidate/reproducer; narrow host test only, no full loader or device qualification"
+    },
+    "run-offline-tests.py": {
+      "sha256": "4c5417f6db86bb2212f9d6b415f669dbb38221b8c6dffdfac6ac4ab8f5a74db6",
+      "status": "synthetic public-source test runner; no hardware access"
     }
   },
   "upstream_reference": {

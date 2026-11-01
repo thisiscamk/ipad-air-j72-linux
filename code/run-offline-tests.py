@@ -64,6 +64,7 @@ def main():
         for folder in ('hub1050', 'hub1050-long', 'hub1050-desktop', 'hub1050-session'):
             subprocess.run(['python3', str(ROOT / 'charging' / folder / 'test-worker-source.py')], check=True)
         subprocess.run(['python3', str(ROOT / 'touch/test-private-includes.py'), '-v'], check=True)
+        subprocess.run(['python3', '-B', str(ROOT / 'wifi/test-j72-wifi-preparation.py'), '-v'], check=True)
     print('PASS: all public-source offline checks; synthetic inputs only, no device contacted.')
 
 

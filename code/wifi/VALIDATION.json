@@ -1,0 +1,46 @@
+{
+  "schema": 1,
+  "status": "offline build inputs verified; NOT boot or Wi-Fi qualification",
+  "preparation_tool_sha256": "81f799d911d70f9d2331dc7efd7eb1c99d60656c89cc6efdf3564bc431889e88",
+  "kernel_release": "7.0.12-j72spi2",
+  "kernel_config_sha256": "3981efba443b9df5682baf2e3495e1e4443782735932ba282a1873e25f658761",
+  "modversions_enabled": false,
+  "abi_check_limit": "Export presence and pinned build provenance; no modversion CRCs exist.",
+  "ios_observed_usb_id": "0a5c:bd1c",
+  "built_driver_alias_matches": false,
+  "probe_ready": false,
+  "remaining": [
+    "J72-owned HSIC PHY/domain/clock/reset sequencing and DT",
+    "Linux USB descriptors; no forced brcmfmac bind",
+    "BCM4324B5 USB download, host-ready and board-data adaptation",
+    "signed regulatory database and network userspace",
+    "matched complete boot bundle, USB recovery and live qualification"
+  ],
+  "device_access": false,
+  "ipad_storage_writes": false,
+  "date": "2026-11-01",
+  "module_names": [
+    "rfkill",
+    "cfg80211",
+    "brcmutil",
+    "brcmfmac",
+    "brcmfmac_wcc",
+    "j72_touch_session"
+  ],
+  "strong_imports_checked": {
+    "rfkill": 49,
+    "cfg80211": 191,
+    "brcmutil": 12,
+    "brcmfmac": 189,
+    "brcmfmac_wcc": 5,
+    "j72_touch_session": 69
+  },
+  "private_trx_crc_valid": true,
+  "module_dependency_closure": "PASS",
+  "depmod_private_tree": "PASS",
+  "refusal_tests": 7,
+  "boot_tested": false,
+  "radio_started": false,
+  "complete_payload": false,
+  "private_inputs_published": false
+}
