@@ -51,22 +51,26 @@ do not sacrifice recovery or silently call a network-served root independent.
 - [Wi-Fi preparation and applicability](WIFI-PLAN.md) and
   [J72 storage gates and source map](INTERNAL-STORAGE-PLAN.md).
 
-**Now:** the continuous-input hub round ended with clean shutdown after
-approximately 34 minutes of input and a 27.2-minute charging run. The voltage
-test guard stopped charging and restoration is independently verified. HSIC
-power/domain/register observation passed in the same boot; radio enumeration
-remains open. The root still requires the host whenever the desktop is
-running. Autonomous power policy and HSIC Wi-Fi remain open; storage is
-planning only.
-
+**Now:** internal Wi-Fi association, DHCP, DNS, verified HTTPS, pinned-key SSH,
+reconnect and renewal work. The powered-hub continuation passed 15 minutes:
+424 settled readings were positive, +239..+397 mA, with verified restoration.
+These guarded sessions are complete; autonomous charging remains open.
+The desktop has now started from RAM in the same boot, with NBD and the host
+export detached. Owner confirmation of this RAM desktop and its first unplugged
+test are pending. Storage remains planning only.
 
 ## RAM desktop candidate prepared after Wi-Fi/charging milestone
 
-A host-only ELF/QML/font audit and read-only image extraction produced a
-private desktop subset around282 MB, compressed around100 MB. All selected
-image files match their source hashes; native labwc, Foot, Quickshell, fonts,
-UID1000 startup and D-Bus checks pass. The image and host kernel are unchanged.
-This is not yet a device result: runtime data/plugin completeness, live RAM
-headroom, input/keyboard behavior and an unplugged owner test remain open.
-The network/SSH tools already run from a separate RAM root. No internal
-storage writes or installation are authorized.
+A read-only image extraction produced a private subset around 282 MB,
+compressed around 100 MB. Selected image files match their source hashes.
+Live startup exposed two missing runtime requirements: the `sh -> bash` link
+and trusted HTTPS certificates. Both were supplied in RAM, and the launcher
+was corrected. Labwc, Quickshell, Foot and the keyboard are running; the
+Wi-Fi widget and unprivileged Wi-Fi-bound HTTPS pass. All mounted filesystems
+are RAM or kernel interfaces, NBD is detached, and the host export is stopped.
+Approximately 235 MiB remained available after startup. No swap is enabled.
+
+The owner UI check and physical unplugged operation are **still pending**.
+Locale/compose data is incomplete, and this small desktop is not the full
+Omarchy application set. RAM data is lost at reboot. No internal-storage
+writes or installation are authorized.

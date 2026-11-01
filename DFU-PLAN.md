@@ -24,9 +24,11 @@ independence milestone. Fully independent startup remains a later goal.
 - [x] Scan, WPA2 association, DHCP, DNS, HTTPS and pinned-key Wi-Fi SSH.
 - [x] Deliberate disconnect/reconnect, explicit DHCP renewal and desktop-user HTTPS.
 - [x] Owner confirms brighter desktop, menu and keyboard with Wi-Fi active; new Wi-Fi bar popup works.
-- [ ] Qualify new provider full stop/restoration, sustained traffic, repeat boot and Wi-Fi with charging.
+- [x] Qualify Wi-Fi with guarded charging: five-minute interactive and fifteen-minute continuation pass.
+- [ ] Qualify new provider full stop/restoration, sustained traffic and repeat boot.
 
-No new DFU is needed for this source review. No radio firmware has been uploaded.
+No new DFU is needed for the current RAM desktop work. Radio firmware has
+been loaded successfully in RAM; it remains private.
 See [Wi-Fi findings and reuse plan](WIFI-PLAN.md).
 
 ## Current Wi-Fi and charging batch
@@ -39,7 +41,8 @@ See [Wi-Fi findings and reuse plan](WIFI-PLAN.md).
 - [x] Owner confirms menu, keyboard and charging indication; HTTPS passes during charging.
 - [x] Complete 900.447 seconds of continuation: 424 settled samples, all +239..+397 mA, time-weighted+306.965 mA, verified restoration.
 - [ ] Qualify complete Wi-Fi provider stop and another cold start.
-- [ ] Finish the reduced RAM desktop, measure runtime headroom, then test unplugged use.
+- [x] Start the reduced desktop from RAM; verify NBD/export detached, live processes, Wi-Fi HTTPS and about 235 MiB available.
+- [ ] Owner-confirm the RAM desktop, then test unplugged use.
 
 The short result includes a brightness change from 1604 to 1203; it does not
 qualify SOC gain, autonomous charging policy or timeout recovery. See the
