@@ -1,3 +1,26 @@
+# 1 November: 27.2-minute charging result and HSIC observation
+
+The continuous-input desktop ran on the powered hub at 802/2047 brightness.
+Charging lasted **27.2 minutes**: 768 distinct host guard readings included
+767 positive readings and one −147 mA transient, with mean **+449 mA**. The
+unchanged test guard stopped it at **4.201 V**, above the 4.2 V test ceiling;
+temperature was **37.5°C**. Independent PMIC reads verified restoration to
+`04c0=02`. RAM logs were retained and the recorder stopped. A full hour and
+percentage gain remain unqualified. See the [sanitized result](code/charging/hub1050-session/CONTINUOUS-DESKTOP-RESULT.json).
+
+Touch session 3 ran for approximately **34 minutes**: 60,113 frames, zero
+rejected layouts, input timeouts or SPI transfer errors, and two handled
+recoveries. The raw wire diagnostic counter was 14,986; this is not a claim
+that all counters were zero. End firmware health and cleanup passed.
+
+In the same boot, a read-only HSIC probe qualified the existing Linux power
+owner and restored both domains. The first version safely rejected automatic
+clock gating; the corrected diagnostic matches the owning kernel driver's
+semantics. It read control `0x4`, configuration `0x153`, and four existing clock
+configuration words `0x108`. No PHY/reset/GPIO/PMIC write, host DMA or radio
+firmware upload occurred. The radio has not enumerated. Source and limits:
+[HSIC observer](code/wifi/hsic-phy-observer/).
+
 # 1 November: hub data returned; lower-power charging trial started
 
 The same RAM boot returned through the qualified powered hub, with the

@@ -1,16 +1,11 @@
 # J72 session plan: power, Wi-Fi and independent operation
 
-Updated 1 November 2026. **The hub handoff and desktop/input restart passed.
-The owner confirms desktop, charging symbol and input. A guarded charging
-test at reduced brightness has started; full duration remains open.** The owner accepts a
-Pi-assisted start followed by unplugged use as the first independence
-milestone. Fully independent startup remains a later goal.
-
-The [independent-operation plan](INDEPENDENCE-PLAN.md) expands every remaining
-batch through internal installation and independent startup. The
-[Wi-Fi plan](WIFI-PLAN.md) records the current Orchard review and actual
-prepared inputs. [Storage preparation](INTERNAL-STORAGE-PLAN.md) covers
-ANS1, iOS 12 coexistence, backups and installation gates.
+Updated 1 November 2026. **The continuous-input hub run and cleanup are
+complete: approximately 34 minutes of input, and 27.2 minutes of charging
+before the unchanged voltage guard stopped it. Restoration is independently
+verified. HSIC register/domain observation passed in the same boot.** The
+owner accepts a Pi-assisted start followed by unplugged use as the first
+independence milestone. Fully independent startup remains a later goal.
 
 ## Completed on this J72
 
@@ -57,8 +52,12 @@ input and sustained charging remain open.
 - [x] Powered-hub data return, desktop/input restart and owner UI confirmation.
 - [x] Start guarded lower-power charging with the unchanged worker/guards:
   initial settled +449…+469 mA, 36.6 C, no faults. Full duration is not claimed.
-- [ ] Observe the bounded run, retain its endpoint and independently verify
-  original-limit restoration before any reboot.
+- [x] Retain the 27.2-minute voltage-guard endpoint and independently verify
+  original-limit restoration. Full hour remains unqualified.
+- [x] Observe HSIC PHY registers through the existing Linux power owner, with
+  automatic clock gating handled and both domains restored. No radio enable.
+- [ ] Prepare a bounded native PHY transition with exact baseline restoration;
+  radio reset/ready, USB enumeration and firmware/association follow.
 
 ## Remaining boot batches
 

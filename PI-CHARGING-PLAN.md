@@ -1,4 +1,18 @@
-# 1 November: continuous-input, lower-brightness hub trial started
+# Latest result: voltage guard after 27.2 minutes
+
+The reduced-brightness continuous-input run reached **27.2 minutes**, with
+768 distinct guard readings: 767 positive, one negative transient, mean
+**+449 mA**. At **4.201 V / 37.5°C**, the unchanged **4.2 V voltage guard**
+ended charging. Both independent PMIC snapshots confirmed `04c0=02`; the
+recorder and source monitor are stopped and logs retained. This was not a
+thermal stop or a full-hour pass. [Complete sanitized result](code/charging/hub1050-session/CONTINUOUS-DESKTOP-RESULT.json).
+
+Next: qualify source-aware autonomous charging and the full operating range,
+retain battery protections, and repeat a longer usability run with suitable
+starting headroom. The existing test ceilings remain unchanged. SOC load
+jumps still do not establish charge gained.
+
+# Earlier: continuous-input, lower-brightness hub trial started
 
 The controlled RAM move to the known powered JCH377 returned USB data; the
 desktop and input restarted in the same boot. The new-payload helper retains

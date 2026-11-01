@@ -167,8 +167,8 @@
       "status": "charging lifetime repair observed; full60min and continuous-touch boot qualification pending"
     },
     "charging/hub1050-session/README.md": {
-      "sha256": "7448e0c2c972ff24ee4d3ea1b5e731b68285f602b5a8d9c142c6f40b00f1c947",
-      "status": "measured source documentation; new continuous-input charging start, full endpoint pending"
+      "sha256": "c517fd3804a8c449551a6047f5d950b29e3c33c7fac85640b6c2886f73c27635",
+      "status": "measured same-boot J72 diagnostic or sanitized result; source byte copy except portable host test paths; no radio enumeration"
     },
     "charging/hub1050-session/test-worker-source.py": {
       "sha256": "2cdf57b4de99371e64a390288fb2c29875fb82d6be719bb3cca24b62f7833051",
@@ -241,6 +241,34 @@
     "charging/hub1050-session/CONTINUOUS-DESKTOP-START.json": {
       "sha256": "251e212a6d6e93c82cbfcc03cdbcd6e81a28250efb0d2b73307d5f487b9cbb0f",
       "status": "sanitized initial hardware observation and owner UI confirmation; not completed qualification"
+    },
+    "charging/hub1050-session/CONTINUOUS-DESKTOP-RESULT.json": {
+      "sha256": "e15008209a1894e8ec231d35b3c7cd8feb5d7cbe96979848111ecef6c48472de",
+      "status": "measured same-boot J72 diagnostic or sanitized result; source byte copy except portable host test paths; no radio enumeration"
+    },
+    "wifi/hsic-phy-observer/run-j72-hsic-phy-observer-v2.py": {
+      "sha256": "8ddb1cefe2d2de264f2df5f48c8da5b54dfb17dc8127f1e54a19353cd1d9749e",
+      "status": "measured same-boot J72 diagnostic or sanitized result; source byte copy except portable host test paths; no radio enumeration"
+    },
+    "wifi/hsic-phy-observer/VALIDATION.json": {
+      "sha256": "cec6c662d97c152b5622c9466b5fb58aca47ef1ca560ceba7923dc99cbeefd73",
+      "status": "measured same-boot J72 diagnostic or sanitized result; source byte copy except portable host test paths; no radio enumeration"
+    },
+    "wifi/hsic-phy-observer/README.md": {
+      "sha256": "b845410a43fe70eb21ee4b1511b85091ad7051d3848798c0261c3ff0eae4ae91",
+      "status": "measured same-boot J72 diagnostic or sanitized result; source byte copy except portable host test paths; no radio enumeration"
+    },
+    "wifi/hsic-phy-observer/Makefile": {
+      "sha256": "1e3f76519ff89f2d0103ec6729b899de1ff70c5f77a7f59d91c24efe3e196d11",
+      "status": "measured same-boot J72 diagnostic or sanitized result; source byte copy except portable host test paths; no radio enumeration"
+    },
+    "wifi/hsic-phy-observer/test-observer.py": {
+      "sha256": "a1199e5f450095bd36d73c213acffa7597315f4d95a5101eeb1e72e59abf0ada",
+      "status": "measured same-boot J72 diagnostic or sanitized result; source byte copy except portable host test paths; no radio enumeration"
+    },
+    "wifi/hsic-phy-observer/j72_hsic_phy_observer_v2.c": {
+      "sha256": "b95a00169680dd770555e8bb4f51f34371ae9aa3811119182a1d53ecbde0635d",
+      "status": "measured same-boot J72 diagnostic or sanitized result; source byte copy except portable host test paths; no radio enumeration"
     }
   },
   "upstream_reference": {

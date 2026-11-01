@@ -1,0 +1,26 @@
+{
+  "date": "2026-11-01",
+  "kernel_build": 33,
+  "result": 0,
+  "observed": true,
+  "restored": true,
+  "consumer_removed": true,
+  "phy_before": "04000200",
+  "phy_active": "1400024f",
+  "phy_after": "04000200",
+  "host_before": "00000200",
+  "host_active": "000002ff",
+  "host_after": "00000200",
+  "control": "00000004",
+  "config": "00000153",
+  "clock_widget_words": [
+    "00000108",
+    "00000108",
+    "00000108",
+    "00000108"
+  ],
+  "radio_enumerated": false,
+  "phy_or_gpio_or_pmic_writes": false,
+  "firmware_uploaded": false,
+  "host_tests": "16 actual-source fault cases under UBSan, six charging-state refusals, auto-state predicates"
+}

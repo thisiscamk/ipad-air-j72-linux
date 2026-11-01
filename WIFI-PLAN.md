@@ -1,5 +1,20 @@
 # J72 Wi-Fi preparation
 
+## Latest: HSIC register and power-owner observation passed
+
+A same-boot diagnostic read control `0x4`, configuration `0x153`, and four
+USB clock configuration words already set to `0x108`. The existing kernel
+power-domain owner restored HSIC1 and its USB2HOST0 parent after the read.
+HSIC1 enters automatic clock gating after a successful resume; the diagnostic
+now recognizes the owning driver's state semantics without raw gate writes.
+[Source, host fault tests and measured limits](code/wifi/hsic-phy-observer/).
+
+The next step is a bounded native PHY transition with exact restoration of
+control `0x4`. Radio reset/ready sequencing, USB enumeration, chip/firmware
+adaptation and scan/association remain open. No radio firmware or calibration
+has been published; this observation did not enable the radio.
+
+
 Reviewed 1 November 2026 against Orchard
 [`824bf0346ae4c3debd208cd34b053130576af60c`](https://github.com/OrchardLinux/orchard/tree/824bf0346ae4c3debd208cd34b053130576af60c).
 This is an offline preparation record. No WLAN firmware was uploaded.

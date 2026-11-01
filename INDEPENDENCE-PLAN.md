@@ -51,8 +51,10 @@ do not sacrifice recovery or silently call a network-served root independent.
 - [Wi-Fi preparation and applicability](WIFI-PLAN.md) and
   [J72 storage gates and source map](INTERNAL-STORAGE-PLAN.md).
 
-**Now:** hub data returned and the desktop/input restarted in the same N1
-RAM boot. Reduced-brightness guarded charging has started with positive
-measured current, and the owner confirms the desktop, charging symbol and
-input. Full duration/final restoration and HSIC Wi-Fi remain open. The host
-still supplies the root and source lease. Storage remains planning only.
+**Now:** the continuous-input hub round ended with clean shutdown after
+approximately 34 minutes of input and a 27.2-minute charging run. The voltage
+test guard stopped charging and restoration is independently verified. HSIC
+power/domain/register observation passed in the same boot; radio enumeration
+remains open. The root still requires the host whenever the desktop is
+running. Autonomous power policy and HSIC Wi-Fi remain open; storage is
+planning only.

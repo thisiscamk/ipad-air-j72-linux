@@ -1,15 +1,17 @@
 # Touch-independent guarded charging continuation
 
-## New continuous-input, reduced-brightness trial started
+## Continuous-input run: 27.2-minute voltage-guard endpoint
 
-The same pinned charging worker is now running with the new #33 continuous
-touch overlay at 802/2047 brightness. The controlled hub data handoff and
-desktop/input restart passed. Initial settled battery readings were
-+449…+469 mA at 36.6 C with no guard faults, and the owner confirmed the
-desktop, charging symbol and input. The maximum is still one hour with the
-same source, battery, temperature and rollback guards. This is an
-[initial observation](CONTINUOUS-DESKTOP-START.json), not a full-duration
-or final-restoration result. Percentage gain remains unqualified.
+The reduced-brightness run ended at **4.201 V / 37.5 C**, above the unchanged
+4.2 V test ceiling. It retained 768 distinct host guard readings: 767 positive
+and one negative transient, mean +449 mA; worker range −147…+473 mA. A full
+hour remains unqualified. Independent PMIC snapshots confirmed `04c0=02`, RAM
+logs were retained, and the recorder stopped. [Sanitized result](CONTINUOUS-DESKTOP-RESULT.json).
+
+The [initial observation](CONTINUOUS-DESKTOP-START.json) remains historical.
+No temperature/source/voltage ceiling was raised. Percentage gain remains
+unqualified. The keyboard resize loop was stopped before this run, so the
+brightness comparison also has a changed-workload confound.
 
 ## Previous normal-brightness continuation
 
