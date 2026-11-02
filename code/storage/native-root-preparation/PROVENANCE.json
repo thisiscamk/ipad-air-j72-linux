@@ -1,0 +1,14 @@
+{
+  "date": "2026-11-02",
+  "kind": "authored preparation and read-only inspection sources; no internal writer",
+  "sources": {
+    "code/storage/native-root-preparation/watch-j72-away-battery.py": "6b53ba2f08c9c8b2f3960812955f98c36224d7a32ce46cbb1f0f3e2f2a411a16",
+    "code/storage/native-root-preparation/inspect-j72-native-view-tools.py": "01beac2194a1b12d9f85df18dac6abf54d365c6cc7cbb0e601f03ff38f6bb73f",
+    "code/storage/native-root-preparation/run-j72-ram-desktop35.py": "9b9c3da787252cb81513e46b1ea28f41c92e1da3d24f9d34431ae7cfba84cfec",
+    "code/storage/native-root-preparation/prepare-j72-native-view-tools.py": "14d283cfafd8118356fa57972c9602c54a9abc195abe5a6e3045a7798dd9fddb",
+    "code/storage/j72_native_view_plan.py": "ad857bc59d69bd023f8b2d53708edcfb7a06c00ee85e6a09b71cc283a750347a",
+    "code/storage/test_j72_native_view_plan.py": "c898a8e0e1edc02c0d20bec42eade223c58a4a056a3e77d02444284217b74c0f",
+    "code/storage/j72_rehearse_layout.py": "9dbb3452fb4b124f78cd594e2cf87097e5fb1ed7e31483bb09627047fcda9d2c",
+    "code/storage/test_j72_rehearse_layout.py": "9de9bf2ac0494ff55589e38d6576dfd7775a82144085117834cc9eee7797611d"
+  }
+}

@@ -1,0 +1,23 @@
+{
+  "status": "DISABLED_LOAD_AND_UNCHANGED_INPUT_LIMIT_PASS_NOT_ARMED",
+  "kernel_build": "#35 SMP PREEMPT Mon Nov 2 07:00:00 +08 2026",
+  "module_build_and_import_closure_pass": true,
+  "policy_headers_identical_to_measured_34": true,
+  "nominal_input_limit_mA": 1050,
+  "new_source_receipt_required": true,
+  "original_source_receipt_reused": false,
+  "requires_known_ram_workload_nbd_detached": true,
+  "module_loaded": true,
+  "controller_armed": false,
+  "autonomous_source_detection": false,
+  "files": {
+    "host-reference.py": "ac96a80fb7b5b79492c9c3184a576af1dfb6dea42dc0074f5e10b10646e946f1",
+    "module/j72_charge_maintain35.c": "8b8c933a9267d5a99a35ed28c496651ae73e139d74bf0b7dc1bcc53bfcfa8486",
+    "module/Makefile": "e0610a13e1471a0fadbfd2378bf1fa43376acafb830b9a397e1210e5a51d775a",
+    "module/j72-maintain-core.h": "2d7aa393d178775c67fdabd43b1489bc86a50da2f6f31bdbd1a5e375dc37a522",
+    "module/j72-limit-core.h": "6c37efdd866d011d7f8a8879d7b99908d30176c193d3e253267790f2121e0526"
+  },
+  "original_input_limit_unchanged": true,
+  "exact_35_manifest_path_and_build_guard": true,
+  "manifest_path_error_refused_before_upload": true
+}

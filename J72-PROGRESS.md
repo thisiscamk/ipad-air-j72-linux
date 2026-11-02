@@ -1,3 +1,32 @@
+# Current device checkpoint: owner UI, nested cleanup and RAM35 restore pass
+
+The owner confirms all compressed-container desktop functions. Normal nested
+loop/ext4/NBD/owned-export cleanup passed, and the known RAM desktop is restored
+on #35 with Wi-Fi, touch and no USB filesystem dependency. Brightness is1604.
+The matching #35 maintenance module loads disabled with its original input limit
+unchanged; active charging awaits the same marked hub port and a fresh source
+receipt. No new DFU is needed for this continuation. No internal storage write
+or installation is authorized or performed.
+
+## Earlier preparation
+
+# Owner-away preparation: bounded local-root design and #35 power adapters
+
+The live #35 kernel reports a linear DM target without creating a mapping.
+A host-only layout rehearsal validates both future GPT copies while preserving
+Apple identity/start/name/flags and MBR; 13 mapping/layout tests pass. The current
+single-APFS capture correctly refuses mapping. No native filesystem or internal
+write is involved. A future first read-only root could use a separately qualified
+iOS write backend, leaving Linux writes for later persistence work.
+
+The #35 RAM desktop staging and maintenance adapters pass host preflight. Charging
+is not armed and needs fresh hub qualification after the cable-path move. The
+owner's pending screen test remains available, temporarily dimmed; a low-battery
+observer can perform normal cleanup and request iOS rather than drain the pack.
+[Prepared tools and remaining gates](code/storage/native-root-preparation/).
+
+## Previous checkpoint
+
 # Latest device test: combined storage/Wi-Fi and container desktop startup pass
 
 The matched #35 image boots, both recovery shells work, and internal-drive

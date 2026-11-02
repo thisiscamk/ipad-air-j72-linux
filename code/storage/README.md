@@ -1,3 +1,11 @@
+## Native-root preparation after the combined boot
+
+[Bounded view planning and host-only GPT rehearsal](native-root-preparation/)
+now pass 13 test methods. The actual live #35 kernel reports a linear DM target;
+no mapping is created and the current all-APFS capture correctly refuses one.
+The first read-only root may use a separately qualified iOS write backend;
+installation, native writes and resize remain unauthorized and unqualified.
+
 ## Latest combined candidate
 
 [Matched #35 desktop/storage sources and host-format rehearsal](desktop-storage35/)

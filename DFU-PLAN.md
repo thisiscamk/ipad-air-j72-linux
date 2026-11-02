@@ -1,3 +1,43 @@
+# Current physical gate: RAM desktop restored; move to the qualified hub
+
+- [x] Owner confirms all compressed-container desktop functions.
+- [x] Away observer cancelled/reaped; brightness restored to1604.
+- [x] Normal nested loop/ext4/NBD/export cleanup passes.
+- [x] Known RAM desktop stages/starts on #35 with Wi-Fi; NBD remains detached.
+- [x] Matched #35 charging module loads disabled, original input limit unchanged.
+- [ ] Owner checks restored menu/keyboard and moves to the same marked powered-hub port.
+- [ ] Bind a fresh source receipt to the actual new USB path before any override.
+- [ ] Observe bounded #35 charging, automatic protection and independent restoration.
+- [ ] Qualify iOS 12 resize/fenced writer/recovery and review the exact install proposal.
+- [ ] Separate authorization for reviewed writes; then verify installed image/layout.
+- [ ] Changed DFU for the first local read-only root; persistence and PC-free startup later.
+
+No internal writes are authorized or performed. No new DFU is needed for the
+current hub continuation. The kernel module is disabled while the move is pending.
+
+## Earlier preparation
+
+# Owner away: preparation complete; no DFU needed yet
+
+- [x] Keep the combined desktop/Wi-Fi/native-read boot available for the owner.
+- [x] Temporarily dim to 401 and run a bounded low-battery return-to-iOS observer.
+- [x] Confirm live kernel linear device-mapper target without creating a mapping.
+- [x] Prepare bounded native-view planner; current all-APFS map correctly refuses.
+- [x] Rehearse future GPT bytes and image hash on host; 13 tests pass, no device writes.
+- [x] Prepare #35 RAM desktop and guarded charging adapters; host preflights pass.
+- [x] Owner confirms all desktop functions; away observer cancelled, brightness restored1604.
+- [x] Normal mounted-container/loop/ext4/NBD/owned-export cleanup passes in this boot.
+- [ ] Qualify known RAM workload on #35 and freshly measured hub source before power testing.
+- [ ] Qualify iOS 12 resize, fenced image/GPT writer and recovery; review exact install proposal.
+- [ ] Separate owner authorization for reviewed writes, then install/verify through qualified backend.
+- [ ] Changed DFU: boot local read-only root through a bounded verified partition view.
+- [ ] Later: native persistence/flush/update/recovery, autonomous charging and PC-free startup.
+
+The layout rehearsal is not executable or approval-ready. No internal operation
+has been authorized. [Prepared source/results](code/storage/native-root-preparation/).
+
+## Previous checkpoint
+
 # Current checkpoint: one-hour net charging pass; combined storage DFU prepared
 
 - [x] Owner confirms RAM desktop, Wi-Fi, menu, keyboard and charging icon on hub.

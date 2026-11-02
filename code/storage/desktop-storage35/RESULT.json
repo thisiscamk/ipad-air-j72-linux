@@ -37,9 +37,9 @@
   "memory_available_kib_after_start": 475880,
   "brightness": 1604,
   "battery_percent_after_start": 70,
-  "owner_ui_confirmation": "pending",
-  "mounted_container_normal_cleanup_tested": false,
-  "keep_usb_connected_until_normal_stop": true,
+  "owner_ui_confirmation": "PASS",
+  "mounted_container_normal_cleanup_tested": true,
+  "keep_usb_connected_until_normal_stop": false,
   "system_busybox_replaced": false,
   "compatibility_fixes": [
     "Pinned static BusyBox helper for HTTP staging",
@@ -47,5 +47,6 @@
   ],
   "internal_install_authorized": false,
   "host_file_rehearsal_device_access": false,
-  "internal_storage_access": "bounded read-only namespace and GPT reads; no internal filesystem mount"
+  "internal_storage_access": "bounded read-only namespace and GPT reads; no internal filesystem mount",
+  "normal_nested_loop_ext4_nbd_owned_export_cleanup_pass": true
 }

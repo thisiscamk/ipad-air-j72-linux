@@ -7,9 +7,9 @@ both GPT signatures. Wi-Fi association, HTTPS and pinned-key SSH pass.
 
 The proposed filesystem format now reports desktop ready: ext4 mounted
 `ro,norecovery,nosuid,nodev,noexec`, read-only loop/SquashFS base, RAM runtime.
-Brightness is 1604/2047 with 475,880 KiB available after startup. **Owner-visible
-UI confirmation and actual mounted-container cleanup are pending. Keep USB
-connected.** This is a Pi-hosted format rehearsal, not an internal installation.
+Brightness is 1604/2047 with 475,880 KiB available after startup. **The owner confirms all desktop functions. Normal nested loop/ext4/NBD cleanup
+and owned host export termination also pass.** This was a Pi-hosted format rehearsal, not an internal installation. The known
+RAM desktop is now restored and the USB filesystem export is detached.
 [Measured status](RESULT.json).
 
 ## Two RAM-only compatibility fixes

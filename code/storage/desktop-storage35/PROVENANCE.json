@@ -80,6 +80,6 @@
       "sha256": "360031e29690fef576ee0dac5f9ffd941816e7d07cd1034b3e805b9fa6f45f4b"
     }
   },
-  "owner_ui_confirmation": "pending",
-  "notes": "Combined boot, Wi-Fi, read-only container desktop startup and concurrent native reads pass; installed local root and owner UI remain unconfirmed."
+  "owner_ui_confirmation": "PASS",
+  "notes": "Combined boot, Wi-Fi, read-only container desktop, owner UI and normal nested loop/ext4/NBD/owned export cleanup pass. Local native root remains untested."
 }

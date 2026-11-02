@@ -1,3 +1,22 @@
+# Latest preparation: first read-only root can use an iOS write backend
+
+The combined #35 desktop/Wi-Fi/native-read boot now passes; owner UI and normal
+nested loop/ext4/NBD/export cleanup also pass. This kernel also reports a linear
+DM target. The bounded view planner and host-only future GPT rehearsal pass 13
+test methods, and the actual current all-APFS capture refuses native mapping.
+[Prepared source, exact arithmetic and limits](code/storage/native-root-preparation/).
+
+The first local root may use a separately qualified **iOS native writer** to
+install the image, keeping Linux ASP read-only. Linux write/flush qualification
+can therefore follow that first read-only milestone. This is a proposed route,
+not a tested writer or permission to resize. iOS 12 APFS resize, fenced GPT/image
+writes and recovery behavior still need qualification before a reviewable install.
+No zero-size resize or snapshot deletion is proposed. The candidate 1536 MiB
+ext4/compressed-base format now fits in host rehearsal; it does not yet exist as
+a Linux partition on the device.
+
+## Earlier plan, with backend qualification clarified below
+
 # Internal-storage preparation for iPad Air J72
 
 This is a research plan for the iPad Air 1 Cellular (`iPad4,2` / `J72AP`, A7, iOS 12.5.7). **No internal-storage write, partition change, or iOS erase has been authorized.** The current Linux and reduced Omarchy A desktop run from RAM, with internal Wi-Fi and demonstrated unplugged use. Read-only native storage qualification has now passed on the new #35 RAM boot.
@@ -12,7 +31,7 @@ See the [morning runbook](STORAGE-MORNING-PLAN.md) for the next actions, the [of
 
 Fresh read-only #35 results identify a 128,000,000,000-byte disk with 4096-byte logical blocks. Repeated direct 4 KiB reads match. Both GPT copies and their arrays pass CRC and consistency checks: one APFS partition occupies LBAs 6–31,249,994, with **no unallocated gap**. Bounded APFS checkpoint and space-manager metadata checks report 71,745,007,616 free bytes inside the container. This is not a validated shrink minimum. No filesystem was mounted and no internal write or unlock was issued by that observer. See the [measured observer result](code/storage/linux-asp-observer35/RESULT.json).
 
-Subsequent live iOS inspection with the existing Amethyst jailbreak confirms one root snapshot and no data snapshots. Orchard's exact `APFSContainerGetMinimalSize` query reports 126,357,602,304 bytes, leaving only 1,642,352,640 bytes geometrically available for shrink. That is insufficient for the planned desktop layout. The original root snapshot supports Amethyst rollback and has not been changed. A snapshot contribution to the high minimum is plausible, not proved. [Measured helpers and result](code/storage/ios12-readonly-inspect/).
+Subsequent live iOS inspection with the existing Amethyst jailbreak confirms one root snapshot and no data snapshots. Orchard's exact `APFSContainerGetMinimalSize` query reports 126,357,602,304 bytes, leaving only 1,642,352,640 bytes geometrically available for shrink. That is insufficient for the original uncompressed desktop. The later 1536 MiB compressed-container host rehearsal fits the conditional aligned layout; the actual shrink remains unqualified. The original root snapshot supports Amethyst rollback and has not been changed. A snapshot contribution to the high minimum is plausible, not proved. [Measured helpers and result](code/storage/ios12-readonly-inspect/).
 
 Current Orchard uses a boot partition read by m1n1 itself; the latest launch change removes the host fallback reader. Its 1 GiB boot / 8 GiB minimum root policy is a sizing reference, not an approved J72 layout. The original reviewed tree has no Linux ASP implementation to enable for J72. Our subsequently ported and hardened [read-only Linux ASP observer](code/storage/linux-asp-observer35/) now passes initial hardware reads; writable storage remains unqualified.
 
@@ -91,14 +110,14 @@ software guards, not hardware locks on each namespace.
 | 1. Read-only ANS1 bring-up | Preserve the iBoot-loaded ANS firmware through Pongo/m1n1; identify the J72 ANS1 controller and block size; enumerate namespace metadata and the partition map read-only; read a few bounded, aligned blocks and compare repeated hashes. Audit loader and Linux initialization as well as the block request path: refuse write-unlock, writes, discard, format and writable passthrough. Do not mount with journal replay. Confirm normal iOS boot afterward. |
 | 2. Recovery design | The owner has waived preserving personal content and has no backup. Record the partition map and firmware/restore path privately, preserve iOS by default, and rehearse a non-destructive recovery boot. A metadata capture on the same host disk is not an independent backup. Check which restore image Apple will currently accept for this exact model before any write. Do not publish backup contents or identifiers. |
 | 3. Layout choice | Decide whether iOS must remain. For coexistence, first prove a supported iOS 12 APFS shrink and partition-table update on this model; the current Resize APFS release is not that proof. If this cannot be established, stop. A full-device replacement would be a separate owner decision and recovery plan. |
-| 4. Write-capable ANS1 driver | Audit and harden the J72-specific Linux ANS1 path: firmware handoff, tag bounds before queue access, complete SGL construction, DMA address limits, measured block geometry, submission/completion errors, cache flush, timeouts, power-loss behavior and protection of auxiliary Apple areas. Test destructive cases away from the owner's only iPad first. Host simulations and repeated read-only tests do not qualify hardware writes. |
+| 4. Write backend qualification | For the first read-only root, qualify an iOS 12 native resize/GPT/image writer with exact extent fences and recovery verification. If using Linux writes, audit and harden the J72-specific Linux ANS1 path: firmware handoff, tag bounds before queue access, complete SGL construction, DMA address limits, measured block geometry, submission/completion errors, cache flush, timeouts, power-loss behavior and protection of auxiliary Apple areas. Test destructive cases away from the owner's only iPad first. Host simulations and repeated read-only tests do not qualify hardware writes. |
 | 5. Installer rehearsal | Build an exact-J72 installer that shows the intended partition map, refuses Apple/unknown regions, checks available space and image hashes, and has an explicit stop point before writes. Rehearse its decision logic on synthetic disk images and a disposable test target. Record the owner's backup waiver and require separate owner authorization for the exact reviewed write plan. |
 | 6. First install | Create only the approved Linux partitions, write and verify a small boot/system image, keep a USB recovery shell, and boot the internal root through the already validated DFU/Pongo path. Check filesystem integrity, touch, Wi-Fi, charging, updates, and repeated iOS/Linux transitions before copying user data. |
 | 7. Maintenance and rollback | Provide update and repair procedures, space monitoring, boot-selection instructions, and a tested rollback to the preserved iOS layout or a documented full restore. Maintain the host RAM boot as a rescue path. |
 
 ## What “installed” would mean
 
-The first realistic outcome is **Linux stored on the iPad but launched from a host after each cold restart**. Orchard's current supported-device flow works this way. The RAM desktop already avoids a Pi-hosted root during unplugged use; internal storage would add persistence. It does not by itself remove the DFU/Pongo host requirement. A truly untethered power-on boot would need a separate, proven boot-chain design and is not included in this plan.
+The first realistic outcome is **Linux stored on the iPad but launched from a host after each cold restart**. Orchard's current supported-device flow works this way. The RAM desktop already avoids a Pi-hosted root during unplugged use; internal storage would localize the base and reduce RAM pressure; persistent changes still need separately qualified writes. It does not by itself remove the DFU/Pongo host requirement. A truly untethered power-on boot would need a separate, proven boot-chain design and is not included in this plan.
 
 The current [Omarchy A README](https://github.com/OrchardLinux/omarchy-a#supported-devices) describes automatic login, an installation password for sudo, a six-digit screen-lock PIN, and no disk encryption. Our experimental RAM image has not been migrated to that installed-system setup. Before storing personal data, validate the chosen login, lock and data-protection configuration on J72; encryption support and performance remain unqualified.
 
