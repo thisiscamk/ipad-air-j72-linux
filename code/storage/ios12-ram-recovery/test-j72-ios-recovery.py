@@ -7,7 +7,9 @@ import json
 from pathlib import Path
 import struct
 import subprocess
+import sys
 import tempfile
+import time
 
 ROOT=Path(__file__).resolve().parents[1]
 WORK=ROOT/'private/j72-platform/power-storage-20261102/recovery-prep'
@@ -25,6 +27,47 @@ def der_children(b):
     while at<len(b):
         tag,value,at=der_value(b,at)
         yield tag,value
+
+def launcher_checks():
+    """Use a fake exploit process, never USB, to exercise the real launcher."""
+    sys.path.insert(0,str(ROOT/'tools'))
+    spec=importlib.util.spec_from_file_location('reconnect_launcher',ROOT/'tools/boot-j72-ios-recovery.py')
+    launcher=importlib.util.module_from_spec(spec);spec.loader.exec_module(launcher)
+    with tempfile.TemporaryDirectory(prefix='j72-reconnect-test-') as folder:
+        folder=Path(folder);(folder/'gaster-src').mkdir();fake=folder/'gaster-src/gaster'
+        fake.write_text('#!/usr/bin/python3\nimport subprocess,time\n'
+                        'p=subprocess.Popen(["/bin/sleep","30"])\n'
+                        'print("child_pid="+str(p.pid),flush=True)\n'
+                        'print("Unplug and replug the device now (at least 2 times)",flush=True)\n'
+                        'print("ret: true",flush=True)\ntime.sleep(30)\n')
+        fake.chmod(0o700);launcher.WORK=folder
+        attempt=launcher.Attempt(folder);attempt.ecid=1234
+        try:
+            attempt.exploit()
+            raise AssertionError('A7 manual step was not intercepted')
+        except launcher.CableCycleRequired:
+            pass
+        state=json.loads((folder/'state.json').read_text())
+        assert state['stage']=='a7_cable_cycles_required' and state['image_upload_started'] is False
+        pid=int((folder/'gaster-live.log').read_text().split('child_pid=')[1].splitlines()[0])
+        time.sleep(.1);stat=Path('/proc')/str(pid)/'stat'
+        assert not stat.exists() or stat.read_text().split(')')[1].split()[0]=='Z'
+        def forbidden_usb():
+            raise AssertionError('USB accessed before saved-state gate')
+        launcher.usb_devices=forbidden_usb
+        cases=0
+        for field,value in [('image_upload_started',True),('stage','image_upload_started'),
+                            ('profile','other'),('capsule_manifest_sha256','0'*64),
+                            ('ecid',0),('ecid','1234')]:
+            invalid=dict(state);invalid[field]=value
+            (folder/'state.json').write_text(json.dumps(invalid))
+            try:
+                launcher.Attempt(folder).resume(folder)
+                raise AssertionError('Invalid resume state allowed')
+            except RuntimeError:
+                cases+=1
+    return {'live_a7_manual_step_detected':True,'descendant_stopped':True,
+            'saved_attempt_resume_refusal_cases':cases,'usb_access':False}
 
 def main():
     source=WORK/'readonly-service'
@@ -81,7 +124,8 @@ def main():
                 ram_image_files_read_back=len(manifest['ramdisk_readback_files']),
                 unchanged_stock_loader_and_imports=len(unchanged),
                 img4_component_types_verified=len(expected_types),
-                original_compressed_kernel_unchanged=True,device_boot_tested=False)
+                original_compressed_kernel_unchanged=True,device_boot_tested=False,
+                launcher_reconnect_checks=launcher_checks())
     (WORK/'offline-result.json').write_text(json.dumps(result,indent=2)+'\n')
     print(json.dumps(result))
 

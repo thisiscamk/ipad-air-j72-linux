@@ -22,5 +22,27 @@
   "same_source_rebuild_byte_identical": true,
   "launcher_timeout_process_group_check": "PASS",
   "runtime_recovery_qualification": "PENDING",
-  "internal_writes_performed": false
+  "internal_writes_performed": false,
+  "first_device_attempt": {
+    "result": "exploit_timeout_before_first_image_upload",
+    "timeout_seconds": 120,
+    "exact_exploit_stage": "unknown_stdout_buffered",
+    "two_manual_cable_cycles_restored_usb": false,
+    "recovery_image_booted": false,
+    "storage_inspector_run": false
+  },
+  "revised_launcher": {
+    "line_buffered_live_exploit_log": true,
+    "a7_cable_prompt_stops_process_group": true,
+    "same_ecid_and_gaster_marker_required_for_resume": true,
+    "resume_refusal_cases": 6,
+    "offline_tests": "PASS",
+    "hardware_tested": false
+  },
+  "launcher_reconnect_checks": {
+    "live_a7_manual_step_detected": true,
+    "descendant_stopped": true,
+    "saved_attempt_resume_refusal_cases": 6,
+    "usb_access": false
+  }
 }

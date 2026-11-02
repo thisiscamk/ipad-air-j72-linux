@@ -1,3 +1,19 @@
+# 2 November: first recovery attempt stopped before image upload
+
+The first exact-J72/direct-Pi recovery attempt timed out in gaster at its
+120-second bound. No iBSS, iBEC or recovery image was uploaded, and no storage
+inspection ran. Buffered stdout prevented identification of the exact exploit
+stage. Two manual cable cycles did not bring USB back; a normal iOS restart
+is needed before the next DFU.
+
+Source review identified gaster's explicit A7 two-reconnect boundary. The revised
+launcher now saves live line-buffered stage output and stops/reaps its process
+group at that prompt. A saved attempt can resume only with its original ECID,
+unchanged capsule and `PWND:[gaster]` marker; it refuses partially uploaded boot
+chains. The live-prompt cleanup check and six saved-state refusal cases pass
+offline. The RAM image is unchanged and remains unqualified on device. No APFS,
+snapshot or partition changes occurred. [Actual code and results](code/storage/ios12-ram-recovery/).
+
 # 2 November: restricted RAM recovery candidate prepared
 
 The iOS storage investigation now has a built recovery candidate using the

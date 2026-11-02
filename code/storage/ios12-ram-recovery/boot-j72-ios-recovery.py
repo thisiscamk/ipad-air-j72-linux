@@ -21,6 +21,9 @@ WORK = ROOT/'private/j72-platform/power-storage-20261102/recovery-prep'
 CAPSULE = WORK/'capsule-v1'
 MARKER = 'J72_RO_RECOVERY_V1'
 
+class CableCycleRequired(RuntimeError):
+    pass
+
 def digest(p):
     return hashlib.sha256(p.read_bytes()).hexdigest()
 
@@ -64,6 +67,44 @@ class Attempt:
         self.ecid = None
         self.proxy = None
         self.parent_exec = ROOT/'tools/host/aarch64/bin/j72-parent-bound-exec'
+
+    def save_state(self, stage):
+        state={'profile':'j72-ios12-ram-recovery-v1','ecid':self.ecid,
+               'capsule_manifest_sha256':digest(CAPSULE/'manifest.json'),
+               'stage':stage,'image_upload_started':False}
+        (self.out/'state.json').write_text(json.dumps(state,indent=2)+'\n')
+
+    def exploit(self):
+        """Line-buffered log; stop cleanly at gaster's A7 manual reconnect step."""
+        path=self.out/'gaster-live.log'
+        argv=[str(self.parent_exec),str(os.getpid()),'/usr/bin/stdbuf','-oL','-eL',
+              str(WORK/'gaster-src/gaster'),'pwn']
+        self.save_state('exploit_started')
+        with path.open('wb') as log:
+            child=subprocess.Popen(argv,stdout=log,stderr=subprocess.STDOUT,start_new_session=True)
+            deadline=time.monotonic()+120
+            try:
+                while child.poll() is None:
+                    text=path.read_text(errors='replace')
+                    marker='Unplug and replug the device now (at least 2 times)'
+                    # PATCH has sent its payload. The native USB reset itself can wait
+                    # for a physical reconnect on A7, so do not require its return.
+                    at=text.find(marker)
+                    if at>=0 and '\nret: true\n' in text[at+len(marker):]:
+                        self.save_state('a7_cable_cycles_required')
+                        raise CableCycleRequired('A7 PATCH reached its manual cable step; perform two cable cycles, then resume this exact attempt')
+                    if time.monotonic()>=deadline:
+                        self.save_state('exploit_timeout')
+                        raise RuntimeError('gaster timed out; live stage log saved privately')
+                    time.sleep(.1)
+                if child.returncode:
+                    raise RuntimeError('gaster failed; inspect private gaster-live.log')
+            finally:
+                try:
+                    os.killpg(child.pid,signal.SIGKILL)
+                except ProcessLookupError:
+                    pass
+                child.wait()
 
     def command(self, argv, timeout=15, accepted=(0,)):
         """Parent-bound process group; capture privately and reap on every path."""
@@ -130,15 +171,42 @@ class Attempt:
         self.identity(('DFU',))
         # gaster cannot select ECID; the exact-single-device guard above is mandatory.
         print('Exact J72 DFU/direct Pi verified. Starting one bounded gaster attempt.', flush=True)
-        gaster = WORK/'gaster-src/gaster'
-        self.command([gaster,'pwn'], timeout=120)
+        self.exploit()
         self.identity(('DFU',), wait=10)
+        self.finish_boot()
+
+    def resume(self, previous):
+        """No exploit retry: require the original ECID and explicit gaster marker."""
+        state=json.loads((previous/'state.json').read_text())
+        if (state.get('profile')!='j72-ios12-ram-recovery-v1' or
+            state.get('capsule_manifest_sha256')!=digest(CAPSULE/'manifest.json') or
+            state.get('stage') not in ('exploit_timeout','a7_cable_cycles_required') or
+            state.get('image_upload_started') is not False or
+            type(state.get('ecid')) is not int or state['ecid']<=0):
+            raise RuntimeError('Previous attempt is not eligible for pwned-DFU resume')
+        devices=usb_devices()
+        if len(devices)!=1 or devices[0][1]!='1227':
+            raise RuntimeError('Resume requires exactly one DFU device')
+        require_direct_pi(devices[0][0])
+        serial=(devices[0][0]/'serial').read_text()
+        if 'PWND:[gaster]' not in serial:
+            raise RuntimeError('Resume refused: gaster PWND marker absent; no exploit repeated')
+        self.ecid=state['ecid'];self.identity(('DFU',))
+        print('Original exact J72 and gaster marker verified; resuming without another exploit.',flush=True)
+        self.finish_boot()
+
+    def finish_boot(self):
+        gaster = WORK/'gaster-src/gaster'
         devices = usb_devices()
         if len(devices) != 1 or devices[0][1] != '1227':
             raise RuntimeError('DFU inventory changed before volatile state reset')
         # This clears DFU transfer state, not user data. Matches both pinned recipes.
         self.command([gaster,'reset'], timeout=12)
         self.identity(('DFU',), wait=10)
+        # Any partial image upload forbids the pwned-DFU resume path above.
+        self.save_state('image_upload_started')
+        state=json.loads((self.out/'state.json').read_text());state['image_upload_started']=True
+        (self.out/'state.json').write_text(json.dumps(state,indent=2)+'\n')
         self.send('iBSS.img4', ('DFU',))
         time.sleep(1)
         self.identity(('DFU',), wait=8)
@@ -212,9 +280,11 @@ class Attempt:
 
 def main():
     p=argparse.ArgumentParser(description=__doc__)
-    p.add_argument('--boot',action='store_true',help='Perform ONE changed physical DFU attempt; requires root and direct Pi')
+    mode=p.add_mutually_exclusive_group()
+    mode.add_argument('--boot',action='store_true',help='Perform ONE changed physical DFU attempt; requires root and direct Pi')
+    mode.add_argument('--resume-pwned-dfu',type=Path,help='Resume a saved exact attempt only after its gaster PWND marker returns')
     args=p.parse_args();os.umask(0o077);preflight()
-    if not args.boot:
+    if not args.boot and args.resume_pwned_dfu is None:
         return
     if os.geteuid()!=0:
         raise RuntimeError('Use the task administrator terminal for a hardware attempt')
@@ -223,7 +293,13 @@ def main():
         out=WORK/('attempt-'+time.strftime('%Y%m%d-%H%M%S'));out.mkdir(mode=0o700)
         attempt=Attempt(out)
         try:
-            attempt.boot()
+            if args.resume_pwned_dfu is not None:
+                attempt.resume(args.resume_pwned_dfu.resolve())
+            else:
+                attempt.boot()
+        except CableCycleRequired as exc:
+            print(str(exc),flush=True)
+            print('Saved resumable attempt: '+str(out),flush=True)
         finally:
             attempt.close()
 

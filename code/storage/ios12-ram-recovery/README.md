@@ -1,6 +1,6 @@
 # J72 iOS 12 RAM recovery candidate
 
-**Built and checked offline; not boot-tested yet.** This is recovery preparation,
+**Image built and checked offline; the first attempt stopped in the exploit before any image upload.** This is recovery preparation,
 not an installer. The current storage blocker is the measured APFS minimum:
 only 1.64 GB can be released, despite about 71.7 GB free inside the container.
 We retain the existing Amethyst rollback snapshot. Its contribution to that
@@ -45,6 +45,16 @@ ABI probe correctly saw three mounts, including two APFS mounts and a
 non-RAM root. These are negative guard tests, not recovery-boot qualification.
 The launcher timeout check stopped a deliberately spawned child process group.
 
+The first device attempt verified exact J72/direct Pi, then timed out in gaster
+after 120 seconds. Its stdout was buffered, so the exact exploit stage is
+unknown. Two cable cycles did not restore USB. No iBSS, iBEC or RAM image was
+uploaded, and the inspector did not run. The revised launcher saves line-buffered
+live exploit output and stops/reaps its group at gaster's explicit A7 cable
+prompt. A saved attempt can resume without another exploit only if its original
+ECID, unchanged capsule and `PWND:[gaster]` USB marker all match. Six invalid
+resume-state cases and the live-prompt/process-group checks pass offline. This
+revised handling is not hardware-tested yet.
+
 ## Building the authored tools
 
 Requires Clang, LLVM's Mach-O linker and a native `ldid`. No Apple SDK is
@@ -78,6 +88,8 @@ after measuring a different device; this candidate is restricted to J72.
 bounded attempt, requires root, a direct Pi connection and one exact J72 in
 DFU. Uploads target the same ECID. It does not retry failed uploads or change
 NVRAM. Each subprocess group is parent-bound and reaped.
+`--resume-pwned-dfu /private/saved-attempt` uses the strict resume gate above;
+it never repeats the exploit or accepts a partially uploaded boot chain.
 
 The native HFS tool reports `BTree inconsistent!` when deleting one stock
 launch job. That failed image was discarded. The accepted recipe starts from

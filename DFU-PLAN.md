@@ -1,3 +1,18 @@
+# Recovery DFU follow-up: A7 reconnect handling
+
+- [x] First changed DFU: exact J72/direct Pi verified; gaster timed out before any image upload.
+- [x] Reap the loader group and inspect USB; two cable cycles did not restore enumeration.
+- [x] Add/test line-buffered live logs and interception of gaster's A7 reconnect prompt.
+- [x] Add/test a saved-attempt resume gate requiring the same ECID, capsule and gaster marker; partial image uploads refuse resume.
+- [ ] Confirm normal iOS after a manual Top+Home restart; keep the direct Pi cable.
+- [ ] New DFU for the revised manual-step handling, then use cable cycles only when its live prompt is reached.
+- [ ] Qualify the actual recovery image and storage reads. Neither has run yet.
+
+The first attempt's exact exploit stage is unknown because stdout was buffered.
+No bootloader, recovery image or storage inspector was uploaded. The functional
+change for the next DFU is handling A7's manual reconnect boundary and resuming
+that same attempt without a repeated exploit. [Source/results](code/storage/ios12-ram-recovery/).
+
 # Next DFU: iOS 12 RAM recovery qualification
 
 - [x] Build a separate recovery capsule with the original J72 iOS 12.5.7 kernel.
