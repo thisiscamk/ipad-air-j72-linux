@@ -1,0 +1,28 @@
+{
+  "status": "HOST_TESTS_AND_INPUT_PREFLIGHT_PASS_DEVICE_UNTESTED",
+  "health_tests_pass": 12,
+  "real_process_group_cleanup_test_pass": true,
+  "source_lease_transport_unchanged": true,
+  "read_only_health_transport": "pinned Wi-Fi SSH",
+  "original_kernel_module_and_charge_watch_unchanged": true,
+  "actual_device_observation_run": false,
+  "storage_writes": false,
+  "continuous_observation_seconds": [
+    3600,
+    5400
+  ],
+  "static_brightness_choices": [
+    802,
+    1604
+  ],
+  "sigterm_cleanup_and_repeated_signal_deferral_host_test_pass": true,
+  "whole_body_identity_guard_host_test_pass": true,
+  "idle_recorder_prepared_device_untested": true,
+  "public_test_import_adjusted_to_sibling": true,
+  "files": {
+    "j72_observation_health.py": "a830a82004e0d6d5861146577631fd8921270f84e292ec898354bb3453e043f5",
+    "record-j72-idle35.py": "9db0e1116c0179fea6ec1f172a556e61884e56ad48d2bf25c7c9ba275d8974c8",
+    "run-j72-observation35.py": "1539e9edaa18ea1aad39453bbc7a023dc8fc4d26aeba145eff2268bc29d0a7a2",
+    "test-j72-observation35.py": "99666ab03279d8b38386df59ba55fa24655a4c65449211a03da26d11139aeaa8"
+  }
+}

@@ -92,5 +92,11 @@
   "existing_recovery_capsule_modified": false,
   "native_ios_query_helper_device_result": "IOS-QUERY-RESULT.json",
   "fresh_minimum_query_status": 0,
-  "fresh_minimum_bytes": 126357602304
+  "fresh_minimum_bytes": 126357602304,
+  "host_regular_file_stream_write_fsync_full_readback_pass": true,
+  "host_regular_file_image_bytes": 1610612736,
+  "host_io_failure_test_methods_pass": 9,
+  "total_storage_model_and_io_test_methods_pass": 44,
+  "native_ios_writer_qualified": false,
+  "scratch_ram_apfs_trial_ready": false
 }

@@ -1,7 +1,33 @@
+# 2 November overnight: next-session preparation completed on the host
+
+The owner is charging in iOS; the iPad was not contacted during this preparation.
+A new disposable host file passes the proposed ordered GPT writes and full
+1.5 GiB image stream, host fsync, exact metadata/full-image readback and outside
+fences. Nine new I/O failure tests bring the storage test total to 44; APFS size
+is simulated and native resize/writes/flash durability remain unqualified.
+
+A bounded observation supervisor passes 12 host tests, including real process-group
+cleanup, SIGTERM handling and whole-body identity-guard coverage. It reads touch
+health through pinned Wi-Fi while the original charge watcher retains the USB
+source lease. Original charging policy, kernel and measured boot artifacts stay
+unchanged. A read-only idle recorder is prepared but device untested.
+
+The next boot should measure idle consumption with ASP absent/present **before**
+loading charging; the storage probe's existing guard otherwise requires another
+boot. Then observe a fixed-workload session with storage active. Fully charged
+battery/voltage limits can delay the charging measurement; use that period for
+ordinary input/idle checks. Exact-stock RAM/APFS tools were found offline, and
+a guarded scratch experiment is designed but not built or ready to run.
+
+[Next-session plan](NEXT-SESSION-PLAN.md), [power plan](POWER-COMPLETION-PLAN.md),
+[scratch APFS design](RAM-APFS-REHEARSAL-PLAN.md).
+
+## Earlier checkpoint
+
 # 2 November: hour result, touch endurance and fresh iOS storage queries
 
 The #35 charging hour completed with independent baseline restoration but
-**net loss 97.30mAh** after a 38.1°C thermal hold; no thermal restart was observed.
+**net loss 97.30 mAh** after a 38.1°C thermal hold; no thermal restart was observed.
 The continuous touch worker stopped on its seventh cumulative recovery after
 120,300 input frames. Physical restoration was reported successful; the touch
 session/cleanup API failed and the normal wrapper refused it. Remaining radio

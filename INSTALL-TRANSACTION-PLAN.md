@@ -30,6 +30,24 @@ blocks, 1MiB read/write transfer limits, media-writable capability and unchanged
 not writer, resize or durability qualification.
 [Device query result](code/storage/native-root-preparation/IOS-QUERY-RESULT.json).
 
+## New host I/O rehearsal and qualification boundary
+
+A new disposable host disk now rehearses the actual ordered GPT writes and
+1.5 GiB image stream, with host fsync, exact metadata/full-image readback and
+outside-fence sentinels. Nine I/O failure tests bring the storage model/I/O total
+to 44 methods. This exercises host regular-file mechanics; APFS size is simulated,
+and no native iOS writer, actual resize or flash durability is qualified.
+[Result](code/storage/native-root-preparation/HOST-WRITE-RESULT.json).
+
+The first internal operation will remain an explicit reviewed trial. Host and
+potential RAM scratch tests cannot prove the first encrypted internal shrink in
+advance. Complete the engineering/recovery review, disclose that uncertainty,
+and obtain the exact write authorization before that trial. No trial is ready
+or requested by the new host preparation.
+
+See [the batched session plan](NEXT-SESSION-PLAN.md) and
+[proposed RAM APFS rehearsal](RAM-APFS-REHEARSAL-PLAN.md).
+
 ## Conditional layout for review
 
 All disk LBAs below are **4096-byte logical blocks**. DM table sectors are

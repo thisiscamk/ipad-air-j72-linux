@@ -1,0 +1,42 @@
+{
+  "status": "HOST_REGULAR_FILE_STREAM_FLUSH_READBACK_PASS",
+  "model_apfs_size_only": true,
+  "apfs_resize_executed": false,
+  "ipad_contacted": false,
+  "internal_storage_writes": false,
+  "native_ios_writer_qualified": false,
+  "power_loss_durability_tested": false,
+  "image_bytes": 1610612736,
+  "ordered_metadata_steps": [
+    {
+      "step": "backup_entries",
+      "host_fsync_and_exact_readback": true
+    },
+    {
+      "step": "backup_header",
+      "host_fsync_and_exact_readback": true
+    },
+    {
+      "step": "primary_entries",
+      "host_fsync_and_exact_readback": true
+    },
+    {
+      "step": "primary_header",
+      "host_fsync_and_exact_readback": true
+    }
+  ],
+  "sequential_image_and_full_hash_pass": true,
+  "outside_fences_unchanged": true,
+  "automatic_resume_or_repair": false,
+  "approval_ready": false,
+  "elapsed_stream_and_readback_s": 32.343,
+  "host_kernel_unchanged": true,
+  "source_stream_hash_matches": true,
+  "source_image_identity_size_mtime_unchanged": true,
+  "io_failure_test_methods_pass": 9,
+  "logical_block_bytes": 4096,
+  "chunk_bytes": 1048576,
+  "original_gpt_input_unchanged": true,
+  "disposable_host_file_removed": true,
+  "total_storage_model_and_io_test_methods_pass": 44
+}

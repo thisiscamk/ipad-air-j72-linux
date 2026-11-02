@@ -1,3 +1,26 @@
+# Overnight preparation: actual host write rehearsal passes
+
+A new disposable host file now exercises the proposed backup-before-primary
+GPT order, followed by the full 1.5 GiB image stream, host fsync, exact metadata/
+full-image hash readback and outside-extent sentinels. The original image/kernel
+stay unchanged and the disposable file is removed afterward. Nine new I/O
+failure tests cover short writes, interrupted writes, flush failure, fence/order
+refusals and incomplete images;44 storage model/I/O test methods pass in total.
+
+APFS size is a simulated input in this host rehearsal. It does not create or
+resize APFS, contact the iPad, or qualify native iOS writes/flash durability.
+There is no automatic repair/resume or approval interface.
+[Measured result](HOST-WRITE-RESULT.json),
+[host I/O implementation](../j72_host_write_rehearsal.py),
+[failure tests](../test_j72_host_write_rehearsal.py),
+[workspace driver reference](rehearse-j72-stream-write.py).
+
+[Next batched session](../../../NEXT-SESSION-PLAN.md),
+[proposed RAM APFS experiment](../../../RAM-APFS-REHEARSAL-PLAN.md).
+The owner is charging overnight; no device action is pending.
+
+## Earlier checkpoint
+
 # Current: normal-iOS read-only capability queries pass
 
 The owner reapplied Amethyst after the power test. Exact-device root SSH and

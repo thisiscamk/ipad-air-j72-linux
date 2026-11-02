@@ -1,8 +1,30 @@
+# Owner charging overnight; next session prepared
+
+No DFU or device action is pending during the charging break.
+[The next-session runbook](NEXT-SESSION-PLAN.md) batches:
+
+- [x] New touch recovery-window module built and host-tested.
+- [x] Bounded input/power supervisor:12 host tests and preflight pass; device untested.
+- [x] Read-only idle recorder prepared; compare ASP absent/present before charging is loaded.
+- [x] Full1.5 GiB host image write/flush/readback rehearsal;44 storage tests pass.
+- [x] Exact-stock RAM/APFS tools found offline; guarded scratch design documented.
+- [ ] Owner returns: direct-Pi DFU, new touch self-check and desktop verification.
+- [ ] Same boot: idle/storage-read/idle comparisons, then qualified-hub power observation.
+- [ ] Native resize/writer/recovery implementation and exact first-trial review.
+- [ ] Separately approved installation, then first internal read-only base boot.
+- [ ] Later persistence, autonomous charging and PC-free startup.
+
+The 4–6 DFU forecast is a conditional planning allowance for the first internal
+read-only desktop, not a cap or a promise of writable persistence. No internal
+write or installation is authorized. The scratch experiment is not built/ready.
+
+## Earlier checkpoint
+
 # Current: iOS inspection complete; no new DFU needed yet
 
 - [x] Combined #35 desktop, Wi-Fi, input, native read checks and mounted cleanup.
 - [x] One-hour charging observation and independent input-limit restoration.
-- [ ] Sustained net charge at normal brightness: latest hour lost 97.30mAh.
+- [ ] Sustained net charge at normal brightness: latest hour lost 97.30 mAh.
 - [ ] Thermal cooldown/restart: guard held at 38.1°C, restart not observed.
 - [x] Build/test a separate bounded recovery-window touch candidate.
 - [ ] Next changed RAM session: stage candidate, self-check, then long input/power observation.
