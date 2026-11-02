@@ -81,12 +81,20 @@ controller off and independently restored register `0x04c0` to `0x02` within
 2.27 seconds. Renewing the lease alone did not restart it. Fresh explicit
 requalification followed by a separate start opened another charging window.
 That window paused automatically at the voltage limit, then stayed off in its
-cooldown hold. The desktop/Wi-Fi observation continues at brightness 1203/2047.
+cooldown hold. The one-hour desktop/Wi-Fi observation is now complete.
 
-Still to measure: automatic restart after the cooldown hold, completion of
-the longer observation and its final independent restoration. A one-hour
-wall clock is not one hour charging. Do not infer all-day/overnight safety or
-standalone charging from these bounded tests.
+The controller completed 3600.6 seconds without a fault and independently
+restored the original limit at the end. Its second charging window lasted
+about 836.7 seconds (14 minutes), with 555 settled readings +199..+378 mA
+and an initial negative transient. Temperature peaked at 37.2 C. It paused at
+4.201 V, then remained in the cooldown hold. Brightness started at 1203/2047,
+was temporarily reduced to 401 during cooldown, and was restored to 1604
+after the test.
+
+Automatic cooldown restart remains unobserved: the pack stayed near 37.1 C,
+above the candidate's 36.5 C restart threshold. A one-hour controller
+observation is not one hour charging, and this run does not qualify net charge
+gain over an hour, all-day/overnight operation or standalone source detection.
 
 ## Orchard reuse
 

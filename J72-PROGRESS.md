@@ -1,3 +1,16 @@
+## 2 November: one-hour controller observation complete; storage image ready
+
+A 3600.6-second controller observation completed without faults and with final
+independent restoration. About 14 minutes were active charging (+199..+378 mA
+across 555 settled readings, initial transient negative); the rest was spent in
+voltage/cool holds. Peak temperature was 37.2 C. Automatic cooldown restart was
+not observed because the pack remained above the 36.5 C restart threshold.
+This is not continuous or unattended charging qualification.
+
+The #35 read-only storage observer is fully built and pinned, with 307 source
+checks and matching recovery modules. Hardware storage access is untested.
+No internal write or installation has been performed.
+
 ## 2 November: active charging lease and hold results
 
 The new maintenance controller started charging automatically after its full-pack

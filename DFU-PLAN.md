@@ -8,7 +8,8 @@
 - [x] Build/load the new maintenance controller disabled; direct Pi source refusal passes.
 - [x] Observe full-pack hold, held-source lease loss, fault latch and explicit requalification.
 - [x] Observe positive charging, active-source lease withdrawal/restoration in 2.27 seconds, explicit restart and automatic voltage/cool holds.
-- [ ] Complete the longer observation, automatic cooldown resume and final independent restoration.
+- [x] Complete 3600.6 seconds of controller observation without faults and independently verify final restoration.
+- [ ] Qualify automatic cooldown restart and sustained net charge gain; native source detection remains open.
 - [x] Build and pin the isolated #35 recovery-only storage image; 307 host cases and matching module imports pass.
 - [ ] Next DFU: check live firmware reservation, then explicitly qualify Identify and bounded read-only storage access.
 - [ ] Capture fresh layout, qualify safe space creation and native root, then review exact install changes.
