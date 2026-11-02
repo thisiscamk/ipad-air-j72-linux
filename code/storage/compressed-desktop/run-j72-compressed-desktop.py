@@ -73,7 +73,7 @@ def main():
  for name,target in [('squashfs.ko','/opt/j72-compressed/squashfs.ko'),('autostart','/opt/j72-compressed/autostart'),('controller.sh','/sbin/j72-compressed-desktop-session')]:uploader.upload(c,host,WORK/name,target)
  c('chmod 755 /opt/j72-compressed/autostart /sbin/j72-compressed-desktop-session; busybox sh -n /sbin/j72-compressed-desktop-session; insmod /opt/j72-compressed/squashfs.ko; busybox grep -q squashfs /proc/filesystems',10)
  with (out/'qemu-nbd.log').open('wb') as log:
-  server=subprocess.Popen(['qemu-nbd','--read-only','--format=raw','--bind=10.0.0.1','--port=10831','--persistent',m['image']],stdin=subprocess.DEVNULL,stdout=log,stderr=log,start_new_session=True)
+  server=subprocess.Popen(['qemu-nbd','--read-only','--format=raw','--bind=10.0.0.1','--port','10831','--persistent',m['image']],stdin=subprocess.DEVNULL,stdout=log,stderr=log,start_new_session=True)
   record={'pid':server.pid,'start_ticks':int(Path('/proc',str(server.pid),'stat').read_text().split()[21]),'image_sha256':m['image_sha256']}
   PIDFILE.write_text(json.dumps(record)+'\n');time.sleep(.3)
   if server.poll() is not None:raise RuntimeError('Read-only export exited; inspect private log')

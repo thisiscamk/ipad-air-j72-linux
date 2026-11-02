@@ -77,7 +77,9 @@ sudo -n python3 tools/prepare-j72-compressed-desktop.py
 sudo -n python3 tools/run-j72-compressed-desktop.py
 ```
 
-Current cold-image validation and shell-syntax checks pass. Device module load,
+Current cold-image validation and shell-syntax checks pass. An actual read-only
+loopback export also passed process-identity, virtual-size and cleanup checks.
+Device module load,
 SquashFS/NBD rendering, memory use, input/keyboard and cleanup await the next
 DFU. Native storage reads/root, approved space creation, write/flush durability,
 persistent overlays and sustained unattended charging remain later gates.

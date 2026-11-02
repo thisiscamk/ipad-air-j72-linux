@@ -27,5 +27,13 @@
   },
   "usb_desktop_test_prepared": true,
   "usb_desktop_test_run": false,
-  "internal_install_authorized": false
+  "internal_install_authorized": false,
+  "actual_loopback_export": {
+    "status": "PASS",
+    "pid_identity": true,
+    "nbd_virtual_size": true,
+    "read_only": true,
+    "owned_group_cleanup": true,
+    "device_access": false
+  }
 }
