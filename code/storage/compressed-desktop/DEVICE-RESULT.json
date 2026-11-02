@@ -1,0 +1,26 @@
+{
+  "date": "2026-11-02",
+  "profile": "j72-compressed-desktop34-v1",
+  "device": "iPad4,2 / J72AP",
+  "kernel_build": "#34 SMP PREEMPT Sun Nov  1 07:40:27 +08 2026",
+  "boot": "PASS proven direct-Pi Pongo and RAM Linux",
+  "module_load": "PASS exact matched SquashFS module",
+  "desktop_ready_marker": true,
+  "root_filesystem": "squashfs",
+  "root_read_only": true,
+  "nbd_read_only": true,
+  "nbd_sectors_512": 1117192,
+  "image_bytes": 572002304,
+  "mem_available_kib_post_start": 535568,
+  "swap_total_kib": 0,
+  "owner_ui_check": "PENDING",
+  "normal_unmount_and_export_cleanup": "PENDING",
+  "internal_storage_access": false,
+  "charging_controller_started": false,
+  "usb_export_still_required": true,
+  "limitations": [
+    "Startup is not proof of owner-visible rendering or keyboard behavior.",
+    "No local installation, persistence, resize or snapshot mutation.",
+    "Touch firmware health is assessed during normal cleanup, not while the input worker is active."
+  ]
+}

@@ -1,4 +1,4 @@
-# 2 November: read-only RAM recovery passes; compressed-root route prepared
+# 2 November: RAM recovery passes; compressed desktop starts on device
 
 RAM recovery now passes SSH authentication, HFS/md0 device identity, zero APFS
 mounts and both GPT copies/CRCs. The actual mount source is `root_device`. The
@@ -9,9 +9,11 @@ or internal write occurred. Normal iOS return is confirmed; battery reports 99%.
 A private compressed copy of the desktop is 572,002,304 bytes. Five selected
 file readbacks pass. Matching #34/#35 SquashFS modules build; 106 strong imports
 resolve to vmlinux, with the original kernels/configs/exports unchanged.
-The prepared next DFU tests the compressed desktop via read-only USB NBD on the
-proven #34 RAM boot. It cannot access the internal disk; keep the cable until
-normal desktop unmount and export cleanup. Device GUI checks are still pending.
+The compressed desktop now reports ready on the proven #34 RAM boot. The
+matched SquashFS module loaded; the read-only NBD block size and SquashFS mount
+checks pass. A post-start sample has 535,568 KiB memory available and no swap.
+Owner GUI checks and normal cleanup are pending; keep the cable/export attached.
+This test does not access the internal disk.
 
 A 1536 MiB partition is a candidate within the reported minimum, subject to a
 reviewed resize/write procedure. The compressed base may avoid snapshot removal

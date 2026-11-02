@@ -1,7 +1,8 @@
-# Compressed J72 desktop — offline candidate
+# Compressed J72 desktop — first device startup passes
 
-**Capacity and build checks pass; the iPad desktop test is next. No internal
-storage has been changed.** This follows the [passing RAM recovery inspection](../ios12-pongo-handoff/).
+**The exact #34 module loads and the compressed desktop reports ready on the
+iPad. Owner UI checks and cleanup are pending. No internal storage has been
+changed.** This follows the [passing RAM recovery inspection](../ios12-pongo-handoff/).
 
 ## Why test this
 
@@ -17,7 +18,7 @@ A conditional 1536 MiB Linux partition could hold this base with space left for
 filesystem metadata and a future overlay. An actual shrink remains unqualified
 and requires separate approval. [Capacity/layout review](../../../SPACE-CREATION-REVIEW.md).
 
-## Next DFU: desktop-format qualification only
+## Device test: desktop-format qualification only
 
 Use the proven **#34** Wi-Fi/RAM boot. The new filesystem module was built
 against that exact kernel configuration/headers; all 106 strong imports resolve
@@ -79,9 +80,12 @@ sudo -n python3 tools/run-j72-compressed-desktop.py
 
 Current cold-image validation and shell-syntax checks pass. An actual read-only
 loopback export also passed process-identity, virtual-size and cleanup checks.
-Device module load,
-SquashFS/NBD rendering, memory use, input/keyboard and cleanup await the next
-DFU. Native storage reads/root, approved space creation, write/flush durability,
+The first device startup passes module load, exact read-only NBD size and
+SquashFS mount checks. Available memory was 535,568 KiB in a post-start sample
+with no swap. Owner rendering/menu/keyboard verification and normal cleanup
+are pending; the USB export remains attached for that check.
+[Sanitized device result](DEVICE-RESULT.json). Native storage reads/root,
+approved space creation, write/flush durability,
 persistent overlays and sustained unattended charging remain later gates.
 
 Authored host/shell code is MIT. The private filesystem module is built from
