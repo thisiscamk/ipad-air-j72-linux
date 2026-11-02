@@ -1,3 +1,22 @@
+# Latest 2 November: net charging and voltage restart pass
+
+A full-hour Pi-supervised desktop/Wi-Fi observation gained 82% → 88% on the
+qualified powered hub. Gauge integration across both charging and holds gives
+about +134.65 mAh. Three automatic voltage-hold restarts passed; no controller
+fault occurred, peak pack temperature was 34.3 C, and independent final baseline
+restoration passed. Brightness was temporarily reduced and then restored.
+This does not qualify unattended charging or general charger detection.
+[Measured power evidence](code/charging/maintain34/).
+
+The next #35 candidate combines native read-only storage with matched desktop,
+touch, Wi-Fi and SquashFS modules. A 1536 MiB ext4 host container holding the
+compressed base passes capacity/read-only verification and cleanup. The combined
+payload and its USB container-desktop rehearsal are **device untested**. No
+internal writes are authorized or performed. [Next DFU](DFU-PLAN.md),
+[candidate source](code/storage/desktop-storage35/).
+
+## Previous checkpoint
+
 # 2 November: RAM recovery passes; compressed desktop starts on device
 
 RAM recovery now passes SSH authentication, HFS/md0 device identity, zero APFS

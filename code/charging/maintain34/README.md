@@ -1,6 +1,30 @@
+# Latest follow-up: net charge gain and automatic voltage restart pass
+
+A second **3600.774-second** desktop/Wi-Fi observation completed on the same
+qualified JCH377 port. The gauge rose **82% → 88%**. Integrating 1704 fresh gauge
+vectors across active charging **and protective holds** gives about **+134.65 mAh**
+(net mean **+134.71 mA**, 3598.466 seconds coverage; longest gap 2.216 seconds).
+This is a gauge-based estimate, not an external USB power-meter measurement.
+
+Three automatic restarts followed voltage holds, without host re-arming.
+The first hold at 4.201 V independently restored `0x04c0=0x02`; charging resumed
+at 4.099 V. Four charging cycles occurred. Peak pack temperature was **34.3 C**;
+no controller fault occurred, and final independent baseline restoration passed.
+Brightness was temporarily reduced from 1604 to 401 during the observation and
+restored to 1604 afterward. These results therefore do not establish the same
+net gain at constant full desktop brightness.
+
+[Sanitized measurements](RESULT.json), [analysis source](analyze-maintenance.py).
+The analyzer includes discharge during holds rather than counting only positive
+samples. Thermal cooldown restart remains unobserved. Source qualification still
+requires the Pi's 2.5-second lease. **Standalone or overnight charging is not yet
+qualified.** Desktop/touch/network/provider cleanup also passed after this run.
+
+## Earlier implementation and observations
+
 # Opt-in J72 charging maintenance candidate
 
-2 November 2026. **Live observation is in progress. This is not unattended
+2 November 2026. **Bounded live observations are complete. This is not unattended
 charging qualification or general charger detection.** [Measured status](RESULT.json).
 
 The old diagnostic worker ended after one session or a battery guard. This

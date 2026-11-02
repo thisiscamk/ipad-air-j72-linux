@@ -10,6 +10,8 @@ Read the [progress report](J72-PROGRESS.md) for measured results and current lim
 
 **Compressed desktop starts on device:** the 572 MB image reports ready on the proven #34 RAM boot. The owner confirmed the initial UI and a same-boot restart with Wi-Fi, menu and keyboard. HTTPS and Wi-Fi SSH pass. Both cleanups pass; the export is detached and the RAM desktop restored for power testing. No internal storage was changed. A conditional 1536 MiB layout could retain the rollback snapshot; actual resizing and installation remain unapproved and unqualified. [Candidate/source](code/storage/compressed-desktop/), [space review](SPACE-CREATION-REVIEW.md).
 
+**Next storage test is prepared:** a combined #35 payload retains the proven storage kernel/loader and adds matching desktop, input, radio and SquashFS modules. A 1536 MiB ext4 host container with the compressed base passes read-only fsck, mount/readback and cleanup. The combined device boot and USB container-format rehearsal are not yet tested. [Source and runbook](code/storage/desktop-storage35/).
+
 The desktop uses software rendering. The qualified unplugged configuration has a reduced Arch Linux ARM filesystem resident in RAM; the current compressed-root test reads its base from the Pi over USB. Native multitouch now reaches Linux input, and the owner has confirmed full-screen touch mapping with a visual target test. This repository is a place to share reviewed notes while J72 support is developed; a focused hardware implementation may later be proposed to [OrchardLinux/orchard](https://github.com/OrchardLinux/orchard).
 
 **Unplugged desktop now works:** after detaching the NBD disk and stopping the
@@ -25,7 +27,7 @@ time-weighted mean +306.965 mA) and independently verified restoration.
 Touch, keyboard and Wi-Fi were active; brightness was 1203/2047. An earlier
 five-minute interactive run averaged+211.332 mA with one brief negative
 sample. [Working worker, retry tests and limits](code/charging/wifi34-refresh/).
-A subsequent one-hour controller observation completed without faults, including about 14 minutes of active charging before voltage/temperature holds and independent restoration. Automatic cooldown restart, autonomous source policy and sustained net charge gain remain open.
+A follow-up one-hour observation gained 82% → 88%, with an estimated net +134.65 mAh across charging and protective holds. Three automatic voltage-hold restarts and final baseline restoration pass. Brightness was temporarily reduced. Thermal cooldown restart, autonomous source policy and unattended endurance remain open. [Measurements and controller source](code/charging/maintain34/).
 
 **Wi-Fi now works:** firmware startup, scanning, WPA2 association, DHCP, DNS, Wi-Fi-bound HTTPS and pinned-key SSH pass on J72. Disconnect/reconnect and explicit DHCP renewal also pass. The owner confirmed touch, keyboard and brighter desktop with Wi-Fi active; a new Wi-Fi status icon is installed. [Actual driver/provider source and limits](code/wifi/usb-hsic/). Full provider cleanup now passes with independent hardware readback and both USB recovery shells responding. Sustained traffic and repeated cold startup remain open; the reduced RAM desktop now works unplugged.
 

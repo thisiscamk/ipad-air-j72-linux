@@ -1,13 +1,15 @@
 {
-  "status": "DEVICE_UI_WIFI_RESUME_AND_BOTH_CLEANUPS_PASS_RAM_DESKTOP_RESTORED",
+  "status": "MEASURED_34_RUNNER_PRESERVED_NEW_35_SELECTORS_DEVICE_UNTESTED",
   "source_hashes": {
-    "DEVICE-RESULT.json": "aa463c31ad573476c93b8ea872f862208900e48fc66ce986c9e9dfe2bdee06b1",
-    "README.md": "acd60db2c97d4c7f8b9e274f484bd9f455f8374cbe7af048a646c534f132c90b",
-    "RESULT.json": "a39599f5102d0fed3a2bf6f9b2a37574bf5d92ee2875485699324ebbadebc837",
-    "autostart-example.sh": "360031e29690fef576ee0dac5f9ffd941816e7d07cd1034b3e805b9fa6f45f4b",
     "controller-example.sh": "80d5a80474d4a7d8807acf666328ed7bd1f3934ac645c9ca764491e378d5a2c8",
-    "prepare-j72-compressed-desktop.py": "985b43480862781c54c2650667688f522de1bade148b8741a408494953bb39ab",
+    "RESULT.json": "a39599f5102d0fed3a2bf6f9b2a37574bf5d92ee2875485699324ebbadebc837",
+    "README.md": "d10c3cd3edc7a5a65249a79ed1ccea1a175a6e2f075504d78c142793a20aef2c",
     "prepare-j72-compressed-root.py": "49f23019f085d8fe89872e8f557b6e19b125072a38132732224b95e0458609d2",
-    "run-j72-compressed-desktop.py": "8b17188c25bdce68180c3d8385ef3a8a7e05a6a78ea89f6298152ce057a91408"
-  }
+    "run-j72-compressed-desktop.py": "a4a3f51db1c4ba39f010179a4784559ea4350071ff6127b1827274442ac281e6",
+    "prepare-j72-compressed-desktop.py": "985b43480862781c54c2650667688f522de1bade148b8741a408494953bb39ab",
+    "DEVICE-RESULT.json": "aa463c31ad573476c93b8ea872f862208900e48fc66ce986c9e9dfe2bdee06b1",
+    "autostart-example.sh": "360031e29690fef576ee0dac5f9ffd941816e7d07cd1034b3e805b9fa6f45f4b",
+    "tested34-runner.py": "8b17188c25bdce68180c3d8385ef3a8a7e05a6a78ea89f6298152ce057a91408"
+  },
+  "tested34_runner_sha256": "8b17188c25bdce68180c3d8385ef3a8a7e05a6a78ea89f6298152ce057a91408"
 }

@@ -13,15 +13,18 @@ def sha(p):
  return h.hexdigest()
 def load(name,file):
  s=importlib.util.spec_from_file_location(name,ROOT/'tools'/file);m=importlib.util.module_from_spec(s);s.loader.exec_module(m);return m
-def preflight():
+def preflight(storage35=False,container35=False):
  m=json.loads((WORK/'manifest.json').read_text())
- if m['profile']!='j72-compressed-desktop34-v1' or m['internal_storage_access'] or not m['nbd_read_only'] or m['nbd_device']!='/dev/nbd2' or m['nbd_port']!=10831:raise RuntimeError('Wrong compressed desktop profile')
- if m['kernel_build']!='#34 SMP PREEMPT Sun Nov  1 07:40:27 +08 2026':raise RuntimeError('Wrong kernel build')
+ profile='j72-container-desktop35-v1' if container35 else ('j72-compressed-desktop35-v1' if storage35 else 'j72-compressed-desktop34-v1')
+ version='#35 SMP PREEMPT Mon Nov 2 07:00:00 +08 2026' if storage35 else '#34 SMP PREEMPT Sun Nov  1 07:40:27 +08 2026'
+ if m['profile']!=profile or m['internal_storage_access'] or not m['nbd_read_only'] or m['nbd_device']!='/dev/nbd2' or m['nbd_port']!=(10832 if container35 else 10831):raise RuntimeError('Wrong compressed desktop profile')
+ if m['kernel_build']!=version:raise RuntimeError('Wrong kernel build')
+ if storage35:load('storage35','j72-desktop-storage35-host.py').preflight(verify_desktop=False)
  for group in ['files','base_kernel_files']:
   for name,digest in m[group].items():
    if sha(ROOT/name)!=digest:raise RuntimeError('Compressed test source/input changed: '+name)
  if sha(Path(m['boot_payload']))!=m['boot_payload_sha256']:raise RuntimeError('Proven boot payload changed')
- print('PASS offline: compressed image/module/controller/source and exact proven #34 kernel pins; no device access',flush=True)
+ print('PASS offline: compressed image/module/controller/source and selected exact kernel pins; no device access',flush=True)
  return m
 def export_pid(m):
  if not PIDFILE.exists():return None
@@ -29,7 +32,7 @@ def export_pid(m):
  if not p.exists():return None
  args=(p/'cmdline').read_bytes().split(b'\0')
  if p.stat().st_uid!=os.geteuid() or os.getpgid(pid)!=pid or int((p/'stat').read_text().split()[21])!=record['start_ticks']:raise RuntimeError('Stale export process identity')
- if not args or Path(os.fsdecode(args[0])).name!='qemu-nbd' or os.fsencode(m['image']) not in args or b'--read-only' not in args or b'10831' not in args:raise RuntimeError('Export process does not match this candidate')
+ if not args or Path(os.fsdecode(args[0])).name!='qemu-nbd' or os.fsencode(m['image']) not in args or b'--read-only' not in args or str(m['nbd_port']).encode() not in args:raise RuntimeError('Export process does not match this candidate')
  return pid
 def configure_usb():
  found=[]
@@ -44,8 +47,11 @@ def configure_usb():
  subprocess.run(['ip','addr','replace','10.0.0.1/24','dev',found[0]],check=True,timeout=5)
  subprocess.run(['ip','link','set',found[0],'up'],check=True,timeout=5)
 def main():
- p=argparse.ArgumentParser(description=__doc__);g=p.add_mutually_exclusive_group();g.add_argument('--run',action='store_true');g.add_argument('--resume',action='store_true',help='Restart previously staged, normally stopped compressed desktop in the same RAM boot');g.add_argument('--stop',action='store_true');a=p.parse_args()
- os.umask(0o077);m=preflight()
+ global WORK,PIDFILE
+ p=argparse.ArgumentParser(description=__doc__);selector=p.add_mutually_exclusive_group();selector.add_argument('--storage35',action='store_true',help='Require the separately pinned combined #35 image');selector.add_argument('--container35',action='store_true',help='Test the local-root container format read-only over USB on exact #35');g=p.add_mutually_exclusive_group();g.add_argument('--run',action='store_true');g.add_argument('--resume',action='store_true',help='Restart previously staged, normally stopped compressed desktop in the same RAM boot');g.add_argument('--stop',action='store_true');a=p.parse_args()
+ if a.storage35 or a.container35:
+  WORK=ROOT/'private/j72-platform/power-storage-20261102/desktop-storage35'/('container-desktop' if a.container35 else 'compressed-desktop');PIDFILE=WORK/'export.json'
+ os.umask(0o077);m=preflight(a.storage35 or a.container35,a.container35)
  if not(a.run or a.resume or a.stop):return
  if os.geteuid()!=0:raise RuntimeError('Use sudo for this private image/export and USB setup')
  configure_usb();host=load('network_host','j72-wifi-host.py');raw=load('locked_shell','run-j72-input-limit-hub1050-desktop.py').locked_ram(host.ram())
@@ -56,6 +62,7 @@ def main():
  if a.stop:
   (out/'target-stop.txt').write_bytes(c('/sbin/j72-compressed-desktop-session stop; /sbin/j72-touch-session stop',40))
   c('test "$(cat /sys/block/nbd2/size)" = 0; ! busybox grep -q " /mnt/omarchy " /proc/mounts; test "$(cat /sys/module/j72_touch_session/parameters/cleanup_ok)" = Y',5)
+  if a.container35:c('! busybox grep -q " /mnt/j72-store " /proc/mounts; test ! -e /run/j72/container-loop',4)
   pid=export_pid(m)
   if pid:
    os.killpg(pid,signal.SIGTERM);deadline=time.monotonic()+5
@@ -79,7 +86,7 @@ def main():
  available=int(c('busybox grep MemAvailable /proc/meminfo',4).split()[1])*1024
  if available<256*1024**2:raise RuntimeError('Insufficient RAM headroom before desktop')
  if export_pid(m):raise RuntimeError('This export is already running; inspect/stop it first')
- with socket.socket() as sock:sock.bind(('10.0.0.1',10831))
+ with socket.socket() as sock:sock.bind(('10.0.0.1',m['nbd_port']))
  if not a.resume:
   c('mkdir -m 700 /opt/j72-compressed',4)
   uploader=load('uploader','run-j72-wlan-enumeration-v2.py')
@@ -87,7 +94,7 @@ def main():
   c('chmod 755 /opt/j72-compressed/autostart /sbin/j72-compressed-desktop-session; busybox sh -n /sbin/j72-compressed-desktop-session; insmod /opt/j72-compressed/squashfs.ko',10)
  c('busybox grep -q squashfs /proc/filesystems',4)
  with (out/'qemu-nbd.log').open('wb') as log:
-  server=subprocess.Popen(['qemu-nbd','--read-only','--format=raw','--bind=10.0.0.1','--port','10831','--persistent',m['image']],stdin=subprocess.DEVNULL,stdout=log,stderr=log,start_new_session=True)
+  server=subprocess.Popen(['qemu-nbd','--read-only','--format=raw','--bind=10.0.0.1','--port',str(m['nbd_port']),'--persistent',m['image']],stdin=subprocess.DEVNULL,stdout=log,stderr=log,start_new_session=True)
   record={'pid':server.pid,'start_ticks':int(Path('/proc',str(server.pid),'stat').read_text().split()[21]),'image_sha256':m['image_sha256']}
   PIDFILE.write_text(json.dumps(record)+'\n');time.sleep(.3)
   if server.poll() is not None:raise RuntimeError('Read-only export exited; inspect private log')

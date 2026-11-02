@@ -1,3 +1,15 @@
+# Latest host filesystem rehearsal
+
+The conditional 1536 MiB budget now has an actual **host-file ext4 rehearsal**:
+572,002,304-byte compressed base, read-only fsck/mount/readback and normal cleanup
+pass. Free after the first base: 958,230,528 bytes; after an equal second base:
+386,228,224 bytes. State is empty; no persistent overlay is enabled.
+The matched #35 USB container-format desktop candidate is prepared but device
+untested. **No APFS shrink, partition-table write or installation occurred.**
+[Source and results](code/storage/desktop-storage35/).
+
+## Previous measurements and conditional layout
+
 # Storage space review after the passing RAM recovery test
 
 Prepared 2 November 2026. **Offline design; no snapshot or storage changes are authorized.**

@@ -2,7 +2,7 @@
   "date": "2026-11-02",
   "kernel_release": "7.0.12-j72spi2",
   "uts_version": "#34 SMP PREEMPT Sun Nov  1 07:40:27 +08 2026",
-  "status": "BOUNDED ONE-HOUR CONTROLLER OBSERVATION COMPLETE; unattended charging not qualified",
+  "status": "TWO BOUNDED ONE-HOUR OBSERVATIONS COMPLETE; latest net gain and automatic voltage restart pass; unattended charging not qualified",
   "host_core_ubsan_scenarios": 35,
   "exact_kernel_build_and_strong_imports_pass": true,
   "target_load_disabled_no_current_change": true,
@@ -15,7 +15,7 @@
   "renewed_lease_alone_did_not_restart": true,
   "explicit_requalification_remained_disabled": true,
   "positive_charging_cycle_observed_on_new_controller": true,
-  "hardware_restart_after_hold_tested": false,
+  "hardware_restart_after_hold_tested": true,
   "active_current_source_withdrawal_tested": true,
   "autonomous_source_detection": false,
   "internal_storage_changes": false,
@@ -47,5 +47,48 @@
   "brightness_initial": 1203,
   "brightness_during_later_cooldown": 401,
   "brightness_restored_after_test": 1604,
-  "full_hour_active_charging_tested": false
+  "full_hour_active_charging_tested": false,
+  "voltage_hold_restart_net_gain_followup": {
+    "status": "COMPLETE_FAULT_FREE_RESTORATION_PASS",
+    "observation_s": 3600.774,
+    "fresh_vectors": 1704,
+    "coverage_s": 3598.466,
+    "max_sample_gap_s": 2.216,
+    "time_weighted_current_uA": 134706.113,
+    "estimated_net_mAh_over_coverage": 134.648713,
+    "net_positive_50mA_margin": true,
+    "current_min_uA": -795000,
+    "current_max_uA": 466000,
+    "max_temperature_tenthC": 343,
+    "soc_first": 82,
+    "soc_last": 88,
+    "cycles": 4,
+    "pauses": 4,
+    "automatic_restarts": [
+      {
+        "host_elapsed_s": 2599.861,
+        "cycle": 2,
+        "soc": 87,
+        "temperature_tenthC": 332,
+        "voltage_uV": 4099000
+      },
+      {
+        "host_elapsed_s": 3066.864,
+        "cycle": 3,
+        "soc": 87,
+        "temperature_tenthC": 337,
+        "voltage_uV": 4100000
+      },
+      {
+        "host_elapsed_s": 3569.689,
+        "cycle": 4,
+        "soc": 88,
+        "temperature_tenthC": 342,
+        "voltage_uV": 4100000
+      }
+    ],
+    "final_input_limit_baseline": "02",
+    "source_scope": "Pi-supervised owner-qualified JCH377 only",
+    "unattended_or_general_charger_qualified": false
+  }
 }

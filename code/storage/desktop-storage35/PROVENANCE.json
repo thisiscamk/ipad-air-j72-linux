@@ -1,0 +1,67 @@
+{
+  "date": "2026-11-02",
+  "kind": "authored lab reference sources; private inputs and dependent workspace tools required",
+  "device_tested": false,
+  "sources": {
+    "prepare-j72-desktop-storage35-modules.py": {
+      "workspace_path": "tools/prepare-j72-desktop-storage35-modules.py",
+      "sha256": "d9a457ddda2f575f248792c8f89f6c067fc76f14cd9a6c7c67b3292559320f4f"
+    },
+    "prepare-j72-desktop-storage35.py": {
+      "workspace_path": "tools/prepare-j72-desktop-storage35.py",
+      "sha256": "7e33f75cd92045adeb963d73da1586dc8013860c7c7f355d0d6a6b44b9a856db"
+    },
+    "audit-j72-desktop-storage35.py": {
+      "workspace_path": "tools/audit-j72-desktop-storage35.py",
+      "sha256": "b32ee6d81104a394dedc3dfcf0d49ac125b3efcb867d99825123e218b297f53d"
+    },
+    "j72-desktop-storage35-host.py": {
+      "workspace_path": "tools/j72-desktop-storage35-host.py",
+      "sha256": "a264b4048bd488bb1051b2e46f70dc2dd6285168dcca3e0f8981639cd1b013eb"
+    },
+    "prepare-j72-compressed-desktop35.py": {
+      "workspace_path": "tools/prepare-j72-compressed-desktop35.py",
+      "sha256": "4db0c44afc9674e5f8e8eaa586162a9eec761fb4c9ba6fcb7b624035ee996fe8"
+    },
+    "prepare-j72-local-root-image.py": {
+      "workspace_path": "tools/prepare-j72-local-root-image.py",
+      "sha256": "12addd6c70dc4b269ff77cc4e47fbd60edb1e3c5dd81bd8af867bc05af7fd758"
+    },
+    "prepare-j72-container-desktop35.py": {
+      "workspace_path": "tools/prepare-j72-container-desktop35.py",
+      "sha256": "44879ddb1807ca80a303983838c878d6b5fa267c80ad56cb84707b071f28338a"
+    },
+    "run-j72-native35-readcheck.py": {
+      "workspace_path": "tools/run-j72-native35-readcheck.py",
+      "sha256": "6d4789fa62e10de183fa400227d37da404f3bcc3d461a65fd1b210a7999e8e9b"
+    },
+    "seal-j72-desktop-storage35.py": {
+      "workspace_path": "tools/seal-j72-desktop-storage35.py",
+      "sha256": "18f570d3d090ad2431bbfd1272f862e958491dc64bb814bbe3481ae8c4556420"
+    },
+    "run-j72-storage-observer.py": {
+      "workspace_path": "tools/run-j72-storage-observer.py",
+      "sha256": "465d585f59a7ec40c744bd6173a91dced8884431c12d8da7eaccf24ab0bc118a"
+    },
+    "run-j72-network.py": {
+      "workspace_path": "tools/run-j72-network.py",
+      "sha256": "400e681055e5062966bc4a60a3dcc23b52ab9f6d8c9a5e86af7b5f5eff3abad0"
+    },
+    "run-j72-wifi-v3.py": {
+      "workspace_path": "tools/run-j72-wifi-v3.py",
+      "sha256": "8fcffc32c72e5340a305688f8e40cf5aee960905fa624ee51e111eaac421658c"
+    },
+    "run-j72-ram-desktop.py": {
+      "workspace_path": "tools/run-j72-ram-desktop.py",
+      "sha256": "4822e96dac767bee19f173652a3e6abb9fe4c691094ac4f258a9bce2800b6de7"
+    },
+    "j72-pongo-pmic-boot.py": {
+      "workspace_path": "tools/j72-pongo-pmic-boot.py",
+      "sha256": "4e61151cea8c87687688b87f9ed629f38ae61e3179eaf99619e4e6b3afb510a3"
+    },
+    "../compressed-desktop/run-j72-compressed-desktop.py": {
+      "workspace_path": "tools/run-j72-compressed-desktop.py",
+      "sha256": "a4a3f51db1c4ba39f010179a4784559ea4350071ff6127b1827274442ac281e6"
+    }
+  }
+}

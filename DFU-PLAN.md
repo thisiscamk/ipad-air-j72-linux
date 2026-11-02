@@ -1,3 +1,27 @@
+# Current checkpoint: one-hour net charging pass; combined storage DFU prepared
+
+- [x] Owner confirms RAM desktop, Wi-Fi, menu, keyboard and charging icon on hub.
+- [x] Complete one-hour observation: 82% → 88%, estimated net +134.65 mAh.
+- [x] Observe three automatic voltage-hold restarts and fault-free final baseline restoration.
+- [x] Restore brightness to 1604; cleanly stop desktop, touch and WLAN provider.
+- [x] Build/audit matched #35 desktop/storage payload; original kernel/loader/DTB retained.
+- [x] Rehearse 1536 MiB ext4 + compressed-base format on host, read-only checks and cleanup pass.
+- [ ] Next changed DFU, direct Pi: qualify combined #35 boot/recovery/native reads.
+- [ ] Same boot: Wi-Fi, USB container-format desktop and concurrent native read checks; owner UI check.
+- [ ] Finalize bounded native mapping and exact resize/GPT/image-write/recovery proposal.
+- [ ] Obtain separate owner approval before internal writes; no install is currently authorized.
+- [ ] Install only after procedure qualification and verify image/map before booting.
+- [ ] Later changed DFU: local read-only root, Wi-Fi/input, clean USB detachment and unplugged use.
+- [ ] Qualify durable writes, persistence and update/recovery handling separately.
+- [ ] Finish thermal restart, autonomous source detection and longer charging endurance before unattended use.
+- [ ] Investigate on-device startup; Pi-assisted startup remains the interim route.
+
+The next DFU is a read-only rehearsal, not an installation. The count after that
+is conditional on native access, installation-method and recovery qualification.
+[Candidate and runbook](code/storage/desktop-storage35/).
+
+## Previous checklist
+
 # Current boot: compressed desktop qualified; RAM desktop ready for hub power test
 
 - [x] Qualify restricted RAM recovery: SSH, md0 root, no APFS mounts, GPT CRCs.

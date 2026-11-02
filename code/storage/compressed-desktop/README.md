@@ -106,3 +106,11 @@ persistent overlays and sustained unattended charging remain later gates.
 
 Authored host/shell code is MIT. The private filesystem module is built from
 Linux's GPL-2.0 source and is not redistributed here.
+
+## New explicit #35 selectors
+
+The current host runner additionally has `--storage35` and `--container35` modes
+for the [combined candidate](../desktop-storage35/). Those modes are device
+untested. The exact runner from the measured #34 Wi-Fi resume/cleanup checkpoint
+is preserved as [tested34-runner.py](tested34-runner.py); the shared runner's
+new selectors do not imply a completed #35 hardware test.

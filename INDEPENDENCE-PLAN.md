@@ -1,3 +1,16 @@
+# PC-free startup remains a separate milestone
+
+Internal Linux storage removes the runtime filesystem dependency on the Pi; it
+does not replace the current DFU launch. The first local-root milestone still
+uses the Pi to start Linux, then runs unplugged. An on-device route to research
+is iOS → reapply Amethyst → launch a local Linux loader. Actual A7/iOS 12.5.7
+kernel handoff, launcher availability/signing after reboot, local boot inputs
+and cold/low-battery/recovery behavior remain unqualified. Root SSH alone is
+not evidence of a working handoff. Direct power-on into Linux additionally
+needs a persistent early boot route; none is validated by this project.
+
+## Earlier independence plan
+
 # Plan for running without the Pi
 
 Updated 1 November 2026. The owner accepts **using the Pi to start Linux after

@@ -1,3 +1,9 @@
+## Latest combined candidate
+
+[Matched #35 desktop/storage sources and host-format rehearsal](desktop-storage35/)
+are prepared for a new read-only DFU. The payload is device untested; it does not
+authorize or perform an internal installation.
+
 # J72 storage preparation and read-only qualification
 
 **A device-tested read-only J72 observer is supplied; no installer is enabled.**
