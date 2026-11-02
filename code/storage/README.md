@@ -6,6 +6,14 @@ See the [morning runbook](../../STORAGE-MORNING-PLAN.md),
 [installation gates](../../INTERNAL-STORAGE-PLAN.md) and
 [measured host results](PREPARATION-RESULT.json).
 
+## Built Linux observer candidate
+
+The new [J72 Linux ASP observer candidate](linux-asp-observer35/) includes the
+actual source, integrated kernel patch, loader recovery patches and host
+harnesses: 307 cases pass. Its isolated #35 kernel, five matching modules and
+RAM USB recovery image now build successfully. Hardware firmware handoff and
+storage reads remain untested. This is a read-only observer, not an installer.
+
 ## Captured GPT metadata checker
 
 [j72_storage_preflight.py](j72_storage_preflight.py) uses Python's standard

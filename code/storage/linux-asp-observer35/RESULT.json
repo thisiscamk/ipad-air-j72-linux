@@ -1,0 +1,32 @@
+{
+  "status": "OFFLINE BUILT AND CHECKED; hardware not tested",
+  "kernel_release": "7.0.12-j72spi2",
+  "build_number": 35,
+  "source_reference": {
+    "repository": "https://github.com/micro23/ipadair2-omarchy",
+    "commit": "e2203b83f45726c825b39dd17fbab405c2a90e5b",
+    "patch_sha256": "6d130f1f664a7df8493b220422f4ad186b3a32eb94ae63dbb367bc67f3dc5063"
+  },
+  "actual_source_host_cases": {
+    "submission_sgl_queue_bounds": 289,
+    "firmware_shutdown_gates": 18
+  },
+  "storage_driver_autoload": false,
+  "loader_storage_initialization": false,
+  "allowed_storage_commands": [
+    "Identify",
+    "bounded user-area reads"
+  ],
+  "automatic_partition_scan": false,
+  "first_queue_read_bytes_max": 4096,
+  "write_unlock": false,
+  "internal_writes": false,
+  "hardware_tested": false,
+  "uts_version": "#35 SMP PREEMPT Mon Nov 2 07:00:00 +08 2026",
+  "target_kernel_image_build_pass": true,
+  "matching_observer_module_builds": 5,
+  "strong_imports_resolved": true,
+  "private_payload_bytes": 11653495,
+  "recovery_archive_component_checks_pass": true,
+  "firmware_handoff_live_verified": false
+}

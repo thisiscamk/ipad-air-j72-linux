@@ -1,0 +1,17 @@
+Subject: [PATCH] J72 observer: leave storage initialization to Linux
+
+Private RAM observer build only. Do not issue storage commands in the loader.
+The firmware handoff remains available through the separate FDT preparation.
+SPDX-License-Identifier: MIT
+
+--- a/src/ans1.c
++++ b/src/ans1.c
+@@ -372,5 +372,8 @@
+ bool ans1_init(void)
+ {
++    /* This observer always receives its kernel/initramfs from the host. */
++    printf("ANS1: loader storage disabled in J72 observer build\n");
++    return false;
+     if (ans1_initialized) {
+         printf("ANS1: already initialized\n");
+         return false;
