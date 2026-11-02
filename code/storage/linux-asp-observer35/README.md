@@ -1,6 +1,6 @@
 # J72 Linux ASP observer candidate
 
-**Experimental, read-only, not hardware qualified. No installer is included.**
+**Experimental, read-only. The first J72 hardware qualification passed; no installer is included.**
 This is a candidate for our Linux 7.0.12 J72 development base. It is not a
 drop-in Orchard 7.3 port and must not be used as a generic Apple storage driver.
 
@@ -55,7 +55,31 @@ They do not demonstrate firmware boot, hardware DMA correctness, reliable reads
 or persistence. The full target build and hardware status are recorded in
 [RESULT.json](RESULT.json).
 
-The first hardware sequence is USB recovery, live firmware reservation review,
-explicit Identify, a few repeated aligned reads, then private GPT capture.
-Stop on the first controller fault. No filesystem mount or internal write is
-part of that sequence. See the [storage runbook](../../../STORAGE-MORNING-PLAN.md).
+## First J72 hardware result — 2 November
+
+The changed image cold-booted and both NCM and ACM recovery shells responded.
+The live firmware reservation matched the loader's physical DRAM extent and
+Linux's `no-map` reservation. Linux's usable `/memory` span deliberately
+excludes the firmware; it must not be mistaken for the complete DRAM extent.
+The host canonicalizes a copy of the valid FDT before child traversal because
+`fdtget -l` can stop at its NOP tokens. The original capture remains private.
+
+Manual driver load negotiated RTKit 10.2, endpoint 6, and Identify exposed a
+128 GB namespace read-only. Repeated direct 4096-byte reads of the protective
+MBR and both GPT headers matched. Both complete GPT copies passed CRC and
+consistency checks. Bounded APFS metadata reads found a checksum-valid latest
+checkpoint and space manager.
+
+The disk has one APFS partition and no unallocated gap. Free blocks inside
+APFS do not establish a valid shrink minimum. Internal storage installation,
+write/flush/recovery qualification, iOS 12 coexistence and native-root boot
+remain open. No internal writes, unlock, format, auxiliary access, discard or
+filesystem mount occurred. Raw metadata, device identities and logs stay local.
+
+See the [storage runbook](../../../STORAGE-MORNING-PLAN.md) for remaining gates.
+
+[host-inventory-reference.py](host-inventory-reference.py) is the actual workspace
+helper, intended at `tools/run-j72-storage-observer.py` alongside the workspace
+USB shell helpers and private manifests. It is not standalone. Its inventory
+mode reads firmware metadata and the separately reserved 16 KiB loader RAM log;
+it never reads firmware bytes or loads the ASP module.

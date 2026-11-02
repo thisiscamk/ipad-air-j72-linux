@@ -219,8 +219,8 @@
       "status": "offline input-staging helper, tests or sanitized preparation receipt; no radio/boot qualification"
     },
     "storage/README.md": {
-      "sha256": "2f7d5683448fa7ef85f521827d30b265e5e21fccb024df9d8fb61144ae598b13",
-      "status": "offline imported-ANS1 cleanup candidate/reproducer; narrow host test only, no full loader or device qualification"
+      "sha256": "f4381489d84fc08ff2b10a86a97e9eae100811707a26097e60baf89f8c1495ad",
+      "status": "J72 read-only observer source/result; first cold boot/Identify/metadata reads passed; no internal writes"
     },
     "storage/0001-ans1-Avoid-freeing-the-command-buffer-twice.patch": {
       "sha256": "860518a3a2659c0f6b0a5d81b0e301fa05185259e9c97fd65abfc7bc6053dfa4",
@@ -432,39 +432,55 @@
     },
     "storage/linux-asp-observer35/9999-J72-observer-do-not-initialize-loader-storage.patch": {
       "sha256": "514f670ba46380204c9af150935c84fbbf4b47928ba0e2e5653ffdb39d4a6102",
-      "status": "offline J72 read-only candidate; full target build passed; hardware not tested"
+      "status": "J72 read-only observer source/result; first cold boot/Identify/metadata reads passed; no internal writes"
     },
     "storage/linux-asp-observer35/9999-Z-J72-keep-recovery-if-ANS-firmware-is-missing.patch": {
       "sha256": "9a77481fcf3327851923e1c6d37a5cad72a0f053fd8497288e96a85275ba3b13",
-      "status": "offline J72 read-only candidate; full target build passed; hardware not tested"
+      "status": "J72 read-only observer source/result; first cold boot/Identify/metadata reads passed; no internal writes"
     },
     "storage/linux-asp-observer35/README.md": {
-      "sha256": "8ea93505910cbb2c13d3812d8d0a05e89f3e25af213950f849e54c8472f32f0c",
-      "status": "offline J72 read-only candidate; full target build passed; hardware not tested"
+      "sha256": "04b437a3fe473c366fa798ee24935b486ff9a26dc0d86a01994bf97821aadaf2",
+      "status": "read-only inspection source; Linux inventory measured, new iOS helper built but not device tested"
     },
     "storage/linux-asp-observer35/RESULT.json": {
-      "sha256": "519ad1b8fcee91452651c7462d7581e77e6053743cb5d5d5a7c400b9bd11fe34",
-      "status": "offline J72 read-only candidate; full target build passed; hardware not tested"
+      "sha256": "c3662f76c19f03b34a7d208d0f2b005f9a9fa48bbf36707bbf55abc9e9ee7a41",
+      "status": "J72 read-only observer source/result; first cold boot/Identify/metadata reads passed; no internal writes"
     },
     "storage/linux-asp-observer35/kernel-integration.patch": {
       "sha256": "48fc92dd5fff770121d8e6bea1d4ca6858e5c6d7cf1989737163f58b64cfa6a2",
-      "status": "offline J72 read-only candidate; full target build passed; hardware not tested"
+      "status": "J72 read-only observer source/result; first cold boot/Identify/metadata reads passed; no internal writes"
     },
     "storage/linux-asp-observer35/src/drivers/block/asp.c": {
       "sha256": "35e850c1a53571b8deb999a3e4054b13cd0f994b8f0490179e26901ca5409c51",
-      "status": "offline J72 read-only candidate; full target build passed; hardware not tested"
+      "status": "J72 read-only observer source/result; first cold boot/Identify/metadata reads passed; no internal writes"
     },
     "storage/linux-asp-observer35/src/drivers/block/j72-asp-bounds.h": {
       "sha256": "49196aebf096e3c6110077d124af78af43ec9c814596946051c7366aae056103",
-      "status": "offline J72 read-only candidate; full target build passed; hardware not tested"
+      "status": "J72 read-only observer source/result; first cold boot/Identify/metadata reads passed; no internal writes"
     },
     "storage/linux-asp-observer35/test-asp-firmware.py": {
       "sha256": "2ed8d19e06143215cc6501283a405e3f97528e9b46b5c726ff79bdaeade97da0",
-      "status": "offline J72 read-only candidate; full target build passed; hardware not tested"
+      "status": "J72 read-only observer source/result; first cold boot/Identify/metadata reads passed; no internal writes"
     },
     "storage/linux-asp-observer35/test-asp-guards.py": {
       "sha256": "428d99212b833410bfeac40f5a98d18039434845e72e7e18b56ef96f3a4a799b",
-      "status": "offline J72 read-only candidate; full target build passed; hardware not tested"
+      "status": "J72 read-only observer source/result; first cold boot/Identify/metadata reads passed; no internal writes"
+    },
+    "storage/linux-asp-observer35/host-inventory-reference.py": {
+      "sha256": "34194eb2ee8a8416eb578aada4737088d3a5c86196e3782c4429f1bd3229bb32",
+      "status": "J72 read-only observer source/result; first cold boot/Identify/metadata reads passed; no internal writes"
+    },
+    "storage/ios12-readonly-inspect/libSystem.tbd": {
+      "sha256": "e84a2c0c18d056a7a522cadaf10e49d54fd317dc6d69b29bee8e6f3e79d3cee4",
+      "status": "read-only inspection source; Linux inventory measured, new iOS helper built but not device tested"
+    },
+    "storage/ios12-readonly-inspect/j72-apfs-inspect.c": {
+      "sha256": "b25a3bad9fe1fc857583e987bbcfffac9f7fed8f71686404b0d6d4832e125405",
+      "status": "read-only inspection source; Linux inventory measured, new iOS helper built but not device tested"
+    },
+    "storage/ios12-readonly-inspect/README.md": {
+      "sha256": "dc9c2ca3178e5a60e6675206110994288c1505feeb18808fd1e7e45231990623",
+      "status": "new read-only iOS helper: built and statically checked, not device tested"
     }
   },
   "upstream_reference": {

@@ -1,3 +1,15 @@
+## 2 November: native internal-storage reads now work
+
+The new #35 image boots and both USB recovery shells respond. The Linux ASP
+observer negotiates RTKit 10.2, identifies 128 GB and exposes it read-only.
+Repeated direct reads match; both GPT copies and their CRCs validate. Bounded
+APFS metadata reads validate the latest checkpoint and space manager.
+
+There is one APFS partition and no unallocated gap. Preparing iOS 12 API and
+snapshot inspection is the next coexistence step. No internal write or
+installation has been performed. The source and measured result are in
+[the observer folder](code/storage/linux-asp-observer35/).
+
 ## 2 November: one-hour controller observation complete; storage image ready
 
 A 3600.6-second controller observation completed without faults and with final

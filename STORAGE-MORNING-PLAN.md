@@ -31,7 +31,10 @@ in isolation: #35 kernel, matching storage/recovery modules, new loader and
 RAM USB shells. All strong imports resolve; 307 actual-source host cases and
 payload/archive checks pass. The storage module is not loaded automatically.
 The loader leaves ANS initialization to Linux and keeps recovery available
-when firmware metadata is missing. No hardware storage read has run yet.
+when firmware metadata is missing. The first J72 hardware boot, firmware reservation check, Identify, repeated
+direct reads, both GPT copies and bounded APFS checkpoint/space-manager reads
+now pass. Raw captures remain private. The disk has one APFS partition with
+no unallocated gap. Free blocks inside APFS do not validate a shrink minimum.
 
 ## Sequence from here
 
@@ -47,6 +50,22 @@ before requesting buttons. Compatible checks share a running boot.
 | 4 — persistent-root and driver qualification | Integrate the ANS1 Linux driver with this kernel/DT, initramfs and PARTUUID root. Qualify tag/SGL/DMA bounds, completion, timeout, flush and recovery. Add persistent desktop/network services and credentials handling. Exercise updates, reboot and recovery with disposable images/test media first. | Boot-tested native root, known failure behavior, protected Apple ranges and passing persistence/update checks. No owner-device write test is implied. |
 | 5 — concrete write proposal | Produce exact target identity, unchanged/changed ranges, both GPT backups/hashes, image hashes, backup checks, rollback limits and failure recovery. Review with the owner. | Separate explicit authorization for that exact proposal. This preparation request authorizes no installation or erase. |
 | 6 — later install and qualification | Write only the approved Linux areas, verify readback and filesystem integrity, boot internal root, check desktop/touch/Wi-Fi/power, then repeat cold starts and iOS recovery. | Persistent files, updates, normal recovery and agreed independent-use features pass. Keep the RAM rescue boot. |
+
+## Next iOS checks
+
+Use the owner's existing jailbreak to restore root SSH after restarting.
+Confirm the method rather than assuming an unpatched iOS boot enables SSH.
+The [read-only iOS helper](code/storage/ios12-readonly-inspect/) is built for
+this model/iOS 12 but not yet run. It checks framework/symbol availability and
+bounded snapshot listing only. No resize API is called and no snapshot is
+created, renamed or deleted. A snapshot workaround or resize would need its
+own qualified plan and explicit review before changing storage.
+
+Hoolock's [support-tool notes](https://github.com/HoolockLinux/docs/blob/master/tools/README.md)
+describe an iOS 11–13 snapshot obstacle. This is a research lead, not proof of
+a safe J72 method. A [separate author's resize helper](https://gist.github.com/iarchiveml/47946a79c0412a38f3e5f1872f040183)
+explicitly excludes iOS 12. Current tool names alone do not establish ABI or
+behavior on this device. Do not run either resize tool as an experiment.
 
 ## Before any storage write
 

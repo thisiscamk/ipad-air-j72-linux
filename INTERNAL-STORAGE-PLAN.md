@@ -1,18 +1,18 @@
 # Internal-storage preparation for iPad Air J72
 
-This is a research plan for the iPad Air 1 Cellular (`iPad4,2` / `J72AP`, A7, iOS 12.5.7). **No internal-storage write, partition change, or iOS erase has been authorized.** The current Linux and reduced Omarchy A desktop run from RAM, with internal Wi-Fi and demonstrated unplugged use. Storage preparation is now active; the iPad remains in iOS charging overnight.
+This is a research plan for the iPad Air 1 Cellular (`iPad4,2` / `J72AP`, A7, iOS 12.5.7). **No internal-storage write, partition change, or iOS erase has been authorized.** The current Linux and reduced Omarchy A desktop run from RAM, with internal Wi-Fi and demonstrated unplugged use. Read-only native storage qualification has now passed on the new #35 RAM boot.
 
 ## 2 November owner and live-state update
 
-The owner has no backup and states that no personal content needs preserving. A personal-data backup is therefore not a prerequisite they want to pursue. Preserve iOS and recovery metadata by default; this statement does not authorize an unreviewed erase or partition change. The current live RAM boot has no ANS device/firmware reservation, so storage needs a changed image. Native charging/source policy and ANS1 integration remain work in progress.
+The owner has no backup and states that no personal content needs preserving. A personal-data backup is therefore not a prerequisite they want to pursue. Preserve iOS and recovery metadata by default; this statement does not authorize an unreviewed erase or partition change. The changed #35 RAM boot preserves the firmware reservation and has passed ANS1 Identify and bounded reads. Native charging/source policy, write qualification and iOS 12 space creation remain work in progress.
 
 ## Prepared now
 
 See the [morning runbook](STORAGE-MORNING-PLAN.md) for the next actions, the [offline tools and ANS1 audit](code/storage/README.md), and [test receipts](code/storage/PREPARATION-RESULT.json). The metadata checker validates both GPT copies and makes a free-space-only dry run. An inactive loader guard passes 280 host cases; a separate 3 GiB host filesystem copy passes a canary reopening check and read-only e2fsck. None of these is a boot-qualified storage image or an installer.
 
-Cached iOS inventory reports a 128 GB main disk with APFS occupying almost all of it. This is historical inventory, not a fresh GPT map: free space inside APFS is not unallocated disk space. No usable gap or safe iOS 12 shrink path has been established.
+Fresh read-only #35 results identify a 128,000,000,000-byte disk with 4096-byte logical blocks. Repeated direct 4 KiB reads match. Both GPT copies and their arrays pass CRC and consistency checks: one APFS partition occupies LBAs 6–31,249,994, with **no unallocated gap**. Bounded APFS checkpoint and space-manager metadata checks report 71,745,007,616 free bytes inside the container. This is not a validated shrink minimum. No filesystem was mounted and no internal write or unlock was issued. See the [measured observer result](code/storage/linux-asp-observer35/RESULT.json).
 
-Current Orchard uses a boot partition read by m1n1 itself; the latest launch change removes the host fallback reader. Its 1 GiB boot / 8 GiB minimum root policy is a sizing reference, not an approved J72 layout. This reviewed tree has no Linux ASP implementation to enable for J72. The older J81 overlay needs porting and its submission/cleanup gaps need repair.
+Current Orchard uses a boot partition read by m1n1 itself; the latest launch change removes the host fallback reader. Its 1 GiB boot / 8 GiB minimum root policy is a sizing reference, not an approved J72 layout. The original reviewed tree has no Linux ASP implementation to enable for J72. Our subsequently ported and hardened [read-only Linux ASP observer](code/storage/linux-asp-observer35/) now passes initial hardware reads; writable storage remains unqualified.
 
 ## When to start
 
@@ -33,7 +33,7 @@ Reviewed Orchard at
 | Source | What to reuse or investigate | J72 gap |
 | --- | --- | --- |
 | [m1n1 ANS1 import](https://github.com/OrchardLinux/orchard/blob/97dccd13fc4af182a48d4e59198ad72acbfc201c/boot/m1n1/patches/hoolock/0032-Add-ANS1-storage.patch) | A7/A8/A8X mailbox/AKF startup, preloaded firmware and user-area reads. | Exact J72 firmware handoff, power/DMA, read bounds and cleanup need qualification. |
-| [Firmware handoff patch](https://github.com/OrchardLinux/orchard/blob/97dccd13fc4af182a48d4e59198ad72acbfc201c/boot/m1n1/patches/hoolock/0034-kboot-Pass-ANS1-firmware-information-to-Linux.patch) | Loader fills the `asp` firmware reserved-memory information for Linux. | Our present DT has no active J72 ASP/mailbox integration; merely enabling a kernel option is insufficient. |
+| [Firmware handoff patch](https://github.com/OrchardLinux/orchard/blob/97dccd13fc4af182a48d4e59198ad72acbfc201c/boot/m1n1/patches/hoolock/0034-kboot-Pass-ANS1-firmware-information-to-Linux.patch) | Loader fills the `asp` firmware reserved-memory information for Linux. | Subsequently integrated in #35; firmware reservation, physical DRAM containment and first Linux ASP reads now pass. |
 | [J81 follow-up merged through PR #34](https://github.com/OrchardLinux/orchard/blob/97dccd13fc4af182a48d4e59198ad72acbfc201c/docs/integration/j81-2026-10-29-followup/NATIVE-ROOT.md) | Experimental internal ext4, systemd/desktop, Wi-Fi and persistence after a fresh host-assisted boot. | Different A8X board and kernel. Orchard's standard J81 profile still has `install=false`. |
 | [Pinned J81 contributor code](https://github.com/micro23/ipadair2-omarchy/tree/e2203b83f45726c825b39dd17fbab405c2a90e5b/experimental/j81-storage) | Read-only ASP overlay, write-range checks, GPT parser/tests, explicit native-tool selection, root guards and PID 1 handoff. | Do not copy its partition boundaries, 4096-byte assumptions, board identity, approvals or resize target. Its patch is for its pinned prepared source. |
 | [Orchard layout planner](https://github.com/OrchardLinux/orchard/blob/97dccd13fc4af182a48d4e59198ad72acbfc201c/src/orchard/install_layout.py) and [boot contract](https://github.com/OrchardLinux/orchard/blob/97dccd13fc4af182a48d4e59198ad72acbfc201c/docs/boot-contract.md) | Pure planning logic, preserving Apple ranges, pinned table hashes, PARTUUID roots and platform/kernel separation. | A future J72 layout must be based on measured geometry and a qualified installer. Existing allocation defaults are not our approved layout. |
@@ -55,7 +55,7 @@ flow on J72/iOS 12.
 
 ### Initial J72 read-only command policy to implement and audit
 
-This table is the required policy for a future J72 driver. The inactive loader candidate enforces command admission and read bounds in host tests only; no active J72 storage driver implements it yet.
+This policy is now implemented by the #35 read-only Linux observer and has passed first hardware reads. The earlier inactive loader candidate remains a separate host-tested reference.
 ANS1 commands are not the newer PCIe NVMe admin command set.
 
 | Path | Initial policy |
@@ -77,7 +77,7 @@ software guards, not hardware locks on each namespace.
 
 ## Current blockers
 
-1. **J72 storage is unproved.** A7/A8 devices use Apple's ANS1 storage processor. The source map above now includes experimentally demonstrated J81 internal writes and persistence. Those results provide code to audit, not a qualified J72 read or write path.
+1. **Writable J72 storage remains unqualified.** A7/ANS1 firmware handoff, Identify, repeated reads, GPT verification and bounded APFS capacity reads now pass on J72. Write fences, flush/durability and native-root operation still need separate qualification.
 2. **The current installer does not support this device.** [Omarchy A's installation instructions](https://github.com/OrchardLinux/omarchy-a#install) list J71b/iPad 6 as supported and require iPadOS 16 or later. They describe creating a Linux-data partition while preserving iOS, with a host `orchard launch` still required after a cold restart. The exact J72 layout remains to be designed from measured geometry.
 3. **The current APFS resizer does not support iOS 12.** [Resize APFS](https://github.com/OrchardLinux/resize-apfs#requirements) requires iOS/iPadOS 16 or later; its documented hardware resize test is on J71b. We must establish a separate, verified J72/iOS 12 coexistence procedure before considering a dual-boot layout.
 
@@ -87,10 +87,10 @@ software guards, not hardware locks on each namespace.
 | --- | --- |
 | 0. Usable RAM Linux | Touch, chosen connectivity and power features, desktop, repeated boot, and recovery pass on this J72. No storage operation is part of this gate. |
 | 1. Read-only ANS1 bring-up | Preserve the iBoot-loaded ANS firmware through Pongo/m1n1; identify the J72 ANS1 controller and block size; enumerate namespace metadata and the partition map read-only; read a few bounded, aligned blocks and compare repeated hashes. Audit loader and Linux initialization as well as the block request path: refuse write-unlock, writes, discard, format and writable passthrough. Do not mount with journal replay. Confirm normal iOS boot afterward. |
-| 2. Recovery design | Make and verify an encrypted iOS backup on a separate computer, inventory owner data that the backup may omit, record the partition map and firmware/restore path privately, and rehearse a non-destructive recovery boot. Check which restore image Apple will currently accept for this exact model before any write. Do not publish backup contents or identifiers. |
+| 2. Recovery design | The owner has waived preserving personal content and has no backup. Record the partition map and firmware/restore path privately, preserve iOS by default, and rehearse a non-destructive recovery boot. A metadata capture on the same host disk is not an independent backup. Check which restore image Apple will currently accept for this exact model before any write. Do not publish backup contents or identifiers. |
 | 3. Layout choice | Decide whether iOS must remain. For coexistence, first prove a supported iOS 12 APFS shrink and partition-table update on this model; the current Resize APFS release is not that proof. If this cannot be established, stop. A full-device replacement would be a separate owner decision and recovery plan. |
 | 4. Write-capable ANS1 driver | Audit and harden the J72-specific Linux ANS1 path: firmware handoff, tag bounds before queue access, complete SGL construction, DMA address limits, measured block geometry, submission/completion errors, cache flush, timeouts, power-loss behavior and protection of auxiliary Apple areas. Test destructive cases away from the owner's only iPad first. Host simulations and repeated read-only tests do not qualify hardware writes. |
-| 5. Installer rehearsal | Build an exact-J72 installer that shows the intended partition map, refuses Apple/unknown regions, checks available space and image hashes, and has an explicit stop point before writes. Rehearse its decision logic on synthetic disk images and a disposable test target. Require a fresh backup and a separate owner authorization for the reviewed write plan. |
+| 5. Installer rehearsal | Build an exact-J72 installer that shows the intended partition map, refuses Apple/unknown regions, checks available space and image hashes, and has an explicit stop point before writes. Rehearse its decision logic on synthetic disk images and a disposable test target. Record the owner's backup waiver and require separate owner authorization for the exact reviewed write plan. |
 | 6. First install | Create only the approved Linux partitions, write and verify a small boot/system image, keep a USB recovery shell, and boot the internal root through the already validated DFU/Pongo path. Check filesystem integrity, touch, Wi-Fi, charging, updates, and repeated iOS/Linux transitions before copying user data. |
 | 7. Maintenance and rollback | Provide update and repair procedures, space monitoring, boot-selection instructions, and a tested rollback to the preserved iOS layout or a documented full restore. Maintain the host RAM boot as a rescue path. |
 

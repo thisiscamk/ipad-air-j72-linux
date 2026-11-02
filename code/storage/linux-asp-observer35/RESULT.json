@@ -1,5 +1,5 @@
 {
-  "status": "OFFLINE BUILT AND CHECKED; hardware not tested",
+  "status": "J72 FIRST COLD BOOT AND BOUNDED READ-ONLY STORAGE CHECKS PASSED; installer not ready",
   "kernel_release": "7.0.12-j72spi2",
   "build_number": 35,
   "source_reference": {
@@ -21,12 +21,38 @@
   "first_queue_read_bytes_max": 4096,
   "write_unlock": false,
   "internal_writes": false,
-  "hardware_tested": false,
+  "hardware_tested": true,
   "uts_version": "#35 SMP PREEMPT Mon Nov 2 07:00:00 +08 2026",
   "target_kernel_image_build_pass": true,
   "matching_observer_module_builds": 5,
   "strong_imports_resolved": true,
   "private_payload_bytes": 11653495,
   "recovery_archive_component_checks_pass": true,
-  "firmware_handoff_live_verified": false
+  "firmware_handoff_live_verified": true,
+  "loader_dram_and_kernel_nomap_checks_pass": true,
+  "acm_ncm_recovery_pass": true,
+  "rtkit_protocol": "10.2",
+  "rtkit_endpoint": 6,
+  "identified_disk_bytes": 128000000000,
+  "logical_block_bytes": 4096,
+  "namespace_readonly": true,
+  "repeated_direct_reads": {
+    "block_bytes": 4096,
+    "positions": [
+      "protective MBR",
+      "primary GPT header",
+      "backup GPT header"
+    ],
+    "repeats_each": 2,
+    "hashes_match": true
+  },
+  "gpt_primary_backup_crcs_and_arrays_match": true,
+  "gpt_apfs_partitions": 1,
+  "unallocated_ranges": 0,
+  "apfs_checkpoint_spaceman_checksums_pass": true,
+  "apfs_metadata_bytes_read": 1155072,
+  "ios12_resize_minimum_verified": false,
+  "installed_root_boot_tested": false,
+  "apfs_container_free_bytes": 71745007616,
+  "apfs_free_is_validated_shrink_minimum": false
 }
