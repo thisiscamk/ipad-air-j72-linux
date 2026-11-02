@@ -1,3 +1,8 @@
+> **Next test moved to the [compact v2 observer](../ios12-pongo-compact/).**
+> The revised verbose probe got past the metadata property on device, but lost
+> USB during output. Its full inventory and kernel UUID did not pass. Keep this
+> source/evidence for history; use v2 for the next prepared DFU.
+
 # Read-only J72 Pongo recovery-handoff probe
 
 **First device inventory partially passed; corrected observer ready for a fresh Pongo boot.** The checkra1n → Pongo

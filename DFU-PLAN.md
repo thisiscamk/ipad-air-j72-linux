@@ -1,3 +1,19 @@
+# Next DFU: compact Pongo recovery inventory
+
+- [x] Boot proven Pongo and load the revised observer.
+- [x] Pass allocator/argument metadata guards and the previously blocking DT property.
+- [x] Preserve the incomplete verbose capture and USB failure evidence.
+- [x] Verify normal iOS and the direct Pi connection after the device returned.
+- [x] Build/test a compact observer and a client that reads the console after command completion.
+- [ ] Fresh DFU on the current direct Pi cable; load the compact observer once.
+- [ ] Verify the original kernel UUID, empty map slots and RAM handoff ranges.
+- [ ] Prepare and qualify RAM recovery using a healthy Pongo session where possible.
+- [ ] Review safe space creation; qualify native write/flush/root before any install proposal.
+
+There is no internal-storage mutation in this test. Recovery has not booted.
+The APFS minimum still leaves only about 1.64 GB shrink allowance.
+[New observer and checks](code/storage/ios12-pongo-compact/).
+
 # Next DFU: one corrected Pongo inventory load
 
 - [x] Use the proven direct-Pi checkra1n → Pongo path successfully.

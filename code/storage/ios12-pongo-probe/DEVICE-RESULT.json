@@ -21,5 +21,20 @@
   "recovery_image_booted": false,
   "internal_storage_accessed": false,
   "internal_storage_writes_performed": false,
-  "host_system_kernel_changed": false
+  "host_system_kernel_changed": false,
+  "second_device_attempt": {
+    "loader": "PASS",
+    "revised_module_load": "PASS_message_retrieved_after_host_reconnect",
+    "allocator_and_argument_metadata_guards": "PASS",
+    "observed_four_byte_handle": "PASS",
+    "verbose_inventory": "INCOMPLETE_USB_IO_ERROR",
+    "kernel_uuid_verified": false,
+    "subsequent_512_byte_client": "STATUS_TIMEOUT_BEFORE_ANY_STDOUT_READ",
+    "owner_screen": "Apple logo or iOS",
+    "normal_ios_direct_usb_identity": "PASS",
+    "recovery_boot_requested": false,
+    "raw_disk_opened": false,
+    "storage_written": false
+  },
+  "next_candidate": "../ios12-pongo-compact/"
 }

@@ -1,3 +1,18 @@
+# 2 November: compact Pongo observer prepared after partial second capture
+
+The second proven Pongo boot and revised module load passed. The observer read
+allocator/argument metadata and passed the previously blocking 4-byte property,
+but USB failed during verbose output. Kernel UUID verification and recovery
+boot remain incomplete. The iPad returned to iOS; exact normal USB/direct Pi
+identity is verified. No disk or snapshot writes occurred.
+
+The next candidate emits a fixed compact summary and waits for command completion
+before reading the full console ring. Smaller reads were rejected as a design:
+Pongo discards leading output, rather than preserving it for later short reads.
+Eleven real C callback cases, eight frame refusals and idle-before-read transport
+checks pass offline. Runtime remains untested; this is a changed test, not a
+claimed fix. [Actual code/results](code/storage/ios12-pongo-compact/).
+
 # 2 November: Pongo inventory captured; corrected probe needs a fresh session
 
 The proven loader and first probe registration passed. Model, RAM and DeviceTree

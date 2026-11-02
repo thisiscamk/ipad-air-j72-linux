@@ -1,0 +1,16 @@
+{
+  "status": "PASS",
+  "actual_source_inventory_cases": 11,
+  "frame_refusal_cases": 8,
+  "command_completed_before_stdout_read": "PASS",
+  "console_control_read_length": 4096,
+  "transport_refusal_cases": 4,
+  "fixture_response_bytes": 562,
+  "existing_shared_bounds_cases": {
+    "span": 8,
+    "macho": 143
+  },
+  "usb_access": false,
+  "revised_device_probe_tested": false,
+  "recovery_boot_tested": false
+}
