@@ -1,7 +1,9 @@
-# J72 storage preparation (offline only)
+# J72 storage preparation and read-only qualification
 
-**No active J72 storage driver or installer is supplied here.** These tools
-prepare metadata review and candidate source changes for later qualification.
+**A device-tested read-only J72 observer is supplied; no installer is enabled.**
+The offline tools prepare metadata review and candidate source changes.
+The [live iOS inspection](ios12-readonly-inspect/) measures snapshots and the
+container minimum without resizing.
 See the [morning runbook](../../STORAGE-MORNING-PLAN.md),
 [installation gates](../../INTERNAL-STORAGE-PLAN.md) and
 [measured host results](PREPARATION-RESULT.json).

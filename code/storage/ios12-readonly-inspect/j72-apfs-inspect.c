@@ -29,7 +29,8 @@ static void snapshots(snapshot_list_fn fn,const char *path)
  if(fd<0){printf("{\"available\":true,\"open_errno\":%d}",*__error());return;}
  buffer=calloc(1,65536);
  if(!buffer){close(fd);printf("{\"available\":true,\"allocation_failed\":true}");return;}
- struct attrs a={5,0,1,0,0,0,0};
+ /* ATTR_BULK_REQUIRED = ATTR_CMN_NAME | ATTR_CMN_RETURNED_ATTRS. */
+ struct attrs a={5,0,0x80000001U,0,0,0,0};
  count=fn(fd,&a,buffer,65536,0);
  if(count<0)err=*__error();
  /* Report only a bounded first batch. No snapshot names or UUIDs leave RAM. */
@@ -45,8 +46,8 @@ int main(void)
  if(!lib)return 4;
  snapshot_list_fn list=(snapshot_list_fn)dlsym(lib,"fs_snapshot_list");
  void *apfs=dlopen("/System/Library/PrivateFrameworks/APFS.framework/APFS",1);
- const char *names[]={"APFSContainerResize","APFSContainerGetSpaceInfo","APFSContainerGetMinimumSize","APFSContainerResizeGetMinimumSize","APFSVolumeGetMinimumSize"};
- printf("{\"profile\":\"j72-ios12-readonly-v1\",\"apfs_framework_loaded\":%s,\"symbols\":{",apfs?"true":"false");
+ const char *names[]={"APFSContainerResize","APFSContainerGetMinimalSize","APFSContainerGetSpaceInfo","APFSContainerGetMinimumSize","APFSContainerResizeGetMinimumSize","APFSVolumeGetMinimumSize"};
+ printf("{\"profile\":\"j72-ios12-readonly-v3\",\"apfs_framework_loaded\":%s,\"symbols\":{",apfs?"true":"false");
  for(unsigned i=0;i<sizeof(names)/sizeof(names[0]);i++)
   printf("%s\"%s\":%s",i?",":"",names[i],apfs&&dlsym(apfs,names[i])?"true":"false");
  printf("},\"root_snapshots\":");snapshots(list,"/");

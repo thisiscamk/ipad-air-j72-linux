@@ -219,7 +219,7 @@
       "status": "offline input-staging helper, tests or sanitized preparation receipt; no radio/boot qualification"
     },
     "storage/README.md": {
-      "sha256": "f4381489d84fc08ff2b10a86a97e9eae100811707a26097e60baf89f8c1495ad",
+      "sha256": "9e3c5309f757c01468ecc5126586727e976065417a31690352fdb51ab4e65062",
       "status": "J72 read-only observer source/result; first cold boot/Identify/metadata reads passed; no internal writes"
     },
     "storage/0001-ans1-Avoid-freeing-the-command-buffer-twice.patch": {
@@ -472,15 +472,23 @@
     },
     "storage/ios12-readonly-inspect/libSystem.tbd": {
       "sha256": "e84a2c0c18d056a7a522cadaf10e49d54fd317dc6d69b29bee8e6f3e79d3cee4",
-      "status": "read-only inspection source; Linux inventory measured, new iOS helper built but not device tested"
+      "status": "J72/iOS12 device-tested read-only snapshot/symbol/minimal-size queries; no resize or snapshot mutations"
     },
     "storage/ios12-readonly-inspect/j72-apfs-inspect.c": {
-      "sha256": "b25a3bad9fe1fc857583e987bbcfffac9f7fed8f71686404b0d6d4832e125405",
-      "status": "read-only inspection source; Linux inventory measured, new iOS helper built but not device tested"
+      "sha256": "a403c4f228420226c8e0e981ab8af8e2c37456d3c0637a8c538a1bcc1b441f0f",
+      "status": "J72/iOS12 device-tested read-only snapshot/symbol/minimal-size queries; no resize or snapshot mutations"
     },
     "storage/ios12-readonly-inspect/README.md": {
-      "sha256": "dc9c2ca3178e5a60e6675206110994288c1505feeb18808fd1e7e45231990623",
-      "status": "new read-only iOS helper: built and statically checked, not device tested"
+      "sha256": "4a0291a38a3e3ab47bc2a2f53f48c14a098cc24a8287b7b5988a686ed5ad7edc",
+      "status": "J72/iOS12 device-tested read-only snapshot/symbol/minimal-size queries; no resize or snapshot mutations"
+    },
+    "storage/ios12-readonly-inspect/j72-apfs-minimum.c": {
+      "sha256": "b8f79477f47e12423b3e534ba0388fb90c0f8f26df7f667f129802ec56622b6c",
+      "status": "J72/iOS12 device-tested read-only snapshot/symbol/minimal-size queries; no resize or snapshot mutations"
+    },
+    "storage/ios12-readonly-inspect/RESULT.json": {
+      "sha256": "8e3ea284d4619db52ab7cfe44066d714c5018113ee8d5a53d438ce8055bdded0",
+      "status": "J72/iOS12 device-tested read-only snapshot/symbol/minimal-size queries; no resize or snapshot mutations"
     }
   },
   "upstream_reference": {

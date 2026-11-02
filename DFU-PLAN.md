@@ -13,7 +13,8 @@
 - [x] Build and pin the isolated #35 recovery-only storage image; 307 host cases and matching module imports pass.
 - [x] Boot #35; verify live firmware, both recovery shells, Identify and repeated direct reads.
 - [x] Capture/validate both GPT copies and APFS checkpoint/space manager; no free partition gap exists.
-- [ ] Next iOS session: inspect supported shrink APIs and snapshot counts with the existing jailbreak active.
+- [x] Reapply existing Amethyst; verify root SSH, snapshot counts and the exact APFS minimum-size query.
+- [ ] Resolve the measured minimum-size limit: only 1.64 GB can currently be released; retain the original root snapshot until recovery is reviewed.
 - [ ] Capture fresh layout, qualify safe space creation and native root, then review exact install changes.
 
 The owner has no backup and does not need the device's personal content.

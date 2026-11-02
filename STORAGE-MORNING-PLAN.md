@@ -2,8 +2,9 @@
 
 Prepared 1 November 2026. **Preparation is ready; an on-device installer is not.**
 The original overnight preparation made no device changes. On 2 November, the
-iPad is running the RAM desktop on its powered hub while a longer charging test
-runs and a new storage observer is built. No internal write has been performed.
+read-only #35 storage boot and live iOS API checks have passed. The iPad is
+back in iOS on the powered hub. No raw storage write, resize, snapshot mutation
+or partition change has been performed.
 Preserve iOS by default. The host kernel stays unchanged.
 
 ## Ready on the host
@@ -51,21 +52,36 @@ before requesting buttons. Compatible checks share a running boot.
 | 5 — concrete write proposal | Produce exact target identity, unchanged/changed ranges, both GPT backups/hashes, image hashes, backup checks, rollback limits and failure recovery. Review with the owner. | Separate explicit authorization for that exact proposal. This preparation request authorizes no installation or erase. |
 | 6 — later install and qualification | Write only the approved Linux areas, verify readback and filesystem integrity, boot internal root, check desktop/touch/Wi-Fi/power, then repeat cold starts and iOS recovery. | Persistent files, updates, normal recovery and agreed independent-use features pass. Keep the RAM rescue boot. |
 
-## Next iOS checks
+## iOS checks passed; next recovery work
 
-Use the owner's existing jailbreak to restore root SSH after restarting.
-Confirm the method rather than assuming an unpatched iOS boot enables SSH.
-The [read-only iOS helper](code/storage/ios12-readonly-inspect/) is built for
-this model/iOS 12 but not yet run. It checks framework/symbol availability and
-bounded snapshot listing only. No resize API is called and no snapshot is
-created, renamed or deleted. A snapshot workaround or resize would need its
-own qualified plan and explicit review before changing storage.
+The owner reapplied the existing Amethyst jailbreak and root SSH returned.
+The [device-tested read-only helpers](code/storage/ios12-readonly-inspect/)
+confirm one root snapshot and no data snapshots. The exact
+`APFSContainerGetMinimalSize` spelling used in Orchard returns success and
+126,357,602,304 bytes, leaving only 1,642,352,640 bytes against the measured
+container. This is too little for the 1 GiB boot + 8 GiB root reference.
+No resize, snapshot mutation or GPT change was run.
 
-Hoolock's [support-tool notes](https://github.com/HoolockLinux/docs/blob/master/tools/README.md)
-describe an iOS 11–13 snapshot obstacle. This is a research lead, not proof of
-a safe J72 method. A [separate author's resize helper](https://gist.github.com/iarchiveml/47946a79c0412a38f3e5f1872f040183)
-explicitly excludes iOS 12. Current tool names alone do not establish ABI or
-behavior on this device. Do not run either resize tool as an experiment.
+Before the next storage DFU or write proposal:
+
+1. Review a recovery route that preserves normal iOS boot and the existing
+   Amethyst restore snapshot. The personal-data backup waiver does not make
+   that snapshot disposable; it supplies a different rollback function.
+2. Investigate Hoolock's [iOS 11–13 snapshot caveat](https://github.com/HoolockLinux/docs/blob/23ebe1fbc375599221553a7e1815e5de182a6b42/tools/README.md).
+   Its deletion/recreation approach is a lead, not a qualified J72 procedure.
+   The live minimum is now measured; snapshot causation remains unproved.
+3. Establish an exact J72/iOS 12 rescue environment, SEP/key access and a
+   reviewed snapshot-preservation/rollback strategy before any snapshot change.
+   Build and inspect that environment before requesting another DFU.
+4. Resolve the capacity limit, then generate an exact layout from fresh
+   measurements. Do not select a size below the reported minimum or treat
+   APFS free blocks as a partition gap.
+5. Continue the fenced Linux write, flush/durability and native-root work on
+   disposable images. No existing read-only observer can install Linux.
+
+A [separate author's resize helper](https://gist.github.com/iarchiveml/47946a79c0412a38f3e5f1872f040183)
+explicitly excludes iOS 12. A present API symbol and successful size query do
+not prove that a destructive operation from another OS version will work.
 
 ## Before any storage write
 

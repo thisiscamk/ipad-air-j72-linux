@@ -1,0 +1,44 @@
+{
+  "profile": "j72-ios12-readonly-v3",
+  "apfs_framework_loaded": true,
+  "symbols": {
+    "APFSContainerResize": true,
+    "APFSContainerGetMinimalSize": true,
+    "APFSContainerGetSpaceInfo": true,
+    "APFSContainerGetMinimumSize": false,
+    "APFSContainerResizeGetMinimumSize": false,
+    "APFSVolumeGetMinimumSize": false
+  },
+  "root_snapshots": {
+    "available": true,
+    "first_batch_entries": 1,
+    "errno": 0,
+    "buffer_bytes": 65536
+  },
+  "data_snapshots": {
+    "available": true,
+    "first_batch_entries": 0,
+    "errno": 0,
+    "buffer_bytes": 65536
+  },
+  "resize_called": false,
+  "snapshot_mutations": false,
+  "mount_called": false,
+  "minimum_query": {
+    "profile": "j72-ios12-minimal-size-v1",
+    "bsd_name": "disk0s1",
+    "api_status": 0,
+    "minimum_bytes": 126357602304,
+    "output_canaries_intact": true,
+    "resize_called": false,
+    "raw_disk_opened": false,
+    "within_measured_container": true,
+    "aligned_4096": true
+  },
+  "measured_container_bytes": 127999954944,
+  "maximum_shrink_bytes_from_reported_minimum": 1642352640,
+  "boot_1GiB_root_8GiB_reference_fits": false,
+  "snapshot_cause_confirmed": false,
+  "installer_ready": false,
+  "partition_table_changed": false
+}

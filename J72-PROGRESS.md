@@ -1,3 +1,17 @@
+## 2 November: live iOS minimum-size query narrows the storage blocker
+
+After the owner reapplied Amethyst, authorized root SSH and the read-only
+inspection helpers passed on iOS 12.5.7. Independent snapshot listings agree:
+one root snapshot and none on the data volume. Orchard's exact
+`APFSContainerGetMinimalSize` query succeeds, reporting 126,357,602,304 bytes.
+That permits only about 1.64 GB of shrink from the present container despite
+about 71.7 GB of internal APFS free space. The planned desktop layout does not fit.
+
+The root snapshot is a candidate cause, consistent with Hoolock's iOS 11–13
+notes, but causation has not been proved. Amethyst uses its original snapshot
+for root-filesystem restoration; it has been retained. No resize, snapshot
+mutation or partition change occurred. [Source, result and ABI references](code/storage/ios12-readonly-inspect/).
+
 ## 2 November: native internal-storage reads now work
 
 The new #35 image boots and both USB recovery shells respond. The Linux ASP
