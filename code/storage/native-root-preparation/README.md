@@ -1,3 +1,25 @@
+# Current: normal-iOS read-only capability queries pass
+
+The owner reapplied Amethyst after the power test. Exact-device root SSH and
+the signed query-only helper pass, without DFU. iOS reports writable media,
+4096-byte physical blocks and maximum read/write transfers of1,048,576 bytes.
+The APFS minimum is unchanged at 126357602304 bytes, with intact canaries.
+Feature mask `0x16` advertises barrier, priority and unmap, as defined in
+[Apple's XNU4903 disk header](https://raw.githubusercontent.com/apple-oss-distributions/xnu/xnu-4903.241.1/bsd/sys/disk.h).
+No feature operation was invoked.
+The helper opened the disk read-only; no resize, flush or storage write was
+issued. These capabilities do not establish successful writes or durability.
+
+The first temporary `/tmp` location was denied by System Policy. The identical
+binary passed from a unique temporary `/usr/bin` location, as earlier probes
+did. All temporary helpers were removed; no signing or global policy changed.
+[Sanitized device result](IOS-QUERY-RESULT.json).
+
+The power hour has finished with net loss during a thermal hold; touch also
+reached its cumulative recovery limit. The iPad is back in iOS and charging.
+
+## Earlier checkpoint
+
 # Current: checkpoint and interrupted-install preparation pass
 
 The #35 desktop and guarded charging are active on the powered hub; the owner
@@ -37,7 +59,7 @@ inputs; it is not a portable installer.
 # Current checkpoint: owner UI and mounted cleanup pass
 
 The owner confirms all desktop functions. The away observer was cancelled and
-reaped, brightness restored to1604, and normal nested loop/ext4/NBD/owned-export
+reaped, brightness restored to 1604, and normal nested loop/ext4/NBD/owned-export
 cleanup passed. The known RAM desktop now stages/starts on #35 with Wi-Fi and
 NBD detached. The #35 maintenance module loads disabled with no input-limit
 change. The next physical gate is the same marked powered-hub port and fresh

@@ -1,0 +1,72 @@
+--- a/j72_touch_session.c
++++ b/j72_touch_session.c
+@@ -19,6 +19,7 @@
+ #include <linux/input.h>
+ #include <linux/input/mt.h>
+ #include "j72-classic-contacts.h"
++#include "j72-recovery-window.h"
+ 
+ #define AUDIT_CS_US 10U
+ #define AUDIT_SYNC 1U
+@@ -44,6 +45,12 @@
+ static bool cleanup_failed;
+ static bool cleanup_ok;
+ module_param(cleanup_ok,bool,0400);
++/* Report physical restoration separately without weakening cleanup_ok/state4. */
++static bool hardware_cleanup_ok;
++module_param(hardware_cleanup_ok,bool,0400);
++static unsigned int recovery_stop_reason;
++module_param(recovery_stop_reason,uint,0400);
++MODULE_PARM_DESC(recovery_stop_reason,"0=none 1=budget 2=info 3=status 4=gate");
+ static unsigned int session_state;
+ static DEFINE_MUTEX(session_control);
+ static const u8 dummy_frame[16] = {
+@@ -597,6 +604,7 @@
+ static noinline void query_report_metadata(struct spi_device *dev,void __iomem *gpio)
+ {
+  u64 start,last_wake=0;unsigned long end;
++ struct j72_recovery_window recovery_window={0};
+  unsigned int seq=1,consecutive_bad=0;bool stopped=false,previous_success=false;
+  audit.cs_us=AUDIT_CS_US;audit.sync_enable=AUDIT_SYNC;
+  audit.stream_enable=AUDIT_STREAM;audit.policy=AUDIT_POLICY;
+@@ -673,9 +681,21 @@
+   if(consecutive_bad>=3){
+    u8 status[4],gate;
+    release_touch_input();
+-   if(++input_recoveries>6 || !read_device_info(dev) ||
+-      !short_report(dev,0x7f,4,status) || memchr_inv(status,0,4) ||
+-      !short_report(dev,0xc8,1,&gate) || gate!=0x19){stopped=true;break;}
++   input_recoveries++;
++   /* Finite diagnostic runs retain their original cumulative limit.
++    * Continuous input uses a bounded sliding window: sparse recovered
++    * transients must not exhaust a lifetime quota. All health gates remain. */
++   if((READ_ONCE(continuous) &&
++       !j72_recovery_admit(&recovery_window,ktime_get_ns()/1000000ULL)) ||
++      (!READ_ONCE(continuous) && input_recoveries>6))recovery_stop_reason=1;
++   else if(!read_device_info(dev))recovery_stop_reason=2;
++   else if(!short_report(dev,0x7f,4,status) || memchr_inv(status,0,4))recovery_stop_reason=3;
++   else if(!short_report(dev,0xc8,1,&gate) || gate!=0x19)recovery_stop_reason=4;
++   if(recovery_stop_reason){
++    pr_err("j72_touch_session: INPUT_RECOVERY_STOP count=%u reason=%u window_ms=60000\n",
++           input_recoveries,recovery_stop_reason);
++    stopped=true;break;
++   }
+    pr_info("j72_touch_session: INPUT_RECOVERY count=%u health=1 flags=0 gate=19\n",input_recoveries);
+    consecutive_bad=0;previous_success=false;
+   }
+@@ -1142,6 +1162,7 @@
+   mutex_unlock(&session_control);
+   memset(&audit,0,sizeof(audit));audit.magic=0x4a373253;audit.version=3;
+   attempted=false;cleanup_failed=false;cleanup_ok=false;
++  hardware_cleanup_ok=false;recovery_stop_reason=0;
+   input_frames=input_bad_layouts=input_timeouts=input_recoveries=0;
+   layout_anomalies=wire_anomalies=0;
+   /* Registration probes synchronously in THIS worker. The diagnostic probe
+@@ -1153,6 +1174,7 @@
+   flush_delayed_work(&after_work);
+   mutex_lock(&session_control);
+   WRITE_ONCE(enabled,false);
++  hardware_cleanup_ok=!ret && attempted && audit.info_end && !cleanup_failed;
+   if(ret || !attempted || audit.done!=1 || !audit.info_end || cleanup_failed){
+    WRITE_ONCE(session_state,4);
+    pr_err("j72_touch_session: SESSION_FAILED number=%u done=%u cleanup_failed=%u\n",session_number,audit.done,cleanup_failed);

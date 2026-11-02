@@ -1,3 +1,29 @@
+# 2 November: hour result, touch endurance and fresh iOS storage queries
+
+The #35 charging hour completed with independent baseline restoration but
+**net loss 97.30mAh** after a 38.1°C thermal hold; no thermal restart was observed.
+The continuous touch worker stopped on its seventh cumulative recovery after
+120,300 input frames. Physical restoration was reported successful; the touch
+session/cleanup API failed and the normal wrapper refused it. Remaining radio
+cleanup passed separately. Brightness 1604 and schedutil were restored, followed
+by normal iOS return, owner-confirmed charging and Amethyst reapplication.
+
+A signed query-only helper now passes in normal iOS over root SSH: writable
+media capability,4 KiB physical blocks,1 MiB read/write transfer limits and unchanged
+APFS minimum126357602304 bytes. No resize/flush/storage write was issued; actual
+resize and writer/durability qualification remain open. All temporary helpers
+were removed. The 35 host model tests, bounded-host-mount rehearsal and live
+checkpoint checks are complete; no installation is authorized or performed.
+
+[Draft Orchard Wi-Fi PR53](https://github.com/OrchardLinux/orchard/pull/53) shares
+the working firmware converter and offline packaging/configuration path;
+449 local tests and upstream CI pass. Native J72 integration remains pending.
+
+[Power](code/charging/maintain35/), [touch](code/touch/LONG-RUN-20261102.md),
+[storage query](code/storage/native-root-preparation/IOS-QUERY-RESULT.json).
+
+## Earlier checkpoint
+
 # Current device checkpoint: owner UI, nested cleanup and RAM35 restore pass
 
 The owner confirms all compressed-container desktop functions. Normal nested

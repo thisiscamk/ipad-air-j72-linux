@@ -1,15 +1,35 @@
-# #35 guarded charging active; owner UI passes
+# #35 hour complete: restoration passes, net charging fails
 
-The worker is now charging on the owner-confirmed same marked JCH377 port and
-adapter. A new receipt binds its changed host path to current configured/high-
-speed/self-powered hub descriptors, the same host boot, and the verified earlier
-iOS 5 V / 1500 mA capability capture. This does **not** claim a new iOS reading
-or general source detection. The same-UDC rebind restored USB after the move.
+The owner-qualified JCH377 test lasted **3600.535 seconds**, with 1704 fresh
+vectors covering 3598.354 seconds. Integrated net battery current was
+**−97.30 mAh** (mean **−97.35 mA**), including the protective hold. The battery
+indicator moved 39% → 34%; gauge transients are not used to infer charge gain.
+This run does **not** qualify sustained charging at normal brightness.
 
-The owner confirms the charging icon, menu and keyboard. Early settled current
-is +52..+186 mA at 1604 brightness and 36.2 C. The bounded one-hour observation
-is running; sustained net gain and final restoration are pending. All original
-source leases, voltage/current/temperature and restoration guards remain.
+The initial charging phase lasted about 44.7 minutes, with positive readings
+up to +199 mA. The unchanged thermal guard entered a hold at **38.1°C**.
+Independent readback confirmed the original input limit `02`, without a fault.
+The pack did not cool to the restart threshold before the observation ended;
+**automatic thermal restart remains unproved**. Brightness was temporarily
+reduced from 1604 to 401 during the hold, then restored to1604. The controller
+was disabled and its original input limit independently verified at the end.
+
+A separate 60-second `conservative` CPU-governor comparison during the hold
+showed no isolated saving; `schedutil` was restored and frequency limits stayed
+unchanged. Touch failed during that comparison after its seventh cumulative
+recovery; causality is unproved. The [touch record](../../touch/LONG-RUN-20261102.md)
+distinguishes acquisition failure from reported hardware restoration.
+
+The desktop unmounted normally. The overall stop wrapper refused its touch
+check; evidence was preserved and the remaining radio shutdown was performed
+separately with independent hardware readback. Normal iOS return and charging
+are owner-confirmed. No internal storage was changed.
+
+The earlier [#34 result](../maintain34/) remains a separate positive test with
+reduced brightness and different thermal conditions. Neither test establishes
+autonomous source detection, general charger support or unattended charging.
+
+[Final measurements](ONE-HOUR-RESULT.json), [source/build status](RESULT.json).
 
 ## Earlier preparation and disabled stage
 

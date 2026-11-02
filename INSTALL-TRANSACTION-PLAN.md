@@ -8,7 +8,8 @@ personal content is recorded; it does not authorize an unspecified disk change.
 
 - The combined #35 RAM desktop, touch, keyboard and Wi-Fi work together. Native
   storage is read-only and repeated bounded reads match. Normal mounted desktop
-  and export cleanup passes. Guarded hub charging is being observed separately.
+  and export cleanup passes. The later power hour lost net charge during thermal
+  hold; continuous touch hit its lifetime recovery limit. Those issues remain open.
 - The conditional layout and bounded-view planners pass against captured metadata.
   A new disposable host disk rehearses 4096-byte read-only backing, an exact
   offset/length read-only DM map, ext4 `ro,noload`, compressed-base hash readback,
@@ -22,6 +23,12 @@ personal content is recorded; it does not authorize an unspecified disk change.
   outcomes. It has no device writer or automatic repair interface.
 
 Sources and sanitized results: [native-root preparation](code/storage/native-root-preparation/).
+
+The fresh normal-iOS query helper also passes with no writes: 4096-byte physical
+blocks, 1MiB read/write transfer limits, media-writable capability and unchanged
+126357602304-byte APFS minimum. No flush was issued. This is capability evidence,
+not writer, resize or durability qualification.
+[Device query result](code/storage/native-root-preparation/IOS-QUERY-RESULT.json).
 
 ## Conditional layout for review
 

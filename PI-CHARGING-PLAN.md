@@ -1,3 +1,14 @@
+# Latest: #35 hour completes with net loss during thermal hold
+
+The normal-brightness run entered a protective thermal hold after 44.7 minutes
+at 38.1°C. Full-hour integration is −97.30 mAh, including the hold; independent
+final restoration passed without a controller fault. Brightness and governor
+were restored. Thermal restart, sustained net gain at this workload and
+unattended charging remain open. The device is back in iOS charging.
+[Final measurements and limits](code/charging/maintain35/).
+
+## Earlier checkpoint
+
 # Latest result: voltage guard after 27.2 minutes
 
 The reduced-brightness continuous-input run reached **27.2 minutes**, with

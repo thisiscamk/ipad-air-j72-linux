@@ -87,7 +87,10 @@
   "host_rehearsal_source_image_and_kernel_unchanged": true,
   "native_ios_query_helper_signed_arm64_build_pass": true,
   "native_ios_query_helper_ubsan_cases_pass": 15,
-  "native_ios_query_helper_device_tested": false,
+  "native_ios_query_helper_device_tested": true,
   "native_ios_query_helper_resize_flush_or_write_interface": false,
-  "existing_recovery_capsule_modified": false
+  "existing_recovery_capsule_modified": false,
+  "native_ios_query_helper_device_result": "IOS-QUERY-RESULT.json",
+  "fresh_minimum_query_status": 0,
+  "fresh_minimum_bytes": 126357602304
 }

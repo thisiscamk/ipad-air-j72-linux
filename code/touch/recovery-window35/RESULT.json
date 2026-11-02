@@ -1,0 +1,17 @@
+{
+  "status": "OFFLINE_BUILD_TESTS_IMPORTS_PASS_DEVICE_UNTESTED",
+  "uts_version": "#35 SMP PREEMPT Mon Nov 2 07:00:00 +08 2026",
+  "base_source_sha256": "a115fa2a7268bf8d16ab49e33186d92922e5cffe3062365134060825fec1f095",
+  "source_sha256": "6e0b02abb94aa9204f9b3162f4dac3451ced7df1887d22f3981702e70fe24b2c",
+  "module_strong_imports": 69,
+  "kernel_files_unchanged": true,
+  "device_access": false,
+  "storage_writes": false,
+  "continuous_max_recoveries": 6,
+  "continuous_window_ms": 60000,
+  "finite_diagnostic_budget_unchanged": true,
+  "cleanup_api_failure_guard_unchanged": true,
+  "actual_recovery_branch_ubsan_health_failure_cases_pass": true,
+  "device_tested": false,
+  "firmware_calibration_or_binary_published": false
+}

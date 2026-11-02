@@ -1,19 +1,27 @@
-# Current physical gate: RAM desktop restored; move to the qualified hub
+# Current: iOS inspection complete; no new DFU needed yet
 
-- [x] Owner confirms all compressed-container desktop functions.
-- [x] Away observer cancelled/reaped; brightness restored to1604.
-- [x] Normal nested loop/ext4/NBD/export cleanup passes.
-- [x] Known RAM desktop stages/starts on #35 with Wi-Fi; NBD remains detached.
-- [x] Matched #35 charging module loads disabled, original input limit unchanged.
-- [x] Owner confirms move to the same marked powered-hub port and charging/menu/keyboard.
-- [x] New source receipt binds the changed live path to same-host-boot verified physical-source evidence.
-- [ ] Observe bounded #35 charging, automatic protection and independent restoration.
-- [ ] Qualify iOS 12 resize/fenced writer/recovery and review the exact install proposal.
-- [ ] Separate authorization for reviewed writes; then verify installed image/layout.
-- [ ] Changed DFU for the first local read-only root; persistence and PC-free startup later.
+- [x] Combined #35 desktop, Wi-Fi, input, native read checks and mounted cleanup.
+- [x] One-hour charging observation and independent input-limit restoration.
+- [ ] Sustained net charge at normal brightness: latest hour lost 97.30mAh.
+- [ ] Thermal cooldown/restart: guard held at 38.1°C, restart not observed.
+- [x] Build/test a separate bounded recovery-window touch candidate.
+- [ ] Next changed RAM session: stage candidate, self-check, then long input/power observation.
+- [x] Restore brightness 1604 and governor schedutil; return to iOS charging.
+- [x] Owner reapplies Amethyst; root SSH and query-only storage helper pass.
+- [x] Refresh APFS minimum: unchanged126357602304 bytes; 4KiB physical blocks.
+- [x] Host bounded-map rehearsal, 35 model tests and live checkpoint checks.
+- [ ] Qualify iOS12 resize, fenced writer, flush and interruption recovery.
+- [ ] Review the exact installation proposal and obtain separate write approval.
+- [ ] Install/verify approved layout and image, then changed DFU for local RO root.
+- [ ] Later: persistent state, autonomous charging and fully PC-free startup.
 
-No internal writes are authorized or performed. No new DFU is needed for the
-current hub continuation. The kernel module is disabled while the move is pending.
+No internal writes are authorized or performed. The iPad remains in iOS on the
+powered hub. The next RAM test should include a reviewed touch-recovery change;
+unchanged charging or DFU retries will not resolve the remaining gates.
+
+[Power measurements](code/charging/maintain35/),
+[touch failure](code/touch/LONG-RUN-20261102.md),
+[storage transaction plan](INSTALL-TRANSACTION-PLAN.md).
 
 ## Earlier preparation
 

@@ -1,0 +1,62 @@
+{
+  "profile": "j72-ios12-native-writer-queries-v1",
+  "read_only": true,
+  "logical_block_bytes": 4096,
+  "total_blocks": 31250000,
+  "queries": {
+    "media_writable": {
+      "status": 0,
+      "errno": 0,
+      "value": 1,
+      "canaries_intact": true
+    },
+    "features": {
+      "status": 0,
+      "errno": 0,
+      "value": 22,
+      "canaries_intact": true
+    },
+    "physical_block_bytes": {
+      "status": 0,
+      "errno": 0,
+      "value": 4096,
+      "canaries_intact": true
+    },
+    "maximum_read_bytes": {
+      "status": 0,
+      "errno": 0,
+      "value": 1048576,
+      "canaries_intact": true
+    },
+    "maximum_write_bytes": {
+      "status": 0,
+      "errno": 0,
+      "value": 1048576,
+      "canaries_intact": true
+    }
+  },
+  "minimal_size": {
+    "available": true,
+    "status": 0,
+    "bytes": 126357602304,
+    "canaries_intact": true
+  },
+  "resize_called": false,
+  "flush_issued": false,
+  "storage_writes": false,
+  "write_qualification_pass": false,
+  "status": "NORMAL_IOS_READ_ONLY_CAPABILITY_QUERIES_PASS",
+  "device_tested": true,
+  "temporary_helpers_removed": true,
+  "execution_location": "unique temporary /usr/bin path; removed",
+  "initial_tmp_execution_denied_by_system_policy": true,
+  "advertised_feature_bits_decoded_from_xnu4903": {
+    "value_hex": "0x16",
+    "barrier": true,
+    "priority": true,
+    "unmap": true,
+    "force_unit_access": false,
+    "capability_only_not_durability_test": true,
+    "reference": "https://raw.githubusercontent.com/apple-oss-distributions/xnu/xnu-4903.241.1/bsd/sys/disk.h"
+  }
+}
