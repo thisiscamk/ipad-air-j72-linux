@@ -1,11 +1,55 @@
-# Combined #35 desktop/storage candidate — device untested
+# Combined #35 storage, Wi-Fi and container desktop start on device
+
+The cold boot and both USB recovery shells pass. The live firmware/reserved-memory
+inventory passes before loading ASP. The internal namespace is read-only; six
+bounded aligned reads match before and during desktop/Wi-Fi activity, including
+both GPT signatures. Wi-Fi association, HTTPS and pinned-key SSH pass.
+
+The proposed filesystem format now reports desktop ready: ext4 mounted
+`ro,norecovery,nosuid,nodev,noexec`, read-only loop/SquashFS base, RAM runtime.
+Brightness is 1604/2047 with 475,880 KiB available after startup. **Owner-visible
+UI confirmation and actual mounted-container cleanup are pending. Keep USB
+connected.** This is a Pi-hosted format rehearsal, not an internal installation.
+[Measured status](RESULT.json).
+
+## Two RAM-only compatibility fixes
+
+The recovery BusyBox HTTP applet crashed, and it lacks `nbd-client`. Both USB
+shells remained healthy. [stage-j72-network35.py](stage-j72-network35.py) stages
+the separately hash-pinned static bootstrap BusyBox under a directory retaining
+its required basename `busybox`. It uses this helper only for HTTP while
+preserving the networking bundle's archive hashes and RAM staging checks.
+The regular bundled BusyBox is dynamic and cannot bootstrap an empty recovery
+root; arbitrary renaming of the static multicall binary also changes dispatch.
+
+After the first desktop attempt stopped and its bounded child exited, normal
+touch/NBD/export cleanup passed. [repair-j72-container35-nbd.py](repair-j72-container35-nbd.py)
+checked exact #35, healthy stopped input, zero NBD size, no mounted roots/export,
+old controller hash and static helper hash. It archived the old controller and
+manifest, changed only NBD calls to a hash-checked helper, updated source pins
+and uploaded the authored RAM controller. `--container35 --resume` then passed.
+[Actual controller](controller-example.sh), [autostart](autostart-example.sh).
+The original kernel, firmware, payload and filesystem image were unchanged;
+`/bin/busybox` was retained. A future fresh start in this workspace must stage
+the helper first and use the corrected pinned controller already prepared here.
+The original offline container preparation recipe predates this compatibility
+fix; its output needs the same controller adaptation before target startup.
+
+The payload audit currently also refreshes the builder manifest. Running it
+after source sealing invalidates the container's manifest pin; the startup
+preflight refused safely. Re-sealing verified unchanged kernel/artifacts before
+updating authored source pins. Do not omit preflight to bypass that refusal.
+
+## Earlier preparation and format details
+
+# Earlier offline preparation of the combined #35 candidate
 
 This prepares the next changed DFU. The existing proven #35 storage kernel,
 loader and DTB are retained; the initramfs now has freshly matched touch,
 WLAN/provider, brcmfmac, recovery and SquashFS modules. Module imports resolve
 against the actual kernel and selected module providers. Builds, payload audit,
-hash preflights and an actual wrong-kernel refusal pass. **This combined image
-has not booted on the iPad yet.** [Sanitized results](RESULT.json).
+hash preflights and an actual wrong-kernel refusal pass. **At that preparation checkpoint this combined image was device untested;
+the later device results are recorded above.** [Sanitized results](RESULT.json).
 
 ## Proposed filesystem format: host rehearsal passes
 
@@ -31,7 +75,7 @@ EXT4/LOOP support is reused. Persistent overlay remains disabled.
 3. `run-j72-native35-readcheck.py probe --receipt PRIVATE_INVENTORY`, then
    `check --receipt PRIVATE_COMPLETED_PROBE`: read-only namespace, six bounded
    aligned reads, repeated hashes and both GPT signatures. No internal mount.
-4. Stage networking, start the matched radio and connect with the private owner
+4. Stage networking with `stage-j72-network35.py`, start the matched radio and connect with the private owner
    profile using the explicit `--storage35` selectors; verify HTTPS and Wi-Fi SSH.
 5. Run `run-j72-compressed-desktop.py --container35 --run`. Check native reads
    again while the desktop is active, and ask the owner to verify input/UI.

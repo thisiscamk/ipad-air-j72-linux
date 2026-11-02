@@ -1,5 +1,5 @@
 {
-  "status": "HOST_FILE_CAPACITY_FSCK_READBACK_CLEANUP_PASS_DEVICE_UNTESTED",
+  "status": "COMBINED_DEVICE_BOOT_WIFI_CONTAINER_STARTUP_AND_CONCURRENT_NATIVE_READS_PASS_OWNER_UI_PENDING",
   "image_bytes": 1610612736,
   "base_bytes": 572002304,
   "available_bytes_after_first_base": 958230528,
@@ -8,7 +8,7 @@
   "readonly_loop_readback_pass": true,
   "normal_host_unmount_and_loop_detach": true,
   "source_unchanged": true,
-  "device_access": false,
+  "device_access": true,
   "internal_storage_writes": false,
   "native_root_boot_tested": false,
   "persistent_overlay_enabled": false,
@@ -21,5 +21,31 @@
   "container_desktop_preflight_pass": true,
   "native_readcheck_preflight_pass": true,
   "radio_preflight_pass": true,
-  "combined_payload_device_tested": false
+  "combined_payload_device_tested": true,
+  "both_usb_recovery_shells_pass": true,
+  "live_firmware_reserved_memory_inventory_pass": true,
+  "read_only_native_namespace_probe_pass": true,
+  "aligned_native_reads_per_phase": 6,
+  "bytes_each_native_read": 4096,
+  "native_reads_before_and_during_desktop_match": true,
+  "wifi_association_pass": true,
+  "wifi_https_pass": true,
+  "wifi_pinned_key_ssh_pass": true,
+  "usb_container_desktop_ready": true,
+  "container_outer_mount": "ext4 ro,norecovery,nosuid,nodev,noexec",
+  "container_inner_mount": "read-only loop/SquashFS",
+  "memory_available_kib_after_start": 475880,
+  "brightness": 1604,
+  "battery_percent_after_start": 70,
+  "owner_ui_confirmation": "pending",
+  "mounted_container_normal_cleanup_tested": false,
+  "keep_usb_connected_until_normal_stop": true,
+  "system_busybox_replaced": false,
+  "compatibility_fixes": [
+    "Pinned static BusyBox helper for HTTP staging",
+    "Hash-guarded NBD helper in stopped desktop controller"
+  ],
+  "internal_install_authorized": false,
+  "host_file_rehearsal_device_access": false,
+  "internal_storage_access": "bounded read-only namespace and GPT reads; no internal filesystem mount"
 }

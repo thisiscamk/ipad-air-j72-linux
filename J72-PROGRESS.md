@@ -1,3 +1,15 @@
+# Latest device test: combined storage/Wi-Fi and container desktop startup pass
+
+The matched #35 image boots, both recovery shells work, and internal-drive
+reads pass before and during desktop activity. Wi-Fi association, HTTPS and
+Wi-Fi SSH pass. The ext4-container/read-only-loop/SquashFS desktop reports ready;
+owner UI confirmation and actual mounted-container cleanup are pending. Two
+RAM-only helper fixes resolved recovery BusyBox HTTP/NBD limitations. USB must
+remain connected; the base is still Pi-hosted. No internal installation or
+writes occurred. [Actual fixes and measurements](code/storage/desktop-storage35/).
+
+## Previous checkpoint
+
 # Latest 2 November: net charging and voltage restart pass
 
 A full-hour Pi-supervised desktop/Wi-Fi observation gained 82% → 88% on the

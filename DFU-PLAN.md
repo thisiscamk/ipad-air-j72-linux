@@ -6,8 +6,10 @@
 - [x] Restore brightness to 1604; cleanly stop desktop, touch and WLAN provider.
 - [x] Build/audit matched #35 desktop/storage payload; original kernel/loader/DTB retained.
 - [x] Rehearse 1536 MiB ext4 + compressed-base format on host, read-only checks and cleanup pass.
-- [ ] Next changed DFU, direct Pi: qualify combined #35 boot/recovery/native reads.
-- [ ] Same boot: Wi-Fi, USB container-format desktop and concurrent native read checks; owner UI check.
+- [x] Direct-Pi DFU: combined #35 boot, both recovery shells and native read-only checks pass.
+- [x] Same boot: Wi-Fi association/HTTPS/SSH, USB container-format desktop ready and concurrent native reads pass.
+- [ ] Owner checks portrait/menu/Wi-Fi/Foot/keyboard; keep USB connected.
+- [ ] Normal mounted-container cleanup, read-only loop/NBD detach and owned host export stop.
 - [ ] Finalize bounded native mapping and exact resize/GPT/image-write/recovery proposal.
 - [ ] Obtain separate owner approval before internal writes; no install is currently authorized.
 - [ ] Install only after procedure qualification and verify image/map before booting.

@@ -1,7 +1,7 @@
 {
   "date": "2026-11-02",
   "kind": "authored lab reference sources; private inputs and dependent workspace tools required",
-  "device_tested": false,
+  "device_tested": true,
   "sources": {
     "prepare-j72-desktop-storage35-modules.py": {
       "workspace_path": "tools/prepare-j72-desktop-storage35-modules.py",
@@ -62,6 +62,24 @@
     "../compressed-desktop/run-j72-compressed-desktop.py": {
       "workspace_path": "tools/run-j72-compressed-desktop.py",
       "sha256": "a4a3f51db1c4ba39f010179a4784559ea4350071ff6127b1827274442ac281e6"
+    },
+    "stage-j72-network35.py": {
+      "workspace_path": "tools/stage-j72-network35.py",
+      "sha256": "fadd0a5a6071aa1ea5c4fed0e324b291693de51a3d6911b4cd76a6d2bf4cb6ed"
+    },
+    "repair-j72-container35-nbd.py": {
+      "workspace_path": "tools/repair-j72-container35-nbd.py",
+      "sha256": "003bb7e7d8e71154b053457afe17c26b0870466727001716322bf9d85522e199"
+    },
+    "controller-example.sh": {
+      "workspace_path": "private prepared authored controller/autostart (no firmware)",
+      "sha256": "888c64616de34b2d94a1105e98641c39e44c506d4ef4887a3fba2da43b2656bf"
+    },
+    "autostart-example.sh": {
+      "workspace_path": "private prepared authored controller/autostart (no firmware)",
+      "sha256": "360031e29690fef576ee0dac5f9ffd941816e7d07cd1034b3e805b9fa6f45f4b"
     }
-  }
+  },
+  "owner_ui_confirmation": "pending",
+  "notes": "Combined boot, Wi-Fi, read-only container desktop startup and concurrent native reads pass; installed local root and owner UI remain unconfirmed."
 }
