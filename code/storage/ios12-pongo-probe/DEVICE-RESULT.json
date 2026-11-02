@@ -1,0 +1,25 @@
+{
+  "status": "PARTIAL_DEVICE_INVENTORY_CORRECTED_PROBE_READY",
+  "proven_checkra1n_pongo_loader": "PASS",
+  "initial_module_registration": "PASS",
+  "exact_model_soc_and_ram_view_guards": "PASS",
+  "initial_probe_refusal": "non-map-property-length",
+  "builtin_memory_map_capture": "PASS",
+  "unused_reserved_memory_map_slots": 16,
+  "existing_trustcache_map_present": true,
+  "other_properties_observed": {
+    "AAPL,phandle": 4,
+    "kernel-only": 0
+  },
+  "loaded_kernel_uuid_verified": false,
+  "revised_probe_device_tested": false,
+  "repeat_module_load": "REFUSED_NOT_MACH_O",
+  "transfer_delay_did_not_resolve_reload": true,
+  "console_after_builtin_bootargs": "LIBUSB_ERROR_IO_NO_FURTHER_RESPONSES",
+  "builtin_pointer_conversion_cause": "suspected_from_source_not_proven_by_device_trace",
+  "corrected_next_test": "fresh Pongo; single revised observer load; no builtin bootargs/xargs",
+  "recovery_image_booted": false,
+  "internal_storage_accessed": false,
+  "internal_storage_writes_performed": false,
+  "host_system_kernel_changed": false
+}

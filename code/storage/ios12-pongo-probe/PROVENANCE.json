@@ -1,12 +1,13 @@
 {
-  "status": "OFFLINE_PASS_DEVICE_PROBE_NOT_YET_RUN",
+  "status": "PARTIAL_DEVICE_INVENTORY_CORRECTED_PROBE_READY",
   "source_hashes": {
-    "RESULT.json": "7d719cb89dd7d9d523d0eb8c452fc5934537cc1e82f354b77ad1b5ed0c319780",
-    "run-j72-pongo-recovery-probe.py": "2723e41de6f3f9acc9596b9829699e9355387c43f3d5fcf0b7a6eeec1e6b9d94",
-    "j72-pongo-recovery-probe.c": "c56af311d04536dca8eece3d66dc88d37874391f40bfb29cf9e49127d00c26db",
+    "DEVICE-RESULT.json": "d60232ada196dc9b83c05cca459bb227afa0b87c5506a6c98e3af09ec0da5614",
+    "RESULT.json": "d5d4db4cb062d72b01afcfb361060acb8ea12fa20567b19a69a79f951fd98860",
     "j72-pongo-recovery-bounds.h": "1f007462d73e31bfeb80ec4ae6cc219d3281ea5e8360ef8759f11d567132791e",
+    "j72-pongo-recovery-probe.c": "e5b042e4de81ef85d5858264de9796b49b6e14e3cf94839a0476c4ef114429da",
     "prepare-j72-pongo-recovery-probe.py": "852d384d8ab7930d6638649cb9313059d5cc681c1dc664e11f1db5e888e7c7fa",
-    "test-j72-pongo-recovery-probe.py": "97add56294cc8838214ac35b35094675e960294c49e9630d3ce912bd73b51487"
+    "run-j72-pongo-recovery-probe.py": "fc0faaf64a9be79defa5e8f830b63e9a81eaad1db9d7edf16423203bed01829b",
+    "test-j72-pongo-recovery-probe.py": "35fffe022089ad98d11e79ad58b89f284d59980d835779eecd30931c985a02e8"
   },
   "pongo_source_pin": "e98323f8a09abd80fc4cbcd74dee023b91a1ec22",
   "cached_gaster_source_pin": "2b9d747f2367f8c0860def02ec4fd299e531c52a",

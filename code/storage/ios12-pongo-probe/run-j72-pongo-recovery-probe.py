@@ -24,7 +24,7 @@ PONGOTERM=ROOT/'tools/host/aarch64/bin/pongoterm'
 PARENT=ROOT/'tools/host/aarch64/bin/j72-parent-bound-exec'
 EXPECTED_IMPORTS={'_command_puts','_command_register','_dt_check$64','_dt_find',
                   '_dt_parse$64','_dt_prop$64','_gBootArgs','_gDeviceTree',
-                  '_gEntryPoint','_socnum'}
+                  '_gEntryPoint','_gTopOfKernelData','_socnum'}
 
 def sha(path):return hashlib.sha256(path.read_bytes()).hexdigest()
 
@@ -110,6 +110,8 @@ def read_until(fd,log,marker,timeout):
         if not block:raise RuntimeError('Pongo console disconnected')
         log.write(block);log.flush();data.extend(block)
         if len(data)>32768:raise RuntimeError('Pongo response exceeds capture bound')
+        if b'J72_PROBE_REFUSED' in data or b'[modload_macho:!]' in data:
+            raise RuntimeError('Pongo refused the probe or module; inspect private console log')
     return bytes(data)
 
 def parse(raw,expected_uuid):
@@ -117,14 +119,24 @@ def parse(raw,expected_uuid):
     begin=b'J72_PONGO_PROBE_BEGIN\n';end=b'J72_PONGO_PROBE_END\n'
     if b'J72_PROBE_REFUSED' in raw or raw.count(begin)!=1 or raw.count(end)!=1:
         raise RuntimeError('Probe refused or response framing invalid')
-    body=raw.split(begin,1)[1].split(end,1)[0];values={};maps={};pending=None
+    body=raw.split(begin,1)[1].split(end,1)[0];values={};maps={};metadata={};pending=None
     allowed={'MODEL_OK','SOC','BOOT_REVISION','BOOT_VERSION','PHYS_BASE','MEM_SIZE',
-             'TOP_KERNEL_DATA','ENTRY_PHYS','RESERVED_SLOTS','KERNEL_HEADER_PHYS'}
+             'TOP_KERNEL_DATA','ENTRY_PHYS','RESERVED_SLOTS','KERNEL_HEADER_PHYS',
+             'ALLOCATOR_TOP','BOOT_COMMAND_LINE_LENGTH'}
     for line in body.decode().splitlines():
+        if not line:continue # command_puts appends a newline to each emitted row.
+        if line.startswith('LEN '):
+            match=re.fullmatch(r'LEN ([A-Za-z0-9_,.+?#@-]{1,31}) ([0-9a-f]{16})',line)
+            if pending is not None or not match or match[1] in maps or match[1] in metadata:
+                raise RuntimeError('Invalid or duplicate property metadata')
+            metadata[match[1]]=int(match[2],16)
+            if metadata[match[1]]>0x100000 or match[1].startswith('MemoryMapReserved-'):
+                raise RuntimeError('Invalid property length')
+            continue
         if line.startswith('MAP '):
             if pending is not None:raise RuntimeError('Incomplete map pair')
-            match=re.fullmatch(r'MAP ([A-Za-z0-9_-]{1,31}) ([0-9a-f]{16})',line)
-            if not match or match[1] in maps:raise RuntimeError('Invalid or duplicate map')
+            match=re.fullmatch(r'MAP ([A-Za-z0-9_,.+?#@-]{1,31}) ([0-9a-f]{16})',line)
+            if not match or match[1] in maps or match[1] in metadata:raise RuntimeError('Invalid or duplicate map')
             pending=(match[1],int(match[2],16));continue
         key,sep,value=line.partition(' ')
         if key=='MAP_SIZE':
@@ -137,20 +149,22 @@ def parse(raw,expected_uuid):
         else:
             if key not in allowed or not re.fullmatch('[0-9a-f]{16}',value):raise RuntimeError('Unexpected probe scalar')
             values[key]=int(value,16)
-    if pending is not None or set(values)!=allowed|{'KERNEL_UUID'} or len(maps)>128:
+    if pending is not None or set(values)!=allowed|{'KERNEL_UUID'} or len(maps)+len(metadata)>128:
         raise RuntimeError('Incomplete probe inventory')
     if values['MODEL_OK']!=1 or values['SOC']!=0x8960 or values['KERNEL_UUID']!=expected_uuid:
         raise RuntimeError('Runtime model or original iOS kernel mismatch')
     base,size=values['PHYS_BASE'],values['MEM_SIZE']
     if not (0x800000000<=base and 0x10000000<=size<=0x40000000):raise RuntimeError('Runtime RAM geometry invalid')
-    for key in ['ENTRY_PHYS','KERNEL_HEADER_PHYS']:
+    for key in ['ENTRY_PHYS','KERNEL_HEADER_PHYS','ALLOCATOR_TOP']:
         if not base<=values[key]<base+size:raise RuntimeError('Kernel address outside RAM')
+    if values['BOOT_COMMAND_LINE_LENGTH']>=256:raise RuntimeError('Command line exceeds iOS12 bound')
     reserved=sum(name.startswith('MemoryMapReserved-') for name in maps)
     if values['RESERVED_SLOTS']!=reserved:raise RuntimeError('Reserved-slot count mismatch')
     return {'profile':'j72-pongo-readonly-recovery-probe-v1','status':'PASS',
             'kernel_uuid_matches_original':True,'raw_disk_opened':False,
             'guest_memory_patched':False,'boot_requested':False,
-            'reserved_memory_map_slots':reserved,'values':values,'memory_maps':maps}
+            'reserved_memory_map_slots':reserved,'values':values,'memory_maps':maps,
+            'other_property_lengths':metadata}
 
 def capture(manifest):
     if os.geteuid()!=0:raise RuntimeError('Use the task administrator terminal for Pongo USB')
@@ -164,9 +178,24 @@ def capture(manifest):
                                          stdin=slave,stdout=slave,stderr=slave,start_new_session=True)
                 os.close(slave);slave=-1
                 os.write(master,b'\n');read_until(master,log,b'pongoOS> ',12)
+                # Only help is used here: this pinned build's bootargs/xargs
+                # commands convert a pointer which our probe already sees mapped.
+                os.write(master,b'help\n')
+                help_marker=b'shows this help message'
+                listing=read_until(master,log,help_marker,12)
+                if b'pongoOS> ' not in listing.split(help_marker,1)[1]:
+                    listing+=read_until(master,log,b'pongoOS> ',12)
+                if b'j72rescueprobe' in listing:
+                    raise RuntimeError('Probe already registered: no repeated module upload in this Pongo boot')
                 os.write(master,(' /send '+str(MODULE)+'\n').lstrip().encode())
                 read_until(master,log,f'Uploaded {MODULE.stat().st_size} bytes'.encode(),15)
-                os.write(master,b'modload\n');read_until(master,log,b'Loaded module j72_recovery_probe',10)
+                # Host bulk completion can precede the device's upload callback.
+                time.sleep(.5)
+                os.write(master,b'modload\n')
+                load_marker=b'Loaded module j72_recovery_probe'
+                loaded=read_until(master,log,load_marker,10)
+                if b'pongoOS> ' not in loaded.split(load_marker,1)[1]:
+                    read_until(master,log,b'pongoOS> ',10)
                 os.write(master,b'j72rescueprobe\n')
                 raw=read_until(master,log,b'J72_PONGO_PROBE_END\n',15)
                 result=parse(raw,manifest['expected_kernel_uuid'])

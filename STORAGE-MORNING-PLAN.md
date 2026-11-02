@@ -1,3 +1,18 @@
+# 2 November: Pongo inventory captured; corrected probe needs a fresh session
+
+The proven loader and first probe registration passed. Model, RAM and DeviceTree
+guards passed; the observer stopped at legitimate non-map metadata. A built-in
+DT read captured 16 unused reserved slots and an existing trust-cache mapping.
+The kernel UUID is not yet verified and the recovery image has not booted.
+
+Repeated module loads failed before execution. A later built-in boot-argument
+read lost console access; an incompatible pointer conversion is suspected from
+source. The next test uses one corrected observer load in fresh Pongo and avoids
+those built-ins. Six real-source property cases and twelve malformed-frame
+refusals now pass, alongside the existing span/Mach-O/transport checks.
+[Actual source and separate device/offline results](code/storage/ios12-pongo-probe/).
+No disk or snapshot writes occurred. Normal iOS return is pending owner confirmation.
+
 # Current recovery gate: inspect the proven Pongo handoff
 
 The gaster route did not restore a pwned USB endpoint after its A7 reconnect

@@ -13,6 +13,7 @@ _Static_assert(__builtin_offsetof(struct boot_args12,args)==108,"Pongo iOS12 com
 extern struct boot_args12 *gBootArgs;
 extern dt_node *gDeviceTree;
 extern void *gEntryPoint;
+extern u64 gTopOfKernelData;
 extern u32 socnum;
 extern int dt_check(void*,size_t,size_t*) __asm__("_dt_check$64");
 extern int dt_parse(dt_node*,int,size_t*,int(*)(void*,dt_node*,int),void*,int(*)(void*,dt_node*,int,const char*,void*,size_t),void*) __asm__("_dt_parse$64");
@@ -30,11 +31,15 @@ static int maprow(void*a,dt_node*node,int depth,const char*key,void*val,size_t l
  (void)a;(void)node;(void)depth;
  if(++maps>128)return -1;
  if(eq(key,"name"))return 0;
- if(len!=16){fail("memory-map-property-size");return -1;}
- if(prefix(key,"MemoryMapReserved-"))reserved++;
- char line[40];unsigned n=0;line[n++]='M';line[n++]='A';line[n++]='P';line[n++]=' ';
- while(key[n-4]&&n<35){unsigned c=(unsigned char)key[n-4];if(!((c>='a'&&c<='z')||(c>='A'&&c<='Z')||(c>='0'&&c<='9')||c=='_'||c=='-'))return -1;line[n++]=(char)c;}
- line[n]=0;value(line,j72_u64(val));value("MAP_SIZE",j72_u64((unsigned char*)val+8));return 0;
+ int isreserved=prefix(key,"MemoryMapReserved-");
+ if(isreserved&&len!=16){fail("reserved-property-size");return -1;}
+ if(isreserved)reserved++;
+ char line[40];unsigned n=0;const char*tag=len==16?"MAP ":"LEN ";
+ while(n<4){line[n]=tag[n];n++;}
+ while(key[n-4]&&n<35){unsigned c=(unsigned char)key[n-4];if(!((c>='a'&&c<='z')||(c>='A'&&c<='Z')||(c>='0'&&c<='9')||c=='_'||c=='-'||c==','||c=='.'||c=='+'||c=='?'||c=='#'||c=='@'))return -1;line[n++]=(char)c;}
+ line[n]=0;
+ if(len!=16){value(line,len);return 0;}
+ value(line,j72_u64(val));value("MAP_SIZE",j72_u64((unsigned char*)val+8));return 0;
 }
 static void probe(const char*command,char*args){
  (void)command;while(*args==' ')args++;if(*args){fail("arguments");return;}
@@ -48,8 +53,12 @@ static void probe(const char*command,char*args){
  if(!model||len!=8||!eq(model,"iPad4,2")){fail("model");return;}
  u64 entry=(u64)gEntryPoint;
  if(!j72_span(b->phys,b->size,entry,4)){fail("entry-range");return;}
+ if(!j72_span(b->phys,b->size,gTopOfKernelData,1)){fail("allocator-top-range");return;}
+ unsigned arglen=0;while(arglen<sizeof(b->args)&&b->args[arglen])arglen++;
+ if(arglen==sizeof(b->args)){fail("boot-command-line-length");return;}
  command_puts("J72_PONGO_PROBE_BEGIN\n");value("MODEL_OK",1);value("SOC",socnum);
  value("BOOT_REVISION",b->revision);value("BOOT_VERSION",b->version);value("PHYS_BASE",b->phys);value("MEM_SIZE",b->size);value("TOP_KERNEL_DATA",b->top);value("ENTRY_PHYS",entry);
+ value("ALLOCATOR_TOP",gTopOfKernelData);value("BOOT_COMMAND_LINE_LENGTH",arglen);
  dt_node*map=dt_find(gDeviceTree,"/chosen/memory-map");if(!map){fail("memory-map-missing");return;}
  maps=reserved=0;if(dt_parse(map,-1,0,0,0,maprow,0)){fail("memory-map-parse");return;}
  value("RESERVED_SLOTS",reserved);
@@ -58,7 +67,8 @@ static void probe(const char*command,char*args){
   if(!j72_span(b->phys,b->size,page,32))break;
   const unsigned char*ptr=(void*)(page-0x800000000ULL+0x400000000ULL);
   if(j72_macho_uuid(ptr,b->size-(page-b->phys),uuid)){found=page;break;}
-  if(page<b->phys+4096)break;page-=4096;
+  if(page<b->phys+4096)break;
+  page-=4096;
  }
  if(!found){fail("bounded-kernel-header-search");return;}
  value("KERNEL_HEADER_PHYS",found);char row[48]="KERNEL_UUID ";unsigned at=12;

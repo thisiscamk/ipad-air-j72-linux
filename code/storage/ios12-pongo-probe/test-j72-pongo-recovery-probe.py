@@ -51,23 +51,61 @@ def main():
         x=bytearray(b);x[112:128]=bytes(16);assert not accepts(x)[0];cases+=1
         original=(WORK/'kernel.original.dec').read_bytes()
         assert accepts(original)==(1,host.kernel_uuid(WORK/'kernel.original.dec'));cases+=1
+        # Exercise the real module callback against the two non-map properties
+        # observed on device, without reading or modifying a device tree.
+        callback=tmp/'callback.c';callback_so=tmp/'callback.so'
+        callback.write_text('''#include <string.h>
+#include "j72-pongo-recovery-probe.c"
+struct boot_args12 *gBootArgs;dt_node *gDeviceTree;void *gEntryPoint;
+u64 gTopOfKernelData;u32 socnum;
+static char output[4096];
+void command_puts(const char*s){strncat(output,s,sizeof(output)-strlen(output)-1);strncat(output,"\\n",sizeof(output)-strlen(output)-1);}
+void command_register(const char*a,const char*b,void(*c)(const char*,char*)){(void)a;(void)b;(void)c;}
+int dt_check(void*a,size_t b,size_t*c){(void)a;(void)b;(void)c;return 0;}
+int dt_parse(dt_node*a,int b,size_t*c,int(*d)(void*,dt_node*,int),void*e,int(*f)(void*,dt_node*,int,const char*,void*,size_t),void*g){(void)a;(void)b;(void)c;(void)d;(void)e;(void)f;(void)g;return 0;}
+void *dt_prop(dt_node*a,const char*b,size_t*c){(void)a;(void)b;(void)c;return 0;}
+dt_node *dt_find(dt_node*a,const char*b){(void)a;(void)b;return 0;}
+int row(const char*key,unsigned long len){unsigned char bytes[16]={0};output[0]=0;maps=reserved=0;return maprow(0,0,0,key,bytes,len);}
+const char *row_output(void){return output;}
+''')
+        subprocess.run(['cc','-shared','-fPIC','-O1','-Wall','-Wextra','-Werror',
+                        '-fsanitize=undefined','-fno-sanitize-recover=all','-I',str(ROOT/'tools'),
+                        str(callback),'-o',str(callback_so)],check=True)
+        cb=ctypes.CDLL(str(callback_so));cb.row.argtypes=[ctypes.c_char_p,ctypes.c_ulong]
+        cb.row_output.restype=ctypes.c_char_p
+        callback_cases=[(b'AAPL,phandle',4,0,b'LEN AAPL,phandle 0000000000000004'),
+                        (b'kernel-only',0,0,b'LEN kernel-only 0000000000000000'),
+                        (b'MemoryMapReserved-14',16,0,b'MAP MemoryMapReserved-14'),
+                        (b'MemoryMapReserved-14',4,-1,b'J72_PROBE_REFUSED'),
+                        (b'Kernel-__TEXT',16,0,b'MAP Kernel-__TEXT'),
+                        (b'bad key',4,-1,b'')]
+        for key,length,expected,marker in callback_cases:
+            assert cb.row(key,length)==expected and marker in cb.row_output()
         uuid='01'*16
         scalar={'MODEL_OK':1,'SOC':0x8960,'BOOT_REVISION':2,'BOOT_VERSION':2,
                 'PHYS_BASE':0x800000000,'MEM_SIZE':0x40000000,'TOP_KERNEL_DATA':0x800800000,
                 'ENTRY_PHYS':0x800401000,'RESERVED_SLOTS':2,'KERNEL_HEADER_PHYS':0x800400000}
+        scalar.update(ALLOCATOR_TOP=0x800800000,BOOT_COMMAND_LINE_LENGTH=0)
         text='J72_PONGO_PROBE_BEGIN\n'+''.join(f'{k} {v:016x}\n' for k,v in scalar.items())
         text+='MAP MemoryMapReserved-0 0000000000000000\nMAP_SIZE 0000000000000000\n'
         text+='MAP MemoryMapReserved-1 0000000000000000\nMAP_SIZE 0000000000000000\n'
         text+='MAP Kernel-__TEXT 0000000800400000\nMAP_SIZE 0000000000100000\n'
+        text+='LEN AAPL,phandle 0000000000000004\nLEN kernel-only 0000000000000000\n'
         text+='KERNEL_UUID '+uuid+'\nJ72_PONGO_PROBE_END\n'
         result=host.parse(text.encode(),uuid);assert result['reserved_memory_map_slots']==2
+        assert result['other_property_lengths']=={'AAPL,phandle':4,'kernel-only':0}
+        assert host.parse(text.replace('\n','\n\n').encode(),uuid)['status']=='PASS'
         invalid=[text.replace('J72_PONGO_PROBE_END\n',''),text+text,
                  text.replace('MODEL_OK 0000000000000001','MODEL_OK 0000000000000000'),
                  text.replace('MEM_SIZE 0000000040000000','MEM_SIZE ffffffffffffffff'),
                  text.replace('RESERVED_SLOTS 0000000000000002','RESERVED_SLOTS 0000000000000003'),
                  text.replace('MAP_SIZE 0000000000000000\n','',1),
                  text.replace('KERNEL_UUID '+uuid,'KERNEL_UUID '+'02'*16),
-                 text.replace('ENTRY_PHYS 0000000800401000','ENTRY_PHYS 0000000000000000')]
+                 text.replace('ENTRY_PHYS 0000000800401000','ENTRY_PHYS 0000000000000000'),
+                 text.replace('LEN AAPL,phandle','LEN MemoryMapReserved-2'),
+                 text.replace('LEN AAPL,phandle','LEN Kernel-__TEXT'),
+                 text.replace('LEN AAPL,phandle 0000000000000004','LEN AAPL,phandle 0000000000100001'),
+                 text.replace('BOOT_COMMAND_LINE_LENGTH 0000000000000000','BOOT_COMMAND_LINE_LENGTH 0000000000000100')]
         for frame in invalid:
             try:host.parse(frame.encode(),uuid);raise AssertionError('bad frame accepted')
             except RuntimeError:pass
@@ -82,6 +120,7 @@ def main():
         finally:os.close(rd);thread.join()
         assert host.parse(raw,uuid)['status']=='PASS'
     result={'status':'PASS','actual_source_span_cases':len(spans),'actual_source_macho_cases':cases,
+            'actual_source_property_cases':len(callback_cases),
             'captured_frame_refusal_cases':len(invalid),'fragmented_crlf_transport':'PASS',
             'native_module_imports':host.module_imports(host.MODULE),'usb_access':False,
             'device_probe_tested':False,'recovery_boot_tested':False}

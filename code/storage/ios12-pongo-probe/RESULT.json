@@ -2,7 +2,8 @@
   "status": "PASS",
   "actual_source_span_cases": 8,
   "actual_source_macho_cases": 143,
-  "captured_frame_refusal_cases": 8,
+  "actual_source_property_cases": 6,
+  "captured_frame_refusal_cases": 12,
   "fragmented_crlf_transport": "PASS",
   "native_module_imports": [
     "_command_puts",
@@ -14,6 +15,7 @@
     "_gBootArgs",
     "_gDeviceTree",
     "_gEntryPoint",
+    "_gTopOfKernelData",
     "_socnum"
   ],
   "usb_access": false,

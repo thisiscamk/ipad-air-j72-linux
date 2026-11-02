@@ -1,3 +1,18 @@
+# Next DFU: one corrected Pongo inventory load
+
+- [x] Use the proven direct-Pi checkra1n → Pongo path successfully.
+- [x] Register the original observer and pass exact model/RAM/DT guards.
+- [x] Capture the full memory map: 16 unused slots and an existing trust cache.
+- [x] Correct handling of the 4-byte handle, zero-length flag and doubled newlines.
+- [x] Test the actual property callback; avoid repeat module uploads and built-in boot-argument commands.
+- [ ] Owner returns to normal iOS on the current direct Pi cable.
+- [ ] Fresh DFU: load the revised observer once; verify original kernel UUID and allocator bounds.
+- [ ] Prepare/qualify the RAM recovery handoff with that evidence, retaining a healthy Pongo session.
+- [ ] Review a concrete space-creation proposal before any internal changes.
+
+The recovery image has not booted and the 1.64 GB shrink allowance remains a
+separate installation blocker. [Measured result and code](code/storage/ios12-pongo-probe/).
+
 # Next DFU: read-only recovery inventory through proven Pongo
 
 - [x] Observe gaster's A7 PATCH/reconnect boundary; stop before any image upload.
