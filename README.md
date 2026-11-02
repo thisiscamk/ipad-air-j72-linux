@@ -6,6 +6,10 @@ Read the [progress report](J72-PROGRESS.md) for measured results and current lim
 
 **Native storage reads now work (2 November):** the new #35 RAM boot identifies the 128 GB internal drive and passes repeated read comparisons plus verification of both GPT copies. There is one APFS partition and no unallocated gap. APFS metadata reports about 71.7 GB free inside the container; the live iOS minimum-size query allows only about 1.64 GB of shrink. The original root snapshot is retained while recovery, space creation and writable storage are qualified. No internal writes or installation have occurred. [Measured source and results](code/storage/linux-asp-observer35/), [next steps](STORAGE-MORNING-PLAN.md).
 
+**RAM recovery now passes:** the restricted iOS12 recovery boots with authenticated SSH, verified HFS/md0 root, zero APFS mounts and valid GPT copies. Its unmounted minimum-size query matches iOS, so the 1.64 GB space limit remains. Normal iOS return is confirmed. [Measured result and code](code/storage/ios12-pongo-handoff/).
+
+**Compressed-root route prepared:** the desktop compresses to 572 MB with five verified file readbacks. Matching SquashFS modules build, and the next direct-Pi DFU will test the compressed desktop over read-only USB before any internal change. A conditional 1536 MiB layout could retain the rollback snapshot; actual resizing and installation remain unapproved and unqualified. [Candidate/source](code/storage/compressed-desktop/), [space review](SPACE-CREATION-REVIEW.md).
+
 The present desktop uses software rendering and a reduced Arch Linux ARM filesystem resident in RAM. The earlier desktop root was served by a Raspberry Pi over USB. Native multitouch now reaches Linux input, and the owner has confirmed full-screen touch mapping with a visual target test. This repository is a place to share reviewed notes while J72 support is developed; a focused hardware implementation may later be proposed to [OrchardLinux/orchard](https://github.com/OrchardLinux/orchard).
 
 **Unplugged desktop now works:** after detaching the NBD disk and stopping the

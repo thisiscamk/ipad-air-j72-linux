@@ -1,7 +1,7 @@
 # Pongo RAM recovery handoff — recovery service reached
 
-**Revision2 boots RAM recovery and authenticates SSH successfully. The inspector
-refused its mount safety check before opening the disk. Revision3 is ready offline.**
+**Revision3 passed on J72: authenticated RAM recovery, verified md0 root, zero
+APFS mounts, both GPT copies/CRCs and an unmounted APFS minimum-size query.**
 The [compact observer](../ios12-pongo-compact/) has now passed on J72 and matched
 the loaded kernel UUID to the original iOS12.5.7 image. This candidate uses that
 measured ABI/memory map to attempt the prepared restricted recovery image in RAM.
@@ -51,42 +51,52 @@ static allocation and comparison of the full bundle; every boot still checks
 its current RAM bounds and available slots.
 No recovery success is claimed from a USB disconnect or Apple logo.
 
-## Device results and revision3
+## Device result
 
-[DEVICE-RESULT.json](DEVICE-RESULT.json) records the revision2 result. It passed
-RAM staging, independent handoff checks, recovery USB, pinned host identity and
-client public-key authentication. The forced inspector executed and refused
-its RAM-root/mount guard with exit 5, **before any raw disk open**. GPT reads and
-the recovery minimum-size query remain pending. [Revision1](DEVICE-REV1.json)
-records the preceding 0775-home authentication failure, fixed by revision2.
+[DEVICE-RESULT.json](DEVICE-RESULT.json) records the passing revision3 test.
+The root source label is actually `root_device`, confirming why revision2's
+literal `/dev/md0` check failed. Independent stat64 checks prove that `/` is on
+the `md0` block device; the root is HFS, its root-filesystem flag is set, and
+there are exactly two mounts with **zero APFS mounts**.
 
-The matching XNU source initially sets the root mount's source label to
-`root_device`; the old inspector accepted only `/dev/md0`. This is a plausible
-explanation, not an observed mount label from this device: the old refusal did
-not report which subcheck failed. Revision3 reports structured guard diagnostics
-and permits the known labels only when **all** of these checks pass:
+The forced inspector opened storage read-only and captured both GPT copies.
+The host validated both headers/entry-array CRCs and matching geometry. The disk
+still has one APFS partition and no unallocated GPT gap. Raw captures, identifiers
+and logs remain private.
 
-- One root mount, type HFS, with the root-filesystem flag.
+`APFSContainerGetMinimalSize` succeeded with no APFS mounted: status0, intact
+canaries, **126,357,602,304 bytes**. It exactly matches the earlier normal-iOS
+query and leaves only **1,642,352,640 bytes** geometrically releasable. Recovery
+boot and mounted-filesystem contention are no longer the measured blocker.
+The cause of the high minimum, including the snapshot hypothesis, remains
+unproved. There was no resize, snapshot mutation or internal-storage write.
+
+The normal reboot command was authenticated and acknowledged after the test.
+USB returned after the initial observation window; normal iOS identity and the
+owner's screen confirmation both pass. The paired battery query reports99%.
+
+[Revision2](DEVICE-REV2.json) preserves the authenticated mount-guard refusal;
+[revision1](DEVICE-REV1.json) preserves the earlier SSH permission defect.
+
+## Root-device guard and diagnostics
+
+Revision3 accepts only known source labels and requires **all** these checks:
+
+- One HFS root mount with the root-filesystem flag.
 - No APFS mounts; bounded, valid mount-table strings and counts.
 - `stat64("/")` reports a directory and `stat64("/dev/md0")` a block device.
 - Root `st_dev` is nonzero and equals the `md0` node's `st_rdev`.
-- Exact board/kernel family and the same approved RAM-root boot arguments.
+- Exact board/kernel family and the approved RAM-root boot arguments.
 
-Thus a matching label alone cannot allow inspection. The new `diagnose` forced
-command reports only metadata and never opens the disk. Arbitrary shell commands
-remain rejected. The host saves diagnostics even after inspection refusal and
-requires a successful device-identity guard receipt before accepting revision3.
+A label alone cannot allow inspection. Structured diagnostics are saved before
+raw disk access; `diagnose` remains a fixed metadata-only command. The host
+requires the device-identity guard receipt before accepting inspection success.
+Twenty-five actual-inspector native-stub/UBSan cases and six transport cleanup/
+refusal cases pass offline. Revision3's device result is recorded separately.
 
-The actual inspector passed 25 native-stub cases under UBSan: supported labels,
-wrong device/type/root flags, APFS, count/string/sysctl/stat failures and command
-refusals. Rejected cases made zero disk-open calls. Six transport cases cover
-cleanup, initial service state and missing marker/guard refusals. These tests
-do not substitute for the next device boot.
-
-Revision2 also confirmed the automatic temporary no-preflight usbmuxd path and
-cleanup/restoration of the Pi's normal service. Root/.ssh/key permissions remain
-audited in the actual HFS image. The original kernel, USB service and keys stay
-fixed; revision3 replaces only the authored inspector and its trust-cache hash.
+The automatic temporary no-preflight usbmuxd path and cleanup/restoration of the
+Pi's normal service also passed. Root/.ssh/key permissions remain audited in
+the actual HFS image. The Apple kernel, USB service and keys are unchanged.
 
 ## Recovery verification
 
@@ -99,8 +109,9 @@ It does not expose an interactive shell or a mount/resize/snapshot command.
 The only additional revision3 command, `diagnose`, reads root/mount metadata.
 
 Both GPT copies/CRCs and any supported minimum-size result must be reviewed
-before proposing space creation. The currently measured **1.64GB shrink allowance**
-still blocks the intended layout. No internal change is authorized by this test.
+before proposing space creation. The measured **1.64 GB shrink allowance**
+still blocks the conventional root layout. A compressed-root capacity rehearsal
+is being evaluated separately; neither layout nor any write is authorized here.
 
 ## Recipes and limits
 
@@ -142,8 +153,8 @@ boot-receipt refusals **before USB access**. The native module's imports and
 actual export pointer pairs are checked against the pinned Pongo binary.
 The existing restricted capsule's signatures, service/source pins and image
 readback remain prerequisites. Revision3 adds 25 actual-inspector cases and six
-transport cases. Revision3 has not run on device; revision2 reached authenticated
-recovery SSH and the mount guard as recorded separately above.
+transport cases. Revision3 now passes the device checks recorded separately
+above; the offline result remains a record of tests without USB access.
 
 - [XNU4903 initial root mount label](https://github.com/apple-oss-distributions/xnu/blob/xnu-4903.221.2/bsd/vfs/vfs_subr.c#L1017)
 - [XNU4903 stat64 ABI](https://github.com/apple-oss-distributions/xnu/blob/xnu-4903.221.2/bsd/sys/stat.h)

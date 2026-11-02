@@ -1,0 +1,12 @@
+{
+  "status": "OFFLINE_CAPACITY_MODULE_AND_DESKTOP_PREFLIGHT_PASS_DEVICE_PENDING",
+  "source_hashes": {
+    "README.md": "6b1bdbcb0731d43830f3f7e34c80d681c822e0569c6a265f06f961ac7c3e811b",
+    "RESULT.json": "fc1fad73b81ecf96ad34d990ec64da2b433ab36376ae81eb968f5b426f3a4a82",
+    "autostart-example.sh": "360031e29690fef576ee0dac5f9ffd941816e7d07cd1034b3e805b9fa6f45f4b",
+    "controller-example.sh": "80d5a80474d4a7d8807acf666328ed7bd1f3934ac645c9ca764491e378d5a2c8",
+    "prepare-j72-compressed-desktop.py": "985b43480862781c54c2650667688f522de1bade148b8741a408494953bb39ab",
+    "prepare-j72-compressed-root.py": "49f23019f085d8fe89872e8f557b6e19b125072a38132732224b95e0458609d2",
+    "run-j72-compressed-desktop.py": "0d051627e47cc0299898ccf83bfacd5335033dd72e8dad227945f5bd4ce0fff7"
+  }
+}

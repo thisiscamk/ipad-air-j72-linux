@@ -1,0 +1,31 @@
+{
+  "status": "OFFLINE_CAPACITY_PASS",
+  "source_bytes": 3221225472,
+  "source_mounted_read_only": true,
+  "compression": "gzip",
+  "block_bytes": 262144,
+  "compressed_bytes": 572002304,
+  "fits_1536_mib_artifact_budget": true,
+  "available_apfs_shrink_bytes": 1642352640,
+  "remaining_bytes_before_partition_and_overlay_overhead": 1070350336,
+  "elapsed_seconds": 209.35,
+  "device_access": false,
+  "device_installed": false,
+  "boot_tested": false,
+  "runtime_overrides_integrated": false,
+  "source_unmounted": true,
+  "selected_files_read_back_count": 5,
+  "matching_module": {
+    "status": "OFFLINE_BUILD_AND_IMPORT_PASS",
+    "kernel_image_config_release_exports_unchanged": true,
+    "strong_imports_checked": 106,
+    "strong_imports_unresolved": 0,
+    "kernel_build": "#34 SMP PREEMPT Sun Nov  1 07:40:27 +08 2026",
+    "module_loaded": false,
+    "all_import_providers": "vmlinux",
+    "additional_module_dependencies": []
+  },
+  "usb_desktop_test_prepared": true,
+  "usb_desktop_test_run": false,
+  "internal_install_authorized": false
+}

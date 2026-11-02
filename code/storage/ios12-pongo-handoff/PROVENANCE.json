@@ -1,10 +1,11 @@
 {
-  "status": "REVISION2_SSH_PASS_MOUNT_GUARD_REFUSED_REVISION3_OFFLINE_PASS",
+  "status": "REVISION3_READ_ONLY_RECOVERY_DEVICE_PASS",
   "pongo_source_pin": "e98323f8a09abd80fc4cbcd74dee023b91a1ec22",
   "source_hashes": {
-    "DEVICE-RESULT.json": "71b45d60ccd410bf1204adafd6afca26b9cea9be4dfe4e1fc3200d6031bcd863",
+    "DEVICE-RESULT.json": "f06a2880dd022b366fa3fd183d7e291ba53b1b5fe5c4fd25b7c68c7188b6b78f",
     "DEVICE-REV1.json": "c1e703af02b9721952277f4eaeb02903c9e1a3bea9315ef8200555d80667a74f",
-    "README.md": "5b554ea0acf9606a1f51813019b6be0abc0dc45cef951b6fb18a6c2a3332355f",
+    "DEVICE-REV2.json": "71b45d60ccd410bf1204adafd6afca26b9cea9be4dfe4e1fc3200d6031bcd863",
+    "README.md": "d27e34194152d8cd94c326a74c076ec1a1dc38413d7e98ce5899c8ff474a1f54",
     "RESULT.json": "b6ffce1ac73cc3b949ee005185ccc4f19bafa1deffa42c5bec6a2cd86339e866",
     "j72-pongo-recovery-bounds.h": "1f007462d73e31bfeb80ec4ae6cc219d3281ea5e8360ef8759f11d567132791e",
     "j72-pongo-recovery-handoff-bounds.h": "dc44bdbf9ce5a614d15a47d0bbb74bcf5796060634b22d1cb26f76a31fab781c",
@@ -13,6 +14,7 @@
     "j72-recovery-inspect-live.py": "73cbc6400206e2891ce014555ad35524029d547f6a4c914de6e2762d62f29b23",
     "j72-recovery-inspect-v3.c": "667c247ac6e5bb236b6ebe48e8473845a9501bb443313a267aa7aa6051a858a6",
     "j72-recovery-mount-guard.h": "6a6a6df687efcc2a29ab1deec72977a7a62b1c452952a95343fdceecd12e5da4",
+    "j72-recovery-reboot.py": "a35d37bfae0424911db8dc7bef93b5b9906466f153eb69fed5fbc8c316680c4a",
     "j72_pongo_control.py": "fe080cf1bdbe1725b8911f8893591fcc9ee67b2d0e5f0f2d4175dfb50af3ef20",
     "j72_sha256.h": "ca6966ca1dee0a3caebce62b0fe7d00032727d73b671510304588785eb26d72b",
     "prepare-j72-ios-recovery-v2.py": "8f521c4aeda8c33b76409f0956111353ffded3074884565d3ec14d9c758a0fad",

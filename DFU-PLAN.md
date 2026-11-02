@@ -1,3 +1,26 @@
+# Next DFU: compressed desktop, then reuse the healthy boot
+
+- [x] Qualify restricted RAM recovery: SSH, md0 root, no APFS mounts, GPT CRCs.
+- [x] Measure unmounted minimum: same 1.64 GB release allowance as normal iOS.
+- [x] Return normally to iOS; owner confirms screen, paired battery 99%.
+- [x] Build 572 MB compressed desktop privately; five file readbacks pass.
+- [x] Build matching #34/#35 SquashFS modules; 106 imports resolve to vmlinux.
+- [x] Prepare #34 compressed-desktop controller, host export and cleanup; preflight passes.
+- [ ] When ready, direct-Pi DFU: proven Pongo and --wifi-ram-desktop boot.
+- [ ] Start read-only compressed export; qualify SquashFS desktop, memory, menu and keyboard.
+- [ ] Unmount/detach/export cleanup; reuse the same Linux boot for RAM desktop/Wi-Fi/power work where healthy.
+- [ ] Integrate native storage reads with the compressed base and review the conditional 1536 MiB layout.
+- [ ] Obtain separate approval for exact shrink/GPT/image writes before installation.
+- [ ] Qualify local read-only root, then persistent write/flush/overlay behavior.
+- [ ] Finish charging cooldown restart and sustained net gain before unattended charging.
+
+The next test needs the cable until cleanup. No internal storage, resize or
+snapshot operation is part of it.
+[Compressed candidate/runbook](code/storage/compressed-desktop/),
+[space/layout review](SPACE-CREATION-REVIEW.md).
+
+## Earlier checkpoints
+
 # Next DFU: qualify the recovery root-device check and inspect storage
 
 - [x] Pass revision2 RAM stage and independent handoff checks.

@@ -1,3 +1,28 @@
+# 2 November: read-only RAM recovery passes; compressed-root route prepared
+
+RAM recovery now passes SSH authentication, HFS/md0 device identity, zero APFS
+mounts and both GPT copies/CRCs. The actual mount source is `root_device`. The
+unmounted APFS minimum query succeeds and matches iOS: 126,357,602,304 bytes,
+leaving 1,642,352,640 bytes geometrically releasable. No resize, snapshot change
+or internal write occurred. Normal iOS return is confirmed; battery reports 99%.
+
+A private compressed copy of the desktop is 572,002,304 bytes. Five selected
+file readbacks pass. Matching #34/#35 SquashFS modules build; 106 strong imports
+resolve to vmlinux, with the original kernels/configs/exports unchanged.
+The prepared next DFU tests the compressed desktop via read-only USB NBD on the
+proven #34 RAM boot. It cannot access the internal disk; keep the cable until
+normal desktop unmount and export cleanup. Device GUI checks are still pending.
+
+A 1536 MiB partition is a candidate within the reported minimum, subject to a
+reviewed resize/write procedure. The compressed base may avoid snapshot removal
+for an interim local-root milestone. Native storage/root qualification, durable
+writes and unattended charging remain open.
+[Recovery result](code/storage/ios12-pongo-handoff/),
+[compressed test/source](code/storage/compressed-desktop/),
+[space review](SPACE-CREATION-REVIEW.md).
+
+## Earlier checkpoints
+
 # 2 November: recovery SSH authentication passes; mount identity check is next
 
 Revision2 passed RAM staging, recovery boot, pinned SSH identity and client-key
