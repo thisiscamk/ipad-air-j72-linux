@@ -44,5 +44,20 @@
     "descendant_stopped": true,
     "saved_attempt_resume_refusal_cases": 6,
     "usb_access": false
+  },
+  "second_device_attempt": {
+    "exact_j72_direct_pi_verified": true,
+    "live_stage_returns": {
+      "SETUP": true,
+      "SPRAY": true,
+      "PATCH": true
+    },
+    "a7_two_reconnect_prompt_observed": true,
+    "stopped_at_manual_step": true,
+    "kernel_usb_reset_wait_observed": true,
+    "loader_process_group_reaped": true,
+    "pwned_usb_marker_status": "pending_owner_cable_cycles",
+    "bootloader_or_ram_image_uploaded": false,
+    "storage_inspector_run": false
   }
 }

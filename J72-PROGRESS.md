@@ -1,3 +1,13 @@
+# 2 November: A7 recovery PATCH/manual reconnect boundary reached
+
+The second attempt's live log confirms SETUP, SPRAY and PATCH returned true,
+then gaster requested its A7 two-cable-cycle step. The launcher saved the exact
+attempt and stopped without uploading iBSS, iBEC or the RAM image. A native
+Linux USB reset wait briefly delayed process termination; the group is now
+reaped. Owner cable cycles and the strict same-device/pwned-marker check are
+pending. This is progress through the exploit stages, not a recovery boot or
+storage change. [Bounded result](code/storage/ios12-ram-recovery/RESULT.json).
+
 # 2 November: first recovery attempt stopped before image upload
 
 The first exact-J72/direct-Pi recovery attempt timed out in gaster at its

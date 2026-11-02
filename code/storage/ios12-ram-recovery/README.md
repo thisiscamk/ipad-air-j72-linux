@@ -118,3 +118,14 @@ The new Python recipes and authored `.tbd` stubs are MIT; the copied GPT
 checker retains GPL-2.0-only. Referenced third-party tools keep their own
 licenses and are not redistributed here. Source pins and hashes are in
 [PROVENANCE.json](PROVENANCE.json).
+
+## Second device attempt: A7 manual boundary observed
+
+Live logging now records `ret: true` for SETUP, SPRAY and PATCH and the explicit
+A7 two-reconnect prompt. The launcher stopped at that boundary without uploading
+a bootloader or RAM image. The native process briefly remained in an
+uninterruptible Linux USB reset wait with its stop signal pending; its process
+group has since been reaped. A kill request cannot force that kernel wait to
+complete immediately. The saved-attempt marker/identity check is pending the
+owner's cable cycles. PATCH's return alone does not qualify the complete exploit
+or establish that the recovery image boots.
