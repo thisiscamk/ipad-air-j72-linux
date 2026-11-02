@@ -1,17 +1,21 @@
 {
-  "status": "OFFLINE_PASS_STAGE_AND_BOOT_UNTESTED",
+  "status": "REVISION2_OFFLINE_PASS_REVISION1_RECOVERY_SSH_REACHED",
   "pongo_source_pin": "e98323f8a09abd80fc4cbcd74dee023b91a1ec22",
   "apple_source_reference": "xnu-4903.221.2/osfmk/kern/trustcache.h",
   "source_hashes": {
-    "README.md": "39b7a4a48d128c944e51ea5c9427471566e2c051f88ab72da20d1acde85088fb",
-    "RESULT.json": "49d4d72007e790f3a56687129f1f40469f7a216b8e1c35021cc096c897f37154",
+    "DEVICE-RESULT.json": "c1e703af02b9721952277f4eaeb02903c9e1a3bea9315ef8200555d80667a74f",
+    "README.md": "d29ee24f4cd24927cbb9d37a98e60e17c108a0852c19a7d27d340a2e8357a8d0",
+    "RESULT.json": "08d8dfb50921a092c224576ad8a6bb761d8bcfcacfd29fb0baffb8aa6c7fcc11",
     "j72-pongo-recovery-bounds.h": "1f007462d73e31bfeb80ec4ae6cc219d3281ea5e8360ef8759f11d567132791e",
     "j72-pongo-recovery-handoff-bounds.h": "dc44bdbf9ce5a614d15a47d0bbb74bcf5796060634b22d1cb26f76a31fab781c",
     "j72-pongo-recovery-handoff.c": "e0d65fee410dd8a4c10dec9269b3bc86e3f5747524d53ec6d98f1ad54b671c13",
+    "j72-recovery-inspect-live.py": "09bab7f98adc518b7c974bf77dca880bec144f1491788ba2d1de3aed166fcaf7",
     "j72_pongo_control.py": "fe080cf1bdbe1725b8911f8893591fcc9ee67b2d0e5f0f2d4175dfb50af3ef20",
     "j72_sha256.h": "ca6966ca1dee0a3caebce62b0fe7d00032727d73b671510304588785eb26d72b",
-    "prepare-j72-pongo-recovery-handoff.py": "8b41cbad8480cdf0609f1b66594f12edf899c71ec89da8049f0d364ff7122264",
-    "run-j72-pongo-recovery-handoff.py": "359bc82970c1e6c07224697916f132344e6a0ff2c48e92e285dfb1e562604a6d",
-    "test-j72-pongo-recovery-handoff.py": "ea957acc37cfcc4d27c803f2c44b02d0ca6d38627467b8d8f70a5bee41af25f2"
+    "prepare-j72-ios-recovery-v2.py": "8f521c4aeda8c33b76409f0956111353ffded3074884565d3ec14d9c758a0fad",
+    "prepare-j72-pongo-recovery-handoff.py": "71ff41c9b93818d7fe9179db12dfe7ae513c03410e6f4947cfc1b9034edd938c",
+    "run-j72-pongo-recovery-handoff.py": "a97af1d1073621421d128d554ee522cf38a413e35aa381b6b0a63400c6155ce7",
+    "test-j72-pongo-recovery-handoff.py": "59dbcb790c64cc5186b8c76b0618f339b2c68a91ceb2ec8a8e3358271aa63d3c",
+    "test-j72-recovery-inspect-transport.py": "2cc01adeef518c9967b75838326173922e481e1d86764ced59c96521ee0c8605"
   }
 }

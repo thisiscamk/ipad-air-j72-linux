@@ -1,3 +1,24 @@
+# 2 November: RAM recovery boots; SSH permission fix ready for its next test
+
+The guarded Pongo stager passed on J72: exact original kernel and full stock
+trust-cache hashes,130MB upload, verified RAM copies and independent handoff
+checks. The RAM recovery's unique USB marker, SSH banner and pinned host key
+were reached. No broad kernel patch was used.
+
+Public-key authentication stopped at a confirmed image-permission defect:
+root's home was 0775, which the bundled Dropbear rejects. The forced inspector
+has not executed, so recovery GPT reads and the unmounted minimum-size query
+remain pending. The owner returned to iOS; no storage change occurred.
+
+Revision2 sets/audits the home and key directory permissions in the actual HFS
+image. It also automates the temporary no-preflight usbmuxd transport that
+reached SSH in the first test, with proxy cleanup and host-service restoration.
+Offline checks, including five transport cleanup/refusal cases, pass. The next
+DFU tests authentication and read-only storage inspection; it is not an install.
+[Code, separate device evidence and next candidate](code/storage/ios12-pongo-handoff/).
+
+## Earlier checkpoints
+
 # 2 November: compact Pongo inventory passes; actual RAM handoff candidate built
 
 The compact probe passed: original kernel UUID matched, all16 reserved slots

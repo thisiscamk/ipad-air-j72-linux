@@ -1,3 +1,24 @@
+# Next DFU: authenticate to the RAM recovery and inspect storage read-only
+
+- [x] Pass compact inventory, original kernel and entire stock cache checks.
+- [x] Stage and independently verify the 130 MB RAM recovery bundle on J72.
+- [x] Reach its unique USB service, SSH banner and pinned host key.
+- [x] Identify the 0775 root-home permission defect blocking authentication.
+- [x] Build revision2 with audited home/.ssh/key ownership and modes.
+- [x] Automate recovery-only no-preflight USB transport; cleanup/refusal checks pass.
+- [x] Owner returns to iOS; normal model/version/direct-Pi connection verified.
+- [ ] Next direct-Pi DFU: proven Pongo loader, revision2 RAM stage and boot.
+- [ ] Pass key authentication and forced RAM-root/no-APFS inspector guards.
+- [ ] Validate both GPT copies and obtain the optional unmounted APFS minimum.
+- [ ] Review space creation if the 1.64 GB shrink allowance persists.
+- [ ] Qualify native storage writes/flush and persistent root before a reviewed install.
+- [ ] Finish charging cooldown restart and sustained net-charge qualification.
+
+No resize, snapshot mutation, internal installation or erase is authorized.
+[Revision2 source/offline checks and revision1 device result](code/storage/ios12-pongo-handoff/).
+
+## Earlier checkpoints
+
 # Next DFU: guarded Pongo RAM recovery handoff
 
 - [x] Compact Pongo inventory: original kernel UUID,16 empty slots and RAM ranges pass.

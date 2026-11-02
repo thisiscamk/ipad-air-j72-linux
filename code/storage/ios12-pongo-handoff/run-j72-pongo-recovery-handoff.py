@@ -5,13 +5,14 @@ import argparse, ctypes as C, fcntl, hashlib, importlib.util, json, os, re, time
 from pathlib import Path
 from j72_pongo_control import PongoControl
 ROOT=Path(__file__).resolve().parents[1]
-WORK=ROOT/'private/j72-platform/power-storage-20261102/recovery-prep/pongo-route/handoff-v1'
+WORK=ROOT/'private/j72-platform/power-storage-20261102/recovery-prep/pongo-route/handoff-v2'
 def load(name,file):
  s=importlib.util.spec_from_file_location(name,file);m=importlib.util.module_from_spec(s);s.loader.exec_module(m);return m
 def sha(p):return hashlib.sha256(p.read_bytes()).hexdigest()
 def preflight(require_tests=True):
  manifest=json.loads((WORK/'manifest.json').read_text())
- if manifest['profile']!='j72-pongo-ram-recovery-handoff-v1' or manifest['kernel_patched'] or manifest['automatic_internal_mounts'] or manifest['internal_storage_write_interface']:raise RuntimeError('Unsafe handoff profile')
+ if manifest['profile']!='j72-pongo-ram-recovery-handoff-v2' or manifest.get('capsule_revision')!=2 or manifest['kernel_patched'] or manifest['automatic_internal_mounts'] or manifest['internal_storage_write_interface']:raise RuntimeError('Unsafe handoff profile')
+ if manifest.get('ssh_auth_permissions',{}).get('root_home')!=0o700:raise RuntimeError('Root SSH home permissions not audited')
  if manifest['bootargs']!='rd=md0 debug=0x2014e -v wdt=-1':raise RuntimeError('RAM-root boot-argument mismatch')
  for name,digest in manifest['files'].items():
   if sha(ROOT/name)!=digest:raise RuntimeError('RAM handoff input/source pin mismatch: '+name)
@@ -89,11 +90,11 @@ def boot(manifest,folder):
    client.control(0x21,4,0xffff)
    try:client.control(0x21,3,data=b'bootux\n')
    except RuntimeError:pass # USB teardown is possible; only the recovery marker proves boot.
-  inspect=load('restricted_recovery',ROOT/'tools/boot-j72-ios-recovery.py')
-  attempt=inspect.Attempt(folder)
-  try:attempt.inspect()
-  finally:attempt.close()
-  receipt['state']='recovery_inspected';(folder/'state.json').write_text(json.dumps(receipt,indent=2)+'\n')
+ # The inspection helper owns the same USB lock while temporarily running
+ # usbmuxd without normal-iOS lockdownd preflight. Release this lock first.
+ inspect=load('restricted_recovery_transport',ROOT/'tools/j72-recovery-inspect-live.py')
+ inspect.inspect_live(folder)
+ receipt['state']='recovery_inspected';(folder/'state.json').write_text(json.dumps(receipt,indent=2)+'\n')
 if __name__=='__main__':
  p=argparse.ArgumentParser(description=__doc__);mode=p.add_mutually_exclusive_group();mode.add_argument('--stage',action='store_true');mode.add_argument('--boot-staged',type=Path);a=p.parse_args()
  os.umask(0o077);m=preflight()

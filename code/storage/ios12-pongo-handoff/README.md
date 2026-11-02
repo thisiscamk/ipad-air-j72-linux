@@ -1,6 +1,7 @@
-# Pongo RAM recovery handoff — built candidate
+# Pongo RAM recovery handoff — recovery service reached
 
-**Offline checks pass; device staging and recovery boot remain untested.**
+**Revision1 passed RAM staging and booted the restricted recovery SSH service.
+Client authentication was blocked; revision2 is built and checked offline.**
 The [compact observer](../ios12-pongo-compact/) has now passed on J72 and matched
 the loaded kernel UUID to the original iOS12.5.7 image. This candidate uses that
 measured ABI/memory map to attempt the prepared restricted recovery image in RAM.
@@ -10,13 +11,14 @@ It does not install, resize, remove snapshots, or expose a disk-write command.
 
 The compact observer captured 16 empty map slots, the allocator top, kernel text
 range and trust-cache map. A same-session 32-byte trust-cache read revealed a
-serialized wrapper: one module at offset8, version1, with1728 records. The stock
-component was then retrieved from the exact16H81 IPSW and checked against Apple's
+serialized wrapper: one module at offset 8, version 1, with 1728 records. The stock
+component was then retrieved from the exact 16H81 IPSW and checked against Apple's
 BuildManifest. Its complete module header matches those live bytes exactly.
 
 A larger RAM dump failed during a later USB transfer. We do not claim the console
-problem is solved for every command. The next client explicitly selects Pongo's
-synchronous-stdin/nonblocking-stdout mode, then reads after completion. A timeout
+problem is solved for every command. The staging client explicitly selects Pongo's
+synchronous-stdin/nonblocking-stdout mode, then reads after completion. This
+mode passed the actual upload, staging and independent status checks. A timeout
 or failed guard stops the procedure; there is no normal-iOS SSH fallback.
 
 ## Guarded RAM staging
@@ -34,8 +36,8 @@ It has **no boot, raw disk, MMIO, kernel patch or installer interface**.
    signature before allocation or DT edits.
 5. Allocate/copy/compare the new cache and HFS in Pongo's static RAM region.
    Keep every original stock record, including five identical duplicates, and
-   all181 records from the prepared recovery cache: **1881 records total**.
-   Twenty-eight recovery records already occur in stock;153 are new.
+   all 181 records from the prepared recovery cache: **1881 records total**.
+   Twenty-eight recovery records already occur in stock; 153 are new.
 6. Commit only RAM handoff metadata: `RAMDisk`, the `TrustCache` address/length,
    exact `rd=md0 debug=0x2014e -v wdt=-1` arguments and framebuffer ownership.
    The kernel's code bytes are not edited. Existing stock cache bytes remain
@@ -44,9 +46,32 @@ It has **no boot, raw disk, MMIO, kernel patch or installer interface**.
    `bootux`; it requires the same USB session, unchanged private manifest and a
    completed staging receipt, and rechecks the module's staged state first.
 
-Partial allocations refuse a second staging attempt. Pongo's allocator may still
-refuse at runtime; static-region availability is not hardware-qualified yet.
+Partial allocations refuse a second staging attempt. The first live test passed
+static allocation and comparison of the full bundle; every boot still checks
+its current RAM bounds and available slots.
 No recovery success is claimed from a USB disconnect or Apple logo.
+
+## First device result and revision2
+
+[DEVICE-RESULT.json](DEVICE-RESULT.json) separates the observed revision1 result
+from the new offline candidate. All live kernel/cache guards, the 130 MB upload,
+RAM copies and independent handoff checks passed. The custom USB marker, SSH
+banner and pinned host key were observed. The forced inspector did **not** run,
+so neither its RAM-root/no-APFS guards nor recovery GPT/minimum-size reads have
+passed on device yet. No disk was opened by the inspector.
+
+The uploaded HFS catalog showed root's home as 0775. The bundled Dropbear checks
+home permissions before accepting a public key and rejects group-writable
+directories. Revision2 sets root's home and the host-key directory to 0700,
+retains .ssh 0700/key 0600, and audits actual HFS ownership and modes after build.
+The same kernel, service and key identities are retained. This fixes a confirmed
+permission defect; successful authentication remains a device gate.
+
+The normal host usbmuxd preflight expected lockdownd, which this minimal recovery
+does not run. A temporary no-preflight daemon reached SSH successfully. Revision2
+automates that transport only after the exact recovery marker/direct-Pi checks,
+reaps its proxy/daemon groups and restores the host service. Five simulated
+success/failure/refusal cases verify cleanup without USB access.
 
 ## Recovery verification
 
@@ -64,12 +89,14 @@ still blocks the intended layout. No internal change is authorized by this test.
 ## Recipes and limits
 
 These are the actual lab sources; they expect scripts in `tools/`, the original
-capsule and private lab inputs, and the preceding compact/observer/recovery
+capsule-v2 and private lab inputs, and the preceding compact/observer/recovery
 source sets. They are not a standalone firmware bundle. Private Apple images,
 keys, kernel UUID/config headers, compiled modules, receipts and logs stay local.
 The native ARM64 host tools and existing Pi kernel are retained.
 
 ```sh
+# Build once into a fresh private capsule-v2 (requires the original inputs):
+python3 tools/prepare-j72-ios-recovery-v2.py build
 python3 tools/prepare-j72-pongo-recovery-handoff.py
 python3 tools/test-j72-pongo-recovery-handoff.py
 python3 tools/run-j72-pongo-recovery-handoff.py
@@ -86,7 +113,7 @@ sudo -n python3 tools/run-j72-pongo-recovery-handoff.py --stage
 sudo -n python3 tools/run-j72-pongo-recovery-handoff.py --boot-staged PRIVATE_STAGE_DIR
 ```
 
-The staging client sends the130,049,536-byte bundle in bounded chunks. Boot and
+The staging client sends the 130,049,536-byte bundle in bounded chunks. Boot and
 staging are device tests; their success is not implied by offline checks.
 Do not run the old verbose observer or built-in `bootargs`/`xargs` commands.
 
@@ -98,8 +125,11 @@ Python, six serialized-cache refusals, validation of the full real bundle,
 boot-receipt refusals **before USB access**. The native module's imports and
 actual export pointer pairs are checked against the pinned Pongo binary.
 The existing restricted capsule's signatures, service/source pins and image
-readback remain prerequisites. No hardware stage or recovery boot has run yet.
+readback remain prerequisites. Revision2 adds actual HFS permission auditing
+and five host-transport cleanup/refusal cases. Revision2 has not run on device;
+revision1 reached the recovery SSH service as recorded separately above.
 
+- [Dropbear home/key permission requirements](https://github.com/mkj/dropbear/blob/main/manpages/dropbear.8)
 - [Apple's serialized cache/module declarations](https://github.com/apple-oss-distributions/xnu/blob/xnu-4903.221.2/osfmk/kern/trustcache.h)
 - [Pongo static allocator](https://github.com/checkra1n/pongoOS/blob/e98323f8a09abd80fc4cbcd74dee023b91a1ec22/src/kernel/mm.c)
 - [Pongo XNU/RAM-disk path](https://github.com/checkra1n/pongoOS/blob/e98323f8a09abd80fc4cbcd74dee023b91a1ec22/src/drivers/xnu/xnu.c)
