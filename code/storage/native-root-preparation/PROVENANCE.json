@@ -9,6 +9,14 @@
     "code/storage/j72_native_view_plan.py": "ad857bc59d69bd023f8b2d53708edcfb7a06c00ee85e6a09b71cc283a750347a",
     "code/storage/test_j72_native_view_plan.py": "c898a8e0e1edc02c0d20bec42eade223c58a4a056a3e77d02444284217b74c0f",
     "code/storage/j72_rehearse_layout.py": "9dbb3452fb4b124f78cd594e2cf87097e5fb1ed7e31483bb09627047fcda9d2c",
-    "code/storage/test_j72_rehearse_layout.py": "9de9bf2ac0494ff55589e38d6576dfd7775a82144085117834cc9eee7797611d"
+    "code/storage/test_j72_rehearse_layout.py": "9de9bf2ac0494ff55589e38d6576dfd7775a82144085117834cc9eee7797611d",
+    "code/storage/j72_install_state.py": "d73f896ba9cff972a60d1e86dd7eb4d0375d31f3602055cefa438cd48d65502c",
+    "code/storage/test_j72_install_state.py": "b86fc2fc7bcd0677a16ee32871f8aebd2f50ed3440b94e181b13b9f847e74852",
+    "code/storage/j72_apfs_checkpoint_plan.py": "df3bfc664cca2724544809be8f4ed0f7ac7e938c31283e6f81de0d592c095c9a",
+    "code/storage/test_j72_apfs_checkpoint_plan.py": "746cb8ef1f96cfd33be198c11a9617c3aaee830c413b2339a10ee4243cc6f964",
+    "code/storage/native-root-preparation/rehearse-j72-host-native-view.py": "0a92ed2bb014433ff5adfca63fd2dcb3533b7af90dd106c1e01562342132151a",
+    "code/storage/native-root-preparation/j72-ios-writer-capabilities.c": "ac15e99d45a3f39c62556d3a8db02854d90807483af552382d617ea1e6717bbc",
+    "code/storage/native-root-preparation/prepare-j72-ios-writer-capabilities.py": "0a494cda427e2f8a71d1799dd590a1ceb10faf3d7deb9b7e20a3171ed81f28a7",
+    "code/storage/native-root-preparation/test-j72-ios-writer-capabilities.py": "77d214edefeb3d72691801c32a0e39825b14067d8b3f600592d0596a7a385d9b"
   }
 }

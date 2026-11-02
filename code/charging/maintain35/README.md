@@ -19,7 +19,7 @@ The matching #35 maintenance module was already built with the combined payload.
 This host adapter is now prepared and passes pinned-source/module preflight.
 The actual policy headers are byte-identical to the #34 controller that passed
 the full-hour net-gain and automatic voltage-hold restart test. The #35 module now loads **disabled**, with the original input limit unchanged.
-It is not armed; actual #35 charging is still untested. The initial host path
+At that earlier checkpoint it was not armed; the active test above supersedes that state. The initial host path
 selected the old #34 manifest and the exact-build check refused before upload.
 The private path was corrected and explicit #35 manifest/build assertions added
 before the successful disabled stage.

@@ -1,3 +1,39 @@
+# Current: checkpoint and interrupted-install preparation pass
+
+The #35 desktop and guarded charging are active on the powered hub; the owner
+confirms the charging icon, menu and keyboard. The prior source-path gate has
+passed; the full one-hour charging result is still pending.
+
+New preparation completed in this boot:
+
+- **35 host test methods pass** across layout, bounded mapping, interrupted-install
+  classification and checkpoint validation. The actual captured-layout model
+  classifies 22 memory-only interruption outcomes without repair or device writes.
+- Read-only ASP reads over pinned Wi-Fi captured the 280-block descriptor area:
+  140 valid NX candidates, no malformed candidates. The selected mapping chain
+  and all five mapped ephemeral objects pass headers/checksums. Container size
+  remains 127,999,954,944 bytes. This does not validate full filesystem semantics.
+- A new disposable **host file** rehearses the 128 GB proposed layout, 4096-byte
+  read-only loop, offset/length-fenced read-only DM map, ext4 `ro,noload`, base
+  hash readback, and normal unmount/map removal/loop detach. Original image and
+  host kernel stay unchanged. No native iPad map or filesystem was created.
+
+The host tool initially assumed `/dev/mapper` contained symlinks; this host
+creates direct block nodes. The revised check uses the actual major/minor and
+sysfs DM name. A transient busy removal was inspected and normally cleaned;
+the successful second rehearsal also waits for udev and uses normal retry.
+The host swap loop was untouched. This is not a device-root boot result.
+
+See [the transaction and recovery plan](../../../INSTALL-TRANSACTION-PLAN.md),
+[interruption model](../j72_install_state.py),
+[checkpoint checker](../j72_apfs_checkpoint_plan.py), and
+[host rehearsal reference](rehearse-j72-host-native-view.py).
+All raw metadata, framework binaries, disassembly, identifiers and image hashes
+remain private. The reference tool expects this research workspace's private
+inputs; it is not a portable installer.
+
+## Earlier preparation checkpoint
+
 # Current checkpoint: owner UI and mounted cleanup pass
 
 The owner confirms all desktop functions. The away observer was cancelled and
@@ -105,3 +141,16 @@ The away observer keeps the current UI/export available, dimmed, while checking
 battery. At <=30%, >=40 C or its two-hour deadline it requests normal desktop,
 touch and radio cleanup and an iOS reboot. It preserves the export on an
 uncertain health read or failed cleanup. It performs no charger override.
+
+## Prepared next normal-iOS query (no DFU required)
+
+A separate signed ARM64/iOS12 [query helper](j72-ios-writer-capabilities.c) is
+ready after normal iOS return and owner reapplication of Amethyst/root SSH.
+It pins iPad4,2 and build16H81, opens only `/dev/rdisk0` read-only with no-follow,
+requires the measured geometry, and issues only fixed read queries for media
+writability, advertised features, physical block size and maximum I/O sizes.
+It repeats the already measured APFS minimal-size query. No resize, raw write,
+mount, snapshot or flush operation is exposed. Capability replies do not prove
+write/flush durability. Fifteen actual-C/UBSan fake-iOS cases pass; native build,
+strict imports and CodeDirectory page hashes pass. Device execution is pending.
+The existing read-only recovery capsule and running Linux payload stay intact.
