@@ -1,6 +1,13 @@
+> **Device update:** the compact inventory passed on J72 and the kernel UUID
+> matched the original image. [DEVICE-RESULT.json](DEVICE-RESULT.json) separates
+> that result from the later larger-read USB failure. The next test is the
+> [guarded RAM recovery handoff](../ios12-pongo-handoff/).
+> The client now also selects synchronous stdin; that additional mode is not
+> device-qualified yet. The successful capture used the earlier e23fb06 client.
+
 # Compact read-only Pongo inventory — v2 candidate
 
-**Built and tested offline. Not yet run on the iPad.** This replaces the next
+**Compact inventory passed on device; subsequent handoff remains untested.** This replaces the next
 verbose observer test; it does not boot the RAM recovery image or install Linux.
 
 ## Measured reason for the change

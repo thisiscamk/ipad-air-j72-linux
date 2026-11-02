@@ -1,3 +1,21 @@
+# Next DFU: guarded Pongo RAM recovery handoff
+
+- [x] Compact Pongo inventory: original kernel UUID,16 empty slots and RAM ranges pass.
+- [x] Match the live cache header to the exact Apple-manifest stock component.
+- [x] Build a serialized cache preserving1728 stock records plus recovery entries:1881 total.
+- [x] Build the RAM-only stager and130MB bundle; native imports and offline checks pass.
+- [x] Return to normal iOS and verify the direct Pi connection after follow-up USB failure.
+- [ ] Fresh DFU: proven Pongo loader, then **handoff module** once; do not reload the observer.
+- [ ] Verify entire original RAM trust cache, upload pinned bundle, stage and recheck RAM metadata.
+- [ ] Boot the staged RAM image; qualify its unique USB marker, pinned SSH key and guarded inspector.
+- [ ] Validate both GPT copies and an optional unmounted-APFS minimum-size query.
+- [ ] Review space creation if the1.64GB shrink limit persists; no snapshot/layout change yet.
+- [ ] Qualify native storage writes/flush and persistent root before a separately reviewed install.
+- [ ] Finish charging cooldown restart and sustained net-charge qualification before unattended Linux charging.
+
+The new test stages RAM and requests a RAM-root boot. No internal installation,
+resize, snapshot mutation or erase is authorized. [Candidate and gates](code/storage/ios12-pongo-handoff/).
+
 # Next DFU: compact Pongo recovery inventory
 
 - [x] Boot proven Pongo and load the revised observer.

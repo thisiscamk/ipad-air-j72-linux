@@ -75,7 +75,9 @@ class PongoControl:
     def command(self,line,marker,timeout=12):
         if line not in (b'help',b'modload',b'j72rescuecompact'):
             raise ValueError('Command is outside this read-only capture procedure')
-        self.control(0x21,4,0xffff) # async stdin, non-blocking device stdout
+        # Pongo's synchronous-stdin mode waits for command_handler_iter while
+        # keeping stdout non-blocking. Status polling remains an extra guard.
+        self.control(0x21,4,0)
         self.control(0x21,3,data=line+b'\n')
         deadline=time.monotonic()+timeout;data=bytearray()
         while True:

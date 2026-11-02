@@ -70,7 +70,7 @@ unsigned long long field(int n){u64 *p=(void*)&current;return p[n];}
                 # Match Pongo: fetching empties the ring, rather than behaving
                 # like a stream; a short requested length loses leading bytes.
                 self.reads+=1;out=self.response[-size:];self.response=b'';return out
-            assert kind==0x21 and ((request==4 and value==0xffff) or (request==3 and data==b'j72rescuecompact\n'))
+            assert kind==0x21 and ((request==4 and value==0) or (request==3 and data==b'j72rescuecompact\n'))
             return b''
     fake=Fake(frame.replace('\n','\r\n').encode(),[b'\1',b'\1',b'\0'])
     reply=fake.command(b'j72rescuecompact',b'J72_COMPACT_END')

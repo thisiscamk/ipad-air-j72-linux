@@ -1,0 +1,17 @@
+{
+  "status": "OFFLINE_PASS_STAGE_AND_BOOT_UNTESTED",
+  "pongo_source_pin": "e98323f8a09abd80fc4cbcd74dee023b91a1ec22",
+  "apple_source_reference": "xnu-4903.221.2/osfmk/kern/trustcache.h",
+  "source_hashes": {
+    "README.md": "39b7a4a48d128c944e51ea5c9427471566e2c051f88ab72da20d1acde85088fb",
+    "RESULT.json": "49d4d72007e790f3a56687129f1f40469f7a216b8e1c35021cc096c897f37154",
+    "j72-pongo-recovery-bounds.h": "1f007462d73e31bfeb80ec4ae6cc219d3281ea5e8360ef8759f11d567132791e",
+    "j72-pongo-recovery-handoff-bounds.h": "dc44bdbf9ce5a614d15a47d0bbb74bcf5796060634b22d1cb26f76a31fab781c",
+    "j72-pongo-recovery-handoff.c": "e0d65fee410dd8a4c10dec9269b3bc86e3f5747524d53ec6d98f1ad54b671c13",
+    "j72_pongo_control.py": "fe080cf1bdbe1725b8911f8893591fcc9ee67b2d0e5f0f2d4175dfb50af3ef20",
+    "j72_sha256.h": "ca6966ca1dee0a3caebce62b0fe7d00032727d73b671510304588785eb26d72b",
+    "prepare-j72-pongo-recovery-handoff.py": "8b41cbad8480cdf0609f1b66594f12edf899c71ec89da8049f0d364ff7122264",
+    "run-j72-pongo-recovery-handoff.py": "359bc82970c1e6c07224697916f132344e6a0ff2c48e92e285dfb1e562604a6d",
+    "test-j72-pongo-recovery-handoff.py": "ea957acc37cfcc4d27c803f2c44b02d0ca6d38627467b8d8f70a5bee41af25f2"
+  }
+}

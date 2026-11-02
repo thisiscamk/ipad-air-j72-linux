@@ -1,0 +1,22 @@
+{
+  "status": "PASS",
+  "actual_source_sha256_vectors": 19,
+  "actual_source_serialized_cache_refusals": 6,
+  "actual_source_full_bundle_pass": true,
+  "actual_source_bundle_refusals": 11,
+  "host_guard_response_refusals": 3,
+  "original_records_preserved": true,
+  "boot_receipt_refusals_before_usb": 4,
+  "recovery_boot_tested": false,
+  "ram_stage_tested": false,
+  "usb_access": false,
+  "private_manifest_bound": true,
+  "original_stock_records": 1728,
+  "original_identical_duplicate_records_retained": 5,
+  "merged_records": 1881,
+  "ram_bundle_bytes": 130049536,
+  "internal_storage_written": false,
+  "kernel_patched": false,
+  "new_unique_records": 153,
+  "recovery_records_already_in_stock": 28
+}

@@ -1,3 +1,19 @@
+# 2 November: compact Pongo inventory passes; actual RAM handoff candidate built
+
+The compact probe passed: original kernel UUID matched, all16 reserved slots
+were empty, and allocator/text/trust-cache ranges were validated. A same-session
+32-byte read identified the serialized cache wrapper. The exact stock component
+matches Apple's manifest and the entire live module header. A larger read then
+failed USB; iOS has returned and normal direct-Pi identity is verified.
+
+The next candidate stages the restricted recovery image and merged trust cache
+in RAM. It preserves all1728 stock records, including five identical duplicates,
+and incorporates the181 recovery-cache records:1881 total. It requires the
+entire original RAM cache hash to match before upload, validates the full bundle,
+checks RAM copies and handoff metadata, and separates staging from boot.
+All offline checks pass; hardware staging and recovery boot remain untested.
+[Code and checks](code/storage/ios12-pongo-handoff/). No disk writes occurred.
+
 # 2 November: compact Pongo observer prepared after partial second capture
 
 The second proven Pongo boot and revised module load passed. The observer read
