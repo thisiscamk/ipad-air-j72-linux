@@ -5,8 +5,8 @@
 - [x] Normal nested loop/ext4/NBD/export cleanup passes.
 - [x] Known RAM desktop stages/starts on #35 with Wi-Fi; NBD remains detached.
 - [x] Matched #35 charging module loads disabled, original input limit unchanged.
-- [ ] Owner checks restored menu/keyboard and moves to the same marked powered-hub port.
-- [ ] Bind a fresh source receipt to the actual new USB path before any override.
+- [x] Owner confirms move to the same marked powered-hub port and charging/menu/keyboard.
+- [x] New source receipt binds the changed live path to same-host-boot verified physical-source evidence.
 - [ ] Observe bounded #35 charging, automatic protection and independent restoration.
 - [ ] Qualify iOS 12 resize/fenced writer/recovery and review the exact install proposal.
 - [ ] Separate authorization for reviewed writes; then verify installed image/layout.

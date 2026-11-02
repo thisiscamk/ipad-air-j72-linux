@@ -1,3 +1,18 @@
+# #35 guarded charging active; owner UI passes
+
+The worker is now charging on the owner-confirmed same marked JCH377 port and
+adapter. A new receipt binds its changed host path to current configured/high-
+speed/self-powered hub descriptors, the same host boot, and the verified earlier
+iOS 5 V / 1500 mA capability capture. This does **not** claim a new iOS reading
+or general source detection. The same-UDC rebind restored USB after the move.
+
+The owner confirms the charging icon, menu and keyboard. Early settled current
+is +52..+186 mA at 1604 brightness and 36.2 C. The bounded one-hour observation
+is running; sustained net gain and final restoration are pending. All original
+source leases, voltage/current/temperature and restoration guards remain.
+
+## Earlier preparation and disabled stage
+
 # Matched #35 charging adapter — disabled load passes
 
 The matching #35 maintenance module was already built with the combined payload.
