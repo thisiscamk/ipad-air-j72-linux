@@ -1,0 +1,26 @@
+{
+  "status": "PASS",
+  "actual_source_guard_cases": 16,
+  "stock_trustcache_entries_retained": 174,
+  "merged_trustcache_entries": 181,
+  "staged_macho_code_pages_and_cache_inclusion_verified": 6,
+  "enabled_launch_jobs": 1,
+  "ram_image_files_read_back": 13,
+  "unchanged_stock_loader_and_imports": 7,
+  "img4_component_types_verified": 6,
+  "original_compressed_kernel_unchanged": true,
+  "device_boot_tested": false,
+  "profile": "j72-ios12-ram-recovery-v1",
+  "normal_ios_service_guard_return": 3,
+  "normal_ios_inspector_guard_return": 5,
+  "normal_ios_mount_abi_probe": {
+    "mount_count": 3,
+    "apfs_mounts": 2,
+    "root_is_hfs_md0": false,
+    "raw_disk_opened": false
+  },
+  "same_source_rebuild_byte_identical": true,
+  "launcher_timeout_process_group_check": "PASS",
+  "runtime_recovery_qualification": "PENDING",
+  "internal_writes_performed": false
+}

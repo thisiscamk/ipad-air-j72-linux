@@ -1,0 +1,10 @@
+--- !tapi-tbd-v3
+archs: [ arm64 ]
+platform: ios
+install-name: /System/Library/Frameworks/IOKit.framework/Versions/A/IOKit
+current-version: 1.0.0
+compatibility-version: 1.0.0
+exports:
+  - archs: [ arm64 ]
+    symbols: [ _IOServiceMatching, _IOServiceGetMatchingService, _IOObjectRelease, _IORegistryEntrySetCFProperties, _IOUSBDeviceDescriptionCreateWithType, _IOUSBDeviceDescriptionSetSerialString, _IOUSBDeviceControllerCreate, _IOUSBDeviceControllerSetDescription ]
+...

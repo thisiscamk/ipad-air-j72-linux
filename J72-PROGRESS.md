@@ -1,3 +1,24 @@
+# 2 November: restricted RAM recovery candidate prepared
+
+The iOS storage investigation now has a built recovery candidate using the
+**original, unpatched 12.5.7 J72 kernel**. Its private RAM image replaces the
+restore daemon with a guarded USB service, enables one launch job and exposes
+only key-authenticated `inspect`/`reboot` commands. The inspector requires
+RAM root with no mounted APFS and reads fixed GPT locations read-only.
+
+Offline checks pass: 16 boot-argument cases, six staged Mach-O signatures and
+trust-cache inclusion, retention of 174 original cache entries, 13 file
+readbacks, seven unchanged stock loader/library files and six IMG4 types.
+Both authored executables rebuild byte-for-byte. Live negative tests in
+normal iOS refuse service actions and raw-disk access as intended. The native
+launcher also passes its timeout/process-group cleanup check.
+
+This is **not a successful recovery boot or install**. The stock-kernel/custom
+trust-cache route must be tested on device next. No APFS, snapshot or GPT
+mutation was performed. The measured 1.64 GB release allowance remains the
+storage blocker. The iPad remains in locked iOS on its powered hub, charging.
+[Reusable source, recipes and bounded results](code/storage/ios12-ram-recovery/).
+
 ## 2 November: locked-screen iOS charging confirmed on the powered hub
 
 The owner locked the screen and left the iPad on the same powered hub.

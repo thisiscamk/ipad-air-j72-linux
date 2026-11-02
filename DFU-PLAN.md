@@ -1,3 +1,20 @@
+# Next DFU: iOS 12 RAM recovery qualification
+
+- [x] Build a separate recovery capsule with the original J72 iOS 12.5.7 kernel.
+- [x] Restrict startup to one guarded USB service; key-only SSH permits only inspection/reboot.
+- [x] Pass boot-argument guards, CodeDirectory/cache checks, image readback and native launcher checks.
+- [x] Publish the actual authored service, inspector, stubs and build/boot/test recipes.
+- [ ] Move only the iPad cable directly to the Pi and enter the next DFU.
+- [ ] Boot the new recovery capsule once; verify its unique USB marker and pinned SSH host key.
+- [ ] Confirm RAM root/no APFS mounts; validate both GPT copies and try the read-only minimum-size getter.
+- [ ] Return to normal iOS and confirm charging. Review results before proposing snapshot or layout changes.
+
+The recovery capsule is **not device-qualified yet**. It does not install,
+resize, mount APFS or remove the rollback snapshot. The measured 1.64 GB
+shrink allowance still blocks the intended Linux layout. This replaces the
+previous “no new recovery payload ready” preparation status.
+[Source and offline results](code/storage/ios12-ram-recovery/).
+
 # 2 November: leave-on power candidate and storage qualification
 
 - [x] Requalify the powered JCH377 using current paired iOS diagnostics.

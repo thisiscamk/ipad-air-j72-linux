@@ -1,3 +1,11 @@
+# New recovery preparation source
+
+The [iOS 12 RAM recovery candidate](storage/ios12-ram-recovery/) now includes
+the actual guarded service/inspector, authored linker stubs and private-image
+build/boot/test recipes. Offline and normal-iOS refusal checks pass; the RAM
+recovery boot is still untested. This is separate from the working Linux
+milestones below.
+
 # Working J72 development code
 
 These are the actual sources used in the measured Linux 7.0.12 J72 RAM

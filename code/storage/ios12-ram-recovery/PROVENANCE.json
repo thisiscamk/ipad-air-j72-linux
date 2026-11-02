@@ -1,0 +1,26 @@
+{
+  "status": "OFFLINE_CANDIDATE_NOT_BOOT_TESTED",
+  "source_hashes": {
+    "j72_storage_preflight_recovery.py": "432f68d7878f6913044af4dd037ba4b7dcb243119eee41c7be74f297f4b4cb2a",
+    "service-entitlements.plist": "d8921cd172ffb171509e68f0cde1230c87bb97d9ec77535bf8184af2ccebbfcd",
+    "RESULT.json": "32543239c9aafbb879a15b1b49c8d7225de59ffa515e3a9a57ea1abfe2c2c882",
+    "libSystem.tbd": "939d96e713f91d4c9cdc74ffd1a6bb9f56386865a44bf7b0f36259e9915fd55c",
+    "j72-recovery-inspect.c": "3963bf758fb077fc2d502f874611a402692633ccc496f0d70c009505c3de8560",
+    "j72_usb_path.py": "ae93e3955fefc2eec7917a75d03196c277a4b48f98be05ec6a266329b20b9d87",
+    "prepare-j72-ios-recovery.py": "bf39453eff7b9b948bba1b42704024048fe446b56769452279b1927d87769714",
+    "j72-usb-recovery.c": "b9205bda0a05970e64c0b57500f69ec1566c1ae3c93b6231e3f749fb609aba9b",
+    "test-j72-ios-recovery.py": "ce0ae6c34fe7dc1d641597fee737cd896cd014e135a26f42a6081cd6174b2f6a",
+    "boot-j72-ios-recovery.py": "aaf3900771879a3e6aa445ee81ec388e9a733ce9b24a7eb1ec464a2ad614703e",
+    "inspect-entitlements.plist": "8984c104b6b9c920a4f2c1212fb32052389ebea76242c18bae3a826fda59c982",
+    "j72-recovery-guard.h": "e0912cda471d5779478d0b994c62a1b863ca43f7219d2379d85eaf8dfcef21a1",
+    "IOKit.framework/IOKit.tbd": "84d831206d8c16e8a3350a3ddb4e86fec3cfda884484a126f0dac7f7c085f872",
+    "CoreFoundation.framework/CoreFoundation.tbd": "4fc6f8266e3137fa25a2c2dd3b212398357e0861dc47f9d9b62236bf2355a92a"
+  },
+  "upstream_pins": {
+    "Legacy-iOS-Kit": "23622f8fe72c09952089d5145a7b008cfcc90d9b",
+    "SSHRD_Script": "d99ec4a19172b87d80fd9dea25eabf39291425a0",
+    "kairos": "e3fb437c5f20630eff99c30871f1460b0fd6406b",
+    "gaster": "2b9d747f2367f8c0860def02ec4fd299e531c52a",
+    "sshtars": "eed9dcb6aa7562c185eb8b3b66c6035c0b026d47"
+  }
+}

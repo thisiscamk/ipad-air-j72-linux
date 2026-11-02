@@ -1,3 +1,17 @@
+# Recovery candidate built; device qualification is next
+
+A separate iOS 12.5.7 RAM recovery capsule is now built and pinned. The original
+Apple kernel is unchanged. The restricted service/inspector, native ARM64
+launcher and image readback checks pass offline; both authored tools rebuild
+byte-for-byte. Normal iOS refusal tests pass. Recovery boot remains untested.
+
+The next DFU qualifies read-only USB recovery, both GPT copies and an optional
+minimum-size query without mounted APFS. It will not create space or install.
+The original snapshot remains intact; its effect on the high shrink minimum
+is still unproved. After recovery qualification we can prepare a concrete
+space-creation proposal, including recovery limits, for separate review.
+[Actual source and checks](code/storage/ios12-ram-recovery/).
+
 # J72 internal storage: morning runbook
 
 Prepared 1 November 2026. **Preparation is ready; an on-device installer is not.**
