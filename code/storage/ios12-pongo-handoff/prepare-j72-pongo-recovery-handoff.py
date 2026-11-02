@@ -5,7 +5,7 @@ import hashlib, importlib.util, json, os, plistlib, struct, subprocess
 from pathlib import Path
 ROOT=Path(__file__).resolve().parents[1]
 BASE=ROOT/'private/j72-platform/power-storage-20261102/recovery-prep'
-WORK=BASE/'pongo-route/handoff-v2'
+WORK=BASE/'pongo-route/handoff-v3'
 IMPORTS={'_alloc_static','_command_puts','_command_register','_dt_alloc_memmap','_dt_check$64',
  '_dt_find','_dt_parse$64','_dt_prop$64','_gBootArgs','_gDeviceTree','_gEntryPoint',
  '_gTopOfKernelData','_loader_xfer_recv_count','_loader_xfer_recv_data','_memcmp','_memcpy',
@@ -26,8 +26,8 @@ def records(raw):
  return entries
 def main():
  os.umask(0o077);WORK.mkdir(exist_ok=True)
- capsule=BASE/'capsule-v2';image=load('image',ROOT/'tools/prepare-j72-ios-recovery.py')
- capsule_manifest=load('audited_capsule',ROOT/'tools/prepare-j72-ios-recovery-v2.py').check(capsule)
+ capsule=BASE/'capsule-v3';image=load('image',ROOT/'tools/prepare-j72-ios-recovery.py')
+ capsule_manifest=load('audited_capsule',ROOT/'tools/prepare-j72-ios-recovery-v3.py').check(capsule)
  legacy=load('legacy',ROOT/'tools/run-j72-pongo-recovery-probe.py')
  compact=load('compact',ROOT/'tools/run-j72-pongo-recovery-compact.py');previous=compact.check()
  decoder=load('der',ROOT/'tools/test-j72-ios-recovery.py')
@@ -91,12 +91,13 @@ def main():
   files[name]=digest
  files[str(inspection_pins.relative_to(ROOT))]=sha(inspection_pins)
  additions=[ROOT/'tools'/name for name in ['j72-pongo-recovery-handoff.c','j72-pongo-recovery-handoff-bounds.h','j72_sha256.h','prepare-j72-pongo-recovery-handoff.py','run-j72-pongo-recovery-handoff.py','test-j72-pongo-recovery-handoff.py','prepare-j72-ios-recovery-v2.py','j72-recovery-inspect-live.py']]
- additions += [ROOT/'tools/test-j72-recovery-inspect-transport.py',stock_image,live_header,config,bundle_path,module,capsule/'manifest.json',capsule/'ramdisk.hfs',capsule/'recovery.trustcache']
+ additions += [ROOT/'tools'/name for name in ['test-j72-recovery-inspect-transport.py','prepare-j72-ios-recovery-v3.py','j72-recovery-inspect-v3.c','j72-recovery-mount-guard.h','j72-recovery-guard.h','test-j72-recovery-mount-guard.py']]
+ additions += [stock_image,live_header,config,bundle_path,module,capsule/'manifest.json',capsule/'ramdisk.hfs',capsule/'recovery.trustcache']
  for p in additions:files[str(p.relative_to(ROOT))]=sha(p)
  files['/usr/sbin/usbmuxd']=sha(Path('/usr/sbin/usbmuxd'))
- manifest={'profile':'j72-pongo-ram-recovery-handoff-v2','files':files,'module_imports':imports,
+ manifest={'profile':'j72-pongo-ram-recovery-handoff-v3','files':files,'module_imports':imports,
    'expected_kernel_uuid':previous['expected_kernel_uuid'],'bootargs':image.BOOTARGS,
-   'capsule_profile':capsule_manifest['profile'],'capsule_revision':capsule_manifest['capsule_revision'],'ssh_auth_permissions':capsule_manifest['ssh_auth_permissions'],'layout':values,
+   'capsule_profile':capsule_manifest['profile'],'capsule_revision':capsule_manifest['capsule_revision'],'root_identity_guard':capsule_manifest['root_identity_guard'],'ssh_auth_permissions':capsule_manifest['ssh_auth_permissions'],'layout':values,
    'original_trustcache_entries':len(original),'recovery_trustcache_entries':len(recovery),'merged_trustcache_entries':len(merged),
    'original_trustcache_records_preserved':True,'kernel_patched':False,'automatic_internal_mounts':False,'internal_storage_write_interface':False,'runtime_tested':False}
  (WORK/'manifest.json').write_text(json.dumps(manifest,indent=2)+'\n')

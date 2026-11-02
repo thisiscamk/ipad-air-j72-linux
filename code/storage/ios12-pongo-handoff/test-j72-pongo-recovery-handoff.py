@@ -4,10 +4,11 @@
 import ctypes, hashlib, importlib.util, json, struct, subprocess, tempfile
 from pathlib import Path
 ROOT=Path(__file__).resolve().parents[1]
-WORK=ROOT/'private/j72-platform/power-storage-20261102/recovery-prep/pongo-route/handoff-v2'
+WORK=ROOT/'private/j72-platform/power-storage-20261102/recovery-prep/pongo-route/handoff-v3'
 def main():
  manifest=json.loads((WORK/'manifest.json').read_text())
  transport=json.loads(subprocess.run(['python3',str(ROOT/'tools/test-j72-recovery-inspect-transport.py')],check=True,capture_output=True,text=True).stdout)
+ mounts=json.loads(subprocess.run(['python3',str(ROOT/'tools/test-j72-recovery-mount-guard.py')],check=True,capture_output=True,text=True).stdout)
  with tempfile.TemporaryDirectory(prefix='j72-handoff-test-') as tmp:
   tmp=Path(tmp);source=tmp/'harness.c';binary=tmp/'harness.so'
   source.write_text('''typedef unsigned long long u64;
@@ -66,6 +67,7 @@ int bundle(const unsigned char*b,u64 n,u64 total,u64 tc_off,u64 tc_size,u64 hfs_
          'host_guard_response_refusals':3,'original_records_preserved':True,
          'boot_receipt_refusals_before_usb':boot_refusals,
          'transport_cleanup_and_refusal_cases':transport['transport_cleanup_and_refusal_cases'],
+         'actual_inspector_guard_and_command_cases':mounts['actual_inspector_guard_and_command_cases'],
          'audited_root_home_mode':manifest['ssh_auth_permissions']['root_home'],
          'recovery_boot_tested':False,'ram_stage_tested':False,'usb_access':False}
  (WORK/'offline-result.json').write_text(json.dumps(result,indent=2)+'\n');print(json.dumps(result))

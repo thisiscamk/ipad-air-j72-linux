@@ -1,7 +1,7 @@
 # Pongo RAM recovery handoff — recovery service reached
 
-**Revision1 passed RAM staging and booted the restricted recovery SSH service.
-Client authentication was blocked; revision2 is built and checked offline.**
+**Revision2 boots RAM recovery and authenticates SSH successfully. The inspector
+refused its mount safety check before opening the disk. Revision3 is ready offline.**
 The [compact observer](../ios12-pongo-compact/) has now passed on J72 and matched
 the loaded kernel UUID to the original iOS12.5.7 image. This candidate uses that
 measured ABI/memory map to attempt the prepared restricted recovery image in RAM.
@@ -51,27 +51,42 @@ static allocation and comparison of the full bundle; every boot still checks
 its current RAM bounds and available slots.
 No recovery success is claimed from a USB disconnect or Apple logo.
 
-## First device result and revision2
+## Device results and revision3
 
-[DEVICE-RESULT.json](DEVICE-RESULT.json) separates the observed revision1 result
-from the new offline candidate. All live kernel/cache guards, the 130 MB upload,
-RAM copies and independent handoff checks passed. The custom USB marker, SSH
-banner and pinned host key were observed. The forced inspector did **not** run,
-so neither its RAM-root/no-APFS guards nor recovery GPT/minimum-size reads have
-passed on device yet. No disk was opened by the inspector.
+[DEVICE-RESULT.json](DEVICE-RESULT.json) records the revision2 result. It passed
+RAM staging, independent handoff checks, recovery USB, pinned host identity and
+client public-key authentication. The forced inspector executed and refused
+its RAM-root/mount guard with exit 5, **before any raw disk open**. GPT reads and
+the recovery minimum-size query remain pending. [Revision1](DEVICE-REV1.json)
+records the preceding 0775-home authentication failure, fixed by revision2.
 
-The uploaded HFS catalog showed root's home as 0775. The bundled Dropbear checks
-home permissions before accepting a public key and rejects group-writable
-directories. Revision2 sets root's home and the host-key directory to 0700,
-retains .ssh 0700/key 0600, and audits actual HFS ownership and modes after build.
-The same kernel, service and key identities are retained. This fixes a confirmed
-permission defect; successful authentication remains a device gate.
+The matching XNU source initially sets the root mount's source label to
+`root_device`; the old inspector accepted only `/dev/md0`. This is a plausible
+explanation, not an observed mount label from this device: the old refusal did
+not report which subcheck failed. Revision3 reports structured guard diagnostics
+and permits the known labels only when **all** of these checks pass:
 
-The normal host usbmuxd preflight expected lockdownd, which this minimal recovery
-does not run. A temporary no-preflight daemon reached SSH successfully. Revision2
-automates that transport only after the exact recovery marker/direct-Pi checks,
-reaps its proxy/daemon groups and restores the host service. Five simulated
-success/failure/refusal cases verify cleanup without USB access.
+- One root mount, type HFS, with the root-filesystem flag.
+- No APFS mounts; bounded, valid mount-table strings and counts.
+- `stat64("/")` reports a directory and `stat64("/dev/md0")` a block device.
+- Root `st_dev` is nonzero and equals the `md0` node's `st_rdev`.
+- Exact board/kernel family and the same approved RAM-root boot arguments.
+
+Thus a matching label alone cannot allow inspection. The new `diagnose` forced
+command reports only metadata and never opens the disk. Arbitrary shell commands
+remain rejected. The host saves diagnostics even after inspection refusal and
+requires a successful device-identity guard receipt before accepting revision3.
+
+The actual inspector passed 25 native-stub cases under UBSan: supported labels,
+wrong device/type/root flags, APFS, count/string/sysctl/stat failures and command
+refusals. Rejected cases made zero disk-open calls. Six transport cases cover
+cleanup, initial service state and missing marker/guard refusals. These tests
+do not substitute for the next device boot.
+
+Revision2 also confirmed the automatic temporary no-preflight usbmuxd path and
+cleanup/restoration of the Pi's normal service. Root/.ssh/key permissions remain
+audited in the actual HFS image. The original kernel, USB service and keys stay
+fixed; revision3 replaces only the authored inspector and its trust-cache hash.
 
 ## Recovery verification
 
@@ -81,6 +96,7 @@ pinned SSH key. It reuses the already-published restricted inspector from the
 or Apple bootloader upload paths. The forced inspector requires HFS `md0` root
 and zero APFS mounts, opens the disk read-only, and takes fixed GPT reads.
 It does not expose an interactive shell or a mount/resize/snapshot command.
+The only additional revision3 command, `diagnose`, reads root/mount metadata.
 
 Both GPT copies/CRCs and any supported minimum-size result must be reviewed
 before proposing space creation. The currently measured **1.64GB shrink allowance**
@@ -89,14 +105,14 @@ still blocks the intended layout. No internal change is authorized by this test.
 ## Recipes and limits
 
 These are the actual lab sources; they expect scripts in `tools/`, the original
-capsule-v2 and private lab inputs, and the preceding compact/observer/recovery
+capsule-v3 and private lab inputs, and the preceding compact/observer/recovery
 source sets. They are not a standalone firmware bundle. Private Apple images,
 keys, kernel UUID/config headers, compiled modules, receipts and logs stay local.
 The native ARM64 host tools and existing Pi kernel are retained.
 
 ```sh
-# Build once into a fresh private capsule-v2 (requires the original inputs):
-python3 tools/prepare-j72-ios-recovery-v2.py build
+# Build once into a fresh private capsule-v3 (requires the original inputs):
+python3 tools/prepare-j72-ios-recovery-v3.py build
 python3 tools/prepare-j72-pongo-recovery-handoff.py
 python3 tools/test-j72-pongo-recovery-handoff.py
 python3 tools/run-j72-pongo-recovery-handoff.py
@@ -125,16 +141,20 @@ Python, six serialized-cache refusals, validation of the full real bundle,
 boot-receipt refusals **before USB access**. The native module's imports and
 actual export pointer pairs are checked against the pinned Pongo binary.
 The existing restricted capsule's signatures, service/source pins and image
-readback remain prerequisites. Revision2 adds actual HFS permission auditing
-and five host-transport cleanup/refusal cases. Revision2 has not run on device;
-revision1 reached the recovery SSH service as recorded separately above.
+readback remain prerequisites. Revision3 adds 25 actual-inspector cases and six
+transport cases. Revision3 has not run on device; revision2 reached authenticated
+recovery SSH and the mount guard as recorded separately above.
 
+- [XNU4903 initial root mount label](https://github.com/apple-oss-distributions/xnu/blob/xnu-4903.221.2/bsd/vfs/vfs_subr.c#L1017)
+- [XNU4903 stat64 ABI](https://github.com/apple-oss-distributions/xnu/blob/xnu-4903.221.2/bsd/sys/stat.h)
+- [HFS reports its underlying device ID](https://github.com/apple-oss-distributions/hfs/blob/hfs-407.30.1/core/hfs_vnops.c#L1055)
 - [Dropbear home/key permission requirements](https://github.com/mkj/dropbear/blob/main/manpages/dropbear.8)
 - [Apple's serialized cache/module declarations](https://github.com/apple-oss-distributions/xnu/blob/xnu-4903.221.2/osfmk/kern/trustcache.h)
 - [Pongo static allocator](https://github.com/checkra1n/pongoOS/blob/e98323f8a09abd80fc4cbcd74dee023b91a1ec22/src/kernel/mm.c)
 - [Pongo XNU/RAM-disk path](https://github.com/checkra1n/pongoOS/blob/e98323f8a09abd80fc4cbcd74dee023b91a1ec22/src/drivers/xnu/xnu.c)
 - [Pongo synchronous stdin and console ring semantics](https://github.com/checkra1n/pongoOS/blob/e98323f8a09abd80fc4cbcd74dee023b91a1ec22/src/shell/usbloader.c)
 
-Authored code is MIT. SHA-256 uses the operations/constants in FIPS180-4;
+Host/build helpers and SHA-256 code are MIT; the inspector and its guard
+headers are GPL-2.0-or-later as marked in each file. SHA-256 uses the operations/constants in FIPS180-4;
 no external crypto source, Apple SDK header or firmware bytes are redistributed.
 [PROVENANCE.json](PROVENANCE.json) records the authored source hashes.

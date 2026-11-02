@@ -5,13 +5,14 @@ import argparse, ctypes as C, fcntl, hashlib, importlib.util, json, os, re, time
 from pathlib import Path
 from j72_pongo_control import PongoControl
 ROOT=Path(__file__).resolve().parents[1]
-WORK=ROOT/'private/j72-platform/power-storage-20261102/recovery-prep/pongo-route/handoff-v2'
+WORK=ROOT/'private/j72-platform/power-storage-20261102/recovery-prep/pongo-route/handoff-v3'
 def load(name,file):
  s=importlib.util.spec_from_file_location(name,file);m=importlib.util.module_from_spec(s);s.loader.exec_module(m);return m
 def sha(p):return hashlib.sha256(p.read_bytes()).hexdigest()
 def preflight(require_tests=True):
  manifest=json.loads((WORK/'manifest.json').read_text())
- if manifest['profile']!='j72-pongo-ram-recovery-handoff-v2' or manifest.get('capsule_revision')!=2 or manifest['kernel_patched'] or manifest['automatic_internal_mounts'] or manifest['internal_storage_write_interface']:raise RuntimeError('Unsafe handoff profile')
+ if manifest['profile']!='j72-pongo-ram-recovery-handoff-v3' or manifest.get('capsule_revision')!=3 or manifest['kernel_patched'] or manifest['automatic_internal_mounts'] or manifest['internal_storage_write_interface']:raise RuntimeError('Unsafe handoff profile')
+ if manifest.get('root_identity_guard')!='hfs-root-flag-md0-device-match-no-apfs':raise RuntimeError('Missing RAM device identity guard')
  if manifest.get('ssh_auth_permissions',{}).get('root_home')!=0o700:raise RuntimeError('Root SSH home permissions not audited')
  if manifest['bootargs']!='rd=md0 debug=0x2014e -v wdt=-1':raise RuntimeError('RAM-root boot-argument mismatch')
  for name,digest in manifest['files'].items():

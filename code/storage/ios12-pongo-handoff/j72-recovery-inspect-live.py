@@ -5,13 +5,22 @@
 No boot, filesystem mount or storage-write command. The normal host service is
 restored after the bounded inspector and all temporary process groups are reaped.
 """
-import argparse, fcntl, importlib.util, os, signal, subprocess, time
+import argparse, fcntl, importlib.util, json, os, signal, subprocess, time
 from pathlib import Path
 ROOT=Path(__file__).resolve().parents[1]
 BASE=ROOT/'private/j72-platform/power-storage-20261102/recovery-prep'
 MARKER='J72_RO_RECOVERY_V1'
 def load_inspector():
  s=importlib.util.spec_from_file_location('recovery',ROOT/'tools/boot-j72-ios-recovery.py');m=importlib.util.module_from_spec(s);s.loader.exec_module(m);return m
+def capture_guard(folder):
+ path=folder/'commands.log'
+ if not path.exists():return None
+ rows=[line[len('J72_GUARD_JSON '):] for line in path.read_text(errors='replace').splitlines() if line.startswith('J72_GUARD_JSON ')]
+ if len(rows)!=1:return None
+ try:data=json.loads(rows[0])
+ except ValueError:return None
+ if data.get('profile')!='j72-ram-mount-guard-v3':return None
+ (folder/'mount-guard.json').write_text(json.dumps(data,indent=2)+'\n');return data
 def target():
  found=[]
  for p in Path('/sys/bus/usb/devices').iterdir():
@@ -24,7 +33,7 @@ def target():
 def inspect_live(receipt):
  if os.geteuid()!=0:raise RuntimeError('Use sudo for the temporary RAM recovery transport')
  folder=receipt.resolve()
- if folder.parent.parent!=BASE/'pongo-route' or folder.parent.name not in ('handoff-v1','handoff-v2') or not folder.name.startswith('stage-'):raise RuntimeError('Not this candidate stage receipt')
+ if folder.parent.parent!=BASE/'pongo-route' or folder.parent.name not in ('handoff-v1','handoff-v2','handoff-v3') or not folder.name.startswith('stage-'):raise RuntimeError('Not this candidate stage receipt')
  os.umask(0o077)
  with (ROOT/'private/j72-usb.lock').open('a') as lock:
   fcntl.flock(lock,fcntl.LOCK_EX|fcntl.LOCK_NB)
@@ -51,7 +60,11 @@ def inspect_live(receipt):
    time.sleep(.5)
    if server.poll() is not None:raise RuntimeError('Temporary recovery usbmuxd exited')
    attempt.inspect()
+   if folder.parent.name=='handoff-v3':
+    guard=capture_guard(folder)
+    if not guard or guard.get('root_is_hfs_md0') is not True or guard.get('bootargs_approved') is not True or guard.get('device_numbers_match')!=1 or guard.get('apfs_mounts')!=0:raise RuntimeError('Missing verified RAM-device guard receipt')
   finally:
+   capture_guard(folder)
    attempt.close()
    if server:
     try:os.killpg(server.pid,signal.SIGTERM)

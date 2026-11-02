@@ -1,3 +1,20 @@
+# 2 November: recovery SSH authentication passes; mount identity check is next
+
+Revision2 passed RAM staging, recovery boot, pinned SSH identity and client-key
+authentication. The forced inspector now executes. It stopped at its RAM-root/
+mount safety check with exit 5, before opening the disk; no GPT/minimum-size
+result or storage change occurred. The owner has returned to iOS.
+
+Matching XNU source uses an initial `root_device` mount label, while the old
+inspector requires `/dev/md0`. The actual label remains unobserved. Revision3
+adds detailed guard output and checks root/device numbers, HFS/root flags and
+zero APFS mounts before permitting read-only inspection. It retains the fixed
+SSH commands and adds a metadata-only `diagnose` command. 25 actual-inspector
+cases and six transport cleanup/refusal cases pass offline; device test pending.
+[Updated code and measured result](code/storage/ios12-pongo-handoff/).
+
+## Earlier checkpoints
+
 # 2 November: RAM recovery boots; SSH permission fix ready for its next test
 
 The guarded Pongo stager passed on J72: exact original kernel and full stock

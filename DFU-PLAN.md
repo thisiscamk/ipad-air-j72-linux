@@ -1,3 +1,23 @@
+# Next DFU: qualify the recovery root-device check and inspect storage
+
+- [x] Pass revision2 RAM stage and independent handoff checks.
+- [x] Boot recovery and pass pinned-host/client-key SSH authentication.
+- [x] Execute forced inspector; preserve its mount-guard refusal before disk open.
+- [x] Build revision3 with root-to-md0 device comparison and structured diagnostics.
+- [x] Pass 25 actual-inspector cases and six transport cleanup/refusal cases offline.
+- [x] Return to normal iOS on the direct Pi connection.
+- [ ] Fresh direct-Pi DFU: boot revision3 and capture the actual mount/device guard.
+- [ ] After all guards pass, validate both GPT copies and try the APFS minimum getter.
+- [ ] Review space creation if the 1.64 GB shrink allowance persists.
+- [ ] Qualify native writes/flush and persistent root before a reviewed installation.
+- [ ] Qualify charging cooldown restart and sustained net gain before unattended use.
+
+The root-label explanation is source-supported, not yet measured on this device.
+No resize, snapshot mutation, internal install or erase is authorized.
+[Source and separate device/offline evidence](code/storage/ios12-pongo-handoff/).
+
+## Earlier checkpoints
+
 # Next DFU: authenticate to the RAM recovery and inspect storage read-only
 
 - [x] Pass compact inventory, original kernel and entire stock cache checks.
