@@ -1,3 +1,16 @@
+## 2 November: locked-screen iOS charging confirmed on the powered hub
+
+The owner locked the screen and left the iPad on the same powered hub.
+A 180.126-second read-only observation collected ten positive battery-current
+readings, +1,035 to +1,140 mA. Charge rose from 42% to 44%; the raw remaining
+capacity also rose. Temperature fell from 40.5°C to 39.0°C. The source remained
+connected and reported 1,500 mA. The last two readings repeated the same gauge
+values, so these are ten observations rather than ten independent updates.
+
+This establishes net charging in this iOS session. It does not qualify
+unattended Linux charging or prove that the screen alone caused the change;
+a background photo service remained busy. No charger setting was changed.
+
 ## 2 November: live iOS minimum-size query narrows the storage blocker
 
 After the owner reapplied Amethyst, authorized root SSH and the read-only

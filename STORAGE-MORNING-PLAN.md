@@ -73,6 +73,13 @@ Before the next storage DFU or write proposal:
 3. Establish an exact J72/iOS 12 rescue environment, SEP/key access and a
    reviewed snapshot-preservation/rollback strategy before any snapshot change.
    Build and inspect that environment before requesting another DFU.
+   Source review has identified concrete preparation work: the pinned
+   [SSHRD script](https://github.com/verygenericname/SSHRD_Script/blob/d99ec4a19172b87d80fd9dea25eabf39291425a0/sshrd.sh)
+   downloads an x86_64 gaster binary on Linux and adds
+   `nand-enable-reformat=1 -restore` for A7. Do not execute that preset as our
+   read-only recovery test. [Legacy iOS Kit](https://github.com/LukeZGD/Legacy-iOS-Kit/blob/23622f8fe72c09952089d5145a7b008cfcc90d9b/restore.sh)
+   provides ARM64 host tools and an A7/iOS 12 producer to audit. No recovery
+   script has been executed and no such payload is ready for DFU yet.
 4. Resolve the capacity limit, then generate an exact layout from fresh
    measurements. Do not select a size below the reported minimum or treat
    APFS free blocks as a partition gap.

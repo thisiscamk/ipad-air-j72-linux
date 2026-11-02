@@ -10,6 +10,7 @@
 - [x] Observe positive charging, active-source lease withdrawal/restoration in 2.27 seconds, explicit restart and automatic voltage/cool holds.
 - [x] Complete 3600.6 seconds of controller observation without faults and independently verify final restoration.
 - [ ] Qualify automatic cooldown restart and sustained net charge gain; native source detection remains open.
+- [x] Return to iOS and confirm locked-screen hub charging: 42% → 44% over three minutes, all sampled currents positive. This is an iOS result.
 - [x] Build and pin the isolated #35 recovery-only storage image; 307 host cases and matching module imports pass.
 - [x] Boot #35; verify live firmware, both recovery shells, Identify and repeated direct reads.
 - [x] Capture/validate both GPT copies and APFS checkpoint/space manager; no free partition gap exists.
