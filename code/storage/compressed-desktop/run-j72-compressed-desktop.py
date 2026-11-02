@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # SPDX-License-Identifier: MIT
 """Preflight, start or stop the read-only compressed desktop on exact #34 RAM Linux."""
-import argparse, hashlib, importlib.util, json, os, shlex, signal, socket, subprocess, time
+import argparse, base64, hashlib, importlib.util, json, os, re, shlex, signal, socket, struct, subprocess, time
 from pathlib import Path
 ROOT=Path(__file__).resolve().parents[1]
 WORK=ROOT/'private/j72-platform/power-storage-20261102/compressed-root-prep/desktop-test34'
@@ -44,9 +44,9 @@ def configure_usb():
  subprocess.run(['ip','addr','replace','10.0.0.1/24','dev',found[0]],check=True,timeout=5)
  subprocess.run(['ip','link','set',found[0],'up'],check=True,timeout=5)
 def main():
- p=argparse.ArgumentParser(description=__doc__);g=p.add_mutually_exclusive_group();g.add_argument('--run',action='store_true');g.add_argument('--stop',action='store_true');a=p.parse_args()
+ p=argparse.ArgumentParser(description=__doc__);g=p.add_mutually_exclusive_group();g.add_argument('--run',action='store_true');g.add_argument('--resume',action='store_true',help='Restart previously staged, normally stopped compressed desktop in the same RAM boot');g.add_argument('--stop',action='store_true');a=p.parse_args()
  os.umask(0o077);m=preflight()
- if not(a.run or a.stop):return
+ if not(a.run or a.resume or a.stop):return
  if os.geteuid()!=0:raise RuntimeError('Use sudo for this private image/export and USB setup')
  configure_usb();host=load('network_host','j72-wifi-host.py');raw=load('locked_shell','run-j72-input-limit-hub1050-desktop.py').locked_ram(host.ram())
  def c(script,timeout=15):return raw('busybox sh -ec '+shlex.quote(script),timeout=timeout)
@@ -62,16 +62,30 @@ def main():
    while Path('/proc',str(pid)).exists() and time.monotonic()<deadline:time.sleep(.1)
    if Path('/proc',str(pid)).exists():raise RuntimeError('Detached export did not exit')
   PIDFILE.unlink(missing_ok=True);print('Compressed desktop unmounted, NBD detached, touch cleaned up and owned host export stopped.',flush=True);return
- c('test "$(cat /sys/block/nbd2/size)" = 0; ! busybox grep -q " /mnt/omarchy " /proc/mounts; test ! -e /opt/j72-compressed; test ! -d /sys/module/squashfs; test "$(cat /sys/module/j72_touch_session/parameters/session_state)" = 0',5)
+ c('test "$(cat /sys/block/nbd2/size)" = 0; ! busybox grep -q " /mnt/omarchy " /proc/mounts; test "$(cat /sys/module/j72_touch_session/parameters/session_state)" = 0',5)
+ if a.resume:
+  c('test -d /sys/module/squashfs; test "$(cat /sys/module/j72_touch_session/parameters/cleanup_ok)" = Y; test "$(cat /sys/module/j72_touch_session/parameters/firmware_healthy)" = 1',5)
+  notes=subprocess.run(['readelf','-n',str(WORK/'squashfs.ko')],check=True,capture_output=True,text=True).stdout
+  ids=re.findall(r'Build ID: ([0-9a-f]+)',notes)
+  note=base64.b64decode(c('busybox base64 /sys/module/squashfs/notes/.note.gnu.build-id',4))
+  if len(note)<16:raise RuntimeError('Truncated loaded module identity')
+  namesz,descsz,kind=struct.unpack_from('<III',note)
+  if namesz!=4 or kind!=3 or note[12:16]!=b'GNU\0' or len(note)!=16+descsz or len(ids)!=1 or note[16:].hex()!=ids[0]:raise RuntimeError('Loaded SquashFS module build identity differs')
+  for name,target in [('squashfs.ko','/opt/j72-compressed/squashfs.ko'),('autostart','/opt/j72-compressed/autostart'),('controller.sh','/sbin/j72-compressed-desktop-session')]:
+   if c('busybox sha256sum '+target,4).decode().split()[0]!=sha(WORK/name):raise RuntimeError('Previously staged compressed file changed: '+target)
+ else:
+  c('test ! -e /opt/j72-compressed; test ! -d /sys/module/squashfs',5)
  (out/'before.txt').write_bytes(c('cat /proc/meminfo; /sbin/j72-touch-session status || true',5))
  available=int(c('busybox grep MemAvailable /proc/meminfo',4).split()[1])*1024
  if available<256*1024**2:raise RuntimeError('Insufficient RAM headroom before desktop')
  if export_pid(m):raise RuntimeError('This export is already running; inspect/stop it first')
  with socket.socket() as sock:sock.bind(('10.0.0.1',10831))
- c('mkdir -m 700 /opt/j72-compressed',4)
- uploader=load('uploader','run-j72-wlan-enumeration-v2.py')
- for name,target in [('squashfs.ko','/opt/j72-compressed/squashfs.ko'),('autostart','/opt/j72-compressed/autostart'),('controller.sh','/sbin/j72-compressed-desktop-session')]:uploader.upload(c,host,WORK/name,target)
- c('chmod 755 /opt/j72-compressed/autostart /sbin/j72-compressed-desktop-session; busybox sh -n /sbin/j72-compressed-desktop-session; insmod /opt/j72-compressed/squashfs.ko; busybox grep -q squashfs /proc/filesystems',10)
+ if not a.resume:
+  c('mkdir -m 700 /opt/j72-compressed',4)
+  uploader=load('uploader','run-j72-wlan-enumeration-v2.py')
+  for name,target in [('squashfs.ko','/opt/j72-compressed/squashfs.ko'),('autostart','/opt/j72-compressed/autostart'),('controller.sh','/sbin/j72-compressed-desktop-session')]:uploader.upload(c,host,WORK/name,target)
+  c('chmod 755 /opt/j72-compressed/autostart /sbin/j72-compressed-desktop-session; busybox sh -n /sbin/j72-compressed-desktop-session; insmod /opt/j72-compressed/squashfs.ko',10)
+ c('busybox grep -q squashfs /proc/filesystems',4)
  with (out/'qemu-nbd.log').open('wb') as log:
   server=subprocess.Popen(['qemu-nbd','--read-only','--format=raw','--bind=10.0.0.1','--port','10831','--persistent',m['image']],stdin=subprocess.DEVNULL,stdout=log,stderr=log,start_new_session=True)
   record={'pid':server.pid,'start_ticks':int(Path('/proc',str(server.pid),'stat').read_text().split()[21]),'image_sha256':m['image_sha256']}

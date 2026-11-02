@@ -13,14 +13,31 @@
   "image_bytes": 572002304,
   "mem_available_kib_post_start": 535568,
   "swap_total_kib": 0,
-  "owner_ui_check": "PENDING",
-  "normal_unmount_and_export_cleanup": "PENDING",
+  "owner_ui_check": "PASS initial compressed desktop, menu/Foot dragging/keyboard; Wi-Fi initially inactive",
+  "normal_unmount_and_export_cleanup": "PASS first desktop: normal unmount, NBD detach, touch cleanup; Wi-Fi activation guard also confirms firmware healthy",
   "internal_storage_access": false,
   "charging_controller_started": false,
   "usb_export_still_required": true,
   "limitations": [
-    "Startup is not proof of owner-visible rendering or keyboard behavior.",
+    "Initial UI is owner-confirmed; screen verification after adding Wi-Fi is pending.",
     "No local installation, persistence, resize or snapshot mutation.",
-    "Touch firmware health is assessed during normal cleanup, not while the input worker is active."
-  ]
+    "Touch firmware health is assessed during normal cleanup, not while the input worker is active.",
+    "Current resumed desktop still needs USB; charging controller remains off."
+  ],
+  "wifi": {
+    "initial_state": "Radio and network tools intentionally not started by format test",
+    "same_boot_initialization": "PASS proven #34 provider, matched RAM driver update and existing private profile",
+    "association": "COMPLETED",
+    "https_status": 200,
+    "pinned_key_ssh": "PASS",
+    "desktop_widget_connected": true,
+    "mem_available_kib_with_wifi": 474240,
+    "owner_visible_after_resume": "PENDING"
+  },
+  "resume": {
+    "result": "PASS same Linux boot, no DFU",
+    "loaded_module_identity": "GNU build ID matches local module; staged module/controller/autostart hashes match",
+    "filesystem": "read-only SquashFS on read-only NBD",
+    "first_guard_refusal": "srcversion field absent in module; refused before export/start, replaced with GNU build ID check"
+  }
 }

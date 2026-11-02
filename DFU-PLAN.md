@@ -1,4 +1,4 @@
-# Current boot: compressed desktop running; owner UI check next
+# Current boot: compressed desktop with Wi-Fi; restored UI check next
 
 - [x] Qualify restricted RAM recovery: SSH, md0 root, no APFS mounts, GPT CRCs.
 - [x] Measure unmounted minimum: same 1.64 GB release allowance as normal iOS.
@@ -8,8 +8,11 @@
 - [x] Prepare #34 compressed-desktop controller, host export and cleanup; preflight passes.
 - [x] Direct-Pi DFU: proven Pongo and --wifi-ram-desktop boot.
 - [x] Load matched module; start read-only NBD/SquashFS desktop; ready marker and memory checks pass.
-- [ ] Owner confirms portrait/menu/Foot dragging and keyboard hide → tap → type twice.
-- [ ] Unmount/detach/export cleanup; reuse the same Linux boot for RAM desktop/Wi-Fi/power work where healthy.
+- [x] Owner confirms initial portrait/menu/Foot dragging and keyboard hide → tap → type twice.
+- [x] Normal unmount/NBD/export/touch cleanup; Wi-Fi association, HTTPS and Wi-Fi SSH pass in the same boot.
+- [x] Resume compressed desktop with Wi-Fi; read-only mount and bar connected-status checks pass.
+- [ ] Owner verifies restored Wi-Fi window/menu/keyboard; keep USB attached.
+- [ ] Clean up compressed desktop and restore known RAM workload before power/hub testing.
 - [ ] Integrate native storage reads with the compressed base and review the conditional 1536 MiB layout.
 - [ ] Obtain separate approval for exact shrink/GPT/image writes before installation.
 - [ ] Qualify local read-only root, then persistent write/flush/overlay behavior.

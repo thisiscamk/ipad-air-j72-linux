@@ -1,8 +1,9 @@
 # Compressed J72 desktop — first device startup passes
 
-**The exact #34 module loads and the compressed desktop reports ready on the
-iPad. Owner UI checks and cleanup are pending. No internal storage has been
-changed.** This follows the [passing RAM recovery inspection](../ios12-pongo-handoff/).
+**The owner confirmed the compressed desktop UI. Normal cleanup and a same-boot
+restart with Wi-Fi also pass. HTTPS and pinned-key Wi-Fi SSH work; the bar status
+says connected. Owner verification of the restored Wi-Fi window is pending.
+No internal storage has been changed.** This follows the [passing RAM recovery inspection](../ios12-pongo-handoff/).
 
 ## Why test this
 
@@ -33,7 +34,10 @@ block state. Its controller mounts **SquashFS read-only**, reusing the existing
 desktop lifecycle with RAM `/home`, `/run` and `/tmp`. Locale is explicit C.utf8,
 portrait transform is explicit, and Foot starts Bash directly.
 
-This test accesses no internal disk and starts no charging controller. It
+This test accesses no internal disk and starts no charging controller.
+Its initial format-only start does not initialize Wi-Fi. In the actual device
+test, normal desktop cleanup was followed by the proven #34 RAM networking
+stage/provider/association workflow, then `--resume` in the same Linux boot. It
 **requires the USB cable until cleanup** because the base is still hosted on
 the Pi. It is neither a local installation nor persistent user storage.
 The fixed controller and autostart examples are authored shell code; firmware,
@@ -49,12 +53,19 @@ sudo -n python3 tools/run-j72-compressed-desktop.py --run
 # Owner checks menu, dragging and hide -> tap -> typing; keep USB connected.
 # Before moving the cable or shutting down:
 sudo -n python3 tools/run-j72-compressed-desktop.py --stop
+# Optional: after Wi-Fi setup, restart already-staged files in this RAM boot:
+sudo -n python3 tools/run-j72-compressed-desktop.py --resume
+# Keep USB attached again until --stop.
 ```
 
 A failed startup keeps the current boot/export available for inspection. Do not
 request another unchanged DFU. Stop checks normal unmount, NBD detach and touch
 cleanup before terminating the owned host export. PID/group/start-time/source
-checks prevent signalling an unrelated process.
+checks prevent signalling an unrelated process. Resume requires an unmounted,
+detached desktop and stopped healthy touch worker; it verifies the loaded
+SquashFS GNU build ID and all staged module/controller/autostart file hashes.
+The initial source-version check refused safely because this module has no
+`srcversion`; GNU build ID is present and passed the replacement identity guard.
 
 The same healthy Linux boot can then resume the existing RAM desktop and Wi-Fi
 workflow for later power checks, after the compressed export is detached. A
@@ -82,8 +93,12 @@ Current cold-image validation and shell-syntax checks pass. An actual read-only
 loopback export also passed process-identity, virtual-size and cleanup checks.
 The first device startup passes module load, exact read-only NBD size and
 SquashFS mount checks. Available memory was 535,568 KiB in a post-start sample
-with no swap. Owner rendering/menu/keyboard verification and normal cleanup
-are pending; the USB export remains attached for that check.
+with no swap. The owner confirmed
+the initial rendering/menu/Foot/keyboard check. Normal unmount, NBD/export
+cleanup and firmware-health checks passed. The same-boot restart after Wi-Fi
+activation has 474,240 KiB available; association, HTTPS 200 and pinned-key SSH
+pass. The restored bar status reports connected; owner verification is pending.
+The resumed USB export remains attached.
 [Sanitized device result](DEVICE-RESULT.json). Native storage reads/root,
 approved space creation, write/flush durability,
 persistent overlays and sustained unattended charging remain later gates.
