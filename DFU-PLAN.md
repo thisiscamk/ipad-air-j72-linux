@@ -1,3 +1,19 @@
+# Next DFU: read-only recovery inventory through proven Pongo
+
+- [x] Observe gaster's A7 PATCH/reconnect boundary; stop before any image upload.
+- [x] Confirm that two cable cycles did not restore USB; do not resume or repeat the same exploit.
+- [x] Compare Legacy iOS Kit's gaster fork: its A7 payload and reconnect logic are unchanged.
+- [x] Return to iOS; verify iPad4,2 / 12.5.7 on the direct Pi connection.
+- [x] Build a read-only Pongo handoff probe; 8 memory-span, 143 Mach-O and 8 response-refusal cases plus fragmented transport checks pass.
+- [ ] Next DFU: use the already proven checkra1n → Pongo 2.6.3 launcher.
+- [ ] Load the probe in RAM; match the loaded Apple kernel UUID and inventory boot arguments/memory-map slots.
+- [ ] Use that evidence to prepare the RAM recovery handoff; reuse a healthy Pongo session for compatible work.
+- [ ] Qualify the recovery boot before any space-creation or installation proposal.
+
+The changed test bypasses gaster and inspects the existing XNU handoff.
+It has no boot, kernel-patch, DeviceTree-edit or disk-access command.
+The iOS recovery image has still not booted. [Probe source/results](code/storage/ios12-pongo-probe/).
+
 # Recovery DFU follow-up: A7 reconnect handling
 
 - [x] First changed DFU: exact J72/direct Pi verified; gaster timed out before any image upload.

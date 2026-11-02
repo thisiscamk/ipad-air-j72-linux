@@ -56,8 +56,12 @@
     "stopped_at_manual_step": true,
     "kernel_usb_reset_wait_observed": true,
     "loader_process_group_reaped": true,
-    "pwned_usb_marker_status": "pending_owner_cable_cycles",
+    "pwned_usb_marker_status": "not_observed_after_owner_completed_two_cable_cycles",
     "bootloader_or_ram_image_uploaded": false,
-    "storage_inspector_run": false
-  }
+    "storage_inspector_run": false,
+    "same_ecid_query_return": 255,
+    "resume_attempted": false,
+    "owner_returned_to_ios": true
+  },
+  "next_route": "read-only handoff inventory using already proven checkra1n/Pongo path"
 }

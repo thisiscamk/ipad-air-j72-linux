@@ -1,0 +1,26 @@
+{
+  "status": "PASS",
+  "actual_source_span_cases": 8,
+  "actual_source_macho_cases": 143,
+  "captured_frame_refusal_cases": 8,
+  "fragmented_crlf_transport": "PASS",
+  "native_module_imports": [
+    "_command_puts",
+    "_command_register",
+    "_dt_check$64",
+    "_dt_find",
+    "_dt_parse$64",
+    "_dt_prop$64",
+    "_gBootArgs",
+    "_gDeviceTree",
+    "_gEntryPoint",
+    "_socnum"
+  ],
+  "usb_access": false,
+  "device_probe_tested": false,
+  "recovery_boot_tested": false,
+  "profile": "j72-pongo-readonly-recovery-probe-v1",
+  "canonical_kernel_entry_within_search_bound": true,
+  "host_system_kernel_changed": false,
+  "internal_storage_writes_performed": false
+}

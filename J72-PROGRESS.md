@@ -1,3 +1,22 @@
+# 2 November: gaster handoff still fails; Pongo observer ready
+
+After the observed A7 PATCH prompt, two owner cable cycles still left no Apple
+USB device; the same-ECID query returned 255. The saved attempt was not resumed.
+No iBSS, iBEC or RAM image was uploaded and no storage inspection or mutation
+occurred. Normal iOS has returned and iPad4,2 / 12.5.7/direct Pi are verified.
+
+Comparison with Legacy iOS Kit's gaster fork finds the same A7 payload and
+reconnect logic. That swap would not give us a changed A7 test. The next route
+uses the checkra1n/Pongo loader already proven by the Linux sessions.
+
+A new read-only ARM64 Pongo module inventories boot arguments, memory-map slots
+and a bounded Mach-O header/UUID search. It neither edits the kernel or DeviceTree
+nor requests boot or disk access. Its native build, relocations/ten Pongo imports,
+8 span cases, 143 Mach-O cases, 8 malformed-response cases and fragmented CR/LF
+transport checks pass offline. It is **not yet tested on the device**. Source and
+capture/build/test recipes are [published here](code/storage/ios12-pongo-probe/).
+The existing RAM recovery capsule and APFS rollback snapshot remain unchanged.
+
 # 2 November: A7 recovery PATCH/manual reconnect boundary reached
 
 The second attempt's live log confirms SETUP, SPRAY and PATCH returned true,

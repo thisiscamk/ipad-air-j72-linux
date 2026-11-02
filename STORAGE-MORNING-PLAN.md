@@ -1,3 +1,17 @@
+# Current recovery gate: inspect the proven Pongo handoff
+
+The gaster route did not restore a pwned USB endpoint after its A7 reconnect
+prompt. It uploaded no bootloader or recovery image. The owner has returned the
+iPad to iOS. A different, read-only test is now built using the checkra1n/Pongo
+path already proven on this J72: identify the loaded XNU kernel, boot arguments
+and reserved memory-map slots. [Actual observer source/results](code/storage/ios12-pongo-probe/).
+
+The next DFU establishes that inventory; it is not an installation or a claim
+that the recovery image boots. A healthy Pongo session can be reused while the
+next RAM handoff is prepared. Space creation, driver write/flush qualification
+and the reviewed write proposal remain later gates. No snapshot change or
+internal install is authorized by this preparation.
+
 # Recovery candidate built; device qualification is next
 
 A separate iOS 12.5.7 RAM recovery capsule is now built and pinned. The original
