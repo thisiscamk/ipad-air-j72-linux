@@ -1,6 +1,8 @@
 # Completing J72 power support
 
-Prepared 2 November 2026. The iPad remains in iOS charging overnight.
+Prepared 2 November; current status updated 3 November 2026. The iPad is now in
+the bounded Linux input/storage/power observation on the powered hub. Follow the
+[session record](SESSION-2026-11-03.md) and [finishing plan](FINISHING-PLAN.md).
 [Next session ordering](NEXT-SESSION-PLAN.md) batches input, native-storage idle
 measurements and guarded charging into one Linux boot.
 

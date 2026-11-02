@@ -1,8 +1,10 @@
 # Next session: one boot for input, storage power and charging
 
-Prepared 2 November 2026. The owner is leaving the iPad charging in iOS overnight.
-No DFU or device action is pending during that break. No internal-storage write,
-resize, snapshot mutation or erase is authorized. The host kernel stays unchanged.
+Prepared 2 November 2026; executed in the 3 November morning session. This is the
+preparation/runbook record. For current completed/pending checks, use the
+[session record](SESSION-2026-11-03.md) and [finishing plan](FINISHING-PLAN.md).
+No further DFU is pending during the current observation. No internal-storage
+write, resize, snapshot mutation or erase is authorized. The host kernel stays unchanged.
 
 ## Ready now
 
@@ -40,10 +42,12 @@ experiment is the separately loaded touch module:
 
 ```sh
 sudo -n python3 tools/j72-pongo-boot.py --require-direct-pi --confirm-pongo
-sudo -n python3 tools/j72-pongo-pmic-boot.py --desktop-storage35
+sudo -n python3 tools/j72-pongo-pmic-boot.py --desktop-storage35 --log-path private/j72-touch/j72-desktop-storage35-UNIQUE-SESSION-pongoterm.log
 ```
 
-Reap the first process group before starting the second. Verify both recovery
+Replace `UNIQUE-SESSION` with a new session identifier: the uploader deliberately
+refuses an existing log instead of overwriting it. Reap the first process group
+before starting the second. Verify both recovery
 shells and configure the discovered matching USB network interface; do not
 start a host filesystem export. Before any existing touch/radio/desktop helper:
 
