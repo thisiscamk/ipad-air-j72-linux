@@ -21,11 +21,12 @@ A gzip SquashFS copy of the existing desktop was built privately from a
 read-only host loop mount: **572,002,304 bytes**. Five selected file readbacks
 match; the source image is preserved and the host mount was removed. Capacity
 and source/tool hashes are recorded locally.
-This is a capacity rehearsal, not a boot-tested release. The #35 kernel has
+The #34 read-only USB desktop test now passes module load, SquashFS/NBD,
+owner-visible desktop/keyboard, Wi-Fi/HTTPS/SSH and normal cleanup. This is
+filesystem-format qualification, not a local-storage boot. The #35 kernel has
 SquashFS and overlay support configured as modules. Matching SquashFS modules
-for #34 and #35 now build and pass 106 import/provider checks. The next #34
-compressed-desktop USB test is fully prepared; native-storage integration and
-writable-overlay qualification remain later work.
+for #34 and #35 now build and pass 106 import/provider checks. Native-storage integration
+and writable-overlay qualification remain later work.
 
 A compressed base can allow an interim local-storage root while retaining the
 original iOS snapshot. The first native-storage boot can keep the base read-only
@@ -94,5 +95,5 @@ step. A GPT metadata copy cannot restore APFS content or the rollback snapshot.
    Fully PC-free startup after shutdown remains separate from assisted startup.
 
 No new DFU is needed merely to repeat the passing recovery query. The next
-DFU tests the prepared compressed desktop over read-only USB NBD. Native local
-root follows later; this next test makes no internal-storage change.
+DFU should test a concrete native-root integration change once prepared. The
+compressed USB test passes; native local root remains unqualified.

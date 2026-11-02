@@ -2,7 +2,7 @@
 
 **The owner confirmed the compressed desktop UI. Normal cleanup and a same-boot
 restart with Wi-Fi also pass. HTTPS and pinned-key Wi-Fi SSH work; the bar status
-says connected. Owner verification of the restored Wi-Fi window is pending.
+says connected. The owner confirms Wi-Fi/menu/keyboard work after restart.
 No internal storage has been changed.** This follows the [passing RAM recovery inspection](../ios12-pongo-handoff/).
 
 ## Why test this
@@ -97,8 +97,9 @@ with no swap. The owner confirmed
 the initial rendering/menu/Foot/keyboard check. Normal unmount, NBD/export
 cleanup and firmware-health checks passed. The same-boot restart after Wi-Fi
 activation has 474,240 KiB available; association, HTTPS 200 and pinned-key SSH
-pass. The restored bar status reports connected; owner verification is pending.
-The resumed USB export remains attached.
+pass. The owner confirms restored Wi-Fi/menu/keyboard. A second normal
+unmount/NBD/export/touch cleanup passed, and the proven RAM desktop was restored
+for separate power testing; no compressed export remains.
 [Sanitized device result](DEVICE-RESULT.json). Native storage reads/root,
 approved space creation, write/flush durability,
 persistent overlays and sustained unattended charging remain later gates.

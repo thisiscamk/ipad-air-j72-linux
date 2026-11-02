@@ -15,8 +15,10 @@ checks pass. A post-start sample has 535,568 KiB memory available and no swap.
 The owner confirmed the initial GUI/menu/Foot/keyboard checks. Normal cleanup
 and firmware-health checks pass. Wi-Fi was then initialized in the same boot:
 association, HTTPS 200 and Wi-Fi SSH pass. The compressed desktop resumes with
-474,240 KiB available and bar status connected; restored-screen check pending.
-Keep USB/export attached. This test does not access the internal disk.
+474,240 KiB available and bar status connected; the owner confirms Wi-Fi/menu/
+keyboard work. A second normal cleanup passed, and the proven RAM desktop
+was restored for power testing. No host export remains. The maintenance worker
+is loaded disabled while the hub move is pending. No internal disk access.
 
 A 1536 MiB partition is a candidate within the reported minimum, subject to a
 reviewed resize/write procedure. The compressed base may avoid snapshot removal

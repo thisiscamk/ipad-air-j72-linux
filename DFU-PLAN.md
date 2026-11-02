@@ -1,4 +1,4 @@
-# Current boot: compressed desktop with Wi-Fi; restored UI check next
+# Current boot: compressed desktop qualified; RAM desktop ready for hub power test
 
 - [x] Qualify restricted RAM recovery: SSH, md0 root, no APFS mounts, GPT CRCs.
 - [x] Measure unmounted minimum: same 1.64 GB release allowance as normal iOS.
@@ -11,14 +11,17 @@
 - [x] Owner confirms initial portrait/menu/Foot dragging and keyboard hide → tap → type twice.
 - [x] Normal unmount/NBD/export/touch cleanup; Wi-Fi association, HTTPS and Wi-Fi SSH pass in the same boot.
 - [x] Resume compressed desktop with Wi-Fi; read-only mount and bar connected-status checks pass.
-- [ ] Owner verifies restored Wi-Fi window/menu/keyboard; keep USB attached.
-- [ ] Clean up compressed desktop and restore known RAM workload before power/hub testing.
+- [x] Owner verifies restored Wi-Fi window/menu/keyboard.
+- [x] Clean up compressed desktop and restore known RAM workload; no export remains.
+- [x] Stage maintenance charging worker disabled, with independent baseline unchanged.
+- [ ] Owner checks restored RAM input and moves to qualified powered hub; verify source/data path before charging.
+- [ ] Observe charging cooldown/restart and sustained net gain under the unchanged protection limits.
 - [ ] Integrate native storage reads with the compressed base and review the conditional 1536 MiB layout.
 - [ ] Obtain separate approval for exact shrink/GPT/image writes before installation.
 - [ ] Qualify local read-only root, then persistent write/flush/overlay behavior.
 - [ ] Finish charging cooldown restart and sustained net gain before unattended charging.
 
-The current desktop needs the cable until cleanup. No internal storage, resize or
+The compressed export is detached; the RAM desktop and Wi-Fi are running. No internal storage, resize or
 snapshot operation is part of it.
 [Compressed candidate/runbook](code/storage/compressed-desktop/),
 [space/layout review](SPACE-CREATION-REVIEW.md).
