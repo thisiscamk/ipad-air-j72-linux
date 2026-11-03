@@ -5,7 +5,20 @@ net charge fails. [Measured diagnosis](SESSION-2026-11-03.md).
 **iOS charging is confirmed at 81% after PIN entry**, by the owner and two
 read-only diagnostic samples 30 seconds apart. USB returned on the same
 qualified hub path and host boot; exact iPad/iOS identity passes. Candidate
-and session preflight pass. The next physical action is direct-Pi DFU.
+and session preflight pass. The direct-Pi boot has now completed.
+
+## Live boot checkpoint
+
+The direct-Pi DFU and unchanged #35 payload boot passed. Both USB recovery
+shells respond. The qualified touch worker passed its start/stop self-check;
+Wi-Fi association, HTTPS, pinned-key Wi-Fi SSH and RAM desktop startup pass.
+The fresh same-boot native inventory, read-only probe and six matching bounded
+reads pass. No internal filesystem is mounted or written. Brightness is 1604
+for the owner input check; the charging module is not loaded yet.
+
+**Pending:** owner menu/typing/keyboard check and transfer back to the marked
+powered-hub port. Charging-policy execution and net-gain measurement have not
+started. The candidate remains untested on device.
 
 ## Concrete change and scope
 
