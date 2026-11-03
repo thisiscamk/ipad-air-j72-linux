@@ -1,0 +1,148 @@
+From 93777b0ab3bd85c9965ef0696a7609a8f923e385 Mon Sep 17 00:00:00 2001
+From: thisiscamk <100883750+thisiscamk@users.noreply.github.com>
+Date: Wed, 4 Nov 2026 05:55:13 +0800
+Subject: [PATCH 3/3] release: stop detached RAM desktop processes safely
+
+Track processes rooted in the owned RAM desktop by PID and start time before normal TERM and bounded exit checks. Accept processes that exit during inspection, preserve unrelated processes and retain ownership on cleanup failure. Use BusyBox-compatible process group signaling.
+
+Assisted-by: LLM
+---
+ system/ram-desktop/session | 60 ++++++++++++++++++++++++++++++++++++--
+ tests/test_ram_desktop.py  | 33 +++++++++++++++++++++
+ 2 files changed, 91 insertions(+), 2 deletions(-)
+
+diff --git a/system/ram-desktop/session b/system/ram-desktop/session
+index cefdc76..ddbf9a9 100755
+--- a/system/ram-desktop/session
++++ b/system/ram-desktop/session
+@@ -7,6 +7,61 @@ is_mounted() {
+     [ -r /proc/self/mountinfo ] || return 2
+     awk -v target="$1" '$5 == target { found = 1 } END { exit !found }' /proc/self/mountinfo
+ }
++desktop_process_identity() {
++    [ -r "/proc/$1/stat" ] || return 1
++    desktop_stat=$(cat "/proc/$1/stat") || return 1
++    # comm can contain spaces and parentheses; fields after its last ') '
++    # start with state (3), and starttime is field 22.
++    desktop_stat=${desktop_stat##*) }
++    set -- $desktop_stat
++    desktop_process_state=$1
++    shift 19
++    desktop_process_born=$1
++}
++is_desktop_process() {
++    [ "$1" -gt 1 ] || return 1
++    desktop_process_identity "$1" || return 1
++    [ "$desktop_process_state" != Z ] || return 1
++    [ "$(readlink "/proc/$1/root" 2>/dev/null)" = "$desktop" ]
++}
++stop_desktop_processes() {
++    # Autostart and menu programs can create new groups and outlive their
++    # launchers. Collect all live processes rooted in our exact overlay.
++    desktop_snapshot=$children.owned
++    : > "$desktop_snapshot" || return 1
++    for desktop_entry in /proc/[0-9]*; do
++        desktop_pid=${desktop_entry##*/}
++        if is_desktop_process "$desktop_pid"; then
++            printf '%s %s\n' "$desktop_pid" "$desktop_process_born" >> "$desktop_snapshot" || return 1
++        fi
++    done
++    while read -r desktop_pid desktop_born; do
++        desktop_process_identity "$desktop_pid" || continue
++        [ "$desktop_process_state" != Z ] || continue
++        [ "$desktop_process_born" = "$desktop_born" ] || return 1
++        if ! is_desktop_process "$desktop_pid"; then
++            desktop_process_identity "$desktop_pid" || continue
++            [ "$desktop_process_state" != Z ] || continue
++            return 1
++        fi
++        [ "$desktop_process_born" = "$desktop_born" ] || return 1
++        if ! kill -TERM "$desktop_pid" 2>/dev/null; then
++            desktop_process_identity "$desktop_pid" || continue
++            [ "$desktop_process_state" = Z ] || return 1
++        fi
++    done < "$desktop_snapshot"
++    desktop_i=0
++    while [ "$desktop_i" -lt 50 ]; do
++        desktop_alive=0
++        for desktop_entry in /proc/[0-9]*; do
++            if is_desktop_process "${desktop_entry##*/}"; then desktop_alive=1; fi
++        done
++        [ "$desktop_alive" = 0 ] && return 0
++        sleep .1
++        desktop_i=$((desktop_i + 1))
++    done
++    return 1
++}
+ pidfile=/run/omarchy-ram.pid
+ state=/run/omarchy-ram-state
+ lock=/run/omarchy-ram-owner
+@@ -31,7 +86,7 @@ stop|status)
+     if [ -r "/proc/$pid/stat" ]; then
+         [ "$(awk '{print $22}' "/proc/$pid/stat")" = "$born" ] || { echo 'Session PID changed'; exit 1; }
+         if [ "$1" = stop ]; then
+-            /bin/busybox kill -TERM -- "-$pid"
++            /bin/busybox kill -TERM "-$pid"
+             i=0
+             while [ -r "/proc/$pid/stat" ] && [ "$i" -lt 100 ]; do sleep .1; i=$((i + 1)); done
+             [ ! -r "/proc/$pid/stat" ] || { echo 'Session cleanup still pending'; exit 1; }
+@@ -64,10 +119,11 @@ children=/run/omarchy-ram-children
+ echo STARTING > "$state"
+ cleanup() {
+     failed=0
++    stop_desktop_processes || failed=1
+     while read -r pid born; do
+         [ -r "/proc/$pid/stat" ] || continue
+         [ "$(awk '{print $22}' "/proc/$pid/stat")" = "$born" ] || { failed=1; continue; }
+-        /bin/busybox kill -TERM -- "-$pid" 2>/dev/null || true
++        /bin/busybox kill -TERM "-$pid" 2>/dev/null || true
+     done < "$children"
+     # Bounded normal exit; keep mounts and ownership on a stuck process.
+     i=0
+diff --git a/tests/test_ram_desktop.py b/tests/test_ram_desktop.py
+index 487c8c2..9c60f7c 100644
+--- a/tests/test_ram_desktop.py
++++ b/tests/test_ram_desktop.py
+@@ -14,6 +14,39 @@ from release import ram_desktop as ram
+ 
+ 
+ class RamDesktop(unittest.TestCase):
++    def test_cleanup_finds_detached_chroot_children_and_preserves_outside_processes(self):
++        script = (ram.PROJECT / 'system/ram-desktop/session').read_text()
++        proc = Path(self.temp.name) / 'proc'
++        proc.mkdir()
++        desktop = Path(self.temp.name) / 'desktop'
++        desktop.mkdir()
++        # No group leader exists for the detached desktop child. Its comm
++        # deliberately contains both spaces and ')' to exercise stat parsing.
++        for pid, root, born in [(42001, desktop, 701), (42002, Path('/'), 702),
++                                (42003, desktop, 703)]:
++            directory = proc / str(pid)
++            directory.mkdir()
++            (directory / 'root').symlink_to(root)
++            fields = ['S'] + ['0'] * 18 + [str(born)] + ['0'] * 4
++            (directory / 'stat').write_text(f'{pid} (detached ) child) ' + ' '.join(fields))
++        prefix = script.split('pidfile=', 1)[0].replace('/proc/', str(proc) + '/')
++        # Removing the fixture stat models ordinary exit after TERM; signaling
++        # the unrelated process is an explicit test failure.
++        commands = '''
++desktop=$1/desktop; children=$1/children
++kill() {
++    test "$1" = -TERM && test "$2" = 42001 || return 9
++    echo "$2" >> "''' + str(Path(self.temp.name) / 'signals') + '''"
++    rm "''' + str(proc / '42001/stat') + '''"
++    rm "''' + str(proc / '42003/stat') + '''"
++}
++stop_desktop_processes
++test "$(cat "$1/signals")" = 42001
++test -r "$1/proc/42002/stat"
++'''
++        subprocess.run(['busybox', 'sh', '-c', prefix + commands, 'fixture', self.temp.name],
++                       check=True, capture_output=True)
++
+     def test_session_overrides_private_umask_and_finds_real_mounts_without_mountpoint(self):
+         script = (ram.PROJECT / 'system/ram-desktop/session').read_text()
+         prefix = script.split('pidfile=', 1)[0]
+-- 
+2.47.3
+

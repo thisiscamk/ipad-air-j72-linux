@@ -1,0 +1,150 @@
+From f2c8742279edef44d7d59421874fa0ba27045c00 Mon Sep 17 00:00:00 2001
+From: thisiscamk <100883750+thisiscamk@users.noreply.github.com>
+Date: Wed, 4 Nov 2026 05:37:41 +0800
+Subject: [PATCH 2/3] release: start and clean up the RAM desktop from rescue
+
+Set session directory permissions independently of the private rescue umask, use mountinfo instead of an absent BusyBox applet, provide standard descriptor links and restrict chroot-aware input discovery to existing input/DRM devices. Include the normal menu IPC utilities and libinput helper in the closure.
+
+Assisted-by: LLM
+---
+ release/ram_desktop.py     |  4 +++-
+ system/ram-desktop/session | 25 ++++++++++++++++++++-----
+ tests/test_ram_desktop.py  | 33 +++++++++++++++++++++++++++++++++
+ 3 files changed, 56 insertions(+), 6 deletions(-)
+
+diff --git a/release/ram_desktop.py b/release/ram_desktop.py
+index 5c00dab..2e85404 100644
+--- a/release/ram_desktop.py
++++ b/release/ram_desktop.py
+@@ -18,7 +18,8 @@ PROGRAMS = ('labwc', 'qs', 'foot', 'bash', 'env', 'dbus-daemon', 'dbus-run-sessi
+             'systemctl', 'cat', 'date', 'grep', 'sed', 'head', 'tail', 'tr', 'cut',
+             'mkdir', 'chmod', 'chown', 'cp', 'mv', 'rm', 'ln', 'readlink', 'id',
+             'sleep', 'kill', 'pkill', 'jq', 'socat', 'sort', 'stat', 'find', 'curl',
+-            'awk', 'basename', 'dirname', 'mktemp', 'rmdir', 'gsettings')
++            'awk', 'basename', 'dirname', 'mktemp', 'rmdir', 'gsettings',
++            'md5sum', 'timeout', 'ls')
+ TREES = (UI, 'usr/local/bin', 'home/tablet/.config/labwc', 'home/tablet/.config/foot',
+          'home/tablet/.config/fontconfig', 'home/tablet/.config/omarchy-ipad',
+          'usr/lib/qt6/qml/QtQuick', 'usr/lib/qt6/qml/QtQml', 'usr/lib/qt6/qml/QML',
+@@ -35,6 +36,7 @@ TREES = (UI, 'usr/local/bin', 'home/tablet/.config/labwc', 'home/tablet/.config/
+          'usr/lib/locale/C.utf8', 'etc/ssl/certs', 'usr/share/glib-2.0/schemas')
+ FILES = ('etc/passwd', 'etc/group', 'etc/nsswitch.conf', 'etc/hosts',
+          'home/tablet/.bashrc', 'usr/lib/systemd/systemd-udevd', 'usr/lib/udev/libinput-device-group',
++         'usr/lib/udev/libinput-fuzz-extract',
+          'usr/libexec/omarchy-wtype',
+          'usr/local/libexec/arch-ipad-scale-output', 'usr/local/libexec/arch-ipad-first-theme',
+          'usr/local/libexec/arch-ipad-rotate-output', 'usr/local/share/applications/foot.desktop',
+diff --git a/system/ram-desktop/session b/system/ram-desktop/session
+index 45fd9d8..cefdc76 100755
+--- a/system/ram-desktop/session
++++ b/system/ram-desktop/session
+@@ -1,7 +1,12 @@
+ #!/bin/busybox sh
+ # A manually started chroot session; PID 1 and the standard SSH keys stay outside.
+ set -eu
++umask 022
+ export PATH=/usr/sbin:/usr/bin:/sbin:/bin
++is_mounted() {
++    [ -r /proc/self/mountinfo ] || return 2
++    awk -v target="$1" '$5 == target { found = 1 } END { exit !found }' /proc/self/mountinfo
++}
+ pidfile=/run/omarchy-ram.pid
+ state=/run/omarchy-ram-state
+ lock=/run/omarchy-ram-owner
+@@ -78,10 +83,12 @@ cleanup() {
+     done
+     if [ "$alive" != 0 ] || [ "$failed" != 0 ]; then echo CLEANUP_FAILED > "$state"; return; fi
+     for name in run sys proc dev/shm dev/pts dev; do
+-        if mountpoint -q "$desktop/$name"; then umount "$desktop/$name" || failed=1; fi
++        if is_mounted "$desktop/$name"; then umount "$desktop/$name" || failed=1
++        else rc=$?; [ "$rc" = 1 ] || failed=1; fi
+     done
+     for path in "$desktop" "$writable" "$lower"; do
+-        if mountpoint -q "$path"; then umount "$path" || failed=1; fi
++        if is_mounted "$path"; then umount "$path" || failed=1
++        else rc=$?; [ "$rc" = 1 ] || failed=1; fi
+     done
+     if [ "$failed" = 0 ]; then echo STOPPED > "$state"; rm -f "$pidfile"; rmdir "$lock";
+     else echo CLEANUP_FAILED > "$state"; fi
+@@ -98,6 +105,14 @@ mkdir "$writable/upper" "$writable/work"
+ mount -t overlay overlay -o "lowerdir=$lower,upperdir=$writable/upper,workdir=$writable/work" "$desktop"
+ mkdir -p "$desktop/dev/pts" "$desktop/proc" "$desktop/sys" "$desktop/run"
+ for name in dev dev/pts proc sys; do mount --bind "/$name" "$desktop/$name"; done
++# devtmpfs alone does not supply the proc-backed descriptors Bash uses for
++# process substitution. Create only absent standard links; preserve existing nodes.
++for descriptor in fd stdin stdout stderr; do
++    case "$descriptor" in fd) target=/proc/self/fd;; stdin) target=fd/0;;
++        stdout) target=fd/1;; stderr) target=fd/2;; esac
++    path="$desktop/dev/$descriptor"
++    [ -e "$path" ] || [ -L "$path" ] || ln -s "$target" "$path"
++done
+ mkdir -p "$desktop/dev/shm"
+ mount -t tmpfs -o size=16m,nr_inodes=4096,mode=1777,nosuid,nodev tmpfs "$desktop/dev/shm"
+ # A private bounded /run avoids recursively binding the parent /run into itself.
+@@ -121,9 +136,9 @@ spawn /usr/bin/dbus-daemon --system --nofork
+ spawn /usr/bin/seatd -g seat
+ sleep 1
+ # Only describe already-created input/DRM nodes to libinput. No bus coldplug.
+-chroot "$desktop" /usr/bin/udevadm trigger --action=add --subsystem-match=input
+-chroot "$desktop" /usr/bin/udevadm trigger --action=add --subsystem-match=drm
+-chroot "$desktop" /usr/bin/udevadm settle --timeout=10
++SYSTEMD_IN_CHROOT=0 chroot "$desktop" /usr/bin/udevadm trigger --action=add --subsystem-match=input
++SYSTEMD_IN_CHROOT=0 chroot "$desktop" /usr/bin/udevadm trigger --action=add --subsystem-match=drm
++SYSTEMD_IN_CHROOT=0 chroot "$desktop" /usr/bin/udevadm settle --timeout=10
+ spawn /usr/bin/setpriv --reuid=1000 --regid=1000 --init-groups /usr/bin/env \
+     HOME=/home/tablet USER=tablet LOGNAME=tablet PATH=/usr/local/bin:/usr/bin \
+     LANG=C.UTF-8 LC_ALL=C.UTF-8 XDG_RUNTIME_DIR=/run/user/1000 \
+diff --git a/tests/test_ram_desktop.py b/tests/test_ram_desktop.py
+index d1db1e1..487c8c2 100644
+--- a/tests/test_ram_desktop.py
++++ b/tests/test_ram_desktop.py
+@@ -4,6 +4,7 @@ import json
+ from pathlib import Path
+ import shutil
+ import struct
++import subprocess
+ import tempfile
+ import unittest
+ from unittest.mock import patch
+@@ -13,6 +14,38 @@ from release import ram_desktop as ram
+ 
+ 
+ class RamDesktop(unittest.TestCase):
++    def test_session_overrides_private_umask_and_finds_real_mounts_without_mountpoint(self):
++        script = (ram.PROJECT / 'system/ram-desktop/session').read_text()
++        prefix = script.split('pidfile=', 1)[0]
++        commands = '''
++mkdir "$1/check"
++test "$(stat -c %a "$1/check")" = 755
++is_mounted /
++if is_mounted "$1/not-mounted"; then exit 8; else test "$?" = 1; fi
++'''
++        subprocess.run(['busybox', 'sh', '-c', 'umask 077\n' + prefix + commands,
++                        'fixture', self.temp.name], check=True, capture_output=True)
++
++    def test_session_mount_table_error_retains_failed_cleanup_ownership(self):
++        script = (ram.PROJECT / 'system/ram-desktop/session').read_text()
++        prefix = script.split('pidfile=', 1)[0]
++        cleanup = script[script.index('cleanup() {'):script.index("trap 'exit 0' TERM INT")]
++        commands = '''
++state=$1/state; pidfile=$1/pid; lock=$1/lock; children=$1/children
++desktop=$1/desktop; writable=$1/writable; lower=$1/lower
++: > "$children"; : > "$pidfile"; mkdir "$lock"
++awk() { return 2; }
++umount() { : > "$1/unexpected-unmount"; return 99; }
++'''
++        assertions = '''
++cleanup
++test "$(cat "$state")" = CLEANUP_FAILED
++test -f "$pidfile"
++test -d "$lock"
++'''
++        subprocess.run(['busybox', 'sh', '-c', prefix + commands + cleanup + assertions,
++                        'fixture', self.temp.name], check=True, capture_output=True)
++
+     def setUp(self):
+         self.temp = tempfile.TemporaryDirectory()
+         self.addCleanup(self.temp.cleanup)
+-- 
+2.47.3
+

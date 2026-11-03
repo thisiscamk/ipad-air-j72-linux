@@ -1,5 +1,11 @@
 # Native touch and Omarchy build preparation
 
+**4 November update:** the [first native device test](NATIVE-TOUCH-BOOT-2026-11-04.md)
+now passes touch startup, gestures, clean stop/restart and supply/clock cleanup.
+The owner verified the desktop after documented RAM-only userspace fixes.
+The host-preparation notes below describe the earlier build state; use the
+device result for current qualification and remaining limits.
+
 3 November 2026. These are **host results**, separate from the measured
 [native Orchard console boot](NATIVE-CLI-BOOT-2026-11-03.md). The iPad is in iOS
 on its powered hub; its last actual charging check passed at 96%. The owner is
