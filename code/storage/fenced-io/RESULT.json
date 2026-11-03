@@ -1,0 +1,21 @@
+{
+  "status": "HOST_C_CORE_PASS_IOS12_ABI_OBJECT_COMPILES",
+  "memory_fixture_scenarios": 34,
+  "new_unlinked_host_file_write_fsync_exact_readback_and_fences_pass": true,
+  "ios12_arm64_compile_only": true,
+  "ios12_executable_linked": false,
+  "native_ios_media_adapter_implemented": false,
+  "native_ios_write_or_flush_qualified": false,
+  "apfs_resize_implemented": false,
+  "scratch_ownership_harness_implemented": false,
+  "transaction_ordering_or_approval_interface_implemented": false,
+  "ipad_contacted": false,
+  "internal_storage_writes": false,
+  "device_ready": false,
+  "files": {
+    "compile-probe.c": "f2093d0a7e2693f8c97ef76b693589f1ec75b0b69f093371c42d5253a2bfb742",
+    "j72-fenced-io.h": "428bb1d9a383da3e52b687170c8c3811ab5aa859b0f30a42b146af5b91947b24",
+    "test-fenced-io.c": "9717a127e3ed9a797fefc186cd70ec4541641f273a6df234b0b016d5ddab1b04",
+    "test-host-file.c": "e5c6069f8581d68ccbeb181d97c0d067ccdd6841f2f5b3a86728e9ebcefc8e96"
+  }
+}

@@ -1,4 +1,4 @@
-# #35 touch recovery-window candidate — device untested
+# #35 touch recovery-window — bounded device run passes
 
 The [long-run failure](../LONG-RUN-20261102.md) reached the old six-recovery
 lifetime budget. This separate candidate retains that cumulative limit for
@@ -18,14 +18,18 @@ The separate module builds without warnings with W=1 against the unchanged #35
 kernel. Strong imports resolve to its built-in exports. UBSan/bounds checks cover
 burst limits, exact expiry, clock reversal, ring rotation,1,000 sparse recoveries,
 finite-session refusal and failures of the actual recovery branch's health gates.
-**No new candidate code has run on the iPad.**
+The 3 November run completed with 221,923 valid frames and eight recoveries,
+zero SPI/layout/timeout errors, and normal stop/firmware/physical cleanup.
+The owner checked input at startup; no end-of-run gesture check was performed.
+Wire anomalies remain under investigation. This is bounded-run evidence,
+not an all-day reliability claim. [Measured result](DEVICE-RESULT-20261103.json).
 
 `j72_touch_session.c` is the complete candidate; the patch is against the pinned
 measured #35 source, whose digest is in [RESULT.json](RESULT.json). Owner firmware
 and calibration includes stay private; generate them using the existing recipe
 and supply `J72_PRIVATE_INCLUDES` when building. No binary or Apple input is included.
 
-Host references expect the private research workspace. On the next proven #35
+Host references expect the private research workspace. For a proven #35
 boot, before any touch/radio/desktop start, the new stage tool verifies exact
 boot/board/source hashes, loads this candidate from RAM, and runs the existing
 start/stop self-check. It preserves the original cold payload/module files.

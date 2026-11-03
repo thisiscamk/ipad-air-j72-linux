@@ -1,7 +1,8 @@
 # Completing J72 power support
 
-Prepared 2 November; current status updated 3 November 2026. The iPad is now in
-the bounded Linux input/storage/power observation on the powered hub. Follow the
+Prepared 2 November; current status updated 3 November 2026. The bounded Linux
+input/storage/power observation is complete: input/restoration pass and net
+charge fails. iOS reboot was requested; charging confirmation is pending. Follow the
 [session record](SESSION-2026-11-03.md) and [finishing plan](FINISHING-PLAN.md).
 [Next session ordering](NEXT-SESSION-PLAN.md) batches input, native-storage idle
 measurements and guarded charging into one Linux boot.
@@ -13,11 +14,20 @@ normal-brightness hour lost 97.30 mAh after a thermal hold. Source, temperature,
 brightness and storage-controller state differ. Compare measured conditions
 before attributing the difference to one component.
 
-Next session: keep governor and brightness fixed, record actual Wi-Fi power-save
-state, screen idle consumption before/after the native storage probe, then run
-up to 90 minutes of guarded charging with storage active. The new supervisor
-interrupts its charging watcher on input/workload failure. All current, thermal,
-voltage, source and independent-restoration guards remain unchanged.
+The 3 November fixed-brightness 802/ASP-active run lost 181.13 mAh over 90 minutes.
+All five active pauses began at 4.201 V. Four restarts passed; after the fifth,
+the pack remained above the common 36.5°C restart threshold. Peak temperature
+was 36.7°C, below the actual thermal-trip cutoff. The final warm wait dominated
+the tail of the run; this is a cause identified in the trace, not proof that a
+policy change will produce net gain.
+
+The separate [restart candidate](code/charging/voltage-resume35/) permits only
+voltage/SOC-hold restart in the existing active 36.6–38°C range. Initial starts,
+expired windows and actual thermal recovery retain the cool gate. Actual
+thermal history is latched. Hard active cutoffs, source/current/window/fault
+and restoration rules remain intact. Host tests/build pass; **device untested**.
+Keep brightness, governor, Wi-Fi, ASP and the qualified touch worker fixed for
+the comparison; integrate every hold. Avoid adding touch resync to the same trial.
 
 Completion evidence for this workload:
 
@@ -68,8 +78,9 @@ Proposed sequence:
    holds/restarts and longer endurance before broadening source support.
 
 Keep the native source policy separate from a host supervisor extending its
-own lease. The current measured #35 loss followed a thermal hold; preserve that
-diagnosis when inspecting input-limit readback and load changes.
+own lease. The 2 November #35 loss followed an actual thermal hold. The 3 November
+loss followed voltage holds and a warm restart wait below the thermal cutoff.
+Keep these experiments distinct when inspecting input-limit and load changes.
 
 ## 3. Power for the first internal-storage milestone
 

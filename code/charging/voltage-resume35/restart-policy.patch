@@ -1,0 +1,63 @@
+--- a/j72-maintain-core.h
++++ b/j72-maintain-core.h
+@@ -23,6 +23,8 @@
+  int sample[5], sample_error, error;
+  u64 sample_at_ms, stopped_at_ms;
+  unsigned int cycles, pauses;
++ unsigned int last_pause, warm_full_resumes;
++ bool thermal_latched;
+ };
+ 
+ static int j72_maintain_pause(struct j72_maintain *m,
+@@ -32,6 +34,7 @@
+  bool was_active = p->active;
+  if (m->fault) {fatal=true;if (!error) error=m->error;}
+  int ret = j72_limit_restore(p, io);
++ if (was_active || mode==J72_OFF || fatal) m->last_pause=mode;
+  if (was_active) {m->pauses++; m->stopped_at_ms=now;}
+  if (ret || p->restore_failed) {fatal=true;error=ret ? ret : -EIO;}
+  m->mode=fatal ? J72_FAULT : mode;
+@@ -84,8 +87,10 @@
+      m->sample[2]<200 || m->sample[2]>500 ||
+      m->sample[3]<3500000 || m->sample[3]>4400000)
+   return j72_maintain_pause(m,p,io,now,J72_FAULT,-ERANGE,true);
+- if (m->sample[2]>380)
++ if (m->sample[2]>380) {
++  m->thermal_latched=true;
+   return j72_maintain_pause(m,p,io,now,J72_WAIT_COOL,0,false);
++ }
+  if (m->sample[1]>95 || m->sample[3]>4200000)
+   return j72_maintain_pause(m,p,io,now,J72_WAIT_FULL,0,false);
+  if (p->active) {
+@@ -93,7 +98,7 @@
+   if (ret || p->error || p->restore_failed)
+    return j72_maintain_pause(m,p,io,now,J72_FAULT,ret ? ret : p->error,true);
+   if (!p->active) {
+-   m->pauses++;m->stopped_at_ms=now;
++   m->pauses++;m->stopped_at_ms=now;m->last_pause=J72_WAIT_WINDOW;
+    return j72_maintain_pause(m,p,io,now,J72_WAIT_WINDOW,0,false);
+   }
+   m->mode=J72_RUNNING;return 0;
+@@ -108,7 +113,12 @@
+  if (m->sample[1]>J72_RESUME_SOC || m->sample[3]>J72_RESUME_VOLTAGE_UV) {
+   m->mode=J72_WAIT_FULL;return 0;
+  }
+- if (m->sample[2]>J72_RESUME_TEMP_TENTHC) {
++ /* A voltage/SOC hold alone is not a thermal trip. The active
++  * 38 C cutoff was checked above. Keep 36.5 C for every initial
++  * start, expired window, stop/fault/requalification and any
++  * actual thermal trip, even if a later voltage hold masks it. */
++ if (m->sample[2]>J72_RESUME_TEMP_TENTHC &&
++     (!m->cycles || m->last_pause!=J72_WAIT_FULL || m->thermal_latched)) {
+   m->mode=J72_WAIT_COOL;return 0;
+  }
+  if (m->cycles && (now<m->stopped_at_ms ||
+@@ -119,6 +129,8 @@
+  ret=j72_limit_start(p,io,now,0);
+  if (ret || !p->active)
+   return j72_maintain_pause(m,p,io,now,J72_FAULT,ret ? ret : -EIO,true);
++ if (m->sample[2]>J72_RESUME_TEMP_TENTHC) m->warm_full_resumes++;
++ m->thermal_latched=false;
+  m->cycles++;m->mode=J72_RUNNING;return 0;
+ }
+ #endif

@@ -1,3 +1,11 @@
+# 3 November: native writer core preparation advances
+
+A separate [C fenced-I/O component](../fenced-io/) now passes 34 fault/boundary
+scenarios, real host-file I/O/flush/readback and arm64 iOS12 object compilation.
+No native adapter or full writer is qualified. The ownership/RAM experiment and
+first internal-trial approval remain open. All earlier host tests/results below
+remain distinct and no internal write has occurred.
+
 # Overnight preparation: actual host write rehearsal passes
 
 A new disposable host file now exercises the proposed backup-before-primary

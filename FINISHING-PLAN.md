@@ -2,7 +2,8 @@
 
 Updated 3 November 2026. This is the current project plan; dated session reports
 hold the measurements. Today's [input/storage/power session](SESSION-2026-11-03.md)
-is still running. An unfinished observation is not a qualification result.
+completed: input and restoration pass, but net charge fails. iOS charging
+confirmation remains pending.
 
 ## Milestones
 
@@ -17,35 +18,27 @@ is still running. An unfinished observation is not a qualification result.
 The owner accepts Pi-assisted startup as an interim milestone. Internal storage
 does not establish persistence, autonomous charging or PC-free startup by itself.
 
-## 1. Finish and analyse the current boot
-
-No further DFU or cable action is currently needed. Leave the iPad on the same
-powered JCH377 charging/data port.
+## 1. Measured input/power result and next comparison
 
 - [x] One direct-Pi DFU; unchanged #35 cold payload.
-- [x] Separate touch recovery-window module: existing self-check and physical restoration.
-- [x] Owner checks menu, typing and keyboard hide/tap/reopen.
-- [x] Wi-Fi, HTTPS and pinned-key SSH; Wi-Fi power saving queried, already on.
-- [x] Five-minute idle recordings before and after enabling read-only ASP.
-- [x] Same-boot native inventory and six matching bounded reads; no mounts/writes.
-- [x] Restore USB communication on the qualified hub; retain Wi-Fi control.
-- [x] Reach unchanged charging entry criteria and start the bounded observation.
-- [ ] Finish up to 90 minutes with fixed brightness 802/2047, `schedutil`, Wi-Fi,
-  touch and ASP active. Include every protective hold in net-current integration.
-- [ ] Check fresh-sample coverage, net mAh, gauge trend, temperature, hold reasons,
-  restarts, input progress and any new layout/SPI/timeout faults.
-- [ ] Verify final disabled state and independent input-limit restoration; normal
-  desktop/input/radio cleanup and return to iOS for charging.
+- [x] Touch self-check and owner menu/typing/keyboard check.
+- [x] Wi-Fi/HTTPS/SSH; native read-only inventory/six matching reads; both idle captures.
+- [x] Complete 90 minutes at brightness 802, `schedutil`, Wi-Fi, touch and ASP active.
+- [x] Analyse fresh vectors including every hold: **−181.13 mAh; net-charge failure**.
+- [x] Input: 221,923 frames, eight recoveries, no SPI/layout/timeout errors; normal stop.
+- [x] Five voltage pauses/four restarts; final restart blocked above 36.5°C.
+- [x] Independent final baseline restoration, normal cleanup and iOS reboot request.
+- [ ] Confirm iOS is visible and charging; USB has not returned.
+- [x] Prepare isolated voltage-hold restart candidate and host/build tests.
+- [ ] Measure the candidate on the same workload, retaining qualified input.
+- [ ] Natural actual-thermal-trip cooldown/restart, repeatability and longer endurance.
 
-The first touch self-check is not long-run qualification. A positive current
-sample is not a net-charge pass. A natural thermal hold/restart must actually
-occur before that device test can be marked complete. Preserve failure evidence
-before resetting or replacing a worker.
-
-**After the run:** publish the measured result, including an adverse result.
-If the hardware guard holds correctly but net charge is negative, investigate
-the stated workload/idle consumption before changing charging policy. No current
-or temperature limit increase is part of this plan.
+The [candidate](code/charging/voltage-resume35/) deliberately relaxes only
+voltage/SOC-hold restart eligibility to 36.6–38°C. Initial starts and actual
+thermal recovery retain 36.5°C; hard active limits, source lease, current,
+restoration and fault guards remain intact. **Host-tested, device untested**.
+There is no net-charge improvement claim. Neither this proposal nor safe
+restoration qualifies autonomous or unattended charging.
 
 ## 2. Finish the storage qualification tools offline
 
@@ -98,7 +91,13 @@ Finish an iOS12-native implementation of the already rehearsed transaction:
 - Keep inspection/classification separate from repair. An unknown, torn or
   foreign state stops progression; no automatic resume or generic GPT repair.
 
-Exercise actual C paths with fake native I/O, then owned RAM/disposable fixtures.
+The [portable C fenced-I/O core](code/storage/fenced-io/) now passes 34 actual
+C scenarios, a new unlinked host-file write/fsync/readback/fence check, and an
+arm64 iOS12 compile-only probe. Native descriptor/media identity, the native
+flush adapter, full transaction owner and detached resize operation are still
+unimplemented/unqualified. This is component preparation, not a ready writer.
+
+Exercise remaining actual C paths with fake native I/O, then owned RAM/disposable fixtures.
 Reuse the 44 existing host tests and full 1.5 GiB host write/readback result.
 Do not count those tests as a native media flush or first encrypted-resize pass.
 The current query-only helper must remain query-only; do not add a resize or

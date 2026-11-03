@@ -12,15 +12,16 @@ current action list; [DFU-PLAN.md](DFU-PLAN.md) tracks proposed boot batches.
 - Native read-only 128 GB storage, repeated aligned reads and both GPT copies.
 - Restricted iOS12 RAM recovery, guarded inspection and normal iOS return.
 - Brief and longer guarded hub charging results under stated workloads. The
-  separate #35 normal-brightness hour lost net charge; today's revised input
-  and fixed-brightness power observation is still pending.
+  separate #35 normal-brightness hour and today's fixed-brightness run both
+  lost net charge. Today's input/cleanup passed; restart-policy comparison
+  is prepared offline and device untested.
 - Shared original source/tests and merged Orchard PR #43; Wi-Fi draft PR #53
   shares the converter/configuration, with native production integration open.
 
 ## Finish in this order
 
-1. **Dependable input and stated-workload power:** finish the running observation,
-   analyse charge across holds, verify restoration and retain failure evidence.
+1. **Dependable input and stated-workload power:** measure the prepared voltage-hold
+   restart candidate, verify net gain across all holds and preserve failure evidence.
 2. **Storage engineering:** qualify the iOS12 RAM-scratch/native writer mechanisms,
    interrupted-operation handling and exact first-trial proposal.
 3. **First internal base:** separately approved resize/GPT/image installation,

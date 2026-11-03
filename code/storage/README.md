@@ -1,3 +1,11 @@
+# 3 November: C writer component preparation
+
+The [portable fenced-I/O core](fenced-io/) passes 34 C failure/boundary scenarios,
+a real new-host-file write/fsync/readback/fence check and arm64 iOS12 object
+compilation. There is no native media adapter, resize/format/install endpoint
+or internal write approval. The RAM ownership harness and native transaction
+qualification remain open. No iPad was contacted for these component tests.
+
 ## Native-root preparation after the combined boot
 
 [Bounded view planning and host-only GPT rehearsal](native-root-preparation/)

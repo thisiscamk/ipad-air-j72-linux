@@ -3,7 +3,9 @@
 Prepared 2 November 2026; executed in the 3 November morning session. This is the
 preparation/runbook record. For current completed/pending checks, use the
 [session record](SESSION-2026-11-03.md) and [finishing plan](FINISHING-PLAN.md).
-No further DFU is pending during the current observation. No internal-storage
+**The steps below are the historical preparation for that completed run.**
+For the next changed power test, use [the current comparison runbook](NEXT-POWER-COMPARISON.md).
+Its candidate and session driver replace section E below. No internal-storage
 write, resize, snapshot mutation or erase is authorized. The host kernel stays unchanged.
 
 ## Ready now

@@ -1,0 +1,11 @@
+--- a/j72-limit-core.h
++++ b/j72-limit-core.h
+@@ -139,7 +139,7 @@
+  return faults;
+ }
+ 
+-static int j72_limit_pack_guard(int present, int soc, int temp,
++static inline int j72_limit_pack_guard(int present, int soc, int temp,
+                                int voltage, int pack_current)
+ {
+  return j72_limit_pack_faults(present, soc, temp, voltage, pack_current) ? -ERANGE : 0;

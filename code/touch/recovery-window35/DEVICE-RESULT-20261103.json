@@ -1,0 +1,23 @@
+{
+  "status": "BOUNDED_INPUT_RUN_AND_NORMAL_CLEANUP_PASS",
+  "date": "2026-11-03",
+  "charging_observation_s": 5400.657,
+  "input_frames": 221923,
+  "input_recoveries": 8,
+  "input_bad_layouts": 0,
+  "input_timeouts": 0,
+  "xfer_errors": 0,
+  "recovery_stop_reason": 0,
+  "firmware_healthy": true,
+  "cleanup_ok": true,
+  "hardware_cleanup_ok": true,
+  "wire_anomalies": 56595,
+  "retained_wire_records": 32,
+  "overwritten_wire_records": 56563,
+  "retained_data_phase_records_with_checksum_valid_16_byte_E1_header": 20,
+  "owner_input_check_at_start_pass": true,
+  "owner_input_check_at_end_performed": false,
+  "all_day_stability_qualified": false,
+  "header_resynchronization_applied": false,
+  "raw_records_published": false
+}
