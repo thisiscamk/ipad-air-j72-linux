@@ -1,6 +1,6 @@
 # Contact state 1: separate inactive-contact experiment
 
-**Offline tests/build/preflight pass; device untested.** The prior resync boot
+**Offline tests/build/preflight and initial device checks pass; long-run unqualified.** The prior resync boot
 passed owner menu/Foot/keyboard checks, but the charging gate found one rejected
 layout. Normal cleanup and independent baseline checks pass. The actual rejected
 report was saved privately before reboot and replayed through the original C
@@ -61,3 +61,12 @@ Use the separate V3 session/observer and matching iOS-return helper. The zero
 layout/SPI/timeout health gate remains; a new failure is captured before shutdown.
 No parser fix, charging benefit, long-run reliability or installation is yet proved.
 No internal-storage write is authorized.
+
+## Initial device stage
+
+The new worker passed the original start/stop self-check, firmware health and
+physical restoration. Wi-Fi/HTTPS/SSH, RAM desktop and fresh native read-only
+checks pass. The initial snapshot has 573 valid frames and no layout/SPI/timeout
+errors. It has not yet observed a state-1 frame, so that new path is not device
+proved. Owner input and longer observation remain pending; no charging started.
+[Sanitized device checkpoint](DEVICE-STAGE-RESULT.json).

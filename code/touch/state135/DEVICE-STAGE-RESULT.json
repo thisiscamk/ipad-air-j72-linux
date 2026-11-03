@@ -1,0 +1,27 @@
+{
+  "status": "SELFCHECK_AND_INITIAL_DESKTOP_PASS_OWNER_AND_LONG_RUN_PENDING",
+  "start_stop_selfcheck_pass": true,
+  "physical_restoration_pass": true,
+  "firmware_healthy": true,
+  "wifi_https_ssh_pass": true,
+  "ram_desktop_ready": true,
+  "fresh_native_readonly_checks_pass": true,
+  "internal_writes": false,
+  "initial_snapshot": {
+    "input_frames": 573,
+    "input_bad_layouts": 0,
+    "input_timeouts": 0,
+    "xfer_errors": 0,
+    "recovery_stop_reason": 0,
+    "contact_state1_policy": 1,
+    "contact_state1_frames": 0,
+    "phase_resync_policy": 1,
+    "phase_resync_headers": 65,
+    "phase_resync_frames": 0,
+    "phase_resync_failures": 65
+  },
+  "owner_input_check_pending": true,
+  "long_run_qualified": false,
+  "charging_started": false,
+  "state1_device_emission_yet_observed": false
+}

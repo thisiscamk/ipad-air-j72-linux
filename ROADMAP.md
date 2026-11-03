@@ -15,8 +15,9 @@ current action list; [DFU-PLAN.md](DFU-PLAN.md) tracks proposed boot batches.
   separate #35 normal-brightness hour and today's fixed-brightness run both
   lost net charge. Today's input/cleanup passed; restart-policy comparison
   is prepared offline and device untested.
-- Shared original source/tests and merged Orchard PR #43; Wi-Fi draft PR #53
-  shares the converter/configuration, with native production integration open.
+- Shared original source/tests; Orchard PR #43 merged documentation and retained
+  experiment code in a history tag outside the active tree. Wi-Fi draft PR #53
+  shares the converter/configuration; native production integration remains open.
 
 ## Finish in this order
 

@@ -255,8 +255,9 @@ included in this preparation.
 ## 10. Upstream integration and reproducibility
 
 Keep measured original sources and sanitized tests/results in this repository.
-The merged Orchard PR #43 covers earlier working code; draft #53 carries the
-private-firmware converter and measured Wi-Fi configuration. Native J72 profile,
+Orchard PR #43 merged documentation; its experiment code is preserved in a
+history tag outside the active build tree. Draft #53 carries the private-firmware
+converter and measured Wi-Fi configuration. Native J72 profile,
 resource ownership, DT and production driver integration remain further work.
 
 Pin an Orchard revision and port each component with an independent reproduction
