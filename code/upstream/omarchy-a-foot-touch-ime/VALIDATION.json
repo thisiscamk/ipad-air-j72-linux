@@ -1,0 +1,17 @@
+{
+  "status": "HOST_BUILD_PASS_DEVICE_UNTESTED",
+  "source_commit": "05f070dca1116d4541e1fd5285b4766c6c4ca6b5",
+  "combined_cherry_pick": "f7040f1",
+  "official_source_commit": "ab33c9a19d626f8d0ac0bd1adfdba21946ada948",
+  "official_archive_sha256": "4296be402b5684d049534598e69db92b918f92beac9dab76b585207045f0b037",
+  "upstream_version": "1.28.0",
+  "actual_c_protocol_mock_checks": 460,
+  "upstream_config_tests": "1/1 PASS",
+  "host_tests": "117/117 PASS",
+  "binary_sha256": "116ae83c9b3603ff8f77fed9136eede3a047f44034b7e512f6679cba19e2fc7a",
+  "default_signed_foot_unchanged": true,
+  "device_tested": false,
+  "files": {
+    "0001-desktop-build-opt-in-Foot-short-tap-IME-component.patch": "5592aab22329f57b277ea62208c0c520dfb96d6451dce1cba4a2ebec6e771f47"
+  }
+}

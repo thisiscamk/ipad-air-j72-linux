@@ -1,0 +1,145 @@
+From ca09d407e7615b6a232cbe24f457cb16ae4e1a62 Mon Sep 17 00:00:00 2001
+From: thisiscamk <100883750+thisiscamk@users.noreply.github.com>
+Date: Tue, 3 Nov 2026 21:45:33 +0800
+Subject: [PATCH] release: select optional Foot component in RAM project
+
+Use the normal verified Foot artifact as a read-only source overlay when --foot-tools is explicit. Keep the staged base and default package selection unchanged, retain component and replacement hashes, and resolve dependencies at the logical runtime path.
+
+Assisted-by: LLM
+---
+ desktop/foot/README.md     | 10 ++++++++++
+ release/ram_desktop.py     | 15 +++++++++------
+ tests/test_ram_desktop.py  | 37 +++++++++++++++++++++++++++++++++++++
+ tools/build-ram-desktop.py |  3 ++-
+ 4 files changed, 58 insertions(+), 7 deletions(-)
+
+diff --git a/desktop/foot/README.md b/desktop/foot/README.md
+index a0303fe..4424049 100644
+--- a/desktop/foot/README.md
++++ b/desktop/foot/README.md
+@@ -71,3 +71,13 @@ The normal native Omarchy GUI, this producer's binary, and its combination with
+ until menu, keyboard icon and repeated same-window hide → tap → type pass on the
+ normal source-built desktop. A successful source build does not qualify the
+ whole J72 platform or its power policy.
++
++## Bounded RAM desktop project
++
++`tools/build-ram-desktop.py --foot-tools DIR` selects the same verified component
++without changing the normal staged base root. The RAM producer resolves its ELF
++dependencies at the logical `/usr/bin/foot` location, records the replaced base
++hash, and retains the Foot manifest in `component_inputs`. Corresponding source
++is included in the selected subset. Omitting this argument retains packaged
++Foot. The RAM producer's host plan and compression checks are separate from a
++successful mount, compositor session or input test on the tablet.
+diff --git a/release/ram_desktop.py b/release/ram_desktop.py
+index bf781e3..5c00dab 100644
+--- a/release/ram_desktop.py
++++ b/release/ram_desktop.py
+@@ -345,11 +345,14 @@ def verify_qml_imports(source, selected, *, disabled_plugins=()):
+             'disabled_plugin_sources_not_required': skipped}
+ 
+ 
+-def normal_components(cursor_tools, labwc_tools):
+-    from release.public_root import cursor_files, labwc_files
++def normal_components(cursor_tools, labwc_tools, foot_tools=None):
++    from release.public_root import cursor_files, labwc_files, foot_files
+     overlay, receipts = {}, {}
+-    for name, directory, verify in (('cursor', Path(cursor_tools), cursor_files),
+-                                    ('labwc', Path(labwc_tools), labwc_files)):
++    components = [('cursor', Path(cursor_tools), cursor_files),
++                  ('labwc', Path(labwc_tools), labwc_files)]
++    if foot_tools is not None:
++        components.append(('foot', Path(foot_tools), foot_files))
++    for name, directory, verify in components:
+         files = verify(directory)
+         record = json.loads((directory / 'manifest.json').read_text())
+         receipts[name] = {'manifest_sha256': digest(directory / 'manifest.json'), 'receipt': record}
+@@ -450,14 +453,14 @@ def apply_profile(subset, overrides):
+         os.chown(path, override['uid'], override['gid'])
+ 
+ 
+-def produce(root, desktop, receipt, packages, output, *, cursor_tools, labwc_tools,
++def produce(root, desktop, receipt, packages, output, *, cursor_tools, labwc_tools, foot_tools=None,
+             compressed_limit=128 * 1024**2,
+             expanded_limit=384 * 1024**2, upper_mib=64, plan_only=False):
+     output = Path(output)
+     if output.exists() or output.is_symlink() or not 16 <= upper_mib <= 128:
+         raise ValueError('Choose a new output and an upper limit of 16..128 MiB')
+     provenance = verify_inputs(root, desktop, receipt, packages)
+-    overlay, component_inputs = normal_components(cursor_tools, labwc_tools)
++    overlay, component_inputs = normal_components(cursor_tools, labwc_tools, foot_tools=foot_tools)
+     source = Source(root, overlay)
+     selected, total = selection(source, [*FILES, *overlay, *('usr/bin/' + p for p in PROGRAMS)], TREES,
+                                  expanded_limit=expanded_limit)
+diff --git a/tests/test_ram_desktop.py b/tests/test_ram_desktop.py
+index 1925cba..d1db1e1 100644
+--- a/tests/test_ram_desktop.py
++++ b/tests/test_ram_desktop.py
+@@ -280,6 +280,43 @@ class RamDesktop(unittest.TestCase):
+         with self.assertRaisesRegex(ValueError, 'changed after verification'):
+             ram.selection(source, ['usr/bin/labwc'], [])
+ 
++    def test_optional_foot_overlay_preserves_base_and_receipt_with_normal_elf_origin(self):
++        from release import public_root
++        self.put('usr/bin/foot', b'normal signed Foot')
++        self.put('usr/lib/libfoot.so')
++        parent = Path(self.temp.name)
++        cursor, labwc, foot = [parent / name for name in ('cursor', 'labwc', 'foot-tools')]
++        for directory in (cursor, labwc, foot):
++            directory.mkdir()
++            (directory / 'manifest.json').write_text('{}')
++        (foot / 'foot').write_bytes(b'source-built Foot')
++        (foot / 'LICENSE').write_bytes(b'MIT')
++        overlay_data = {'usr/bin/foot': (b'source-built Foot', 0o755),
++                        'usr/share/licenses/omarchy-foot-touch-ime/LICENSE': (b'MIT', 0o644),
++                        'etc/omarchy/foot-touch-ime.json': (b'{}', 0o644)}
++        with patch.object(public_root, 'cursor_files', return_value={}), \
++                patch.object(public_root, 'labwc_files', return_value={}), \
++                patch.object(public_root, 'foot_files', return_value=overlay_data) as verify:
++            overlay, receipts = ram.normal_components(cursor, labwc)
++            verify.assert_not_called()
++            self.assertFalse(overlay)
++            self.assertNotIn('foot', receipts)
++            overlay, receipts = ram.normal_components(cursor, labwc, foot_tools=foot)
++            verify.assert_called_once_with(foot)
++        self.assertEqual(receipts['foot']['manifest_sha256'], ram.digest(foot / 'manifest.json'))
++        self.assertNotIn('etc/omarchy/foot-touch-ime.json', overlay)  # Outer receipt carries this.
++        source = ram.Source(self.root, overlay)
++        selected, _ = ram.selection(source, overlay, [], dependencies=lambda path:
++                                   (['libfoot.so'], ['$ORIGIN/../lib'], None)
++                                   if path == foot / 'foot' else ([], [], None))
++        self.assertEqual(selected['usr/bin/foot']['source'], 'foot')
++        self.assertEqual(selected['usr/bin/foot']['uid'], 0)
++        self.assertIn('usr/lib/libfoot.so', selected)
++        self.assertEqual((self.root / 'usr/bin/foot').read_bytes(), b'normal signed Foot')
++        (foot / 'foot').write_bytes(b'modified after verification')
++        with self.assertRaisesRegex(ValueError, 'changed after verification'):
++            ram.selection(source, ['usr/bin/foot'], [])
++
+     def test_profile_retains_default_theme_and_wayland_plugin_without_optional_installed_payloads(self):
+         theme = ram.UI + '/themes'
+         self.put(theme + '/jade-horse/colors.toml')
+diff --git a/tools/build-ram-desktop.py b/tools/build-ram-desktop.py
+index 35c25c3..f122922 100755
+--- a/tools/build-ram-desktop.py
++++ b/tools/build-ram-desktop.py
+@@ -15,6 +15,7 @@ def main():
+     for option in ('root', 'desktop', 'source-receipt', 'packages-lock', 'cursor-tools',
+                    'labwc-tools', 'output', 'orchard'):
+         parser.add_argument('--' + option, type=Path, required=True)
++    parser.add_argument('--foot-tools', type=Path, help='opt-in source-built short-tap IME Foot component')
+     parser.add_argument('--plan-only', action='store_true')
+     parser.add_argument('--upper-mib', type=int, default=64)
+     args = parser.parse_args()
+@@ -25,7 +26,7 @@ def main():
+                    check=True, env={**os.environ, 'ORCHARD_CHECKOUT': str(args.orchard.resolve())})
+     record = produce(args.root, args.desktop, args.source_receipt, args.packages_lock,
+                      args.output, cursor_tools=args.cursor_tools, labwc_tools=args.labwc_tools,
+-                     upper_mib=args.upper_mib, plan_only=args.plan_only)
++                     foot_tools=args.foot_tools, upper_mib=args.upper_mib, plan_only=args.plan_only)
+     print(record['status'])
+ 
+ 
+-- 
+2.47.3
+

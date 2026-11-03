@@ -59,9 +59,12 @@ independent extraction checks confirm critical file hashes and ownership.
 The native kernel is still compiling. Native touch, desktop lifecycle, working
 memory and input on this new source-built combination remain unqualified.
 
-The working terminal touch/IME change is also being prepared as a separate,
-opt-in source component. Its actual C callback checks pass; compilation and
-integration are in progress. Normal signed Foot remains the default.
+The [terminal touch/IME component](code/upstream/omarchy-a-foot-touch-ime) also
+builds successfully from pinned official Foot source. Its upstream config test
+and 460 actual C callback/IME checks pass. The [combined RAM profile](code/upstream/omarchy-a-ram-foot)
+passes 133 host tests and builds a **105.83 MiB** SquashFS with the patched
+terminal selected explicitly. Its default still uses signed Arch Foot.
+Repeated tap/keyboard behaviour in this native combination remains untested.
 
 ## Next qualification
 
@@ -70,3 +73,11 @@ serial and SSH, then explicitly load the native touch driver. If startup and
 health checks pass, record taps, holds, swipes and releases; inspect normal
 cleanup and return to iOS for charging. A compact native desktop follows once
 its root and input gates pass. No internal-storage installation is authorized.
+
+## Native power follow-up
+
+The [source-based power plan](NATIVE-POWER-INTEGRATION-PLAN.md) identifies the
+existing HDQ/BQ27545 pieces and the missing J72 DT/capacity/freshness work.
+Charging also needs verified D2089 event/ADC/current handling before reusing
+the D2365 Tristar policy. These changes are separate from the touch build;
+unattended Linux charging is not yet qualified.

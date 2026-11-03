@@ -1,0 +1,23 @@
+{
+  "status": "HOST_BUILD_PASS_DEVICE_UNTESTED",
+  "source_commit": "ca09d407e7615b6a232cbe24f457cb16ae4e1a62",
+  "combined_host_tests": "133/133 PASS",
+  "ram_host_tests": "16/16 PASS",
+  "real_normal_root_elf_closure": "PASS",
+  "expanded_bytes": 295290967,
+  "selected_files": 3765,
+  "default_signed_foot_unchanged": true,
+  "published_patch_replay_tree": "36450974444c7fe4f2e341e3d6cc2bddcfb9d212",
+  "device_tested": false,
+  "files": {
+    "0001-release-select-optional-Foot-component-in-RAM-project.patch": "6052842d66af24177905155d746c13f6104e4e08aa6e31cbb7b7a93567db71be"
+  },
+  "actual_image": {
+    "compressed_bytes": 110972928,
+    "expanded_bytes": 295290967,
+    "sha256": "98067ea6e36c334c07269e4818c25ab8c347e4f0cf3cfac131d9412b2e53efb9",
+    "critical_file_hashes_and_ownership": "PASS",
+    "qml_modules": 77,
+    "required_imports": 52
+  }
+}

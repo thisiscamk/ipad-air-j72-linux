@@ -1,0 +1,870 @@
+From f7040f109082878f592343fe8c7be111510d9c14 Mon Sep 17 00:00:00 2001
+From: thisiscamk <100883750+thisiscamk@users.noreply.github.com>
+Date: Tue, 3 Nov 2026 21:42:30 +0800
+Subject: [PATCH] desktop: build opt-in Foot short-tap IME component
+
+Pin upstream Foot 1.28.0 and the measured lab patch, retain corresponding source and compiler receipts, and validate actual touch/IME C functions before building. Keep signed Arch Foot as the normal default; allow explicit component selection with root metadata audit.
+
+Assisted-by: LLM
+---
+ desktop/build-foot                            |  82 +++++++++
+ desktop/foot/.gitattributes                   |   2 +
+ .../0001-touch-ime-on-short-grid-tap.patch    |  29 +++
+ desktop/foot/Containerfile                    |   4 +
+ desktop/foot/README.md                        |  73 ++++++++
+ desktop/foot/install-toolchain                |   9 +
+ desktop/foot/source.json                      |   7 +
+ desktop/foot/test-touch-ime.py                | 146 +++++++++++++++
+ desktop/foot_source.py                        |  36 ++++
+ release/audit.py                              |  25 ++-
+ release/build.py                              |   5 +-
+ release/public_root.py                        |  47 ++++-
+ tests/test_foot_component.py                  | 174 ++++++++++++++++++
+ tools/build.py                                |  11 +-
+ 14 files changed, 645 insertions(+), 5 deletions(-)
+ create mode 100755 desktop/build-foot
+ create mode 100644 desktop/foot/.gitattributes
+ create mode 100644 desktop/foot/0001-touch-ime-on-short-grid-tap.patch
+ create mode 100644 desktop/foot/Containerfile
+ create mode 100644 desktop/foot/README.md
+ create mode 100755 desktop/foot/install-toolchain
+ create mode 100644 desktop/foot/source.json
+ create mode 100644 desktop/foot/test-touch-ime.py
+ create mode 100644 desktop/foot_source.py
+ create mode 100644 tests/test_foot_component.py
+
+diff --git a/desktop/build-foot b/desktop/build-foot
+new file mode 100755
+index 0000000..d8d4017
+--- /dev/null
++++ b/desktop/build-foot
+@@ -0,0 +1,82 @@
++#!/usr/bin/env python3
++"""Build opt-in Foot 1.28.0 with short grid taps requesting a fresh input method."""
++import argparse
++import hashlib
++import json
++from pathlib import Path
++import shutil
++import subprocess
++import tempfile
++import urllib.request
++
++from foot_source import extract
++from snapshot_buildenv import buildenv
++
++HERE = Path(__file__).resolve().parent
++IMAGE = 'localhost/omarchy-a-foot-builder:arm64'
++PATCH = '0001-touch-ime-on-short-grid-tap.patch'
++OPTIONS = ['--buildtype=release', '--wrap-mode=nofallback', '--prefix=/usr',
++           '-Ddocs=disabled', '-Dthemes=false', '-Dterminfo=disabled',
++           '-Dime=true', '-Dutmp-backend=none', '-Dgrapheme-clustering=enabled']
++
++
++def sha(path):
++    return hashlib.sha256(path.read_bytes()).hexdigest()
++
++
++def main():
++    parser = argparse.ArgumentParser(description=__doc__)
++    parser.add_argument('--output', required=True, type=Path)
++    parser.add_argument('--archive', type=Path, help='cached pinned upstream archive')
++    args = parser.parse_args()
++    if args.output.exists() or args.output.is_symlink():
++        parser.error('Choose a new Foot output directory')
++    pin = json.loads((HERE / 'foot/source.json').read_text())
++    patch = HERE / 'foot' / PATCH
++    if sha(patch) != pin['patch_sha256']:
++        parser.error('Foot patch differs from pin')
++    data = args.archive.read_bytes() if args.archive else urllib.request.urlopen(pin['url'], timeout=30).read()
++    if hashlib.sha256(data).hexdigest() != pin['sha256']:
++        parser.error('Foot source differs from pin')
++    buildenv.build(IMAGE, HERE / 'foot/Containerfile', HERE / 'foot')
++    image_id = buildenv.identity(IMAGE)
++    args.output.parent.mkdir(parents=True, exist_ok=True)
++    with tempfile.TemporaryDirectory(dir=args.output.parent, prefix='.foot-') as directory:
++        work = Path(directory).resolve()
++        source, output = work / 'source', work / 'output'
++        source.mkdir(); output.mkdir()
++        extract(data, source)
++        subprocess.run(['patch', '--batch', '--fuzz=0', '-p1', '-i', str(patch.resolve())],
++                       cwd=source, check=True)
++        # This fixture compiles the actual patched callback and actual IME enable/disable
++        # functions with protocol mocks. It needs neither a compositor nor a device.
++        shutil.copyfile(HERE / 'foot/test-touch-ime.py', source / 'test-touch-ime.py')
++        recipe = '''
++set -eu
++umask 022
++test "$(uname -m)" = aarch64
++python "$ORCHARD_SOURCE/test-touch-ime.py" --source "$ORCHARD_SOURCE" > "$ORCHARD_OUTPUT/touch-ime-tests.json"
++meson setup "$ORCHARD_WORK/build" "$ORCHARD_SOURCE" ''' + ' '.join(OPTIONS) + '''
++meson compile -C "$ORCHARD_WORK/build" -j1
++meson test -C "$ORCHARD_WORK/build" --no-rebuild --print-errorlogs
++cp "$ORCHARD_WORK/build/foot" "$ORCHARD_OUTPUT/foot"
++chmod 755 "$ORCHARD_OUTPUT/foot"
++pacman -Q > "$ORCHARD_OUTPUT/packages.lock"
++cc --version > "$ORCHARD_OUTPUT/compiler.txt"
++"$ORCHARD_OUTPUT/foot" --version > "$ORCHARD_OUTPUT/version.txt"
++'''
++        buildenv.run(IMAGE, ['sh', '-c', recipe],
++                     [(source, '/source', True), (output, '/output', False)], root=True)
++        shutil.copyfile(source / 'LICENSE', output / 'LICENSE')
++        shutil.copyfile(patch, output / PATCH)
++        (output / 'source.tar.gz').write_bytes(data)
++        record = {'schema': 1, 'architecture': 'aarch64', 'variant': 'touch-ime-experiment',
++                  'source': pin, 'compiler_image': image_id, 'build_options': OPTIONS,
++                  'files': {p.name: sha(p) for p in sorted(output.iterdir())}}
++        (output / 'manifest.json').write_text(json.dumps(record, indent=2) + '\n')
++        shutil.move(output, args.output)
++    print('Experimental Foot component built:', args.output)
++
++
++if __name__ == '__main__':
++    main()
+diff --git a/desktop/foot/.gitattributes b/desktop/foot/.gitattributes
+new file mode 100644
+index 0000000..adbb18c
+--- /dev/null
++++ b/desktop/foot/.gitattributes
+@@ -0,0 +1,2 @@
++# Preserve the pinned patch verbatim, including blank unified-diff context lines.
++*.patch whitespace=-blank-at-eol
+diff --git a/desktop/foot/0001-touch-ime-on-short-grid-tap.patch b/desktop/foot/0001-touch-ime-on-short-grid-tap.patch
+new file mode 100644
+index 0000000..abfe6d6
+--- /dev/null
++++ b/desktop/foot/0001-touch-ime-on-short-grid-tap.patch
+@@ -0,0 +1,29 @@
++diff --git a/input.c b/input.c
++index f6ba9de..da15737 100644
++--- a/input.c
+++++ b/input.c
++@@ -1,4 +1,5 @@
++ #include "input.h"
+++#include "ime.h"
++ 
++ #include <string.h>
++ #include <unistd.h>
++@@ -3595,6 +3596,18 @@ wl_touch_up(void *data, struct wl_touch *wl_touch, uint32_t serial,
++ 
++     switch (seat->touch.state) {
++     case TOUCH_STATE_HELD:
+++        /* A short grid tap is an explicit request for text input, including
+++         * when the keyboard was manually hidden while this terminal retained
+++         * focus. Re-enable in a separate committed transaction so Labwc's
+++         * input-method relay delivers a fresh activation. Scroll/drag paths
+++         * and physical mouse clicks do not enter this branch.
+++         */
+++        if (seat->ime_focus == term &&
+++            seat->touch.surface_kind == TERM_SURF_GRID) {
+++            ime_disable(seat);
+++            ime_enable(seat);
+++            LOG_INFO("touch tap requested input method");
+++        }
++         wl_pointer_button(seat, NULL, seat->touch.serial, time, BTN_LEFT,
++                           WL_POINTER_BUTTON_STATE_PRESSED);
++         /* fallthrough */
+diff --git a/desktop/foot/Containerfile b/desktop/foot/Containerfile
+new file mode 100644
+index 0000000..0044449
+--- /dev/null
++++ b/desktop/foot/Containerfile
+@@ -0,0 +1,4 @@
++FROM localhost/omarchy-a-desktop-builder:arm64
++COPY install-toolchain /tmp/install-toolchain
++RUN bash /tmp/install-toolchain && rm /tmp/install-toolchain
++WORKDIR /work
+diff --git a/desktop/foot/README.md b/desktop/foot/README.md
+new file mode 100644
+index 0000000..a0303fe
+--- /dev/null
++++ b/desktop/foot/README.md
+@@ -0,0 +1,73 @@
++# Experimental short-tap input-method request
++
++This optional component builds upstream Foot 1.28.0 with the narrow patch in
++this directory. A short tap on the focused terminal grid commits an input-method
++disable followed by a separate enable. This gives Labwc a fresh activation when
++the on-screen keyboard was hidden while the same terminal retained focus.
++Scrolling, dragging, decoration taps and physical mouse handling keep their
++existing paths. Foot's own IME setting and compositor protocol availability
++still apply.
++
++## Build and select explicitly
++
++The default release continues to use the signed Arch Foot package. To build and
++select this experiment in a normal release:
++
++```sh
++ORCHARD_CHECKOUT=/path/to/orchard python tools/build.py \
++  --version YOUR_VERSION --output out/YOUR_VERSION --foot-touch-ime
++```
++
++Or build only the component with the normal Orchard build environment:
++
++```sh
++ORCHARD_CHECKOUT=/path/to/orchard python desktop/build-foot --output out/foot-tools
++```
++
++`--archive FILE` accepts a cached archive only when its SHA256 matches the pin.
++`release.public_root.foot_files(directory)` verifies the resulting manifest,
++AArch64 executable, IME feature, source, patch and host-fixture receipt before
++returning an optional root overlay. Release assembly accepts `--foot-tools DIR`;
++release audit checks the installed binary, corresponding source and metadata.
++Only `usr/bin/foot` replaces a signed package file; the same-version Foot client,
++terminfo and desktop resources remain supplied by Arch. The locally built binary
++is identified by its own receipt and is not described as an Arch-signed binary.
++Rebuilding without the option selects the signed package again.
++
++The producer uses a signed Arch container toolchain, disables dependency
++fallback downloads and runs upstream's configuration test plus the actual-C
++callback fixture. It retains the pristine source archive, patch, MIT license,
++package/compiler versions and fixture result alongside the executable. A build
++container needs an init/reaper (`--init` when provisioning native workers).
++
++## Source and compatibility
++
++- [Official Foot source](https://codeberg.org/dnkl/foot), version 1.28.0,
++  commit `ab33c9a19d626f8d0ac0bd1adfdba21946ada948`.
++- [Official Arch packaging, 1.28.0-2](https://gitlab.archlinux.org/archlinux/packaging/packages/foot/-/blob/1.28.0-2/PKGBUILD)
++  selects that upstream tag. Its Git-source checksum differs from the archive
++  checksum used by this producer.
++- The pristine `input.c` Git blob is
++  `f6ba9dec76ab39fb32a840cc9af54e1b65df3746`, matching the patch preimage.
++  The exact published patch applies with `--fuzz=0`.
++- [Original bring-up patch and evidence](https://github.com/thisiscamk/ipad-air-j72-linux/tree/main/code/desktop)
++  used this change in a combined desktop with keyboard-focus and touch-worker
++  fixes. Repeated hide → tap → type passed there; that result does not isolate
++  this patch from those other changes.
++
++The source pin records both archive and patch hashes. No firmware, calibration,
++credentials or device logs are inputs to this component.
++
++## Qualification boundary
++
++Host tests compile the actual patched `wl_touch_up` and upstream `ime_enable` /
++`ime_disable` functions with protocol mocks. They check ordered commits, 100
++repeated taps in one focused window, scroll/drag/decoration paths, missing
++protocol, disabled IME, wrong touch ID and focus changes. These are protocol
++requests, not a running compositor or keyboard test.
++
++The normal native Omarchy GUI, this producer's binary, and its combination with
++`OMARCHY_KEYBOARD_AUTO=1` still need a device test. Do not make this the default
++until menu, keyboard icon and repeated same-window hide → tap → type pass on the
++normal source-built desktop. A successful source build does not qualify the
++whole J72 platform or its power policy.
+diff --git a/desktop/foot/install-toolchain b/desktop/foot/install-toolchain
+new file mode 100755
+index 0000000..c66e6bd
+--- /dev/null
++++ b/desktop/foot/install-toolchain
+@@ -0,0 +1,9 @@
++#!/usr/bin/env bash
++set -euo pipefail
++rank-mirrors
++# Signed Arch packages; this is a disposable build container, never the tablet.
++mapfile -t unneeded < <(pacman -Qq | grep -E '^(linux-aarch64|linux-firmware.*)$')
++(( ${#unneeded[@]} == 0 )) || pacman -Rdd --noconfirm "${unneeded[@]}"
++pacman -Syu --noconfirm --needed gcc meson ninja patch pkgconf python \
++  fcft fontconfig libutf8proc libxkbcommon ncurses pixman tllist wayland wayland-protocols
++pacman -Sc --noconfirm
+diff --git a/desktop/foot/source.json b/desktop/foot/source.json
+new file mode 100644
+index 0000000..fae7882
+--- /dev/null
++++ b/desktop/foot/source.json
+@@ -0,0 +1,7 @@
++{
++  "version": "1.28.0",
++  "commit": "ab33c9a19d626f8d0ac0bd1adfdba21946ada948",
++  "url": "https://codeberg.org/dnkl/foot/archive/ab33c9a19d626f8d0ac0bd1adfdba21946ada948.tar.gz",
++  "sha256": "4296be402b5684d049534598e69db92b918f92beac9dab76b585207045f0b037",
++  "patch_sha256": "73cca83674cd4022f20f76bdf1c6de7ad89d19354a27cabcaf598ba95c2370a3"
++}
+diff --git a/desktop/foot/test-touch-ime.py b/desktop/foot/test-touch-ime.py
+new file mode 100644
+index 0000000..5907132
+--- /dev/null
++++ b/desktop/foot/test-touch-ime.py
+@@ -0,0 +1,146 @@
++#!/usr/bin/env python3
++"""Host-only actual Foot callback/IME function fixture, using protocol mocks."""
++import argparse
++import hashlib
++import json
++from pathlib import Path
++import subprocess
++import tempfile
++
++
++def function(text, signature):
++    start = text.index(signature)
++    brace = text.index('{', start)
++    depth = 1
++    end = brace + 1
++    while depth:
++        depth += (text[end] == '{') - (text[end] == '}')
++        end += 1
++    return text[start:end]
++
++
++PREFIX = r'''
++#include <assert.h>
++#include <stdbool.h>
++#include <stdint.h>
++#include <stdio.h>
++#include <string.h>
++#define unlikely(x) (x)
++#define LOG_INFO(...) ((void)0)
++#define LOG_DBG(...) ((void)0)
++#define BUG(...) assert(0)
++#define BTN_LEFT 272
++#define WL_POINTER_BUTTON_STATE_PRESSED 1
++#define WL_POINTER_BUTTON_STATE_RELEASED 0
++#define ZWP_TEXT_INPUT_V3_CONTENT_HINT_NONE 0
++#define ZWP_TEXT_INPUT_V3_CONTENT_PURPOSE_TERMINAL 13
++struct wl_touch { int unused; };
++enum term_surface { TERM_SURF_NONE, TERM_SURF_GRID, TERM_SURF_TITLE };
++enum touch_state { TOUCH_STATE_INHIBITED, TOUCH_STATE_IDLE, TOUCH_STATE_HELD,
++                   TOUCH_STATE_DRAGGING, TOUCH_STATE_SCROLLING };
++struct terminal { enum term_surface active_surface; bool ime_enabled; int scale; };
++struct wl_window { struct terminal *term; };
++struct wayl { void *text_input_manager; };
++struct rect { int x, y, width, height; };
++struct seat {
++ struct { enum touch_state state; int32_t id; void *surface;
++          enum term_surface surface_kind; uint32_t serial; } touch;
++ struct terminal *ime_focus, *mouse_focus;
++ struct wayl *wayl; void *wl_text_input;
++ struct { struct { struct rect pending, sent; } cursor_rect; uint32_t serial; } ime;
++};
++static char journal[1024]; static int pos, resets, clicks;
++static void event(char c) { assert(pos < (int)sizeof(journal)-1); journal[pos++]=c; journal[pos]=0; }
++static void ime_reset_pending(struct seat *s) { (void)s; resets++; }
++static void ime_reset_preedit(struct seat *s) { (void)s; resets++; }
++static void zwp_text_input_v3_disable(void *p) { (void)p; event('D'); }
++static void zwp_text_input_v3_enable(void *p) { (void)p; event('E'); }
++static void zwp_text_input_v3_commit(void *p) { (void)p; event('C'); }
++static void zwp_text_input_v3_set_content_type(void *p, int a, int b) {
++ (void)p; assert(a==0 && b==13); event('T');
++}
++static void zwp_text_input_v3_set_cursor_rectangle(void *p, int x, int y, int w, int h) {
++ (void)p; assert(x==5 && y==10 && w==15 && h==20); event('R');
++}
++static struct wl_window *wl_surface_get_user_data(void *p) { return p; }
++static void wl_pointer_button(struct seat *s, void *p, uint32_t serial,
++                             uint32_t time, int button, int state) {
++ (void)p; assert(time==900 && button==BTN_LEFT);
++ assert(s->mouse_focus && s->mouse_focus->active_surface==s->touch.surface_kind);
++ assert(serial==(state ? 123U : 456U)); clicks++; event(state ? 'P' : 'U');
++}
++'''
++SUFFIX = r'''
++int main(void) {
++ int checks=0;
++ for (int state=0;state<=4;state++)
++ for (int surface=0;surface<=2;surface++)
++ for (int focus=0;focus<3;focus++)
++ for (int manager=0;manager<2;manager++)
++ for (int enabled=0;enabled<2;enabled++)
++ for (int wrong_id=0;wrong_id<2;wrong_id++) {
++  struct terminal term={TERM_SURF_TITLE,enabled,2}, other={TERM_SURF_NONE,true,2};
++  struct wl_window win={&term}; struct wayl wayl={manager ? &win : NULL};
++  struct seat seat={.touch={state,42,&win,surface,123},
++   .ime_focus=focus==0 ? &term : focus==1 ? &other : NULL,
++   .mouse_focus=&other,.wayl=&wayl,
++   .ime={.cursor_rect={.pending={10,20,30,40}},.serial=77}};
++  pos=resets=clicks=0; journal[0]=0;
++  wl_touch_up(&seat,NULL,456,900,wrong_id ? 43 : 42);
++  const bool accepted=state>TOUCH_STATE_IDLE && !wrong_id;
++  const bool request=accepted && state==TOUCH_STATE_HELD && surface==TERM_SURF_GRID && focus==0 && manager;
++  char expected[32]="";
++  if(request) strcat(expected,enabled ? "DCETRC" : "DC");
++  if(accepted && state==TOUCH_STATE_HELD) strcat(expected,"P");
++  if(accepted && (state==TOUCH_STATE_HELD || state==TOUCH_STATE_DRAGGING)) strcat(expected,"U");
++  assert(strcmp(journal,expected)==0);
++  assert(seat.ime.serial==77U+(request ? (enabled ? 2U:1U):0U));
++  assert(resets==(request ? (enabled ? 4:2):0));
++  assert(seat.mouse_focus==&other && term.active_surface==TERM_SURF_TITLE);
++  assert(seat.touch.state==(accepted ? TOUCH_STATE_IDLE:state));
++  if(request && enabled) assert(memcmp(&seat.ime.cursor_rect.pending,&seat.ime.cursor_rect.sent,sizeof(struct rect))==0);
++  checks++;
++ }
++ // Same focused window, manually hidden between taps: every short tap commits
++ // a new disable then enable. No dependency on focus leave/re-enter.
++ struct terminal term={TERM_SURF_TITLE,true,2}; struct wl_window win={&term};
++ struct wayl wayl={&win}; struct seat s={.touch={TOUCH_STATE_HELD,42,&win,TERM_SURF_GRID,123},
++  .ime_focus=&term,.wayl=&wayl,.ime={.cursor_rect={.pending={10,20,30,40}}}};
++ for(int i=0;i<100;i++) {
++  pos=resets=clicks=0; journal[0]=0; s.touch.state=TOUCH_STATE_HELD;
++  wl_touch_up(&s,NULL,456,900,42);
++  assert(strcmp(journal,"DCETRCPU")==0 && s.ime.serial==(uint32_t)(i+1)*2);
++  assert(s.touch.state==TOUCH_STATE_IDLE && s.mouse_focus==NULL);
++  checks++;
++ }
++ printf("%d\n",checks);
++ return 0;
++}
++'''
++
++
++def main():
++    parser = argparse.ArgumentParser(description=__doc__)
++    parser.add_argument('--source', type=Path, required=True, help='pinned, patched Foot source directory')
++    args = parser.parse_args()
++    functions = {
++        'touch_up': function((args.source / 'input.c').read_text(), 'static void\nwl_touch_up('),
++        'ime_enable': function((args.source / 'ime.c').read_text(), 'void\nime_enable('),
++        'ime_disable': function((args.source / 'ime.c').read_text(), 'void\nime_disable('),
++    }
++    with tempfile.TemporaryDirectory(prefix='foot-ime-fixture-') as work:
++        source, binary = Path(work) / 'test.c', Path(work) / 'test'
++        source.write_text(PREFIX + functions['ime_enable'] + '\n' + functions['ime_disable'] +
++                          '\n' + functions['touch_up'] + SUFFIX)
++        subprocess.run(['cc', '-std=c11', '-Wall', '-Wextra', '-Werror',
++                        '-Wno-unused-parameter', '-Wno-sign-compare', '-Wno-implicit-fallthrough',
++                        '-fsanitize=undefined,bounds', '-fno-sanitize-recover=all',
++                        str(source), '-o', str(binary)], check=True)
++        checks = int(subprocess.check_output([str(binary)], text=True))
++    print(json.dumps({'schema': 1, 'checks': checks, 'kind': 'actual-c-protocol-mocks',
++                      'functions': {name: hashlib.sha256(text.encode()).hexdigest()
++                                    for name, text in functions.items()}}, sort_keys=True))
++
++
++if __name__ == '__main__':
++    main()
+diff --git a/desktop/foot_source.py b/desktop/foot_source.py
+new file mode 100644
+index 0000000..f78f4ab
+--- /dev/null
++++ b/desktop/foot_source.py
+@@ -0,0 +1,36 @@
++"""Safe extraction for the pinned experimental Foot component."""
++import io
++from pathlib import PurePosixPath
++import tarfile
++
++
++def extract(data, directory):
++    """Require one source root and regular files/directories; never extract links."""
++    seen, root = set(), None
++    with tarfile.open(fileobj=io.BytesIO(data)) as archive:
++        for entry in archive:
++            name = PurePosixPath(entry.name)
++            if name.is_absolute() or '..' in name.parts or not name.parts:
++                raise ValueError('Unsafe Foot source member')
++            if root is None:
++                root = name.parts[0]
++            if name.parts[0] != root or not (entry.isdir() or entry.isfile()):
++                raise ValueError('Unexpected Foot source member')
++            relative = PurePosixPath(*name.parts[1:])
++            if str(relative) == '.':
++                if not entry.isdir():
++                    raise ValueError('Foot source root is not a directory')
++                continue
++            if str(relative) in seen:
++                raise ValueError('Duplicate Foot source member')
++            seen.add(str(relative))
++            target = directory.joinpath(*relative.parts)
++            if entry.isdir():
++                target.mkdir(parents=True, exist_ok=True)
++                target.chmod(0o755)
++            else:
++                target.parent.mkdir(parents=True, exist_ok=True)
++                target.write_bytes(archive.extractfile(entry).read())
++                target.chmod(0o755 if entry.mode & 0o111 else 0o644)
++    if not {'input.c', 'ime.c', 'meson.build', 'LICENSE'} <= seen:
++        raise ValueError('Incomplete Foot source archive')
+diff --git a/release/audit.py b/release/audit.py
+index f8a2acd..1e7bbd0 100644
+--- a/release/audit.py
++++ b/release/audit.py
+@@ -130,7 +130,7 @@ def audit(manifest, orchard=None):
+         layers[name] = layer['hashes']
+     hashes, links, modes, owners, groups, sizes = {}, {}, {}, {}, {}, {}
+     names, ancestors, directories = set(), set(), set()
+-    desktop = privileges = cursor = bluetooth = labwc = None
++    desktop = privileges = cursor = bluetooth = labwc = foot = None
+     with subprocess.Popen(['zstd', '-d', '-q', '-c', str(root_path)], stdout=subprocess.PIPE) as decoder:
+         with tarfile.open(fileobj=decoder.stdout, mode='r|') as archive:
+             for member in archive:
+@@ -156,6 +156,8 @@ def audit(manifest, orchard=None):
+                         bluetooth = json.loads(data)
+                     if name == 'etc/omarchy/labwc-helper.json':
+                         labwc = json.loads(data)
++                    if name == 'etc/omarchy/foot-touch-ime.json':
++                        foot = json.loads(data)
+                     if name == 'etc/omarchy/package-privileges.json':
+                         privileges = json.loads(data)
+                 elif member.isdir():
+@@ -207,6 +209,8 @@ def audit(manifest, orchard=None):
+         raise ValueError('Missing startup cursor helper license')
+     verify_bluetooth(bluetooth, hashes, modes, owners, groups)
+     verify_labwc(labwc, hashes, modes, owners, groups)
++    if foot is not None:
++        verify_foot(foot, hashes, modes, owners, groups)
+     if 'home/tablet/.local/share/omarchy-ipad/shell/bluetooth-pairing/shell.qml' not in desktop:
+         raise ValueError('Pairing UI is absent from desktop integrity manifest')
+     for name in ('omarchy-desktop-ready', 'omarchy-wtype', 'omarchy-screen-toggle', 'omarchy-bluetooth-pair'):
+@@ -235,6 +239,25 @@ def verify_labwc(record, hashes, modes, owners, groups):
+             raise ValueError('Labwc component content/metadata differs: ' + path)
+ 
+ 
++
++def verify_foot(record, hashes, modes, owners, groups):
++    pin = json.loads((PROJECT / 'desktop/foot/source.json').read_text())
++    patch = '0001-touch-ime-on-short-grid-tap.patch'
++    expected = {'foot', 'LICENSE', 'source.tar.gz', patch, 'packages.lock', 'compiler.txt',
++                'version.txt', 'touch-ime-tests.json'}
++    if (record.get('schema') != 1 or record.get('architecture') != 'aarch64' or
++            record.get('variant') != 'touch-ime-experiment' or record.get('source') != pin or
++            record.get('files', {}).keys() != expected or
++            record['files']['source.tar.gz'] != pin['sha256'] or
++            record['files'][patch] != pin['patch_sha256']):
++        raise ValueError('Incompatible experimental Foot receipt')
++    for name, digest in record['files'].items():
++        path = 'usr/bin/foot' if name == 'foot' else 'usr/share/licenses/omarchy-foot-touch-ime/' + name
++        mode = 0o755 if name == 'foot' else 0o644
++        if (hashes.get(path), modes.get(path), owners.get(path), groups.get(path)) != (digest, mode, 0, 0):
++            raise ValueError('Foot component content/metadata differs: ' + path)
++
++
+ def verify_bluetooth(record, hashes, modes, owners, groups):
+     pin = json.loads((PROJECT / 'desktop/bluetooth/dbus-next.json').read_text())
+     if not record or record.get('schema') != 1 or record.get('source') != pin:
+diff --git a/release/build.py b/release/build.py
+index 7f8b18e..d8524d4 100644
+--- a/release/build.py
++++ b/release/build.py
+@@ -71,6 +71,7 @@ def main():
+     for name in ('base', 'base-receipt', 'loader', 'splash', 'logo', 'pongo', 'busybox', 'dropbear', 'dropbearkey',
+                  'wpa-supplicant', 'wpa-cli', 'iw', 'cursor-tools', 'bluetooth-tools', 'labwc-tools', 'output'):
+         parser.add_argument('--' + name, type=Path, required=True)
++    parser.add_argument('--foot-tools', type=Path, help='opt-in experimental Foot component')
+     parser.add_argument('--orchard', type=Path, help='the orchard snapshot (default: ORCHARD_CHECKOUT)')
+     parser.add_argument('--inputs', type=Path, help="orchard's inputs for this build (python -m orchard.inputs)")
+     parser.add_argument('--kernel-dir', action='append', metavar='PLATFORM=DIRECTORY',
+@@ -89,6 +90,8 @@ def main():
+     for name in ('cursor_tools', 'bluetooth_tools', 'labwc_tools'):
+         if not getattr(args, name).is_dir():
+             parser.error(f'Missing tools directory: {getattr(args, name)}')
++    if args.foot_tools is not None and not args.foot_tools.is_dir():
++        parser.error('Missing Foot component directory')
+     try:
+         args.orchard = snapshot.directory(args.orchard)
+         document = json.loads(args.inputs.read_text()) if args.inputs else None
+@@ -101,7 +104,7 @@ def main():
+     root = build_root(args.base, args.base_receipt, args.output, args.release,
+                       args.cursor_tools, args.bluetooth_tools, args.labwc_tools,
+                       tools={'dropbear': args.dropbear, 'dropbearkey': args.dropbearkey, 'busybox': args.busybox},
+-                      splash=args.splash)
++                      splash=args.splash, foot_tools=args.foot_tools)
+     platforms = {}
+     for name, bundle in bundles.items():
+         files = layer(args, name, bundle)
+diff --git a/release/public_root.py b/release/public_root.py
+index 6057168..6dffc74 100644
+--- a/release/public_root.py
++++ b/release/public_root.py
+@@ -109,6 +109,46 @@ def labwc_files(directory):
+     return files
+ 
+ 
++
++def foot_files(directory):
++    """Explicit experiment only: replace Foot, retaining its pinned corresponding source."""
++    directory = Path(directory)
++    manifest = directory / 'manifest.json'
++    if manifest.is_symlink() or not manifest.is_file():
++        raise ValueError('Invalid Foot component receipt')
++    record = json.loads(manifest.read_text())
++    pin = json.loads((PROJECT / 'desktop/foot/source.json').read_text())
++    if (record.get('schema') != 1 or record.get('architecture') != 'aarch64' or
++            record.get('variant') != 'touch-ime-experiment' or record.get('source') != pin):
++        raise ValueError('Incompatible Foot component receipt')
++    patch = '0001-touch-ime-on-short-grid-tap.patch'
++    expected = {'foot', 'LICENSE', 'source.tar.gz', patch, 'packages.lock', 'compiler.txt',
++                'version.txt', 'touch-ime-tests.json'}
++    if record.get('files', {}).keys() != expected:
++        raise ValueError('Incomplete Foot component')
++    files = {}
++    for name, digest in record['files'].items():
++        path = directory / name
++        if path.is_symlink() or not path.is_file() or sha(path) != digest:
++            raise ValueError('Foot component differs from receipt')
++        destination = 'usr/bin/foot' if name == 'foot' else 'usr/share/licenses/omarchy-foot-touch-ime/' + name
++        files[destination] = (path.read_bytes(), 0o755 if name == 'foot' else 0o644)
++    if (record['files']['source.tar.gz'] != pin['sha256'] or
++            record['files'][patch] != pin['patch_sha256']):
++        raise ValueError('Foot corresponding source differs from pin')
++    elf = files['usr/bin/foot'][0]
++    if len(elf) < 64 or elf[:6] != b'\x7fELF\x02\x01' or elf[18:20] != b'\xb7\x00':
++        raise ValueError('Foot must be an AArch64 ELF executable')
++    version = (directory / 'version.txt').read_text()
++    if 'version: 1.28.0' not in version or '+ime' not in version:
++        raise ValueError('Foot version or input-method support differs')
++    fixture = json.loads((directory / 'touch-ime-tests.json').read_text())
++    if fixture.get('kind') != 'actual-c-protocol-mocks' or fixture.get('checks') != 460:
++        raise ValueError('Foot callback fixture did not pass')
++    files['etc/omarchy/foot-touch-ime.json'] = (json.dumps(record, sort_keys=True).encode(), 0o644)
++    return files
++
++
+ def desktop_additions():
+     name = 'home/tablet/.local/share/omarchy-ipad/shell/bluetooth-pairing/shell.qml'
+     return {name: ((PROJECT / 'desktop/shell/shell/bluetooth-pairing/shell.qml').read_bytes(), 0o644)}
+@@ -138,7 +178,7 @@ def access_files(tools):
+ 
+ 
+ def build(base, base_receipt, outdir, release, cursor_tools, bluetooth_tools=None, labwc_tools=None, tools=None,
+-          splash=None):
++          splash=None, foot_tools=None):
+     """The root image for every platform: no kernel, DTBs or modules (orchard's layer has them)."""
+     if outdir.exists():
+         raise ValueError('Choose a new release output directory')
+@@ -150,6 +190,8 @@ def build(base, base_receipt, outdir, release, cursor_tools, bluetooth_tools=Non
+     additions = cursor_files(cursor_tools)
+     additions.update(bluetooth_files(bluetooth_tools or PROJECT / 'out/desktop/bluetooth-tools'))
+     additions.update(labwc_files(labwc_tools or PROJECT / 'out/desktop/labwc-tools'))
++    if foot_tools is not None:
++        additions.update(foot_files(foot_tools))
+     desktop_extra = desktop_additions()
+     additions.update(desktop_extra)
+     additions['etc/omarchy/package-privileges.json'] = (json.dumps(privileges, sort_keys=True).encode(), 0o644)
+@@ -273,8 +315,9 @@ def main():
+     for name in ('base', 'base-receipt', 'outdir', 'cursor-tools', 'bluetooth-tools', 'labwc-tools'):
+         parser.add_argument('--' + name, type=Path, required=True)
+     parser.add_argument('--release', required=True)
++    parser.add_argument('--foot-tools', type=Path, help='opt-in experimental Foot component')
+     args = parser.parse_args()
+-    print(json.dumps(build(args.base, args.base_receipt, args.outdir, args.release, args.cursor_tools, args.bluetooth_tools, args.labwc_tools), indent=2))
++    print(json.dumps(build(args.base, args.base_receipt, args.outdir, args.release, args.cursor_tools, args.bluetooth_tools, args.labwc_tools, foot_tools=args.foot_tools), indent=2))
+ 
+ 
+ if __name__ == '__main__':
+diff --git a/tests/test_foot_component.py b/tests/test_foot_component.py
+new file mode 100644
+index 0000000..d96d6b7
+--- /dev/null
++++ b/tests/test_foot_component.py
+@@ -0,0 +1,174 @@
++"""Optional Foot artifact qualification and hostile source archive regression tests."""
++import hashlib
++import importlib.util
++import io
++import json
++import subprocess
++from contextlib import ExitStack
++from pathlib import Path
++import tarfile
++import tempfile
++import unittest
++from unittest.mock import patch
++
++from release import audit, public_root
++
++PROJECT = Path(__file__).resolve().parents[1]
++spec = importlib.util.spec_from_file_location('foot_source', PROJECT / 'desktop/foot_source.py')
++source = importlib.util.module_from_spec(spec)
++spec.loader.exec_module(source)
++
++
++def archive(entries):
++    data = io.BytesIO()
++    with tarfile.open(fileobj=data, mode='w:gz') as tar:
++        for name, kind in entries:
++            item = tarfile.TarInfo(name)
++            item.mode = 0o4777
++            if kind == 'file':
++                item.size = 1
++                tar.addfile(item, io.BytesIO(b'x'))
++            else:
++                item.type = tarfile.SYMTYPE if kind == 'link' else tarfile.DIRTYPE
++                item.linkname = '/etc/passwd'
++                tar.addfile(item)
++    return data.getvalue()
++
++
++class FootSource(unittest.TestCase):
++    def test_source_archive_refuses_links_escape_duplicate_and_multiple_roots(self):
++        valid = [('foot/' + name, 'file') for name in ('input.c', 'ime.c', 'meson.build', 'LICENSE')]
++        for extra in ([('../escape', 'file')], [('/escape', 'file')], [('other/file', 'file')],
++                      [('foot/link', 'link')], [('foot/input.c', 'file')]):
++            with self.subTest(extra=extra), tempfile.TemporaryDirectory() as work:
++                with self.assertRaises(ValueError):
++                    source.extract(archive(valid + extra), Path(work))
++        with tempfile.TemporaryDirectory() as work:
++            source.extract(archive(valid), Path(work))
++            self.assertEqual((Path(work) / 'input.c').stat().st_mode & 0o7777, 0o755)
++        with tempfile.TemporaryDirectory() as work, self.assertRaisesRegex(ValueError, 'Incomplete'):
++            source.extract(archive([('foot/input.c', 'file')]), Path(work))
++
++
++class FootComponent(unittest.TestCase):
++    def prepare(self, root):
++        component = root / 'component'
++        component.mkdir()
++        elf = bytearray(64)
++        elf[:6] = b'\x7fELF\x02\x01'
++        elf[18:20] = b'\xb7\x00'
++        data = {'foot': bytes(elf), 'LICENSE': b'MIT', 'source.tar.gz': b'fixture archive',
++                '0001-touch-ime-on-short-grid-tap.patch': b'fixture patch', 'packages.lock': b'fcft 3.3.3',
++                'compiler.txt': b'gcc', 'version.txt': b'foot version: 1.28.0 -pgo +ime +graphemes',
++                'touch-ime-tests.json': json.dumps({'kind': 'actual-c-protocol-mocks', 'checks': 460}).encode()}
++        hashes = {name: hashlib.sha256(content).hexdigest() for name, content in data.items()}
++        pin = {'version': '1.28.0', 'sha256': hashes['source.tar.gz'],
++               'patch_sha256': hashes['0001-touch-ime-on-short-grid-tap.patch']}
++        p = root / 'desktop/foot'
++        p.mkdir(parents=True)
++        (p / 'source.json').write_text(json.dumps(pin))
++        for name, content in data.items():
++            (component / name).write_bytes(content)
++        record = {'schema': 1, 'architecture': 'aarch64', 'variant': 'touch-ime-experiment',
++                  'source': pin, 'files': hashes}
++        (component / 'manifest.json').write_text(json.dumps(record))
++        return component, record
++
++    def test_component_supplies_pinned_source_and_audits_root_ownership(self):
++        with tempfile.TemporaryDirectory() as work:
++            root = Path(work)
++            component, record = self.prepare(root)
++            with patch.object(public_root, 'PROJECT', root), patch.object(audit, 'PROJECT', root):
++                files = public_root.foot_files(component)
++                self.assertEqual(files['usr/bin/foot'][1], 0o755)
++                self.assertIn('usr/share/licenses/omarchy-foot-touch-ime/source.tar.gz', files)
++                hashes = {name: hashlib.sha256(data).hexdigest() for name, (data, _) in files.items()}
++                modes = {name: mode for name, (_, mode) in files.items()}
++                owners = {name: 0 for name in files}
++                audit.verify_foot(record, hashes, modes, owners, owners)
++                for metadata, value in ((modes, 0o777), (owners, 1000), (hashes, 'wrong')):
++                    previous = metadata['usr/bin/foot']
++                    metadata['usr/bin/foot'] = value
++                    with self.assertRaises(ValueError):
++                        audit.verify_foot(record, hashes, modes, owners, owners)
++                    metadata['usr/bin/foot'] = previous
++
++    def test_release_default_keeps_packaged_foot_and_explicit_overlay_replaces_it(self):
++        files = {'usr/bin/foot': b'signed-package-foot', 'usr/lib/systemd/systemd': b'systemd',
++                 'etc/group': b'seat:x:1:\nvideo:x:2:\ninput:x:3:\n',
++                 'etc/gshadow': b'seat:!*::\nvideo:!*::\ninput:!*::\n',
++                 'arch-ipad-ui-manifest.json': b'{}',
++                 'home/tablet/.local/share/omarchy-ipad/shell/shell.qml': b'QML'}
++        data = io.BytesIO()
++        with tarfile.open(fileobj=data, mode='w:gz') as tar:
++            parents = {str(parent) for name in files for parent in Path(name).parents if str(parent) != '.'}
++            for name in sorted(parents):
++                item = tarfile.TarInfo(name)
++                item.type, item.mode = tarfile.DIRTYPE, 0o755
++                tar.addfile(item)
++            for name, content in files.items():
++                item = tarfile.TarInfo(name)
++                item.mode, item.size = 0o755, len(content)
++                tar.addfile(item, io.BytesIO(content))
++            item = tarfile.TarInfo('lib')
++            item.type, item.linkname = tarfile.SYMTYPE, 'usr/lib'
++            tar.addfile(item)
++        with tempfile.TemporaryDirectory() as work, ExitStack() as patches:
++            root = Path(work)
++            base, receipt = root / 'base.gz', root / 'base.json'
++            base.write_bytes(data.getvalue())
++            receipt.write_text(json.dumps({'bytes': base.stat().st_size, 'sha256': public_root.sha(base)}))
++            for name in ('privileged_entries', 'cursor_files', 'bluetooth_files', 'labwc_files',
++                         'desktop_additions', 'desktop_replacements', 'system_files'):
++                patches.enter_context(patch.object(public_root, name, return_value={}))
++            foot = patches.enter_context(patch.object(public_root, 'foot_files',
++                return_value={'usr/bin/foot': (b'patched-foot', 0o755)}))
++            for selected in (None, root / 'foot-component'):
++                out = root / ('default' if selected is None else 'experiment')
++                public_root.build(base, receipt, out, 'test', root / 'cursor', foot_tools=selected)
++                raw = subprocess.check_output(['zstd', '-dq', '-c', str(out / 'rootfs.tar.zst')])
++                with tarfile.open(fileobj=io.BytesIO(raw)) as tar:
++                    expected = b'signed-package-foot' if selected is None else b'patched-foot'
++                    self.assertEqual(tar.extractfile('usr/bin/foot').read(), expected)
++                    self.assertEqual(tar.getmember('usr/bin/foot').mode, 0o755)
++                if selected is None:
++                    foot.assert_not_called()
++                else:
++                    foot.assert_called_once_with(selected)
++
++    def test_wrong_target_source_fixture_and_file_content_are_refused(self):
++        mutations = ('architecture', 'source', 'fixture', 'elf', 'version', 'tamper', 'missing', 'link')
++        for mutation in mutations:
++            with self.subTest(mutation=mutation), tempfile.TemporaryDirectory() as work:
++                root = Path(work)
++                component, record = self.prepare(root)
++                rehash = None
++                if mutation == 'architecture':
++                    record['architecture'] = 'x86_64'
++                elif mutation == 'source':
++                    record['source']['version'] = 'wrong'
++                elif mutation == 'fixture':
++                    rehash = 'touch-ime-tests.json'
++                    (component / rehash).write_text('{"kind":"actual-c-protocol-mocks","checks":0}')
++                elif mutation == 'elf':
++                    rehash = 'foot'
++                    (component / rehash).write_bytes(b'not an AArch64 binary')
++                elif mutation == 'version':
++                    rehash = 'version.txt'
++                    (component / rehash).write_text('version: 1.28.0 -ime')
++                elif mutation == 'tamper':
++                    (component / 'foot').write_bytes(b'tampered')
++                elif mutation == 'missing':
++                    del record['files']['LICENSE']
++                elif mutation == 'link':
++                    (component / 'foot').unlink()
++                    (component / 'foot').symlink_to(component / 'LICENSE')
++                if rehash:
++                    record['files'][rehash] = public_root.sha(component / rehash)
++                (component / 'manifest.json').write_text(json.dumps(record))
++                with patch.object(public_root, 'PROJECT', root), self.assertRaises(ValueError):
++                    public_root.foot_files(component)
++
++
++if __name__ == '__main__':
++    unittest.main()
+diff --git a/tools/build.py b/tools/build.py
+index 84ddc85..3b43b08 100755
+--- a/tools/build.py
++++ b/tools/build.py
+@@ -31,6 +31,7 @@ INPUTS = {
+     'cursor': ['desktop/build-cursor-helper', 'desktop/cursor', *DESKTOP_IMAGE],
+     'bluetooth': ['desktop/build-bluetooth-tools', 'desktop/bluetooth'],
+     'labwc': ['desktop/build-labwc', 'desktop/labwc'],
++    'foot': ['desktop/build-foot', 'desktop/foot_source.py', 'desktop/foot', *DESKTOP_IMAGE],
+     'base': ['system/build-rootfs', 'system/assemble-rootfs', 'system/Containerfile',
+              'system/install-toolchain', 'system/packages.txt'],
+     'artwork': ['boot/build-artwork', 'boot/generate-logo.py', 'boot/splash.py', 'boot/artwork'],
+@@ -57,6 +58,8 @@ def orchard_command(module, *argv):
+ def main():
+     parser = argparse.ArgumentParser(description=__doc__.split('\n\n')[0])
+     parser.add_argument('--version', required=True)
++    parser.add_argument('--foot-touch-ime', action='store_true',
++                        help='build and select experimental short-tap IME Foot (default: signed Arch Foot)')
+     parser.add_argument('--output', type=Path, required=True)
+     parser.add_argument('--platform', action='append', default=[],
+                         help='build this platform (repeat), or all; orchard passes the selection')
+@@ -83,6 +86,12 @@ def main():
+     labwc, _ = component(PROJECT, 'labwc', INPUTS['labwc'],
+                          lambda path, work: python('desktop/build-labwc', '--output', path),
+                          artifact='labwc-tools')
++    foot_args = []
++    if args.foot_touch_ime:
++        foot, _ = component(PROJECT, 'foot', INPUTS['foot'],
++                            lambda path, work: python('desktop/build-foot', '--output', path),
++                            artifact='foot-tools')
++        foot_args = ['--foot-tools', foot]
+     # The base names the component, not a release: it serves every build with the same inputs.
+     base, _ = component(PROJECT, 'base', INPUTS['base'],
+                         lambda path, work: run('system/build-rootfs', '--output', path, '--desktop', desktop,
+@@ -103,7 +112,7 @@ def main():
+            *(part for name in ('busybox', 'dropbear', 'dropbearkey', 'wpa_supplicant', 'wpa_cli', 'iw')
+              for part in ('--' + name.replace('_', '-'), tools[name])),
+            '--cursor-tools', cursor, '--bluetooth-tools', bluetooth, '--labwc-tools', labwc,
+-           *selected, '--output', args.output)
++           *foot_args, *selected, '--output', args.output)
+     python('-m', 'release.audit', args.output / 'release.toml')
+     # install.sh and orchard-install.pyz, with orchard's launch loaders.
+     orchard_command('orchard.installer', 'release', args.output)
+-- 
+2.47.3
+
