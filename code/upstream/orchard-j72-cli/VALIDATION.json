@@ -38,7 +38,7 @@
     "returned_file_sha256": "c8f5d0341d54d951a71b136e6e2afcb14d11ed8489a7ae126a8fee0df6ecf193",
     "no_internal_filesystems_mounted": true,
     "normal_ios_usb_return": true,
-    "ios_charging_confirmation": "pending",
+    "ios_charging_confirmation": "OWNER_AND_TWO_DIAGNOSTIC_SAMPLES_30_SECONDS_APART_96_PERCENT",
     "desktop_hardware_qualified": false,
     "repeat_boot_reliability_qualified": false
   },
@@ -49,5 +49,14 @@
   "upstream_draft_prs": [
     58,
     59
-  ]
+  ],
+  "ci": {
+    "python_3_11": "PASS",
+    "python_3_14": "PASS",
+    "native_smoke": "PASS",
+    "prs": [
+      58,
+      59
+    ]
+  }
 }

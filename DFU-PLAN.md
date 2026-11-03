@@ -12,7 +12,7 @@ for the next authorized direct-Pi DFU:
 - [x] Component/CPIO inspection and focused host tests.
 - [x] Final complete Orchard test gate: 510 tests pass, no skips.
 - [x] One native CLI RAM boot: serial/SSH, `exec`, 4 KiB RAM push/pull and forced serial pull pass; normal iOS USB returns.
-- [ ] Owner confirms unlocked iOS charging on powered hub.
+- [x] Owner and two diagnostic reads confirm unlocked iOS charging on powered hub, 96%.
 - [ ] Repeat native boot reliability and visually qualify display.
 - [ ] Native touch, Wi-Fi and power integration, followed by the Omarchy A desktop.
 

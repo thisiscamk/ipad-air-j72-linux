@@ -53,8 +53,8 @@ Internal storage remains untouched.
 - Final complete Orchard unit suite: **510 tests pass, no skips** (task umask022).
 - Hardware qualification: one direct-Pi RAM boot, serial and SSH execution,
   4 KiB SSH push/pull and forced serial pull pass. iOS USB returned after
-  normal reboot. Charging confirmation is pending; display and desktop
-  hardware are unqualified.
+  normal reboot. Owner and two diagnostic reads confirm iOS charging on the powered hub;
+  display and desktop hardware remain unqualified.
 
 Only source and public recipe metadata are included. Apple firmware,
 calibration, credentials, raw device logs and binary boot images stay local.

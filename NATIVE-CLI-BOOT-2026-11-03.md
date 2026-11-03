@@ -33,8 +33,9 @@ checks pass. It changes no runtime code.
 - The mount inventory contains rootfs and virtual/RAM filesystems only.
 - A normal `reboot -f` request disconnects Linux; normal iOS USB returns.
 
-Visible iOS and charging on the powered hub still need owner confirmation.
-A reboot request and iOS USB identity alone do not establish charging.
+The owner confirmed unlocked iOS charging on the powered hub. Two independent
+iOS diagnostic reads 30 seconds apart confirm external charge-capable power
+and active charging at 96%. The device remains in iOS on that hub.
 
 ## Limits
 
@@ -60,7 +61,7 @@ drafts; the device draft documents its dependency and exact measured scope.
 
 ## Next integration gates
 
-1. Confirm iOS charging, then retain the proven native console as a fallback.
+1. Retain the proven native console as a fallback; iOS charging is confirmed.
 2. Port native touch dependencies: A7 SPI match data, clock/regulator/reset/
    attention ownership, N1 firmware conversion and `apple_z2` support.
 3. Integrate the measured HSIC Wi-Fi path through normal kernel providers and
