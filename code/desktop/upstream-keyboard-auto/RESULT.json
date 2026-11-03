@@ -1,0 +1,14 @@
+{
+  "status": "HOST_TESTED_REVIEW_PATCH_WAYLAND_UNTESTED",
+  "repository": "OrchardLinux/omarchy-a",
+  "base": "ace594051492b1121794a5a6ed98d01719451753",
+  "local_commit": "fa25972a83a279bdd7e5edc9ff6013cd211562fb",
+  "full_unit_tests_passed": 113,
+  "new_controller_tests": 8,
+  "skipped_tests": 0,
+  "actual_wayland_tested": false,
+  "finished_artifact_tested": false,
+  "device_profile_added": false,
+  "upstream_pr_opened": false,
+  "patch_sha256": "50db84dee2be13e34ce07f7630b218c18b132f69399ce2b39338d6ed39108593"
+}

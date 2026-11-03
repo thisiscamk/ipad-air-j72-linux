@@ -1,0 +1,45 @@
+{
+  "status": "OFFLINE_INACTIVE12_BUILD_TESTS_IMPORTS_PASS_DEVICE_UNTESTED",
+  "uts_version": "#35 SMP PREEMPT Mon Nov 2 07:00:00 +08 2026",
+  "module_sha256": "a4e6019fe72408c13f74bbeba1c585bdd2b0b45286b443d4d3d52d3398450f28",
+  "base_module_sha256": "0ad27c0475fc1c63df7008e68f7f5422b4fc00a6e0801f52c40d7b829adb5509",
+  "kernel_files_unchanged": true,
+  "prior_candidate_unchanged": true,
+  "private_inputs_unchanged": true,
+  "active_states_unchanged": true,
+  "unknown_states_still_rejected": true,
+  "wire_checksums_and_layout_bounds_unchanged": true,
+  "data_phase_retry_unchanged": true,
+  "recovery_timeout_cleanup_unchanged": true,
+  "actual_emitter_exhaustive_state_tests": true,
+  "private_rejected_report_replay_pass": true,
+  "module_strong_imports": 69,
+  "device_tested": false,
+  "actual_private_report_replays": 8,
+  "accepted_states": [
+    0,
+    1,
+    2,
+    3,
+    4,
+    5,
+    7
+  ],
+  "active_states": [
+    3,
+    4
+  ],
+  "files": {
+    "run-j72-touch-inactive1235.py": "39c9fe278172b19dfe7b02d5f75ff17616a6e1618404ae8868418423e1c7c374",
+    "prepare-j72-touch-inactive1235.py": "0a90b495d63427e3ef81e267ee792f21604d667f4428956e87d98156e33d9f09",
+    "j72-classic-contacts.h": "a44ddb33a9995f5182883a2f9b9bf1f1feba092dc92a1b30a072f8759da1cf7e",
+    "Makefile": "98d7643bc92d1e047db68fed6afcc9314db7f703d0518efb07a0c73294e1dc2b",
+    "j72_touch_session.c": "975a2dfbfd3be205417623591e3bf1b9cce721ba9a9f608f3ef6364edbc1866e",
+    "inactive12.patch": "e6bf798ce6d9a0e6bf76b1c7dbd4a509ec2280865217629775b0909d1a669480",
+    "test-recovery-window.c": "de47dfbb0e155e371c1daa9ec6a5a541dc33a12f8e2d4052858cfa0cc52f3ab1",
+    "test-data-phase.c": "2649e37bff7db3846e9f1d94e4b724e11204814b58058fa4969b9bdd6d0904b4",
+    "j72-data-phase.h": "3ef3c33dcaade7d2ea01fa4ec5b57c9b3108582b03377ed91359beb1ba28387b",
+    "test-emitter.py": "1c4ffa8901b769a09a85e08a0d3251469b571b55aa232a90c2bc85324f5ad56b",
+    "j72-recovery-window.h": "34405939eb327f6cdd6604665cbd574fd53985652e0e12a8032a8e4017db78af"
+  }
+}

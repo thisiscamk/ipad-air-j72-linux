@@ -1,5 +1,5 @@
 {
-  "status": "SELFCHECK_AND_INITIAL_DESKTOP_PASS_OWNER_AND_LONG_RUN_PENDING",
+  "status": "OWNER_INPUT_PASS_STATE2_LAYOUT_GATE_FAILED_BEFORE_CHARGING",
   "start_stop_selfcheck_pass": true,
   "physical_restoration_pass": true,
   "firmware_healthy": true,
@@ -20,8 +20,30 @@
     "phase_resync_frames": 0,
     "phase_resync_failures": 65
   },
-  "owner_input_check_pending": true,
+  "owner_input_check_pending": false,
   "long_run_qualified": false,
   "charging_started": false,
-  "state1_device_emission_yet_observed": false
+  "state1_device_emission_yet_observed": true,
+  "owner_menu_typing_keyboard_pass": true,
+  "hub_move_pass": true,
+  "final_input_snapshot": {
+    "input_frames": 14713,
+    "input_bad_layouts": 7,
+    "input_timeouts": 0,
+    "xfer_errors": 0,
+    "recovery_stop_reason": 0,
+    "input_recoveries": 1,
+    "contact_state1_frames": 7,
+    "phase_resync_headers": 1891,
+    "phase_resync_frames": 0,
+    "phase_resync_failures": 1891
+  },
+  "all_seven_raw_layouts_saved_privately": true,
+  "rejected_contact_states": [
+    2
+  ],
+  "normal_cleanup_pass": true,
+  "independent_baseline_verified": true,
+  "ios_charging_verified": true,
+  "ios_diagnostic_confirmations": 2
 }

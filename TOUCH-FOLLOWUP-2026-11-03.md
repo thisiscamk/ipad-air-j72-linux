@@ -88,3 +88,26 @@ The [separate state-1 inactive candidate](code/touch/state135/) now passes actua
 emitter/private-report replay, exhaustive state tests, warning-free build/import
 checks and V3 host preflight. It is device untested. The device remains in iOS
 charging; use the new runbook selector for the next changed DFU.
+
+## State-1 worker: remaining reports are state 2
+
+The owner confirmed menu, Foot typing and keyboard reopening. The worker processed
+seven state-1 frames, then the hub health gate found seven other rejected layouts.
+All seven were captured before shutdown. They have valid wire checksums and the
+same native structure, with contact state **2**. At stop: 14,713 valid frames, one
+bounded recovery, zero SPI errors/timeouts and stop reason 0. Normal cleanup,
+firmware health and independent baseline pass. No charging module/current override
+was used. None of 1,891 extra retries recovered a frame.
+
+A read-only same-boot replacement precheck found CONFIG_MODULE_UNLOAD disabled
+in this exact kernel. No unload, force operation or kernel modification occurred.
+The selected V3 iOS-return helper now handled the absent charging module normally;
+iOS returned, the owner unlocked and two fresh diagnostic samples confirm charging
+at 70% on the qualified hub.
+
+The [next inactive-state-1/2 candidate](code/touch/inactive1235/) preserves active
+states 3/4 and all other packet/layout/refusal/cleanup rules. Actual C emitter
+replay of the earlier state-1 report plus all seven state-2 reports, exhaustive
+state/malformed-report checks, original acquisition/recovery tests, warning-free
+build/import checks and V4 host preflight pass. It is device untested. Another
+DFU is needed because this kernel cannot replace the loaded module.

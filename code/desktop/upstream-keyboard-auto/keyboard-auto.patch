@@ -1,0 +1,262 @@
+diff --git a/desktop/shell/bin/omarchy-keyboard b/desktop/shell/bin/omarchy-keyboard
+index 4c3b995..1c77d1d 100644
+--- a/desktop/shell/bin/omarchy-keyboard
++++ b/desktop/shell/bin/omarchy-keyboard
+@@ -14,6 +14,10 @@ binary = root / "trials/wvkbd-mobintl-v0.20-font18-special15-state"
+ pid_file = runtime / "omarchy-keyboard.pid"
+ state_file = runtime / "omarchy-keyboard-visible"
+ log_file = runtime / "omarchy-keyboard.log"
++# Opt in per session until automatic text focus is qualified on its clients.
++automatic = os.environ.get("OMARCHY_KEYBOARD_AUTO", "0")
++if automatic not in ("0", "1"):
++    raise SystemExit("OMARCHY_KEYBOARD_AUTO must be 0 or 1")
+ 
+ 
+ def live_pid():
+@@ -69,6 +73,8 @@ elif mode == "run":
+             "--fg-sp", color("selection"), "--press", color("accent"),
+             "--press-sp", color("accent"), "--text", color("foreground"),
+             "--text-sp", color("bright_foreground", "foreground")]
++    if automatic == "1":
++        args.insert(1, "--auto")
+     state_file.write_text("0\n")
+     pid_file.write_text(str(os.getpid()) + "\n")
+     os.environ["WVKBD_STATE_FILE"] = str(state_file)
+diff --git a/docs/keyboard-focus.md b/docs/keyboard-focus.md
+new file mode 100644
+index 0000000..8b23da8
+--- /dev/null
++++ b/docs/keyboard-focus.md
+@@ -0,0 +1,36 @@
++# Automatic keyboard focus experiment
++
++The session controller can opt into wvkbd 0.20's input-method-v2 focus
++handling by inheriting `OMARCHY_KEYBOARD_AUTO=1` from the compositor session.
++Unset or `0` keeps the current manual keyboard policy. Other values are
++rejected before the controller signals or starts a keyboard.
++
++For a disposable development session, set the variable before starting Labwc:
++
++```sh
++export OMARCHY_KEYBOARD_AUTO=1
++```
++
++The keyboard is still resident and initially hidden. wvkbd's existing
++`--auto` option then responds to application text-focus activation. The
++same session variable reaches a lazy launch from the keyboard icon and a
++restart after a theme change. The existing icon toggle and executable/PID
++identity checks remain in use.
++
++This switch alone does not guarantee that a tap on an already focused
++terminal reopens a manually hidden keyboard. That needs a new activation
++from the terminal/compositor. The J72 development desktop used an
++experimental Foot 1.28 short-tap IME patch alongside automatic keyboard
++mode; the combined result has not been isolated to this controller change.
++Do not infer that the current signed Foot package has that patch.
++
++`tests/test_keyboard_controller.py` runs the actual controller with a
++compiled native fixture to check exec arguments, hidden state, lazy
++startup, toggle signals, theme restart and refusal to signal an unrelated
++PID. These tests do not run Wayland or prove text-focus behavior.
++
++Before enabling automatic mode by default, test the exact built desktop
++with its real compositor and keyboard: focus and leave a text client,
++hide/tap/type twice, drag and scroll without unintended activation,
++toggle the bar icon and restart after a theme change. Repeat on supported
++tablets. No device is added or marked supported by this experiment.
+diff --git a/tests/test_keyboard_controller.py b/tests/test_keyboard_controller.py
+new file mode 100644
+index 0000000..82e4d0c
+--- /dev/null
++++ b/tests/test_keyboard_controller.py
+@@ -0,0 +1,190 @@
++"""Exercise the real controller's exec/signal paths with a native keyboard fixture."""
++import os
++from pathlib import Path
++import shutil
++import signal
++import subprocess
++import sys
++import tempfile
++import time
++import unittest
++
++PROJECT = Path(__file__).resolve().parents[1]
++CONTROLLER = PROJECT / 'desktop/shell/bin/omarchy-keyboard'
++
++FIXTURE = r'''
++#include <fcntl.h>
++#include <signal.h>
++#include <stdio.h>
++#include <stdlib.h>
++#include <string.h>
++#include <unistd.h>
++static int events;
++static void event(int number)
++{
++    if (number == SIGTERM) _exit(0);
++    const char *message = number == SIGUSR2 ? "SHOW\n" : "TOGGLE\n";
++    if (write(events, message, strlen(message)) < 0) _exit(2);
++}
++int main(int argc, char **argv)
++{
++    events = open(getenv("KEYBOARD_TEST_EVENTS"), O_WRONLY | O_CREAT | O_APPEND, 0600);
++    if (events < 0) return 1;
++    signal(SIGTERM, event);
++    signal(SIGUSR2, event);
++    signal(SIGRTMIN, event);
++    dprintf(events, "START:%ld\n", (long)getpid());
++    for (int i = 1; i < argc; i++) dprintf(events, "ARG:%s\n", argv[i]);
++    dprintf(events, "STATE:%s\nREADY\n", getenv("WVKBD_STATE_FILE"));
++    for (;;) pause();
++}
++'''
++
++
++@unittest.skipUnless(sys.platform == 'linux' and shutil.which('cc'),
++                     'native Linux /proc and a C compiler required')
++class KeyboardControllerTests(unittest.TestCase):
++    @classmethod
++    def setUpClass(cls):
++        cls.build = tempfile.TemporaryDirectory(prefix='omarchy-keyboard-test-')
++        source = Path(cls.build.name) / 'keyboard.c'
++        source.write_text(FIXTURE)
++        cls.fixture = Path(cls.build.name) / 'keyboard'
++        subprocess.run(['cc', '-std=c11', '-D_POSIX_C_SOURCE=200809L', '-Wall', '-Wextra',
++                        '-Werror', str(source), '-o', str(cls.fixture)], check=True)
++
++    @classmethod
++    def tearDownClass(cls):
++        cls.build.cleanup()
++
++    def setUp(self):
++        self.temporary = tempfile.TemporaryDirectory(prefix='omarchy-keyboard-session-')
++        self.root = Path(self.temporary.name)
++        # Rootfs assembly installs these source scripts executable.
++        self.controller = self.root / 'omarchy-keyboard'
++        shutil.copyfile(CONTROLLER, self.controller)
++        self.controller.chmod(0o755)
++        self.binary = self.root / 'omarchy/trials/wvkbd-mobintl-v0.20-font18-special15-state'
++        self.binary.parent.mkdir(parents=True)
++        shutil.copy2(self.fixture, self.binary)
++        self.runtime = self.root / 'runtime'
++        self.runtime.mkdir()
++        colors = self.root / 'home/.local/state/omarchy/current/theme/colors.toml'
++        colors.parent.mkdir(parents=True)
++        colors.write_text(''.join(f'{name} = "#123456"\n' for name in
++                                 ('background', 'lighter_background', 'selection',
++                                  'accent', 'foreground', 'bright_foreground')))
++        self.events = self.root / 'events'
++        self.environment = {**os.environ, 'OMARCHY_PATH': str(self.binary.parents[1]),
++                            'XDG_RUNTIME_DIR': str(self.runtime), 'HOME': str(self.root / 'home'),
++                            'KEYBOARD_TEST_EVENTS': str(self.events)}
++        self.environment.pop('OMARCHY_KEYBOARD_AUTO', None)
++        self.processes = []
++
++    def tearDown(self):
++        # Lazy launch/restart starts a new session. Only stop our exact fixture.
++        if self.events.exists():
++            for line in self.events.read_text().splitlines():
++                if not line.startswith('START:'):
++                    continue
++                pid = int(line.split(':')[1])
++                try:
++                    if Path(f'/proc/{pid}/exe').resolve() == self.binary:
++                        os.kill(pid, signal.SIGTERM)
++                except ProcessLookupError:
++                    pass
++        for process in self.processes:
++            if process.poll() is None:
++                process.terminate()
++            process.wait(timeout=3)
++        self.temporary.cleanup()
++
++    def run_controller(self, mode):
++        return subprocess.run([sys.executable, str(self.controller), mode], env=self.environment,
++                              capture_output=True, text=True, timeout=5)
++
++    def start(self):
++        process = subprocess.Popen([sys.executable, str(self.controller), 'run'],
++                                   env=self.environment, stdout=subprocess.DEVNULL,
++                                   stderr=subprocess.DEVNULL, start_new_session=True)
++        self.processes.append(process)
++        self.wait_for(lambda text: text.count('READY\n') == 1)
++        return process
++
++    def wait_for(self, predicate):
++        deadline = time.monotonic() + 3
++        while time.monotonic() < deadline:
++            text = self.events.read_text() if self.events.exists() else ''
++            if predicate(text):
++                return text
++            time.sleep(0.01)
++        self.fail('Keyboard fixture did not reach the expected state')
++
++    def test_manual_default_remains_hidden_and_has_no_auto_argument(self):
++        self.start()
++        text = self.events.read_text()
++        self.assertNotIn('ARG:--auto\n', text)
++        self.assertIn('ARG:--hidden\n', text)
++        self.assertIn('STATE:' + str(self.runtime / 'omarchy-keyboard-visible'), text)
++        self.assertEqual((self.runtime / 'omarchy-keyboard-visible').read_text(), '0\n')
++
++    def test_explicit_manual_mode_has_no_auto_argument(self):
++        self.environment['OMARCHY_KEYBOARD_AUTO'] = '0'
++        self.start()
++        self.assertNotIn('ARG:--auto\n', self.events.read_text())
++
++    def test_auto_mode_executes_same_keyboard_with_auto_once(self):
++        self.environment['OMARCHY_KEYBOARD_AUTO'] = '1'
++        process = self.start()
++        self.assertEqual(Path(f'/proc/{process.pid}/exe').resolve(), self.binary)
++        self.assertEqual(self.events.read_text().count('ARG:--auto\n'), 1)
++
++    def test_invalid_mode_refuses_without_starting_or_writing_pid(self):
++        self.environment['OMARCHY_KEYBOARD_AUTO'] = 'yes'
++        result = self.run_controller('run')
++        self.assertNotEqual(result.returncode, 0)
++        self.assertIn('must be 0 or 1', result.stderr)
++        self.assertFalse(self.events.exists())
++        self.assertFalse((self.runtime / 'omarchy-keyboard.pid').exists())
++
++    def test_toggle_signals_existing_auto_keyboard_without_restarting(self):
++        self.environment['OMARCHY_KEYBOARD_AUTO'] = '1'
++        process = self.start()
++        result = self.run_controller('toggle')
++        self.assertEqual(result.returncode, 0, result.stderr)
++        text = self.wait_for(lambda text: 'TOGGLE\n' in text)
++        self.assertEqual(text.count('START:'), 1)
++        self.assertIsNone(process.poll())
++
++    def test_lazy_toggle_inherits_automatic_mode_and_requests_show(self):
++        self.environment['OMARCHY_KEYBOARD_AUTO'] = '1'
++        result = self.run_controller('toggle')
++        self.assertEqual(result.returncode, 0, result.stderr)
++        text = self.wait_for(lambda text: 'SHOW\n' in text)
++        self.assertEqual(text.count('ARG:--auto\n'), 1)
++
++    def test_restart_preserves_auto_mode_and_replaces_old_process(self):
++        self.environment['OMARCHY_KEYBOARD_AUTO'] = '1'
++        process = self.start()
++        result = self.run_controller('restart')
++        self.assertEqual(result.returncode, 0, result.stderr)
++        text = self.wait_for(lambda text: text.count('READY\n') == 2)
++        self.assertEqual(text.count('ARG:--auto\n'), 2)
++        self.assertEqual(process.wait(timeout=3), 0)
++        pid = int((self.runtime / 'omarchy-keyboard.pid').read_text())
++        self.assertNotEqual(pid, process.pid)
++        self.assertEqual(Path(f'/proc/{pid}/exe').resolve(), self.binary)
++
++    def test_stale_foreign_pid_is_not_signalled(self):
++        foreign = subprocess.Popen(['sleep', '10'])
++        self.processes.append(foreign)
++        (self.runtime / 'omarchy-keyboard.pid').write_text(str(foreign.pid))
++        self.environment['OMARCHY_KEYBOARD_AUTO'] = '1'
++        result = self.run_controller('toggle')
++        self.assertEqual(result.returncode, 0, result.stderr)
++        self.wait_for(lambda text: 'SHOW\n' in text)
++        self.assertIsNone(foreign.poll())
++
++
++if __name__ == '__main__':
++    unittest.main()

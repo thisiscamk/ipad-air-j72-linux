@@ -52,12 +52,13 @@ charging on one rejected layout. This time the report was captured: checksum-val
 native structure with contact state 1, outside our whitelist. None of 495 extra
 retries recovered a frame. Cleanup and iOS charging pass.
 
-The [next state-1 inactive candidate](code/touch/state135/) follows upstream Z2
-inactive semantics for that observed state, while retaining other unknown-state,
-packet and layout refusals. Actual emitter/private replay/build and V3 host
-preflight pass; device execution remains untested. Capture before shutdown is now
-proved on device. Continue guarded charging in that same boot only if input passes.
-The combined touch/power qualification does not isolate a power-policy effect.
+The state-1 worker then passed owner input checks and processed seven state-1
+frames, but seven captured state-2 reports stopped progression before charging.
+Normal cleanup and iOS charging pass. The [next inactive-state-1/2 candidate](code/touch/inactive1235/)
+passes actual eight-report/emitter tests, build and V4 preflight; device execution
+remains untested. Input gates remain strict. A fresh DFU is required because the
+current kernel disables module unloading. Continue guarded charging in that boot
+only if input passes. This does not isolate a power-policy effect.
 
 ## 2. Finish the storage qualification tools offline
 
@@ -253,6 +254,10 @@ No downgrade, boot-variable change or persistent boot-chain modification is
 included in this preparation.
 
 ## 10. Upstream integration and reproducibility
+
+The [concrete integration plan](UPSTREAM-INTEGRATION-PLAN.md) maps current producer
+contracts, ownership, focused PRs and clean-checkout acceptance. A small optional
+keyboard patch passes 113 Omarchy host tests; real Wayland qualification is open.
 
 Keep measured original sources and sanitized tests/results in this repository.
 Orchard PR #43 merged documentation; its experiment code is preserved in a

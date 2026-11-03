@@ -2,9 +2,11 @@
 
 An experimental **RAM-only** Linux and Omarchy A desktop project with Pi-assisted startup and demonstrated unplugged use for the iPad Air 1 Cellular (`iPad4,2` / `J72AP`). The iPad's iOS installation and internal storage remain intact.
 
+The end state is a clean build from Orchard and Omarchy A, with J72 support submitted upstream. See the [integration plan and PR sequence](UPSTREAM-INTEGRATION-PLAN.md).
+
 Start with the [current finishing plan](FINISHING-PLAN.md) and [remaining DFU batches](DFU-PLAN.md). Read the [progress report](J72-PROGRESS.md) for measurements, the [process guide](PROCESS.md) for the RAM boot sequence and the [roadmap](ROADMAP.md) for milestones. The [power plan](POWER-COMPLETION-PLAN.md), [storage transaction](INSTALL-TRANSACTION-PLAN.md) and [independent-operation plan](INDEPENDENCE-PLAN.md) give the detailed remaining gates.
 
-**Latest follow-up:** the new touch worker passed owner input checks, but a captured checksum-valid report with contact state `1` stopped progression before charging. The original decoder rejects that state. A separate inactive-state candidate passes actual C replay/tests/build and is ready for device testing; the prior extra retry recovered no frames in 495 attempts. Cleanup and iOS charging are verified. [Diagnosis](TOUCH-FOLLOWUP-2026-11-03.md), [candidate source](code/touch/state135/), [next test](NEXT-POWER-COMPARISON.md).
+**Latest follow-up:** the state-1 worker passed owner input checks and processed seven state-1 reports, but seven captured checksum-valid state-2 reports stopped progression before charging. Normal cleanup and iOS charging pass. The next inactive-state-1/2 candidate passes replay of all eight captured reports, exhaustive emitter tests, build and V4 preflight; it is device untested. [Diagnosis](TOUCH-FOLLOWUP-2026-11-03.md), [candidate source](code/touch/inactive1235/), [next test](NEXT-POWER-COMPARISON.md).
 
 **Native storage reads now work (2 November):** the new #35 RAM boot identifies the 128 GB internal drive and passes repeated read comparisons plus verification of both GPT copies. There is one APFS partition and no unallocated gap. APFS metadata reports about 71.7 GB free inside the container; the live iOS minimum-size query allows only about 1.64 GB of shrink. The original root snapshot is retained while recovery, space creation and writable storage are qualified. No internal writes or installation have occurred. [Measured source and results](code/storage/linux-asp-observer35/), [next steps](STORAGE-MORNING-PLAN.md).
 

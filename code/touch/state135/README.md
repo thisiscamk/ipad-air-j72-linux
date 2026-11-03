@@ -70,3 +70,13 @@ checks pass. The initial snapshot has 573 valid frames and no layout/SPI/timeout
 errors. It has not yet observed a state-1 frame, so that new path is not device
 proved. Owner input and longer observation remain pending; no charging started.
 [Sanitized device checkpoint](DEVICE-STAGE-RESULT.json).
+
+## Completed device follow-up
+
+Owner menu/typing/keyboard checks passed. Seven state-1 frames were processed,
+but seven checksum-valid native state-2 reports were rejected. All seven raw
+reports were saved privately. At stop: 14,713 valid frames, one bounded recovery,
+zero SPI errors/timeouts, reason 0, firmware/normal cleanup pass. No charging was
+started. None of 1,891 extra retries recovered a frame. Independent baseline and
+normal iOS charging pass. The [next state-1/2 candidate](../inactive1235/) is host
+tested and device untested; the prior failure remains a failure.
