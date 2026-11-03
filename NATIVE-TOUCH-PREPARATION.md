@@ -16,7 +16,7 @@ hardware owners are not being installed as native startup services.
 | Firmware converter | Existing Z2FW format; 37 targeted tests and byte comparisons with the working setup | New native combination untested |
 | SPI provider | 72 actual C transfer scenarios; ARM64 4k/16k object builds | Untested |
 | Clock and power providers | 1,047 actual provider scenarios, readback/fault checks, 4k/16k builds and selected bindings | Untested |
-| N1 input driver | Saved contact reports, strict packet/contact validation, startup and cleanup fault fixtures | Selected source/object/DT gates pass; full kernel build running |
+| N1 input driver | Saved contact reports, strict packet/contact validation, startup and cleanup fault fixtures | Full source kernel, DT and 71 modules build; complete console/GUI payload checks pass; hardware untested |
 
 The [source-only firmware converter](code/upstream/orchard-j72-n1-firmware)
 contains no Apple bytes or unit calibration. The public J72 recipe keeps its
@@ -56,8 +56,9 @@ host. The [compact RAM producer](code/upstream/omarchy-a-ram-desktop) now builds
 a **104.64 MiB gzip SquashFS** from those normal inputs. Its selected expanded
 files total 293,944,222 bytes. All 128 host tests pass, including 15 RAM fixtures;
 independent extraction checks confirm critical file hashes and ownership.
-The native kernel is still compiling. Native touch, desktop lifecycle, working
-memory and input on this new source-built combination remain unqualified.
+The native kernel and complete console/GUI payloads now build successfully.
+Native touch, desktop lifecycle, working memory and input on this new
+source-built combination remain unqualified.
 
 The [terminal touch/IME component](code/upstream/omarchy-a-foot-touch-ime) also
 builds successfully from pinned official Foot source. Its upstream config test
@@ -66,13 +67,52 @@ passes 133 host tests and builds a **105.83 MiB** SquashFS with the patched
 terminal selected explicitly. Its default still uses signed Arch Foot.
 Repeated tap/keyboard behaviour in this native combination remains untested.
 
+## Complete native payloads
+
+The full native kernel, device tree and 71 modules now build through the normal
+Orchard producer. The source is `4c8cee77d`, with a coherent
+`7.3.0-rc1-orchard-apple-4k` ABI. The first-tested m1n1 and Pongo bootstrap files
+are retained through supported build overrides; the new kernel is untested.
+
+Normal console and combined Omarchy RAM desktop builds, followed by independent
+artifact inspection, pass:
+
+| Payload | Complete upload size | Hardware status |
+| --- | ---: | --- |
+| Native touch console | 15,125,358 bytes | Untested |
+| Native touch + normal Omarchy desktop/Foot | 125,378,798 bytes | Untested |
+
+The GUI fits the unchanged 128 MiB uploader cap with 8,838,930 bytes spare. It
+contains the independently checked 105.83 MiB SquashFS, all matching modules,
+normal static USB/SSH tools and privately supplied model firmware. The driver requires bootloader-supplied unit calibration; none is baked into
+the desktop.
+Rescue PID1 and both USB transports remain outside the manually started GUI.
+Automatic module loading and automatic desktop startup are disabled.
+
+The first GUI assembly correctly failed the size limit because the standard
+module stager included DWARF. A small **local, unsubmitted Orchard packaging
+topic** now removes debug information from unsigned staged copies, retaining
+all 71 modules and leaving original builds intact. Signed inputs remain
+unchanged. All actual modules preserve every allocated section, module metadata,
+BTF and nondebug relocation semantics, with identical vermagic. Staged modules
+shrink from 143,763,464 to 12,009,120 bytes; Image and DTB hashes are unchanged.
+The cache producer generation advances, so old bundles cannot be confused with
+new ones. The isolated Orchard suite passes **519 tests**, with no skips.
+
+One earlier full CLI attempt finished its kernel but failed when the native
+host lacked a Rust target for an additional quiet-loader build. That failure
+was retained; the completed commands use the exact verified loader already
+booted successfully. No host kernel or global toolchain change was made.
+These are host preparation results. They do not qualify the native touch,
+GUI, Wi-Fi, battery or charging implementation on the device.
+
 ## Next qualification
 
 After the owner returns, one changed boot will first establish normal Orchard
 serial and SSH, then explicitly load the native touch driver. If startup and
 health checks pass, record taps, holds, swipes and releases; inspect normal
-cleanup and return to iOS for charging. A compact native desktop follows once
-its root and input gates pass. No internal-storage installation is authorized.
+cleanup and return to iOS for charging. The complete GUI candidate can then be started manually once its native
+input and baseline checks pass. No internal-storage installation is authorized.
 
 ## Native power follow-up
 
