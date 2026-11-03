@@ -1,10 +1,11 @@
 # Native Orchard J72 CLI candidate
 
 Source for the first native `orchard build` / `orchard run` test on the iPad
-Air 1 Cellular. **Device untested.** This is a review bundle against Orchard
+Air 1 Cellular. **One native USB console boot passes.** This is a review bundle against Orchard
 `6b5fca68c56868651113ede0063a3061d0b22914`, not a supported-device release.
-Apply the three numbered patches with `git am` in a clean checkout of that
-base. The integrated source is `e9946443f4901125fc24a5895aa3c9a70629d665`.
+Apply the four numbered patches with `git am` in a clean checkout of that
+base. The runtime test used `e9946443f4901125fc24a5895aa3c9a70629d665`; the later
+result/feature metadata commit is `6ae6dfc` (no runtime-code change).
 
 The patches contain:
 
@@ -13,7 +14,7 @@ The patches contain:
    console build. The existing Orchard remote extractor already works.
 2. An experimental J72 descriptor, explicit checksum-checked A7 bootstrap,
    dynamic Pi 4 direct-port check and a RAM console using standard serial,
-   NCM and SSH. Native feature flags remain unqualified; install is disabled.
+   NCM and SSH. Native desktop features remain unqualified; install is disabled.
 3. Shared build tooling to reuse source-key/checksum verified nightly tools
    in RAM builds, reuse the prepared BusyBox and exclude cache metadata from
    the payload. This is a separate upstream tooling topic, replayed alone as
@@ -21,9 +22,9 @@ The patches contain:
 
 The normal checkout `bin/orchard build examples/usb-console --device j72`
 path has produced a real 11.9 MB image using coherent verified nightly kernel,
-loader and tools plus an explicit known Pongo 2.6.3 image. The first test will
-use that image with `orchard run ... --no-build`, then check serial, SSH,
-`orchard exec`, RAM-only file transfer and normal return to iOS.
+loader and tools plus an explicit known Pongo 2.6.3 image. The device booted that image with `orchard run ... --no-build --yes`.
+Serial/SSH, `orchard exec`, RAM-only file transfer and normal iOS USB return
+pass. See the [measured result](../../../NATIVE-CLI-BOOT-2026-11-03.md).
 
 A source build can use `--kernel-tree`; the prepared first image instead
 uses the normal `--kernel-dir`, `--busybox`, `--loader`, `--pongo` and `--cache`
@@ -37,6 +38,9 @@ native driver/DT/firmware integration and exact-revision hardware tests.
 The new native SPI source topic is not in this published first-test kernel.
 Internal storage remains untouched.
 
+4. The measured first native console result and qualification of USB serial
+   and NCM/SSH only. Installation stays disabled; desktop hardware is unqualified.
+
 ## Validation
 
 - Eight A7 bootstrap/process-ownership tests pass.
@@ -47,9 +51,20 @@ Internal storage remains untouched.
   Dropbear and SSH permissions pass inspection. No private key, firmware,
   optional modules or cache metadata is included.
 - Final complete Orchard unit suite: **510 tests pass, no skips** (task umask022).
-- Hardware qualification: pending a new owner-authorized DFU.
+- Hardware qualification: one direct-Pi RAM boot, serial and SSH execution,
+  4 KiB SSH push/pull and forced serial pull pass. iOS USB returned after
+  normal reboot. Charging confirmation is pending; display and desktop
+  hardware are unqualified.
 
 Only source and public recipe metadata are included. Apple firmware,
 calibration, credentials, raw device logs and binary boot images stay local.
 Kernel topics will be exported through Orchard's prescribed workflow only
 after their hardware gates pass; these files are CLI/recipe source patches.
+
+## Upstream drafts
+
+- [Orchard #58](https://github.com/OrchardLinux/orchard/pull/58): shared RAM tools reuse/staging fix.
+- [Orchard #59](https://github.com/OrchardLinux/orchard/pull/59): experimental J72 native console, depending on #58.
+
+Both are drafts. They contain the implementation, tests and measured result;
+they do not submit the unqualified native touch/Wi-Fi/power topics.

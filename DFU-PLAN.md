@@ -11,7 +11,9 @@ for the next authorized direct-Pi DFU:
 - [x] Standard CLI build of a coherent native RAM console image.
 - [x] Component/CPIO inspection and focused host tests.
 - [x] Final complete Orchard test gate: 510 tests pass, no skips.
-- [ ] One native CLI RAM boot: serial/SSH, `exec`, RAM-only push/pull, normal iOS return.
+- [x] One native CLI RAM boot: serial/SSH, `exec`, 4 KiB RAM push/pull and forced serial pull pass; normal iOS USB returns.
+- [ ] Owner confirms unlocked iOS charging on powered hub.
+- [ ] Repeat native boot reliability and visually qualify display.
 - [ ] Native touch, Wi-Fi and power integration, followed by the Omarchy A desktop.
 
 The native console supplies no desktop or charging policy. The lab's separate

@@ -1,5 +1,5 @@
 {
-  "status": "OFFLINE_SOURCE_BUILD_TESTS_PASS_DEVICE_UNTESTED",
+  "status": "MEASURED_NATIVE_RAM_CONSOLE_USB_PASS_DESKTOP_UNQUALIFIED",
   "upstream_base": "6b5fca68c56868651113ede0063a3061d0b22914",
   "integrated_commit": "e9946443f4901125fc24a5895aa3c9a70629d665",
   "commits": {
@@ -17,12 +17,37 @@
   "native_image_build": "PASS_CHECKOUT_ORCHARD_BUILD",
   "image_bytes": 11852965,
   "payload_components_and_cpio": "PASS",
-  "hardware_tested": false,
+  "hardware_tested": true,
   "internal_storage_install": false,
   "kernel_topics_exported": false,
   "files": {
     "0003-build-Reuse-verified-nightly-tools-for-RAM-payloads.patch": "ac3e374f38884ea39444a141d162f22848ae0f7e0ab607b90d8bae362889e320",
+    "0004-devices-Record-the-first-native-J72-CLI-console-boot.patch": "5d2e83925be63670598e452c4e8af9cae255fdffc30723f8d763f5958284c303",
     "0001-firmware-Describe-verified-J72-iOS-12.5.7-input.patch": "441e1ab2290485a9b8e662ede09451435fbc3d8b9064370deb78627198660710",
     "0002-apple-Prepare-an-experimental-J72-RAM-console-path.patch": "4f988e67bba692a6359113aae450036f8653f6fde05e9ffcf9965acc2f72801c"
-  }
+  },
+  "tested_runtime_commit": "e9946443f4901125fc24a5895aa3c9a70629d665",
+  "result_metadata_commit": "6ae6dfc",
+  "hardware_scope": {
+    "boots": 1,
+    "direct_pi_boot": true,
+    "serial_host_key_pin": true,
+    "ssh_exec": true,
+    "ssh_push_pull_bytes": 4096,
+    "forced_serial_pull_bytes": 4096,
+    "returned_file_sha256": "c8f5d0341d54d951a71b136e6e2afcb14d11ed8489a7ae126a8fee0df6ecf193",
+    "no_internal_filesystems_mounted": true,
+    "normal_ios_usb_return": true,
+    "ios_charging_confirmation": "pending",
+    "desktop_hardware_qualified": false,
+    "repeat_boot_reliability_qualified": false
+  },
+  "post_result_metadata_schema_tests": {
+    "count": 9,
+    "result": "PASS"
+  },
+  "upstream_draft_prs": [
+    58,
+    59
+  ]
 }

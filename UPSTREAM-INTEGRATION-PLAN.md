@@ -11,8 +11,10 @@ experimental descriptor, verified firmware recipe, explicit A7 bootstrap and
 standard USB console, plus a separately scoped shared-tools reuse fix.
 A real 11.9 MB image builds through the checkout's `orchard build` command
 using verified components from the exact matching nightly. Its first hardware
-qualification will test `orchard run`, serial/SSH, command execution and
-RAM-only file transfer before porting the desktop features. Device untested.
+qualification now passes `orchard run`, serial/SSH, command execution and
+4 KiB RAM-only file transfer over SSH and forced serial. Normal reboot returns
+iOS USB. This qualifies the USB console only; repeatability and desktop
+hardware integration remain open. [Measured result](NATIVE-CLI-BOOT-2026-11-03.md).
 
 Native SPI actual-function fixtures pass 72 cases, with 4 KiB/16 KiB object and
 binding gates passed. A separate generic brcmfmac USB reply-validation topic

@@ -4,7 +4,7 @@ An experimental **RAM-only** Linux and Omarchy A desktop project with Pi-assiste
 
 The end state is a clean build from Orchard and Omarchy A, with J72 support submitted upstream. See the [integration plan and PR sequence](UPSTREAM-INTEGRATION-PLAN.md).
 
-**Native CLI preparation:** an experimental J72 descriptor, verified firmware recipe, A7 bootstrap and standard USB console are prepared as [source patches](code/upstream/orchard-j72-cli/). A real image builds with `orchard build`; `orchard run` hardware qualification is next. The lab desktop remains the measured reference.
+**Native CLI boot passes:** the first normal `orchard build` / `orchard run` RAM console boots on J72. `orchard exec`, SSH push/pull and forced serial transfer pass; normal reboot returns iOS USB. This qualifies USB console support, with desktop drivers still to port. [Measured result](NATIVE-CLI-BOOT-2026-11-03.md), [source patches](code/upstream/orchard-j72-cli/).
 
 Start with the [current finishing plan](FINISHING-PLAN.md) and [remaining DFU batches](DFU-PLAN.md). Read the [progress report](J72-PROGRESS.md) for measurements, the [process guide](PROCESS.md) for the RAM boot sequence and the [roadmap](ROADMAP.md) for milestones. The [power plan](POWER-COMPLETION-PLAN.md), [storage transaction](INSTALL-TRANSACTION-PLAN.md) and [independent-operation plan](INDEPENDENCE-PLAN.md) give the detailed remaining gates.
 
