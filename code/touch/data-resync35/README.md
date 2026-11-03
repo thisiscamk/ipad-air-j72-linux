@@ -1,4 +1,4 @@
-# Bounded data-phase resynchronisation — device untested
+# Bounded data-phase resynchronisation — initial device checks pass
 
 The next candidate addresses a measured transport pattern: 20 of 32 retained
 J72 data-phase anomalies contain a checksum-valid 16-byte E1 length header.
@@ -41,7 +41,13 @@ New read-only counters report policy, headers, emitted resync frames and failure
 - The actual C header guard recognises 20 of 32 retained private J72 data-phase
   records. This classifies old replies; it does not prove a real follow-up frame.
 
-[Source hashes and result](RESULT.json). No new candidate has run on the iPad.
+[Original offline source hashes and result](RESULT.json) are preserved.
+[Initial device-stage result](DEVICE-STAGE-RESULT.json): start/stop self-check,
+physical restoration, Wi-Fi/HTTPS/SSH, RAM desktop and fresh native read-only
+checks pass. At the initial snapshot, 706 valid frames and no rejected layouts,
+SPI errors or timeouts were recorded. All 84 admitted extra retries failed to
+deliver a resync frame; no benefit is proved. Owner input and long-run checks
+remain pending; charging has not started.
 The old qualified candidate, #35 kernel and cold payload are preserved.
 
 ## Next device sequence

@@ -37,8 +37,8 @@ actual rejected report type.
 The [separate data-phase resync candidate](code/touch/data-resync35/) builds
 warning-free and passes acquisition/recovery tests, including every advertised
 16-bit length. It addresses checksum-valid E1 headers in data replies, a known
-lead from prior private J72 captures and Orchard's J71b fix. It is **device
-untested** and may not fix the three layout rejections. The original complete
+lead from prior private J72 captures and Orchard's J71b fix. Its initial device checks now pass, but it may not fix the three layout
+rejections. The original complete
 wire/contact checks remain unchanged.
 
 ## Next changed DFU
@@ -49,3 +49,13 @@ uses `--touch-resync35`, requires its policy/counters and retains the zero-layou
 health gate. If input passes, continue the guarded charging test in that same
 boot. If it fails, capture the actual rejected packets before iOS return.
 No internal write or storage installation is authorized.
+
+## New boot: initial checks pass
+
+The distinct touch worker passed its existing start/stop self-check, firmware
+health and physical restoration. Wi-Fi, HTTPS, pinned SSH, RAM desktop and fresh
+native read-only checks pass. The initial snapshot has 706 valid frames with
+zero rejected layouts, SPI errors or timeouts. It also has 84 eligible headers,
+zero recovered resync frames and 84 resync failures: the extra retry has not
+proved useful. Owner input verification and the longer guarded test are pending.
+Charging has not started in this boot.

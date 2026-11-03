@@ -1,0 +1,26 @@
+{
+  "status": "SELFCHECK_AND_INITIAL_DESKTOP_PASS_OWNER_AND_LONG_RUN_PENDING",
+  "module_sha256": "0ad27c0475fc1c63df7008e68f7f5422b4fc00a6e0801f52c40d7b829adb5509",
+  "start_stop_selfcheck_pass": true,
+  "physical_restoration_pass": true,
+  "firmware_healthy": true,
+  "wifi_https_ssh_pass": true,
+  "ram_desktop_ready": true,
+  "fresh_native_readonly_checks_pass": true,
+  "internal_writes": false,
+  "initial_snapshot": {
+    "input_frames": 706,
+    "input_bad_layouts": 0,
+    "input_timeouts": 0,
+    "xfer_errors": 0,
+    "recovery_stop_reason": 0,
+    "phase_resync_policy": 1,
+    "phase_resync_headers": 84,
+    "phase_resync_frames": 0,
+    "phase_resync_failures": 84
+  },
+  "owner_input_check_pending": true,
+  "long_run_qualified": false,
+  "charging_started": false,
+  "resync_benefit_proved": false
+}
