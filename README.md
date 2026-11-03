@@ -6,6 +6,8 @@ The end state is a clean build from Orchard and Omarchy A, with J72 support subm
 
 **Native CLI boot passes:** the first normal `orchard build` / `orchard run` RAM console boots on J72. `orchard exec`, SSH push/pull and forced serial transfer pass; normal reboot returns iOS USB. This qualifies USB console support, with desktop drivers still to port. [Measured result](NATIVE-CLI-BOOT-2026-11-03.md), [source patches](code/upstream/orchard-j72-cli/).
 
+**Native touch and Omarchy build work:** source-native SPI/clock/power/input changes are being built through Orchard. The four normal Omarchy userspace components now build on the Pi; a bounded RAM desktop profile is in preparation. These new native drivers remain unqualified on the device. [Current host results and source](NATIVE-TOUCH-PREPARATION.md).
+
 Start with the [current finishing plan](FINISHING-PLAN.md) and [remaining DFU batches](DFU-PLAN.md). Read the [progress report](J72-PROGRESS.md) for measurements, the [process guide](PROCESS.md) for the RAM boot sequence and the [roadmap](ROADMAP.md) for milestones. The [power plan](POWER-COMPLETION-PLAN.md), [storage transaction](INSTALL-TRANSACTION-PLAN.md) and [independent-operation plan](INDEPENDENCE-PLAN.md) give the detailed remaining gates.
 
 **Latest follow-up:** the state-1 worker passed owner input checks and processed seven state-1 reports, but seven captured checksum-valid state-2 reports stopped progression before charging. Normal cleanup and iOS charging pass. The next inactive-state-1/2 candidate passes replay of all eight captured reports, exhaustive emitter tests, build and V4 preflight; it is device untested. [Diagnosis](TOUCH-FOLLOWUP-2026-11-03.md), [candidate source](code/touch/inactive1235/), [next test](NEXT-POWER-COMPARISON.md).

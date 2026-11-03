@@ -1,0 +1,307 @@
+From cc79b4d4cd5209f42ede54e9f85d45dc7ce696f6 Mon Sep 17 00:00:00 2001
+From: thisiscamk <100883750+thisiscamk@users.noreply.github.com>
+Date: Tue, 3 Nov 2026 20:28:17 +0800
+Subject: [PATCH] firmware: Add an N1 packet conversion with zero proximity
+ initialization
+
+Add a separate versioned step preserving Z2FW v1 framing and the legacy source packet. Emit explicit mode 0/HBPP 0x103, a bounded zero proximity blob, a dynamic unit calibration record and the firmware packet. Leave reset, readiness, register calibration and execute in the native N1 driver.
+
+Reject configured/invalid profiles, malformed packets, unaligned or overlapping ranges, payload overlap and length overflow. Keep the active J72 recipe outputs empty until native hardware qualification. Synthetic cases and private working-worker wire oracles pass; no native device test is claimed.
+
+Assisted-by: LLM
+---
+ docs/bring-up/j72-firmware.md |  62 ++++++++++++++++++-
+ docs/firmware-recipes.md      |   2 +
+ src/orchard/apple/z2packet.py |  43 +++++++++++++
+ src/orchard/recipe.py         |   9 +++
+ tests/test_z2packet_n1.py     | 110 ++++++++++++++++++++++++++++++++++
+ 5 files changed, 223 insertions(+), 3 deletions(-)
+ create mode 100644 tests/test_z2packet_n1.py
+
+diff --git a/docs/bring-up/j72-firmware.md b/docs/bring-up/j72-firmware.md
+index 6542aaa..a5458dd 100644
+--- a/docs/bring-up/j72-firmware.md
++++ b/docs/bring-up/j72-firmware.md
+@@ -37,6 +37,62 @@ A native touch output must not be added until J72 firmware conversion and its
+ native driver are qualified together on hardware. Successful extraction alone
+ does not qualify a boot packet or the per-device calibration sequence.
+ 
+-The existing Gen1 converter targets a different board's firmware protocol.
+-Its presence is not evidence that it can convert J72's N1 personality. No
+-native J72 touch firmware format or device calibration output is claimed here.
++## Native N1 candidate contract
++
++The separate `z2fw-from-z2-packet@2` step preserves the existing Z2FW version-1
++framing. It is an offline candidate; the active J72 recipe still has no
++outputs. The intended firmware name is `apple/j72-fwstart.z2fw`, with these
++parameters:
++
++```json
++{
++  "step": "z2fw-from-z2-packet@2",
++  "input": "J72.mtprops",
++  "profile": "C1F15,1",
++  "calibration_address": 268472320,
++  "calibration_size": 1024,
++  "prox_address": 268473856,
++  "prox_size": 128
++}
++```
++
++The four records, in order, are:
++
++| Record | Content |
++|---|---|
++| CONFIG (4) | Eleven little-endian u32 words: `0x818`, nine zeros, `0x103`; mode 0 and explicit legacy full-word HBPP counts |
++| SEND (1) | A 144-byte legacy blob loading 128 zero proximity bytes at `0x10009600` |
++| CALIBRATION (6) | Three little-endian u32 words: address `0x10009000`, maximum 1024 bytes, provider 0 |
++| SEND (1) | The unchanged 57,016-byte `Constructed Firmware` packet from `C1F15,1` |
++
++The generated candidate is 57,256 bytes, SHA-256
++`73ca290607695ca841867a2bf76cab4bc2f5c33b9ab5ac171de5b5580a7c0c09`.
++The proximity and firmware wire packets match the private working RAM worker
++byte for byte. An independent reconstruction of the dynamic 1008-byte and
++16-byte calibration chunks also matches that worker. These are offline
++comparisons; they do not establish that the native driver boots or handles
++touch on J72.
++
++The native N1 driver owns warm-up, reset, HBPP readiness, register calibration,
++the 65 ms calibration wait, execute and runtime discovery. Those commands must
++not also appear in this firmware file. In particular, `z2fw-from-mtprops@3`
++includes a different driver's INIT and register sequence and is not suitable
++for this native N1 loader.
++
++## Per-device calibration
++
++The firmware output contains no owner's calibration. Provider 0 consumes
++`apple,z2-cal-blob` on the touchscreen node. Existing m1n1 code copies the
++running unit's ADT `multi-touch-calibration` into that property through the
++`touchscreen0` FDT alias. Unresolved `syscfg/` references are not copied.
++
++The native driver must require exactly 1024 bytes, reject absent, all-zero and
++all-`0xff` data before powering the controller, then send it in 1008-byte and
++16-byte chunks. It must not substitute another unit's calibration or an IPSW
++default. The zero proximity packet is a separate, observed model initialization;
++it does not replace this mandatory unit calibration.
++
++Before qualifying an output, test the exact native kernel, providers, device
++tree, m1n1 and privately generated firmware together. Check the calibration
++property's presence and size without publishing its bytes, then verify boot,
++touch events, coordinates, release handling and normal cleanup on the device.
+diff --git a/docs/firmware-recipes.md b/docs/firmware-recipes.md
+index ec20c4b..c7d639f 100644
+--- a/docs/firmware-recipes.md
++++ b/docs/firmware-recipes.md
+@@ -116,6 +116,8 @@ The CLI used to do that; it isn't needed for recipes any more.
+ | `z2fw-from-mtprops@1` | `input`, `profile`, `packet`, `load_address`, `hbpp_version` | Z2 touch firmware with calibration records |
+ | `z2fw-from-mtprops@2` | `input`, `profile`, `packet` | Z2 touch firmware from an mtprops packet array (iPhone 7 Plus) |
+ | `z2fw-from-mtprops@3` | `input`, `profile`, `packet`, `touch_maximum`, `prox_maximum`, `fll_mval`, `ref_clk_div`, `clk32_clock_enable` | Legacy Gen1 Z2 touch firmware (iPhone 6), with full word counts, bounded calibration from the ADT and the board's kernel clock policy |
++| `z2fw-from-z2-packet@1` | `input`, `profile`, `calibration_address`, `calibration_size` | One legacy Z2 packet, with SPI mode 0 and a dynamic multi-touch calibration record |
++| `z2fw-from-z2-packet@2` | `input`, `profile`, `calibration_address`, `calibration_size`, `prox_address`, `prox_size` | N1's four-record contract: SPI mode 0/HBPP 0x103, a zero proximity initialization packet, dynamic multi-touch calibration, and the unchanged legacy packet; reset, register calibration and execute remain in the native driver |
+ | `z2fw-from-mtfw@1` | `profile`, `otp_preflight` | Z2 touch firmware from an MTFW HBPP item list (iPad 7); each calibration loads Apple's default, then its record |
+ 
+ Before it extracts anything, the CLI checks that it implements every step a
+diff --git a/src/orchard/apple/z2packet.py b/src/orchard/apple/z2packet.py
+index 1864db0..bc4fb57 100644
+--- a/src/orchard/apple/z2packet.py
++++ b/src/orchard/apple/z2packet.py
+@@ -13,6 +13,7 @@ from orchard.apple import z2fw
+ 
+ # SPI mode bits in the Z2FW config record's valid mask (apple_z2.c).
+ CONFIG_CPHA, CONFIG_CPOL = 1 << 3, 1 << 4
++CONFIG_HBPP_VERSION = 1 << 11
+ 
+ PREFIX = b'\x18\xe1\x30\x01'
+ 
+@@ -53,3 +54,45 @@ def convert(mtprops: bytes, profile: str, calibration_address: int, calibration_
+                                        calibration_size, []),
+                (z2fw.SEND, packet)]
+     return z2fw.container(records)
++
++
++def convert_n1(mtprops: bytes, profile: str, calibration_address: int,
++               calibration_size: int, prox_address: int, prox_size: int) -> bytes:
++    """N1's legacy packet, zero proximity initialization and dynamic unit data.
++
++    The native N1 driver owns reset, readiness, register calibration and
++    execute; this file contains no INIT, register-write or execute commands.
++    Unlike HBPP14, the packet word count includes every payload word.
++    """
++    document = plistlib.loads(mtprops)
++    if not isinstance(document, dict):
++        raise ValueError('Expected N1 mtprops profile dictionary')
++    entry = document.get(profile)
++    if isinstance(entry, dict) and 'Firmware Config' in entry:
++        raise ValueError('N1 packet with an unsupported firmware config')
++    packet = extract(mtprops, profile)
++    firmware_address, firmware = z2fw.decode_blob(packet, hbpp_version=0x103)
++    providers = []
++    # Validate both ranges together, including overlap and address overflow.
++    z2fw.calibration_record('prox-calibration', prox_address, prox_size, providers)
++    calibration = z2fw.calibration_record('multi-touch-calibration', calibration_address,
++                                         calibration_size, providers)
++    prox_address = providers[0]['address']
++    prox_size = providers[0]['maximum']
++    if any(item['address'] % 4 or item['maximum'] % 4 for item in providers):
++        raise ValueError('N1 calibration ranges must be word aligned')
++    if any(item['address'] < firmware_address + len(firmware) and
++           firmware_address < item['address'] + ((item['maximum'] + 3) & ~3)
++           for item in providers):
++        raise ValueError('N1 calibration overlaps the firmware load range')
++    # The legacy length field is u16, in words. Do not wrap it.
++    if prox_size // 4 > 0xffff:
++        raise ValueError('N1 proximity initialization is too large')
++    header = struct.pack('>H', prox_size // 4) + z2fw.xe32(prox_address)
++    prox = PREFIX + header + struct.pack('>H', sum(header)) + bytes(prox_size + 4)
++    validate_prox_address, validate_prox = z2fw.decode_blob(prox, hbpp_version=0x103)
++    if validate_prox_address != prox_address or validate_prox != bytes(prox_size):
++        raise ValueError('N1 proximity initialization roundtrip mismatch')
++    config = [CONFIG_CPHA | CONFIG_CPOL | CONFIG_HBPP_VERSION] + [0] * 9 + [0x103]
++    return z2fw.container([(z2fw.CONFIG, struct.pack('<11I', *config)),
++                           (z2fw.SEND, prox), calibration, (z2fw.SEND, packet)])
+diff --git a/src/orchard/recipe.py b/src/orchard/recipe.py
+index eb30079..4c6f926 100644
+--- a/src/orchard/recipe.py
++++ b/src/orchard/recipe.py
+@@ -61,6 +61,11 @@ def _z2_packet(step, data, expected):
+     return z2packet.convert(data, step['profile'], step['calibration_address'], step['calibration_size'])
+ 
+ 
++def _z2_packet_n1(step, data, expected):
++    return z2packet.convert_n1(data, step['profile'], step['calibration_address'],
++                               step['calibration_size'], step['prox_address'], step['prox_size'])
++
++
+ def _z2fw_packets(step, data, expected):
+     profile = _touch_profile(data, step['profile'])
+     output, _ = z2fw.convert_packets(profile, apple_xml(profile['Firmware Config']), packet=step['packet'])
+@@ -98,6 +103,10 @@ STEPS = {
+     # mtprops with one complete preconstructed Z2 boot packet (iPad 5), wrapped unmodified.
+     'z2fw-from-z2-packet@1': (_z2_packet, {'profile': str, 'calibration_address': int,
+                                            'calibration_size': int}),
++    # N1 legacy Z2 packet, zero proximity initialization, dynamic unit calibration.
++    'z2fw-from-z2-packet@2': (_z2_packet_n1, {'profile': str, 'calibration_address': int,
++                                         'calibration_size': int, 'prox_address': int,
++                                         'prox_size': int}),
+     # mtprops with an array of preconstructed packets (iPhone 7 Plus), makez2fw's layout.
+     'z2fw-from-mtprops@2': (_z2fw_packets, {'profile': str, 'packet': str}),
+     # Legacy Gen1 data-form mtprops (iPhone 6), Corellium's bootstrap and board calibration bounds.
+diff --git a/tests/test_z2packet_n1.py b/tests/test_z2packet_n1.py
+new file mode 100644
+index 0000000..fe10e28
+--- /dev/null
++++ b/tests/test_z2packet_n1.py
+@@ -0,0 +1,110 @@
++"""N1 firmware recipe contract, on synthetic bytes without Apple firmware."""
++import hashlib
++import plistlib
++import struct
++import unittest
++
++from orchard import recipe
++from orchard.apple import z2fw, z2packet
++
++
++def fixture():
++    payload = bytes(range(16))
++    header = struct.pack('>H', len(payload) // 4) + bytes(4)
++    packet = z2packet.PREFIX + header + struct.pack('>H', sum(header))
++    packet += payload + z2fw.xe32(sum(payload))
++    return {'C1F15,1': {'PreconstructedBootloadPacketType': 'Z2',
++                       'Constructed Firmware': packet}}
++
++
++def convert(document=None, **kwargs):
++    params = {'profile': 'C1F15,1', 'calibration_address': 0x10009000,
++              'calibration_size': 1024, 'prox_address': 0x10009600, 'prox_size': 128}
++    return z2packet.convert_n1(plistlib.dumps(fixture() if document is None else document),
++                                **(params | kwargs))
++
++
++class N1PacketConversion(unittest.TestCase):
++    def test_four_records_keep_firmware_verbatim_and_calibration_dynamic(self):
++        records = z2fw.decode_container(convert())
++        self.assertEqual([code for code, _ in records], [4, 1, 6, 1])
++        self.assertEqual(struct.unpack('<11I', records[0][1]),
++                         (0x818, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0x103))
++        self.assertEqual(len(records[1][1]), 144)
++        self.assertEqual(z2fw.decode_blob(records[1][1], hbpp_version=0x103),
++                         (0x10009600, bytes(128)))
++        with self.assertRaisesRegex(ValueError, 'length mismatch'):
++            z2fw.decode_blob(records[1][1], hbpp_version=0x104)
++        self.assertEqual(records[2][1], struct.pack('<III', 0x10009000, 1024, 0))
++        self.assertEqual(records[3][1], fixture()['C1F15,1']['Constructed Firmware'])
++        self.assertEqual(z2packet.convert(plistlib.dumps(fixture()), 'C1F15,1',
++                                          0x10009000, 1024),
++                         z2fw.container([(4, struct.pack('<11I', 0x18, *([0] * 10))),
++                                          records[2], records[3]]))
++
++    def test_invalid_profiles_and_wire_packets_are_refused(self):
++        original = fixture()['C1F15,1']
++        packet = original['Constructed Firmware']
++        bad_checksum = packet[:-5] + bytes([packet[-5] ^ 1]) + packet[-4:]
++        cases = [([], 'profile dictionary'), ({}, 'No preconstructed'),
++                 ({'C1F15,1': []}, 'No preconstructed'),
++                 ({'C1F15,1': original | {'PreconstructedBootloadPacketType': 'HBPP14'}},
++                  'No preconstructed'),
++                 ({'C1F15,1': original | {'Constructed Firmware': [packet]}},
++                  'no constructed firmware'),
++                 ({'C1F15,1': original | {'Firmware Config': {}}}, 'unsupported firmware config'),
++                 ({'C1F15,1': original | {'Constructed Firmware': packet[:-1]}}, 'length mismatch'),
++                 ({'C1F15,1': original | {'Constructed Firmware': bad_checksum}}, 'checksum')]
++        for document, error in cases:
++            with self.subTest(error=error), self.assertRaisesRegex(ValueError, error):
++                convert(document)
++        for offset in (0, 4, 6, 10):
++            corrupt = bytearray(packet)
++            corrupt[offset] ^= 1
++            with self.subTest(offset=offset), self.assertRaises(ValueError):
++                convert({'C1F15,1': original | {'Constructed Firmware': bytes(corrupt)}})
++
++    def test_calibration_range_errors_refuse_before_output(self):
++        for kwargs in ({'prox_size': 0}, {'prox_size': True}, {'prox_size': -4},
++                       {'prox_size': 127}, {'prox_size': 0x40000},
++                       {'prox_address': 0}, {'prox_address': 0x10009601},
++                       {'prox_address': 0xfffffffc},
++                       {'calibration_size': 0}, {'calibration_size': True},
++                       {'calibration_size': 1023}, {'calibration_size': 0x40001},
++                       {'calibration_size': 0x604}, {'calibration_address': 0x10009001},
++                       {'calibration_address': 0x10009600}, {'calibration_address': 4}):
++            with self.subTest(kwargs=kwargs), self.assertRaises(ValueError):
++                convert(**kwargs)
++
++    def test_normal_recipe_checks_both_hashes_and_exact_parameters(self):
++        data, output = plistlib.dumps(fixture()), convert()
++        step = {'step': 'z2fw-from-z2-packet@2', 'input': 'mtprops', 'profile': 'C1F15,1',
++                'calibration_address': 0x10009000, 'calibration_size': 1024,
++                'prox_address': 0x10009600, 'prox_size': 128}
++        document = {'schema': 2, 'device': 'iPad4,2',
++                    'ipsw': {'version': '12.5.7', 'build': '16H81', 'bytes': 1,
++                             'sha256': '0' * 64, 'url': 'https://updates.cdn-apple.com/test.ipsw'},
++                    'inputs': {'mtprops': {'ipsw': {'rootfs': 'test.mtprops'},
++                                          'sha256': hashlib.sha256(data).hexdigest()}},
++                    'outputs': [{'destination': 'lib/firmware/apple/test-n1.z2fw',
++                                 'sha256': hashlib.sha256(output).hexdigest(), 'steps': [step]}]}
++        recipe.check(document)
++        self.assertEqual(recipe.run(document, lambda _: data),
++                         {'lib/firmware/apple/test-n1.z2fw': output})
++        with self.assertRaisesRegex(ValueError, 'input differs'):
++            recipe.run(document, lambda _: b'tampered')
++        document['outputs'][0]['sha256'] = '1' * 64
++        with self.assertRaisesRegex(ValueError, 'output differs'):
++            recipe.run(document, lambda _: data)
++        for field in ('prox_address', 'prox_size'):
++            value = step.pop(field)
++            with self.assertRaisesRegex(ValueError, 'Wrong parameters'):
++                recipe.check(document)
++            step[field] = value
++        step['prox_size'] = True
++        with self.assertRaisesRegex(ValueError, 'must be int'):
++            recipe.check(document)
++
++
++if __name__ == '__main__':
++    unittest.main()
+-- 
+2.47.3
+

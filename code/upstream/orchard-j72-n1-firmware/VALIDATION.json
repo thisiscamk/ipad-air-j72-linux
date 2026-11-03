@@ -1,0 +1,21 @@
+{
+  "status": "HOST_ONLY_NATIVE_TOUCH_UNQUALIFIED",
+  "source_commit": "cc79b4d4cd5209f42ede54e9f85d45dc7ce696f6",
+  "original_topic_commit": "bf8bc09f3330d83be0fd51296dce226d800256fd",
+  "depends_on_cli_metadata": "6ae6dfc",
+  "targeted_tests": {
+    "count": 37,
+    "result": "PASS"
+  },
+  "integrated_new_test_methods": {
+    "count": 4,
+    "result": "PASS"
+  },
+  "private_working_wire_comparison": "PASS_PROXIMITY_FIRMWARE_AND_TWO_DYNAMIC_CALIBRATION_CHUNKS",
+  "default_j72_outputs": [],
+  "native_touch_hardware_tested": false,
+  "apple_firmware_or_unit_calibration_published": false,
+  "files": {
+    "0001-firmware-Add-an-N1-packet-conversion.patch": "30ca65d89613003fc34faed978604bbd9775f22ba53416e51939479e855094f2"
+  }
+}
