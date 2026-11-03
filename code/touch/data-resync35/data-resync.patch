@@ -1,0 +1,87 @@
+--- a/j72_touch_session.c
++++ b/j72_touch_session.c
+@@ -20,6 +20,7 @@
+ #include <linux/input/mt.h>
+ #include "j72-classic-contacts.h"
+ #include "j72-recovery-window.h"
++#include "j72-data-phase.h"
+ 
+ #define AUDIT_CS_US 10U
+ #define AUDIT_SYNC 1U
+@@ -601,6 +602,27 @@
+  last_input_frame=jiffies;input_frames++;return true;
+ }
+ 
++/* Acquisition retries a validated data-phase E1 header exactly once.
++ * Final frame checksums and the complete native contact decoder are unchanged. */
++static unsigned int phase_resync_policy=1;
++static unsigned int phase_resync_headers,phase_resync_frames,phase_resync_failures;
++module_param(phase_resync_policy,uint,0400);
++module_param(phase_resync_headers,uint,0400);
++module_param(phase_resync_frames,uint,0400);
++module_param(phase_resync_failures,uint,0400);
++struct phase_context {struct spi_device *dev;u64 start;u32 flags;};
++static int phase_xfer(void *arg,u8 *tx,u8 *rx,unsigned int wire)
++{
++ struct phase_context *ctx=arg;
++ return checked_xfer(ctx->dev,tx,rx,wire);
++}
++static void phase_header(void *arg,const u8 *tx,const u8 *rx,unsigned int wire)
++{
++ struct phase_context *ctx=arg;
++ phase_resync_headers++;audit.bad_frame++;
++ audit_save(ctx->start,2,tx,rx,wire,ctx->flags|AUDIT_FRAME_BAD);
++}
++
+ static noinline void query_report_metadata(struct spi_device *dev,void __iomem *gpio)
+ {
+  u64 start,last_wake=0;unsigned long end;
+@@ -620,8 +642,8 @@
+  while((READ_ONCE(continuous) || time_before(jiffies,end)) && !READ_ONCE(stop_requested)) {
+   bool prime=AUDIT_POLICY==2 && !previous_success;
+ read_again: ;
+-  u8 tx[16]={0xeb},rx[16]={0};unsigned int length,wire,j;
+-  u16 sum;bool success=false;u32 level,flags;
++  u8 tx[16]={0xeb},rx[16]={0};unsigned int length,wire;
++  bool success=false;u32 level,flags;
+   u64 now=ktime_get_ns();
+   level=readl(gpio+GPIO111_OFFSET)&1;flags=level?AUDIT_ATTN_HIGH:AUDIT_ATTN_LOW;
+   if(prime)flags|=AUDIT_PRIME;
+@@ -652,21 +674,21 @@
+    */
+   if(prime){success=true;consecutive_bad=0;goto length_done;}
+   audit_save(start,1,tx,rx,16,flags);
+-  wire=length+5;
+-  memset(report_data_tx,0,sizeof(report_data_tx));
+-  report_data_tx[0]=0xeb;report_data_tx[1]=seq;report_data_tx[2]=1;
+-  sum=0;for(j=0;j<14;j++)sum+=report_data_tx[j];
+-  report_data_tx[wire-2]=sum;report_data_tx[wire-1]=sum>>8;
+-  if(checked_xfer(dev,report_data_tx,report_data_rx,wire)){
+-   audit.xfer_errors++;stopped=true;break;
+-  }
++  struct phase_context phase={dev,start,level?AUDIT_ATTN_HIGH:AUDIT_ATTN_LOW};
++  struct j72_data_io data_io={&phase,phase_xfer,phase_header};
++  struct j72_data_result data=j72_data_phase(&data_io,report_data_tx,
++    report_data_rx,sizeof(report_data_tx),length,seq);
++  wire=data.wire;
++  if(data.error){audit.xfer_errors++;stopped=true;break;}
+   flags=level?AUDIT_ATTN_HIGH:AUDIT_ATTN_LOW;
+   if(!memchr_inv(report_data_rx,0,wire-2)) {
+    audit.data_zero++;flags|=AUDIT_ZERO|AUDIT_FRAME_BAD;consecutive_bad++;
+   } else if(audit_data_reply(report_data_rx,wire)) {
+    audit.frames++;flags|=AUDIT_FRAME_OK;success=true;consecutive_bad=0;
+    if(!emit_touch_input(report_data_rx+5,wire-7))flags|=0x0800;
++   else if(data.resynced)phase_resync_frames++;
+   } else {audit.bad_frame++;flags|=AUDIT_FRAME_BAD;consecutive_bad++;}
++  if(data.resynced && ((flags&AUDIT_FRAME_BAD)||(flags&0x0800)))phase_resync_failures++;
+   audit_save(start,2,report_data_tx,report_data_rx,wire,flags);
+   goto next;
+ bad_length:
+@@ -1164,6 +1186,7 @@
+   attempted=false;cleanup_failed=false;cleanup_ok=false;
+   hardware_cleanup_ok=false;recovery_stop_reason=0;
+   input_frames=input_bad_layouts=input_timeouts=input_recoveries=0;
++  phase_resync_headers=phase_resync_frames=phase_resync_failures=0;
+   layout_anomalies=wire_anomalies=0;
+   /* Registration probes synchronously in THIS worker. The diagnostic probe
+    * deliberately detaches after full restoration; init never blocks on it.

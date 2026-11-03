@@ -1,5 +1,12 @@
 # #35 touch recovery-window — bounded device run passes
 
+The subsequent precharge attempt found **three rejected layouts** while input
+continued with zero SPI errors/timeouts. Its power test was aborted before
+arming. Normal cleanup and iOS charging after unlock pass. The report cause
+is unknown; the earlier bounded run below remains a separate successful result.
+[Follow-up diagnosis](../../../TOUCH-FOLLOWUP-2026-11-03.md),
+[separate resync candidate](../data-resync35/).
+
 The [long-run failure](../LONG-RUN-20261102.md) reached the old six-recovery
 lifetime budget. This separate candidate retains that cumulative limit for
 finite diagnostic sessions. For explicit continuous sessions it permits at

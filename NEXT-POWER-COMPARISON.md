@@ -7,23 +7,25 @@ read-only diagnostic samples 30 seconds apart. USB returned on the same
 qualified hub path and host boot; exact iPad/iOS identity passes. Candidate
 and session preflight pass. The direct-Pi boot has now completed.
 
-## Live boot checkpoint
+## Latest completed attempt and next change
 
-The direct-Pi DFU and unchanged #35 payload boot passed. Both USB recovery
-shells respond. The qualified touch worker passed its start/stop self-check;
-Wi-Fi association, HTTPS, pinned-key Wi-Fi SSH and RAM desktop startup pass.
-The fresh same-boot native inventory, read-only probe and six matching bounded
-reads pass. No internal filesystem is mounted or written. Brightness is 1604
-for the owner input check; the charging module is not loaded yet.
+The direct-Pi boot, Wi-Fi/RAM desktop, owner input check, fresh read-only storage
+and hub recovery passed. After the five-minute baseline, the new charger loaded
+disabled, but **three rejected touch layouts stopped the precharge check**.
+No current override or 90-minute power measurement occurred. Normal cleanup,
+independent baseline restoration and iOS charging after unlock pass.
+[Diagnosis and result](TOUCH-FOLLOWUP-2026-11-03.md).
 
-**Pending:** owner menu/typing/keyboard check and transfer back to the marked
-powered-hub port. Charging-policy execution and net-gain measurement have not
-started. The candidate remains untested on device.
+The next changed boot adds the [bounded touch resync candidate](code/touch/data-resync35/)
+and capture-before-shutdown. Host tests/build/preflight pass; hardware behaviour
+is untested. The three rejected layouts remain unexplained. Keep all input,
+source and battery health gates intact. This is now a combined touch/power
+qualification, not an isolated change to charging policy.
 
 ## Concrete change and scope
 
-Use the same #35 cold payload and successful recovery-window touch worker.
-The only deliberate power-policy change is the separate
+Use the same #35 cold payload and new bounded-resync touch candidate.
+The power-policy change remains the separate
 [voltage-hold restart candidate](code/charging/voltage-resume35/): voltage/SOC
 holds may resume at 36.6–38°C. Initial starts, actual thermal recovery,
 stop/rearm and expired-window starts retain 36.5°C. An actual >38°C reading
@@ -36,7 +38,7 @@ Host tests/build pass; device behaviour and net gain are unproved.
 1. Verify current iOS/source state, host boot, same powered hub/marked port and
    no boot/test owner. Refresh source qualification if its identity changed.
 2. Use the proven direct-Pi DFU path and a new log filename. Boot the unchanged
-   #35 payload; stage the successful separate touch worker before radio/desktop.
+   #35 payload; stage the new resync worker before radio/desktop: `tools/run-j72-touch-resync35.py --stage`.
    Reap one boot owner before starting another. The failed unchanged hub boot
    handoff is not part of this trial.
 3. Start existing Wi-Fi/HTTPS/pinned SSH and the RAM-only desktop. At brightness
@@ -57,13 +59,13 @@ Host tests/build pass; device behaviour and net gain are unproved.
 Workspace commands after steps 1–4 and the qualified hub transfer:
 
 ```sh
-sudo -n python3 tools/run-j72-voltage-session35.py --preflight
-sudo -n python3 tools/run-j72-voltage-session35.py --run --readcheck PATH_TO_THIS_BOOTS_READCHECK
+sudo -n python3 tools/run-j72-voltage-session35.py --preflight --touch-resync35
+sudo -n python3 tools/run-j72-voltage-session35.py --run --touch-resync35 --readcheck PATH_TO_THIS_BOOTS_READCHECK
 # Separate follow-up, once the session is running; it waits for test owners:
 sudo -n python3 tools/ensure-j72-ios-charging.py --run --voltage-resume35
 ```
 
-[Host source references](code/charging/voltage-resume35/workspace-reference/).
+[Host source references](code/charging/voltage-resume35/workspace-reference-v2/).
 These require the private research workspace; they are not public turnkey tools.
 Do not run the original morning driver or load its original charging module
 for this comparison. Storage qualification remains separate: the new

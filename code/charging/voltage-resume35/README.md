@@ -6,6 +6,20 @@ the thermal cutoff. After the fifth pause the pack stayed above the old
 36.5°C restart gate. Charging remained off for the rest of the observation.
 This differs from the actual thermal hold in the 2 November run.
 
+## First disabled load and precharge abort
+
+The module loaded disabled with baseline unchanged. Before any arming/current
+write, the five-minute idle/precharge health check found three rejected touch
+layouts. The driver stopped progression; cycles and `used` remained zero.
+Normal full cleanup, independent baseline `02`, iOS return and charging after
+unlock pass. **The active restart policy has not run on device.**
+[Measured stage/abort result](DEVICE-STAGE-RESULT.json). The build receipt below
+is retained as the earlier offline checkpoint.
+
+The next input candidate adds [bounded resynchronisation](../../touch/data-resync35/)
+and a capture-before-reboot path. The three rejected layouts remain unexplained.
+The next combined workload is not an isolated charging-policy comparison.
+
 ## Deliberate policy change
 
 Only a voltage/SOC hold after a successful start may resume at 36.6–38.0°C.
@@ -33,7 +47,7 @@ and #35 boot payload are unchanged.
 - Exact-kernel W=1 build has no warnings; strong imports resolve to built-ins.
 - Separate host policy-status/refusal tests and observer preflight pass.
 
-[Status and source hashes](RESULT.json). No device execution has occurred.
+[Original build status and source hashes](RESULT.json), [revised host orchestration](workspace-reference-v2/). Only the disabled load has run; the active policy remains untested.
 Keep the qualified touch worker, brightness 802, `schedutil`, Wi-Fi, read-only
 ASP and source fixed for the comparison. Include every protective hold in net
 charge. Verify thermal-history behaviour, independent restoration and normal

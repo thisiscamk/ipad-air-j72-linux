@@ -8,6 +8,11 @@ and two diagnostic readings. Follow the
 [Next session ordering](NEXT-SESSION-PLAN.md) batches input, native-storage idle
 measurements and guarded charging into one Linux boot.
 
+The follow-up charging candidate loaded disabled, but three touch layout
+rejections stopped precharge checks before arming. No power observation ran.
+Normal cleanup/iOS charging after unlock pass. The [next changed batch](NEXT-POWER-COMPARISON.md)
+adds bounded touch resync and capture before shutdown; input gates remain strict.
+
 ## 1. A repeatable known-hub workload
 
 The #34 reduced-brightness hour integrated positive net charge; the #35

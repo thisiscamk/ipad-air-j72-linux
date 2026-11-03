@@ -1,0 +1,26 @@
+{
+  "status": "CAPTURE_AND_RESYNC_OBSERVER_HOST_TESTS_PASS_DEVICE_UNTESTED",
+  "capture_tests": 6,
+  "resync_observer_tests": 2,
+  "session_tests": 5,
+  "charging_return_tests": 4,
+  "files": {
+    "test-j72-voltage-session35.py": "1730f40002ebf182a3b8bb849f49d3cd84c7f4716e8e252550410df1b5570d7c",
+    "run-j72-voltage-resume35.py": "cf4c93008ed06e46a259aaf4b59b9fc9266ebeab8e6333b54e5229ea3569eb7a",
+    "run-j72-voltage-session35.py": "60d5778bb0005480d2eaf0e57152ac3d59c672016f485a6ab115e6d75fb49ad3",
+    "test-j72-resync-observation35.py": "8ce7bf322bb09f5551cf8d7a307d441c1c902ae6de1ad339936ba146b60b089d",
+    "README.md": "8d421b5c25d4e14cb967ee62f5e0ab63dbed9f43a70ae11735ea58eb2d1376c0",
+    "run-j72-voltage-observation35.py": "acf74d522e751add14018e0b77040411a0f7e6bcbd4b6811c4ea5b532304e942",
+    "ensure-j72-ios-charging.py": "3616c532642ef7cb93f43db068e9bf059ea325fcc8b977314d3b655492facf25",
+    "analyze-j72-reader-audit.py": "27a7a7a060a6263454fcab06b4df77eac2217ef90f3b95b2f2d8c11f987544cd",
+    "test-j72-voltage-observation35.py": "543b3e81e642ba03f31329638a7ca44f7a444e1f7a8c5a40e17c635b2868c175",
+    "test-j72-input-failure-capture.py": "6c43aefdee1e0e5b7adc82e003516792bf841f9014c17863b42195ece6576089",
+    "run-j72-resync-observation35.py": "cbb304ee5034ba4b9e5f139178856e06d0334ccfc80ed2f7c741c1f403ffb3ee",
+    "test-ensure-j72-ios-charging.py": "044ec3d70ce0210f64ea6c9ea92cce98d02e715b971669db944d67e20cfeeb70",
+    "analyze-j72-session-anomalies.py": "bf5f27fc4098ea239cc7117ebe2448cd12b467cac7a5cf8ddeb2fed280fa9f43",
+    "j72_observation_health.py": "a830a82004e0d6d5861146577631fd8921270f84e292ec898354bb3453e043f5",
+    "prepare-j72-voltage-resume35.py": "e14c294a6782523ec13d2b2741fd177964114cc57b8884be94167a2ff92a4d6a",
+    "first-precharge-session-driver.py": "e31fd4bfba5c1c5e75ab39562a2d52d2dbb83cdf4b7a5e05e8b8ce5d0e570731",
+    "j72_input_failure_capture.py": "eef9379b7bd075fc2128f7ca67bb1b69f663fdbb05decc36129bb1d2eca53da2"
+  }
+}

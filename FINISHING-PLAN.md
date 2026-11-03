@@ -40,6 +40,19 @@ restoration and fault guards remain intact. **Host-tested, device untested**.
 There is no net-charge improvement claim. Neither this proposal nor safe
 restoration qualifies autonomous or unattended charging.
 
+### Later precharge abort and revised next batch
+
+The owner UI and fresh storage checks passed again, but three touch layout
+rejections stopped the idle/precharge gate. The charging candidate only loaded
+disabled: no current override or net-charge observation occurred. Normal cleanup
+and iOS charging after unlock pass. [Follow-up diagnosis](TOUCH-FOLLOWUP-2026-11-03.md).
+
+The next input candidate retries one checksum-valid E1 header in the data phase;
+complete frame/contact validation and strict observation gates remain unchanged.
+It builds/tests offline but may not explain the three layouts. The revised host
+path saves stopped rejected reports before reboot. If input passes, continue
+charging in that same boot. Account for both changes when interpreting results.
+
 ## 2. Finish the storage qualification tools offline
 
 The next storage DFU should carry prepared tools and a precise experiment, not

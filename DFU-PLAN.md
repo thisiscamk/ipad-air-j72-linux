@@ -1,13 +1,16 @@
 # Remaining DFU batches — 3 November 2026
 
-The current Linux observation is complete. Normal cleanup passed and iOS reboot
-was requested. After PIN entry, the owner and two iOS diagnostic readings
-confirm charging at 81% on the powered hub. The next comparison is prepared;
-its direct-Pi boot and fresh read-only prechecks now pass. Owner input/hub
-transfer is pending before the new charging policy is loaded. See the [full finishing plan](FINISHING-PLAN.md)
-and [session record](SESSION-2026-11-03.md).
+The morning observation completed with a net-charge failure. The later attempt
+passed desktop/owner/read-only storage checks, but three rejected touch layouts
+stopped precharge checks before arming. Normal cleanup and iOS charging after
+unlock are confirmed. See [the diagnosis](TOUCH-FOLLOWUP-2026-11-03.md).
 
-## Completed boot
+**Next changed batch:** bounded touch data-phase resync plus capture before
+shutdown, then the guarded charging test in the same boot only if input passes.
+Host build/tests/preflight pass; device execution is untested. No internal
+filesystem was mounted or written.
+
+## Morning boot (completed)
 
 - [x] Direct-Pi DFU and unchanged #35 RAM payload.
 - [x] Revised touch worker self-check and owner desktop/input checks.
@@ -29,7 +32,7 @@ All new tools must be ready before asking the owner to move a cable or press but
 
 | Batch | Work in that boot | Readiness / condition |
 | --- | --- | --- |
-| C0 — Known-hub power comparison | Same #35 RAM boot and qualified touch worker; only voltage/SOC-hold restart eligibility changes. Fixed brightness 802, Wi-Fi/read-only ASP, full current integration and final restoration. | [Prepared runbook](NEXT-POWER-COMPARISON.md); warning-free build, 49 core scenarios and two branch replays pass. Device untested. Direct-Pi boot, Wi-Fi/desktop and fresh RO storage pass; owner UI/hub transfer pending, charging not started. |
+| C0 — Known-hub power comparison | Same #35 cold payload; new bounded-resync touch worker and existing voltage-hold charging candidate. Strict input gates, brightness 802, Wi-Fi/read-only ASP, full integration and restoration. Capture failures before reboot. | [Prepared runbook](NEXT-POWER-COMPARISON.md); warning-free build, 49 core scenarios and two branch replays pass. Device untested. Previous precharge attempt aborted on 3 rejected layouts. New input build/tests and v2 preflight pass; next changed direct-Pi DFU is ready. |
 | Q1 — Recovery/RAM scratch qualification | Exact RAM recovery identity, owned-media inventory and guarded disposable RAM APFS/native-I/O experiment. | New harness not built/qualified yet. Preserve the proven v3 rescue image. No internal mutation. |
 | Q2 — Conditional follow-up qualification | Resolve a measured Q1/backend issue or finish native writer/flush testing on disposable media. | Only if required. Explain the concrete change; combine compatible checks in Q1 where possible. |
 | W1 — Approved installation recovery | With internal APFS unmounted, verify the approved shrink, commit exact GPT changes and write/fully verify the image. | Requires qualified backend, refreshed evidence and separate exact internal-write approval. A proposed normal-iOS resize precedes this boot. |
