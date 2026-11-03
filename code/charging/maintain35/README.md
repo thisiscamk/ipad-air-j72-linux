@@ -4,8 +4,8 @@ At fixed brightness 802 with Wi-Fi, touch and read-only ASP active, the run
 lost **181.13 mAh**. Five voltage holds and four restarts occurred. The final
 restart was blocked above 36.5°C; peak temperature was 36.7°C, without an
 actual thermal trip above 38°C. Independent final baseline restoration and
-normal input/desktop/radio cleanup pass. iOS reboot was requested; charging
-confirmation is pending. [Measured result](NINETY-MINUTE-RESULT.json),
+normal input/desktop/radio cleanup pass. iOS charging at 81% is now owner- and
+diagnostic-confirmed after PIN entry. [Measured result](NINETY-MINUTE-RESULT.json),
 [session diagnosis](../../../SESSION-2026-11-03.md),
 [separate device-untested restart candidate](../voltage-resume35/).
 

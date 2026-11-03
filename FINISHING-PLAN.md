@@ -3,7 +3,7 @@
 Updated 3 November 2026. This is the current project plan; dated session reports
 hold the measurements. Today's [input/storage/power session](SESSION-2026-11-03.md)
 completed: input and restoration pass, but net charge fails. iOS charging
-confirmation remains pending.
+is confirmed after PIN entry by the owner and two diagnostic readings.
 
 ## Milestones
 
@@ -28,7 +28,7 @@ does not establish persistence, autonomous charging or PC-free startup by itself
 - [x] Input: 221,923 frames, eight recoveries, no SPI/layout/timeout errors; normal stop.
 - [x] Five voltage pauses/four restarts; final restart blocked above 36.5°C.
 - [x] Independent final baseline restoration, normal cleanup and iOS reboot request.
-- [ ] Confirm iOS is visible and charging; USB has not returned.
+- [x] Confirm iOS charging at 81% after PIN entry; USB/identity and two diagnostics pass.
 - [x] Prepare isolated voltage-hold restart candidate and host/build tests.
 - [ ] Measure the candidate on the same workload, retaining qualified input.
 - [ ] Natural actual-thermal-trip cooldown/restart, repeatability and longer endurance.

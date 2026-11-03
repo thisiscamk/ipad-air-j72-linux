@@ -2,7 +2,8 @@
 
 Prepared 2 November; current status updated 3 November 2026. The bounded Linux
 input/storage/power observation is complete: input/restoration pass and net
-charge fails. iOS reboot was requested; charging confirmation is pending. Follow the
+charge fails. iOS charging at 81% is now confirmed after PIN entry by the owner
+and two diagnostic readings. Follow the
 [session record](SESSION-2026-11-03.md) and [finishing plan](FINISHING-PLAN.md).
 [Next session ordering](NEXT-SESSION-PLAN.md) batches input, native-storage idle
 measurements and guarded charging into one Linux boot.

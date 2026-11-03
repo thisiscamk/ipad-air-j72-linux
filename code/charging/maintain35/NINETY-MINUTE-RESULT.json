@@ -26,7 +26,13 @@
   "disabled_and_restoration_verified": true,
   "normal_cleanup_pass": true,
   "ios_reboot_requested": true,
-  "ios_charging_verified": false,
   "internal_writes": false,
-  "unattended_or_autonomous_charging_qualified": false
+  "unattended_or_autonomous_charging_qualified": false,
+  "ios_charging_verified_at_test_end": false,
+  "ios_charging_confirmed_later_after_owner_PIN": true,
+  "ios_return_owner_confirmed": true,
+  "later_ios_diagnostic_charging_samples": 2,
+  "later_diagnostic_interval_s": 30,
+  "later_ios_capacity_percent": 81,
+  "normal_ios_USB_identity_and_same_qualified_hub_verified": true
 }

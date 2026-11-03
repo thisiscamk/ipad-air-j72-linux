@@ -2,9 +2,10 @@
 
 Prepared 3 November 2026. The previous run is complete: touch/cleanup pass,
 net charge fails. [Measured diagnosis](SESSION-2026-11-03.md).
-**First confirm iOS is visible and charging on the powered hub.** USB has not
-returned; neither a requested reboot nor a connected charger proves charging.
-No new DFU has been requested yet.
+**iOS charging is confirmed at 81% after PIN entry**, by the owner and two
+read-only diagnostic samples 30 seconds apart. USB returned on the same
+qualified hub path and host boot; exact iPad/iOS identity passes. Candidate
+and session preflight pass. The next physical action is direct-Pi DFU.
 
 ## Concrete change and scope
 

@@ -1,8 +1,9 @@
 # Remaining DFU batches — 3 November 2026
 
 The current Linux observation is complete. Normal cleanup passed and iOS reboot
-was requested, but USB did not return. **iOS charging confirmation is pending**;
-leave the device on the powered hub. See the [full finishing plan](FINISHING-PLAN.md)
+was requested. After PIN entry, the owner and two iOS diagnostic readings
+confirm charging at 81% on the powered hub. The next comparison is prepared;
+its boot uses the proven direct-Pi connection. See the [full finishing plan](FINISHING-PLAN.md)
 and [session record](SESSION-2026-11-03.md).
 
 ## Completed boot
@@ -14,7 +15,7 @@ and [session record](SESSION-2026-11-03.md).
 - [x] Complete 90-minute observation: input/normal cleanup pass; **net charge fails**.
 - [x] Analyse holds: five voltage pauses, four restarts; final warm restart blocked.
 - [x] Independent restoration to `02`, normal cleanup and iOS reboot request.
-- [ ] Confirm iOS is visible and charging on the powered hub.
+- [x] Confirm iOS is visible and charging on the powered hub; owner and diagnostics pass.
 - [x] Build/test separate voltage-hold restart candidate; **device untested**.
 
 No internal filesystem was mounted or written. Natural thermal restart,
@@ -27,7 +28,7 @@ All new tools must be ready before asking the owner to move a cable or press but
 
 | Batch | Work in that boot | Readiness / condition |
 | --- | --- | --- |
-| C0 — Known-hub power comparison | Same #35 RAM boot and qualified touch worker; only voltage/SOC-hold restart eligibility changes. Fixed brightness 802, Wi-Fi/read-only ASP, full current integration and final restoration. | [Prepared runbook](NEXT-POWER-COMPARISON.md); warning-free build, 49 core scenarios and two branch replays pass. Device untested. Confirm iOS/source and owner availability before requesting DFU. |
+| C0 — Known-hub power comparison | Same #35 RAM boot and qualified touch worker; only voltage/SOC-hold restart eligibility changes. Fixed brightness 802, Wi-Fi/read-only ASP, full current integration and final restoration. | [Prepared runbook](NEXT-POWER-COMPARISON.md); warning-free build, 49 core scenarios and two branch replays pass. Device untested. iOS/source checks pass; direct-Pi DFU is the next physical action. |
 | Q1 — Recovery/RAM scratch qualification | Exact RAM recovery identity, owned-media inventory and guarded disposable RAM APFS/native-I/O experiment. | New harness not built/qualified yet. Preserve the proven v3 rescue image. No internal mutation. |
 | Q2 — Conditional follow-up qualification | Resolve a measured Q1/backend issue or finish native writer/flush testing on disposable media. | Only if required. Explain the concrete change; combine compatible checks in Q1 where possible. |
 | W1 — Approved installation recovery | With internal APFS unmounted, verify the approved shrink, commit exact GPT changes and write/fully verify the image. | Requires qualified backend, refreshed evidence and separate exact internal-write approval. A proposed normal-iOS resize precedes this boot. |
