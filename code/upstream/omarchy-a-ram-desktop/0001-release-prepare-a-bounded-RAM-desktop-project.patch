@@ -1,0 +1,888 @@
+From e2b1b568227d36c410c0f77b3cacf6b23e044157 Mon Sep 17 00:00:00 2001
+From: thisiscamk <100883750+thisiscamk@users.noreply.github.com>
+Date: Tue, 3 Nov 2026 20:56:40 +0800
+Subject: [PATCH] release: prepare a bounded RAM desktop project
+
+Select a desktop subset from the normal staged root and verified desktop component, retaining ELF and script interpreter closure plus explicit QML, font and locale inputs. Record selected byte and ownership provenance, enforce expanded/compressed limits and produce a normal Orchard RAM project.
+
+Keep standard serial and SSH in rescue PID 1. The manually started chroot adds bounded writable, runtime and shared-memory mounts; installed login and device lifecycle remain unqualified.
+
+Assisted-by: LLM
+---
+ docs/ram-desktop.md        | 100 ++++++++++++
+ release/ram_desktop.py     | 305 +++++++++++++++++++++++++++++++++++++
+ system/ram-desktop/init    |  27 ++++
+ system/ram-desktop/session | 144 +++++++++++++++++
+ tests/test_ram_desktop.py  | 217 ++++++++++++++++++++++++++
+ tools/build-ram-desktop.py |  31 ++++
+ 6 files changed, 824 insertions(+)
+ create mode 100644 docs/ram-desktop.md
+ create mode 100644 release/ram_desktop.py
+ create mode 100755 system/ram-desktop/init
+ create mode 100755 system/ram-desktop/session
+ create mode 100644 tests/test_ram_desktop.py
+ create mode 100755 tools/build-ram-desktop.py
+
+diff --git a/docs/ram-desktop.md b/docs/ram-desktop.md
+new file mode 100644
+index 0000000..44e2620
+--- /dev/null
++++ b/docs/ram-desktop.md
+@@ -0,0 +1,100 @@
++# Experimental RAM desktop project
++
++This producer prepares a small desktop from normal Omarchy build inputs.
++It is separate from the installed root and installer recovery. No device has
++qualified this project yet; the first stage provides host selection, limits,
++receipts and runtime source for review.
++
++## Inputs
++
++Use the kept root directory produced by the normal `system/assemble-rootfs`,
++its `rootfs.tar.gz.json` and `packages.lock`, and the matching verified normal
++`desktop/build` component. Run in that Arch native build environment so file
++ownership can be preserved. Nothing is extracted from the historical lab root.
++
++```sh
++python3 tools/build-ram-desktop.py \
++  --root STAGED_ROOT --desktop DESKTOP_COMPONENT \
++  --source-receipt ROOTFS_RECEIPT --packages-lock PACKAGES_LOCK \
++  --orchard ORCHARD_CHECKOUT --output NEW_PLAN --plan-only
++```
++
++After reviewing the plan, use a different new output directory and omit
++`--plan-only` to build. The host needs `readelf` and `mksquashfs`. The producer
++calls the normal desktop verifier, checks that the staged root carries its UI
++manifest and matches the package lock, and records each selected byte hash.
++It records the normal base archive receipt; it does not re-read that archive
++or claim that every unselected file of the staged directory was checked.
++
++The source root must be the normal base stage. The finished release root
++rewrites the UI manifest; accepting that later stage needs a separate matching
++receipt contract, rather than ignoring a manifest mismatch.
++
++## Selection and limits
++
++The initial profile keeps Labwc, Quickshell, the normal keyboard and UI,
++Foot, session tools and their ELF interpreters/dependencies. Runtime seeds
++include QML, Wayland Qt plugins, fonts, xkb, locale, NSS/account information,
++CA certificates and D-Bus/input data. Script interpreters and the Python
++standard library are included when needed. Optional GTK platform themes and
++non-SQLite Qt SQL backends are outside this session.
++
++This is an explicit first profile, not proof of every runtime `dlopen`, QML
++import, helper or optional panel dependency. Missing files/dependencies and
++limits refuse a build. Large applications such as browsers are not included.
++
++- Selected regular files: at most 384 MiB and 25,000 files.
++- Gzip SquashFS image: at most 128 MiB, 256 KiB blocks, one build worker.
++- Writable overlay: default 64 MiB, configurable only between 16 and 128 MiB.
++- Desktop `/run`: a separate 32 MiB tmpfs.
++- Desktop `/dev/shm`: a separate 16 MiB tmpfs.
++
++These are bounds, not a measurement of free RAM or peak desktop use. The
++kernel, framebuffers, runtime allocations and page cache also need room. Zram
++is not enabled by this first profile and is not additional physical RAM.
++
++## Ordinary Orchard build and run
++
++The output's `project/` is a normal `orchard.toml` RAM project:
++
++```sh
++ORCHARD_CHECKOUT/bin/orchard build OUTPUT/project --device BOARD --kernel-tree KERNEL_TREE
++ORCHARD_CHECKOUT/bin/orchard run OUTPUT/project --device BOARD --no-build
++```
++
++Use one coherent, qualified native kernel/DT/provider/module set. Orchard
++adds its ordinary USB session, matching modules and board firmware. The public
++J72 recipe still has no touch output until native qualification; private test
++firmware can be an explicit private `rootfs/lib/firmware` overlay before build.
++
++Boot starts only the tested style of rescue console, serial and key-authenticated
++SSH. PID 1 stays in the rescue initramfs, and automatic module/hotplug loading
++is disabled. No internal filesystem, charging policy, bus coldplug or optional
++touch module is started by init. After hardware checks and explicit normal
++module loading, the host can request the desktop through the usual transport:
++
++```sh
++ORCHARD_CHECKOUT/bin/orchard exec -- /usr/libexec/omarchy/ram-desktop start
++```
++
++The session mounts its SquashFS file read-only and adds the bounded tmpfs
++upper. It runs normal source-built Omarchy components in a chroot. USB shell
++and key paths remain outside that root; its private `/run` avoids recursive
++bind mounts and duplicate SSH ownership. Only existing input/DRM nodes are
++announced to its udev daemon. Process startup is reported separately from UI
++readiness. `ram-desktop stop` terminates only recorded process groups and
++unmounts normally; stuck cleanup retains ownership and reports failure.
++
++The RAM session uses the normal first-theme renderer, keyboard, Labwc
++configuration and panel. It has a private D-Bus session and seatd; it does not
++claim the installed systemd/PAM/greetd login or all optional desktop services.
++The profile explicitly sets `C.UTF-8` and includes its locale data.
++
++## Gates before device use
++
++Run the first real-root plan and inspect expanded size and closure; verify
++the image compressor, generated root and normal component provenance. Check
++normal startup/stop under a suitable Linux test environment, including failure
++cleanup and file ownership. Then measure native device RAM, UI/input/keyboard,
++USB-shell survival, unplugged operation and normal return to iOS. Host unit
++fixtures and shell syntax do not establish those results.
+diff --git a/release/ram_desktop.py b/release/ram_desktop.py
+new file mode 100644
+index 0000000..33ffe9d
+--- /dev/null
++++ b/release/ram_desktop.py
+@@ -0,0 +1,305 @@
++"""A bounded RAM desktop from a normal staged Omarchy root; no device access."""
++from collections import deque
++import hashlib
++import json
++import os
++from pathlib import Path, PurePosixPath
++import re
++import shlex
++import shutil
++import stat
++import subprocess
++
++PROJECT = Path(__file__).resolve().parents[1]
++UI = 'home/tablet/.local/share/omarchy-ipad'
++PROGRAMS = ('labwc', 'qs', 'foot', 'bash', 'env', 'dbus-daemon', 'dbus-run-session', 'dbus-uuidgen',
++            'seatd', 'setpriv', 'wlr-randr', 'fc-cache', 'fc-match', 'udevadm',
++            'systemctl', 'cat', 'date', 'grep', 'sed', 'head', 'tail', 'tr', 'cut',
++            'mkdir', 'chmod', 'chown', 'cp', 'mv', 'rm', 'ln', 'readlink', 'id',
++            'sleep', 'kill', 'pkill', 'jq', 'socat', 'sort', 'stat', 'find', 'curl',
++            'awk', 'basename', 'dirname', 'mktemp', 'rmdir', 'gsettings')
++TREES = (UI, 'usr/local/bin', 'home/tablet/.config/labwc', 'home/tablet/.config/foot',
++         'home/tablet/.config/fontconfig', 'home/tablet/.config/omarchy-ipad',
++         'usr/lib/qt6/qml', 'usr/lib/qt6/plugins',
++         'usr/lib/udev/rules.d', 'usr/share/X11/xkb', 'etc/fonts',
++         'usr/share/fontconfig', 'usr/share/libinput', 'usr/share/dbus-1',
++         'etc/dbus-1', 'usr/lib/locale/C.utf8', 'etc/ssl/certs', 'usr/share/glib-2.0/schemas')
++FILES = ('etc/passwd', 'etc/group', 'etc/nsswitch.conf', 'etc/hosts',
++         'home/tablet/.bashrc', 'usr/lib/systemd/systemd-udevd', 'usr/lib/udev/libinput-device-group',
++         'usr/libexec/omarchy-wtype',
++         'usr/local/libexec/arch-ipad-scale-output', 'usr/local/libexec/arch-ipad-first-theme',
++         'usr/local/libexec/arch-ipad-rotate-output', 'usr/local/share/applications/foot.desktop',
++         'usr/share/terminfo/f/foot', 'usr/share/terminfo/x/xterm-256color',
++         'usr/share/fonts/TTF/DejaVuSans.ttf',
++         'usr/share/fonts/TTF/DejaVuSansMono.ttf',
++         'usr/share/fonts/TTF/JetBrainsMonoNerdFont-Regular.ttf')
++
++
++def digest(path):
++    h = hashlib.sha256()
++    with Path(path).open('rb') as stream:
++        for block in iter(lambda: stream.read(1024 * 1024), b''):
++            h.update(block)
++    return h.hexdigest()
++
++
++def normalized(name):
++    result = []
++    for part in str(name).split('/'):
++        if part in ('', '.'):
++            continue
++        if part == '..':
++            if not result:
++                raise ValueError('Path escapes the source root')
++            result.pop()
++        else:
++            result.append(part)
++    return '/'.join(result)
++
++
++class Source:
++    def __init__(self, root):
++        self.root = Path(root).absolute()
++        if self.root.is_symlink() or not self.root.is_dir():
++            raise ValueError('Expected a real staged root directory')
++        self.links = {}
++
++    def resolve(self, name):
++        name = normalized(name)
++        for _ in range(32):
++            parts = name.split('/')
++            for index in range(len(parts)):
++                label = '/'.join(parts[:index + 1])
++                path = self.root / label
++                if path.is_symlink():
++                    target = os.readlink(path)
++                    self.links[label] = target
++                    base = '' if target.startswith('/') else '/'.join(parts[:index])
++                    name = normalized('/'.join((base, target, *parts[index + 1:])))
++                    break
++            else:
++                return name
++        raise ValueError('Source symlink cycle or excessive depth')
++
++
++def elf_dependencies(path):
++    with Path(path).open('rb') as stream:
++        header = stream.read(20)
++    if header[:4] != b'\x7fELF':
++        return [], [], None
++    if len(header) < 20 or header[4:6] != b'\x02\x01' or int.from_bytes(header[18:20], 'little') != 183:
++        raise ValueError('RAM desktop requires little-endian AArch64 ELF')
++    output = subprocess.check_output(['readelf', '-d', '-l', str(path)], text=True)
++    needed = re.findall(r'Shared library: \[([^\]]+)\]', output)
++    if any('/' in name or name in ('.', '..') for name in needed):
++        raise ValueError('Unsafe ELF library name')
++    paths = [p for group in re.findall(r'\((?:RUNPATH|RPATH)\).*?\[([^\]]+)\]', output)
++             for p in group.split(':') if p]
++    interpreters = re.findall(r'Requesting program interpreter: ([^\]]+)', output)
++    if len(interpreters) > 1:
++        raise ValueError('Multiple ELF interpreters')
++    return needed, paths, interpreters[0] if interpreters else None
++
++
++def selection(source, seeds, trees, *, expanded_limit=384 * 1024**2,
++              dependencies=elf_dependencies):
++    selected, pending, total = {}, deque(), 0
++
++    def add(name):
++        nonlocal total
++        label = source.resolve(name)
++        if label in selected:
++            return
++        path = source.root / label
++        if not path.is_file() or path.is_symlink():
++            raise ValueError('Missing selected regular file: ' + label)
++        info = path.stat()
++        if not stat.S_ISREG(info.st_mode) or info.st_size > 128 * 1024**2:
++            raise ValueError('Special or oversized selected file: ' + label)
++        total += info.st_size
++        if total > expanded_limit or len(selected) >= 25000:
++            raise ValueError('RAM desktop subset exceeds its declared limit')
++        selected[label] = {'bytes': info.st_size, 'sha256': digest(path),
++                           'mode': stat.S_IMODE(info.st_mode), 'uid': info.st_uid, 'gid': info.st_gid}
++        pending.append(label)
++
++    for seed in seeds:
++        add(seed)
++    visited_trees = set()
++
++    def tree_files(tree):
++        resolved = source.resolve(tree)
++        parent = source.root / resolved
++        if not parent.is_dir():
++            raise ValueError('Missing runtime data directory: ' + tree)
++        if resolved in visited_trees:
++            return
++        visited_trees.add(resolved)
++        for path in sorted(parent.iterdir()):
++            if path.name in ('__pycache__', 'test', 'tests', 'idlelib', 'tkinter', 'site-packages'):
++                continue
++            label = path.relative_to(source.root).as_posix()
++            # This session uses the native Wayland QPA and SQLite only. GTK
++            # platform themes and optional SQL backends require other desktops.
++            if '/plugins/platformthemes/' in label or ('/plugins/sqldrivers/' in label and
++                                                        path.name != 'libqsqlite.so'):
++                continue
++            actual = source.root / source.resolve(label)
++            if actual.is_dir():
++                tree_files(label)
++            elif actual.is_file():
++                add(label)
++            else:
++                raise ValueError('Special runtime data member')
++
++    for tree in trees:
++        tree_files(tree)
++    python_added = False
++    while pending:
++        label = pending.popleft()
++        with (source.root / label).open('rb') as stream:
++            head = stream.readline(4096)
++        if head.startswith(b'#!'):
++            fields = shlex.split(head[2:].decode().strip())
++            if not fields or not fields[0].startswith('/'):
++                raise ValueError('Invalid script interpreter: ' + label)
++            add(fields[0])
++            if fields[0] == '/usr/bin/env':
++                if len(fields) < 2 or fields[1].startswith('-') or '/' in fields[1]:
++                    raise ValueError('Unsupported env script interpreter: ' + label)
++                add('usr/bin/' + fields[1])
++        if not python_added and re.fullmatch(r'usr/bin/python3(?:\.[0-9]+)?', label):
++            python_added = True
++            libraries = sorted((source.root / 'usr/lib').glob('python3.*'))
++            if not libraries:
++                raise ValueError('Missing Python standard library')
++            for library in libraries:
++                if library.is_dir():
++                    tree_files(library.relative_to(source.root).as_posix())
++        needed, paths, interpreter = dependencies(source.root / label)
++        if interpreter:
++            add(interpreter)
++        origin = str(PurePosixPath(label).parent)
++        if any(not p.startswith(('/', '$ORIGIN', '${ORIGIN}')) for p in paths):
++            raise ValueError('Relative ELF search path depends on runtime directory')
++        paths = [p.replace('${ORIGIN}', origin).replace('$ORIGIN', origin).lstrip('/') for p in paths]
++        if any('$' in p for p in paths):
++            raise ValueError('Unsupported ELF search variable')
++        for name in needed:
++            candidates = [normalized(p + '/' + name) for p in [*paths, 'usr/lib', 'lib']]
++            found = next((p for p in candidates if (source.root / source.resolve(p)).is_file()), None)
++            if found is None:
++                raise ValueError(f'Unresolved ELF dependency: {label} needs {name}')
++            add(found)
++    return selected, total
++
++
++def stage(source, selected, target):
++    target = Path(target)
++    if target.exists():
++        raise ValueError('Choose a new subset staging directory')
++    target.mkdir()
++    directories = {''}
++    for label, link in source.links.items():
++        if not (source.root / label).is_symlink() or os.readlink(source.root / label) != link:
++            raise ValueError('Source symlink changed during staging: ' + label)
++    for label in selected:
++        src, dst = source.root / label, target / label
++        if source.resolve(label) != label:
++            raise ValueError('Source path changed during staging: ' + label)
++        info = src.stat()
++        expected = selected[label]
++        if (digest(src) != expected['sha256'] or info.st_size != expected['bytes'] or
++                (stat.S_IMODE(info.st_mode), info.st_uid, info.st_gid) !=
++                (expected['mode'], expected['uid'], expected['gid'])):
++            raise ValueError('Source changed during staging: ' + label)
++        dst.parent.mkdir(parents=True, exist_ok=True)
++        shutil.copy2(src, dst)
++        if digest(dst) != selected[label]['sha256']:
++            raise ValueError('Subset copy differs: ' + label)
++        info = src.stat()
++        if (info.st_uid, info.st_gid) != (dst.stat().st_uid, dst.stat().st_gid):
++            os.chown(dst, info.st_uid, info.st_gid)
++        directories.update(str(p) for p in PurePosixPath(label).parents if str(p) != '.')
++    for label in sorted(directories, key=lambda n: n.count('/'), reverse=True):
++        src, dst = source.root / label, target / label
++        info = src.stat()
++        dst.chmod(stat.S_IMODE(info.st_mode))
++        if (info.st_uid, info.st_gid) != (dst.stat().st_uid, dst.stat().st_gid):
++            os.chown(dst, info.st_uid, info.st_gid)
++    for label, link in sorted(source.links.items(), key=lambda pair: pair[0].count('/')):
++        dst = target / label
++        if dst.exists() or dst.is_symlink():
++            raise ValueError('Symlink collides with selected files: ' + label)
++        dst.parent.mkdir(parents=True, exist_ok=True)
++        dst.symlink_to(link)
++
++
++def verify_inputs(root, desktop, receipt, packages):
++    metadata = json.loads(Path(desktop, 'manifest.json').read_text())
++    manifest = Path(desktop, 'payload/arch-ipad-ui-manifest.json')
++    if digest(manifest) != metadata['payload_manifest_sha256']:
++        raise ValueError('Normal desktop component manifest differs')
++    if digest(Path(root, 'arch-ipad-ui-manifest.json')) != metadata['payload_manifest_sha256']:
++        raise ValueError('Staged root does not contain this desktop component')
++    base = json.loads(Path(receipt).read_text())
++    if digest(packages) != base['packages_lock_sha256']:
++        raise ValueError('Normal root packages.lock differs')
++    return {'base_receipt': base, 'desktop_manifest_sha256': digest(Path(desktop, 'manifest.json')),
++            'packages_lock_sha256': digest(packages)}
++
++
++def verify_component_selection(source, selected, desktop):
++    payload = Path(desktop, 'payload')
++    contents = json.loads((payload / 'arch-ipad-ui-manifest.json').read_text())
++    for label, metadata in selected.items():
++        if label in contents and metadata['sha256'] != contents[label]:
++            raise ValueError('Selected desktop file differs from normal component: ' + label)
++    for label, link in source.links.items():
++        original = payload / label
++        if label in contents or (original.is_symlink() and os.readlink(original) != link):
++            raise ValueError('Selected desktop symlink differs from normal component: ' + label)
++
++
++def produce(root, desktop, receipt, packages, output, *, compressed_limit=128 * 1024**2,
++            expanded_limit=384 * 1024**2, upper_mib=64, plan_only=False):
++    output = Path(output)
++    if output.exists() or output.is_symlink() or not 16 <= upper_mib <= 128:
++        raise ValueError('Choose a new output and an upper limit of 16..128 MiB')
++    provenance = verify_inputs(root, desktop, receipt, packages)
++    source = Source(root)
++    selected, total = selection(source, [*FILES, *('usr/bin/' + p for p in PROGRAMS)], TREES,
++                                 expanded_limit=expanded_limit)
++    verify_component_selection(source, selected, desktop)
++    record = {'schema': 1, 'kind': 'ram-desktop-candidate', 'status': 'HOST_PLAN_ONLY',
++              'source': provenance, 'selected': selected, 'symlinks': source.links,
++              'expanded_bytes': total, 'expanded_limit': expanded_limit,
++              'compressed_limit': compressed_limit, 'upper_mib': upper_mib,
++              'device_tested': False, 'full_installed_omarchy': False,
++              'source_archive_rechecked': False}
++    output.mkdir(parents=True)
++    if not plan_only:
++        subset = output / '.subset'
++        stage(source, selected, subset)
++        project = output / 'project'
++        image = project / 'rootfs/usr/share/omarchy/desktop.squashfs'
++        image.parent.mkdir(parents=True)
++        subprocess.run(['mksquashfs', str(subset), str(image), '-noappend', '-comp', 'gzip',
++                        '-b', '262144', '-processors', '1', '-mem', '128M', '-no-xattrs',
++                        '-no-exports', '-mkfs-time', '0', '-all-time', '0'], check=True)
++        if image.stat().st_size > compressed_limit:
++            raise ValueError('Compressed desktop exceeds the declared RAM limit')
++        shutil.copyfile(PROJECT / 'system/ram-desktop/init', project / 'init')
++        (project / 'init').chmod(0o755)
++        session = project / 'rootfs/usr/libexec/omarchy/ram-desktop'
++        session.parent.mkdir(parents=True)
++        shutil.copyfile(PROJECT / 'system/ram-desktop/session', session)
++        session.chmod(0o755)
++        (project / 'rootfs/etc').mkdir(parents=True)
++        (project / 'rootfs/etc/omarchy-ram-upper-mib').write_text(str(upper_mib) + '\n')
++        (project / 'orchard.toml').write_text('name = "omarchy-ram-desktop"\n\n[payload]\ntransport = true\nmodules = true\nfirmware = true\n')
++        record.update(status='HOST_BUILT_DEVICE_UNTESTED', compressed_bytes=image.stat().st_size,
++                      image_sha256=digest(image), project='project')
++        shutil.rmtree(subset)
++    (output / 'ram-desktop.json').write_text(json.dumps(record, indent=2, sort_keys=True) + '\n')
++    return record
+diff --git a/system/ram-desktop/init b/system/ram-desktop/init
+new file mode 100755
+index 0000000..60bc627
+--- /dev/null
++++ b/system/ram-desktop/init
+@@ -0,0 +1,27 @@
++#!/bin/busybox sh
++# Experimental RAM desktop. Hardware comes from Orchard's matching kernel.
++set -eu
++export PATH=/usr/sbin:/usr/bin:/sbin:/bin
++/bin/busybox --install -s /bin
++mount -t proc -o nosuid,nodev,noexec proc /proc
++mount -t sysfs -o nosuid,nodev,noexec sysfs /sys
++mount -t devtmpfs -o nosuid devtmpfs /dev
++mount -t tmpfs -o nosuid,nodev tmpfs /run
++mkdir -p /dev/pts /tmp
++mount -t devpts -o nosuid devpts /dev/pts
++exec </dev/console >/dev/console 2>&1
++echo /bin/false > /proc/sys/kernel/modprobe
++echo /bin/false > /proc/sys/kernel/hotplug
++
++# Keep the ordinary host key, serial console and SSH outside the desktop root.
++sh /usr/libexec/orchard/usb-session || echo 'USB session startup failed'
++(
++    while :; do
++        setsid -c sh -i </dev/ttyGS0 >/dev/ttyGS0 2>&1 || true
++        sleep 1
++    done
++) &
++echo 'RAM console ready; no desktop, optional drivers or internal storage activated.'
++echo 'After hardware checks, use normal orchard exec to run:'
++echo '  /usr/libexec/omarchy/ram-desktop start'
++while :; do sleep 60; done
+diff --git a/system/ram-desktop/session b/system/ram-desktop/session
+new file mode 100755
+index 0000000..45fd9d8
+--- /dev/null
++++ b/system/ram-desktop/session
+@@ -0,0 +1,144 @@
++#!/bin/busybox sh
++# A manually started chroot session; PID 1 and the standard SSH keys stay outside.
++set -eu
++export PATH=/usr/sbin:/usr/bin:/sbin:/bin
++pidfile=/run/omarchy-ram.pid
++state=/run/omarchy-ram-state
++lock=/run/omarchy-ram-owner
++case "${1:-}" in
++start)
++    [ ! -e "$pidfile" ] || { echo 'Session ownership exists; inspect status first'; exit 1; }
++    mkdir "$lock" || { echo 'Session start/cleanup ownership exists'; exit 1; }
++    setsid sh "$0" run </dev/null >/run/omarchy-ram-session.log 2>&1 &
++    pid=$!
++    [ -r "/proc/$pid/stat" ]
++    printf '%s %s\n' "$pid" "$(awk '{print $22}' "/proc/$pid/stat")" > "$pidfile"
++    echo START_REQUESTED
++    exit 0
++    ;;
++stop|status)
++    [ -r "$pidfile" ] || {
++        [ ! -e "$lock" ] || { echo 'Session ownership is incomplete; inspect logs'; exit 1; }
++        echo STOPPED; exit 0;
++    }
++    read -r pid born < "$pidfile"
++    case "$pid:$born" in *[!0-9:]*|:*|*:) echo 'Invalid session ownership'; exit 1;; esac
++    if [ -r "/proc/$pid/stat" ]; then
++        [ "$(awk '{print $22}' "/proc/$pid/stat")" = "$born" ] || { echo 'Session PID changed'; exit 1; }
++        if [ "$1" = stop ]; then
++            /bin/busybox kill -TERM -- "-$pid"
++            i=0
++            while [ -r "/proc/$pid/stat" ] && [ "$i" -lt 100 ]; do sleep .1; i=$((i + 1)); done
++            [ ! -r "/proc/$pid/stat" ] || { echo 'Session cleanup still pending'; exit 1; }
++            [ "$(cat "$state")" = STOPPED ] || { cat "$state"; exit 1; }
++        else
++            cat "$state" 2>/dev/null || echo STARTING
++        fi
++    else
++        cat "$state" 2>/dev/null || echo STOPPED
++        [ "$(cat "$state" 2>/dev/null)" != CLEANUP_FAILED ] || exit 1
++    fi
++    exit 0
++    ;;
++run)
++    # Internal child only: refuse direct/concurrent runtime entry points.
++    i=0
++    while [ ! -r "$pidfile" ] && [ "$i" -lt 20 ]; do sleep .1; i=$((i + 1)); done
++    [ -d "$lock" ] && [ -r "$pidfile" ] || exit 1
++    read -r owner born < "$pidfile"
++    [ "$owner" = "$$" ] && [ "$(awk '{print $22}' "/proc/$$/stat")" = "$born" ] || exit 1
++    ;;
++*) echo 'Usage: ram-desktop start|stop|status'; exit 2;;
++esac
++
++lower=/run/omarchy-lower
++writable=/run/omarchy-writable
++desktop=/run/omarchy-desktop
++children=/run/omarchy-ram-children
++: > "$children"
++echo STARTING > "$state"
++cleanup() {
++    failed=0
++    while read -r pid born; do
++        [ -r "/proc/$pid/stat" ] || continue
++        [ "$(awk '{print $22}' "/proc/$pid/stat")" = "$born" ] || { failed=1; continue; }
++        /bin/busybox kill -TERM -- "-$pid" 2>/dev/null || true
++    done < "$children"
++    # Bounded normal exit; keep mounts and ownership on a stuck process.
++    i=0
++    while [ "$i" -lt 50 ]; do
++        alive=0
++        while read -r pid born; do
++            if [ -r "/proc/$pid/stat" ]; then
++                case "$(awk '{print $3}' "/proc/$pid/stat")" in Z) wait "$pid" 2>/dev/null || true;; *) alive=1;; esac
++            fi
++        done < "$children"
++        [ "$alive" = 0 ] && break
++        sleep .1; i=$((i + 1))
++    done
++    if [ "$alive" != 0 ] || [ "$failed" != 0 ]; then echo CLEANUP_FAILED > "$state"; return; fi
++    for name in run sys proc dev/shm dev/pts dev; do
++        if mountpoint -q "$desktop/$name"; then umount "$desktop/$name" || failed=1; fi
++    done
++    for path in "$desktop" "$writable" "$lower"; do
++        if mountpoint -q "$path"; then umount "$path" || failed=1; fi
++    done
++    if [ "$failed" = 0 ]; then echo STOPPED > "$state"; rm -f "$pidfile"; rmdir "$lock";
++    else echo CLEANUP_FAILED > "$state"; fi
++}
++trap 'exit 0' TERM INT
++trap cleanup EXIT
++mkdir -p "$lower" "$writable" "$desktop"
++upper_mib=$(cat /etc/omarchy-ram-upper-mib)
++case "$upper_mib" in ''|*[!0-9]*) exit 1;; esac
++[ "$upper_mib" -ge 16 ] && [ "$upper_mib" -le 128 ]
++mount -t squashfs -o loop,ro /usr/share/omarchy/desktop.squashfs "$lower"
++mount -t tmpfs -o "size=${upper_mib}m,nr_inodes=32768,mode=0755" tmpfs "$writable"
++mkdir "$writable/upper" "$writable/work"
++mount -t overlay overlay -o "lowerdir=$lower,upperdir=$writable/upper,workdir=$writable/work" "$desktop"
++mkdir -p "$desktop/dev/pts" "$desktop/proc" "$desktop/sys" "$desktop/run"
++for name in dev dev/pts proc sys; do mount --bind "/$name" "$desktop/$name"; done
++mkdir -p "$desktop/dev/shm"
++mount -t tmpfs -o size=16m,nr_inodes=4096,mode=1777,nosuid,nodev tmpfs "$desktop/dev/shm"
++# A private bounded /run avoids recursively binding the parent /run into itself.
++mount -t tmpfs -o size=32m,nr_inodes=8192,mode=0755 tmpfs "$desktop/run"
++mkdir -p "$desktop/tmp" "$desktop/run/user/1000" "$desktop/run/dbus" "$desktop/run/udev"
++chmod 1777 "$desktop/tmp"
++chmod 700 "$desktop/run/user/1000"
++chown 1000:1000 "$desktop/run/user/1000"
++# A new per-boot machine ID lives only in the RAM upper. The staged root has
++# no installed machine identity, and no host/system machine ID is copied.
++chroot "$desktop" /usr/bin/dbus-uuidgen --ensure=/etc/machine-id
++if [ -f /etc/resolv.conf ]; then cat /etc/resolv.conf > "$desktop/etc/resolv.conf"; fi
++spawn() {
++    setsid chroot "$desktop" "$@" &
++    pid=$!
++    [ -r "/proc/$pid/stat" ]
++    printf '%s %s\n' "$pid" "$(awk '{print $22}' "/proc/$pid/stat")" >> "$children"
++}
++spawn /usr/lib/systemd/systemd-udevd --resolve-names=never
++spawn /usr/bin/dbus-daemon --system --nofork
++spawn /usr/bin/seatd -g seat
++sleep 1
++# Only describe already-created input/DRM nodes to libinput. No bus coldplug.
++chroot "$desktop" /usr/bin/udevadm trigger --action=add --subsystem-match=input
++chroot "$desktop" /usr/bin/udevadm trigger --action=add --subsystem-match=drm
++chroot "$desktop" /usr/bin/udevadm settle --timeout=10
++spawn /usr/bin/setpriv --reuid=1000 --regid=1000 --init-groups /usr/bin/env \
++    HOME=/home/tablet USER=tablet LOGNAME=tablet PATH=/usr/local/bin:/usr/bin \
++    LANG=C.UTF-8 LC_ALL=C.UTF-8 XDG_RUNTIME_DIR=/run/user/1000 \
++    XDG_SESSION_TYPE=wayland XDG_CURRENT_DESKTOP=wlroots LIBSEAT_BACKEND=seatd \
++    WLR_BACKENDS=drm,libinput WLR_RENDERER=pixman QT_QUICK_BACKEND=software \
++    QSG_RENDER_LOOP=basic QT_QPA_PLATFORM=wayland OMARCHY_TOUCH_MODE=1 \
++    OMARCHY_KEYBOARD_AUTO=1 OMARCHY_PATH=/home/tablet/.local/share/omarchy-ipad \
++    /usr/bin/dbus-run-session /bin/bash -ec \
++    '/usr/local/libexec/arch-ipad-first-theme; exec /usr/bin/labwc -m'
++echo PROCESSES_STARTED_UI_UNVERIFIED > "$state"
++while :; do
++    while read -r pid born; do
++        [ -r "/proc/$pid/stat" ] || exit 1
++        [ "$(awk '{print $22}' "/proc/$pid/stat")" = "$born" ] || exit 1
++        [ "$(awk '{print $3}' "/proc/$pid/stat")" != Z ] || exit 1
++    done < "$children"
++    sleep 1
++done
+diff --git a/tests/test_ram_desktop.py b/tests/test_ram_desktop.py
+new file mode 100644
+index 0000000..52bd713
+--- /dev/null
++++ b/tests/test_ram_desktop.py
+@@ -0,0 +1,217 @@
++"""Bounded subset staging; no large build, source root or device required."""
++import hashlib
++import json
++from pathlib import Path
++import shutil
++import struct
++import tempfile
++import unittest
++from unittest.mock import patch
++
++from release import ram_desktop as ram
++
++
++class RamDesktop(unittest.TestCase):
++    def setUp(self):
++        self.temp = tempfile.TemporaryDirectory()
++        self.addCleanup(self.temp.cleanup)
++        self.root = Path(self.temp.name) / 'root'
++        self.root.mkdir()
++
++    def put(self, name, data=b'data'):
++        path = self.root / name
++        path.parent.mkdir(parents=True, exist_ok=True)
++        path.write_bytes(data)
++        return path
++
++    def test_closure_resolves_elf_interpreter_needed_origin_and_root_symlinks(self):
++        self.put('usr/bin/app')
++        self.put('usr/lib/ld.so')
++        self.put('usr/lib/libfirst.so')
++        self.put('usr/lib/libsecond.so')
++        self.put('usr/share/qml/module.qml')
++        (self.root / 'lib').symlink_to('usr/lib')
++        (self.root / 'usr/lib/libalias.so').symlink_to('libfirst.so')
++
++        def dependencies(path):
++            if path.name == 'app':
++                return ['libalias.so'], ['$ORIGIN/../lib'], '/lib/ld.so'
++            if path.name == 'libfirst.so':
++                return ['libsecond.so'], [], None
++            return [], [], None
++
++        source = ram.Source(self.root)
++        selected, total = ram.selection(source, ['usr/bin/app'], ['usr/share/qml'],
++                                        dependencies=dependencies)
++        self.assertEqual(set(selected), {'usr/bin/app', 'usr/lib/ld.so',
++                         'usr/lib/libfirst.so', 'usr/lib/libsecond.so', 'usr/share/qml/module.qml'})
++        self.assertEqual(total, 20)
++        target = Path(self.temp.name) / 'subset'
++        ram.stage(source, selected, target)
++        self.assertEqual((target / 'lib').readlink(), Path('usr/lib'))
++        self.assertEqual((target / 'usr/lib/libalias.so').readlink(), Path('libfirst.so'))
++        self.assertEqual((target / 'usr/lib/libalias.so').read_bytes(), b'data')
++
++    def test_missing_dependency_and_data_or_over_budget_refuse(self):
++        self.put('usr/bin/app')
++        with self.assertRaisesRegex(ValueError, 'Unresolved ELF'):
++            ram.selection(ram.Source(self.root), ['usr/bin/app'], [],
++                          dependencies=lambda _: (['missing.so'], [], None))
++        with self.assertRaisesRegex(ValueError, 'data directory'):
++            ram.selection(ram.Source(self.root), [], ['missing'])
++        with self.assertRaisesRegex(ValueError, 'declared limit'):
++            ram.selection(ram.Source(self.root), ['usr/bin/app'], [], expanded_limit=3)
++
++    def test_symlink_escape_and_cycles_refuse(self):
++        (self.root / 'escape').symlink_to('../outside')
++        (self.root / 'cycle').symlink_to('cycle')
++        for name in ('escape', 'cycle'):
++            with self.subTest(name=name), self.assertRaises(ValueError):
++                ram.Source(self.root).resolve(name)
++
++    def test_source_mutation_refuses_before_staging_changed_bytes(self):
++        path = self.put('usr/bin/app')
++        source = ram.Source(self.root)
++        selected, _ = ram.selection(source, ['usr/bin/app'], [])
++        path.write_bytes(b'changed')
++        with self.assertRaisesRegex(ValueError, 'changed during staging'):
++            ram.stage(source, selected, Path(self.temp.name) / 'subset')
++
++    def test_provenance_ties_normal_component_manifest_and_package_receipt(self):
++        desktop = Path(self.temp.name) / 'desktop'
++        (desktop / 'payload').mkdir(parents=True)
++        manifest = b'{"some-file":"some-hash"}'
++        (desktop / 'payload/arch-ipad-ui-manifest.json').write_bytes(manifest)
++        (desktop / 'manifest.json').write_text(json.dumps(
++            {'payload_manifest_sha256': hashlib.sha256(manifest).hexdigest()}))
++        self.put('arch-ipad-ui-manifest.json', manifest)
++        packages = Path(self.temp.name) / 'packages.lock'
++        packages.write_bytes(b'normal packages\n')
++        receipt = Path(self.temp.name) / 'rootfs.tar.gz.json'
++        receipt.write_text(json.dumps({'packages_lock_sha256': ram.digest(packages)}))
++        ram.verify_inputs(self.root, desktop, receipt, packages)
++        packages.write_bytes(b'changed')
++        with self.assertRaisesRegex(ValueError, 'packages.lock differs'):
++            ram.verify_inputs(self.root, desktop, receipt, packages)
++
++    def test_non_aarch64_or_truncated_elf_refuses(self):
++        for blob in (b'\x7fELF', b'\x7fELF' + bytes(60)):
++            with self.subTest(blob=blob), self.assertRaisesRegex(ValueError, 'AArch64 ELF'):
++                ram.elf_dependencies(self.put('app', blob))
++
++    def test_scripts_and_absolute_data_directory_symlink_stay_in_source_root(self):
++        self.put('usr/bin/script', b'#!/usr/bin/env python3\n')
++        self.put('usr/bin/env')
++        self.put('usr/bin/python3.13')
++        (self.root / 'usr/bin/python3').symlink_to('python3.13')
++        self.put('usr/lib/python3.13/tomllib/__init__.py')
++        self.put('usr/lib/python3.13/site-packages/unused.py')
++        self.put('unique-fixture-data/file')
++        (self.root / 'data-alias').symlink_to('/unique-fixture-data')
++        selected, _ = ram.selection(ram.Source(self.root), ['usr/bin/script'], ['data-alias'])
++        self.assertTrue({'usr/bin/env', 'usr/bin/python3.13',
++                         'usr/lib/python3.13/tomllib/__init__.py',
++                         'unique-fixture-data/file'}.issubset(selected))
++        self.assertNotIn('usr/lib/python3.13/site-packages/unused.py', selected)
++        self.put('usr/bin/script', b'#!/usr/bin/env -S python3 -I\n')
++        with self.assertRaisesRegex(ValueError, 'Unsupported env'):
++            ram.selection(ram.Source(self.root), ['usr/bin/script'], [])
++
++    def test_relative_loader_search_and_changed_symlink_refuse(self):
++        self.put('usr/bin/app')
++        with self.assertRaisesRegex(ValueError, 'Relative ELF'):
++            ram.selection(ram.Source(self.root), ['usr/bin/app'], [],
++                          dependencies=lambda _: ([], ['../lib'], None))
++        alias = self.root / 'app'
++        alias.symlink_to('usr/bin/app')
++        source = ram.Source(self.root)
++        selected, _ = ram.selection(source, ['app'], [])
++        alias.unlink()
++        alias.symlink_to('other')
++        with self.assertRaisesRegex(ValueError, 'symlink changed'):
++            ram.stage(source, selected, Path(self.temp.name) / 'subset')
++
++    @unittest.skipUnless(shutil.which('readelf'), 'readelf required by producer')
++    def test_real_readelf_reads_synthetic_aarch64_dynamic_and_interpreter(self):
++        # Small ELF with ordinary section headers; no executable code or host ELF.
++        interp = b'/lib/ld-linux-aarch64.so.1\0'
++        strings = b'\0libthing.so\0$ORIGIN/../lib\0'
++        start = 64 + 3 * 56
++        strings_offset = start + len(interp)
++        dynamic = b''.join(struct.pack('<QQ', tag, value) for tag, value in
++                           ((1, strings.index(b'libthing')), (29, strings.index(b'$ORIGIN')),
++                            (5, strings_offset), (10, len(strings)), (0, 0)))
++        names = b'\0.dynstr\0.dynamic\0.shstrtab\0'
++        offsets = (strings_offset, strings_offset + len(strings),
++                   strings_offset + len(strings) + len(dynamic))
++        shoff = offsets[2] + len(names)
++        ident = b'\x7fELF\x02\x01\x01' + bytes(9)
++        header = struct.pack('<16sHHIQQQIHHHHHH', ident, 3, 183, 1, 0, 64, shoff,
++                             0, 64, 56, 3, 64, 4, 3)
++        size = shoff + 4 * 64
++        program = struct.pack('<IIQQQQQQ', 1, 4, 0, 0, 0, size, size, 1)
++        program += struct.pack('<IIQQQQQQ', 3, 4, start, start, start, len(interp), len(interp), 1)
++        program += struct.pack('<IIQQQQQQ', 2, 4, offsets[1], offsets[1], offsets[1],
++                               len(dynamic), len(dynamic), 8)
++        sections = bytes(64)
++        for name, kind, offset, size, link, entry_size in (
++                (1, 3, offsets[0], len(strings), 0, 0),
++                (9, 6, offsets[1], len(dynamic), 1, 16),
++                (18, 3, offsets[2], len(names), 0, 0)):
++            sections += struct.pack('<IIQQQQIIQQ', name, kind, 0, 0, offset, size, link, 0, 1, entry_size)
++        path = self.put('app', header + program + interp + strings + dynamic + names + sections)
++        self.assertEqual(ram.elf_dependencies(path),
++                         (['libthing.so'], ['$ORIGIN/../lib'], '/lib/ld-linux-aarch64.so.1'))
++
++    def test_selected_component_file_changes_refuse_even_with_unchanged_manifest(self):
++        desktop = Path(self.temp.name) / 'desktop'
++        (desktop / 'payload').mkdir(parents=True)
++        self.put('usr/bin/app', b'changed')
++        (desktop / 'payload/arch-ipad-ui-manifest.json').write_text(json.dumps(
++            {'usr/bin/app': hashlib.sha256(b'original').hexdigest()}))
++        source = ram.Source(self.root)
++        selected, _ = ram.selection(source, ['usr/bin/app'], [])
++        with self.assertRaisesRegex(ValueError, 'file differs from normal component'):
++            ram.verify_component_selection(source, selected, desktop)
++
++    def test_plan_build_and_compressed_budget_are_separate_gates(self):
++        desktop = Path(self.temp.name) / 'desktop'
++        (desktop / 'payload').mkdir(parents=True)
++        manifest = b'{}'
++        (desktop / 'payload/arch-ipad-ui-manifest.json').write_bytes(manifest)
++        (desktop / 'manifest.json').write_text(json.dumps(
++            {'payload_manifest_sha256': hashlib.sha256(manifest).hexdigest()}))
++        self.put('arch-ipad-ui-manifest.json', manifest)
++        self.put('usr/bin/app')
++        packages = Path(self.temp.name) / 'packages.lock'
++        packages.write_bytes(b'packages\n')
++        receipt = Path(self.temp.name) / 'receipt.json'
++        receipt.write_text(json.dumps({'packages_lock_sha256': ram.digest(packages)}))
++
++        def compress(command, **kwargs):
++            self.assertEqual(command[0], 'mksquashfs')
++            self.assertEqual(command[command.index('-comp') + 1], 'gzip')
++            Path(command[2]).write_bytes(b'synthetic image')
++
++        with patch.object(ram, 'PROGRAMS', ()), patch.object(ram, 'FILES', ('usr/bin/app',)), \
++                patch.object(ram, 'TREES', ()), patch.object(ram.subprocess, 'run', side_effect=compress) as run:
++            output = Path(self.temp.name) / 'plan'
++            plan = ram.produce(self.root, desktop, receipt, packages, output, plan_only=True)
++            self.assertEqual(plan['status'], 'HOST_PLAN_ONLY')
++            self.assertFalse((output / 'project').exists())
++            run.assert_not_called()
++            built = Path(self.temp.name) / 'built'
++            result = ram.produce(self.root, desktop, receipt, packages, built)
++            self.assertEqual(result['status'], 'HOST_BUILT_DEVICE_UNTESTED')
++            self.assertFalse((built / '.subset').exists())
++            self.assertEqual((built / 'project/init').read_bytes(),
++                             (ram.PROJECT / 'system/ram-desktop/init').read_bytes())
++            self.assertIn('transport = true', (built / 'project/orchard.toml').read_text())
++            self.assertFalse(result['device_tested'])
++            with self.assertRaisesRegex(ValueError, 'Compressed desktop exceeds'):
++                ram.produce(self.root, desktop, receipt, packages,
++                            Path(self.temp.name) / 'too-large', compressed_limit=1)
++
++
++if __name__ == '__main__':
++    unittest.main()
+diff --git a/tools/build-ram-desktop.py b/tools/build-ram-desktop.py
+new file mode 100755
+index 0000000..54226c7
+--- /dev/null
++++ b/tools/build-ram-desktop.py
+@@ -0,0 +1,31 @@
++#!/usr/bin/env python3
++"""Prepare an experimental bounded RAM project from normal Omarchy build inputs."""
++import argparse
++import os
++from pathlib import Path
++import subprocess
++import sys
++
++sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
++from release.ram_desktop import produce
++
++
++def main():
++    parser = argparse.ArgumentParser(description=__doc__)
++    for option in ('root', 'desktop', 'source-receipt', 'packages-lock', 'output', 'orchard'):
++        parser.add_argument('--' + option, type=Path, required=True)
++    parser.add_argument('--plan-only', action='store_true')
++    parser.add_argument('--upper-mib', type=int, default=64)
++    args = parser.parse_args()
++    if not (args.orchard / 'src/orchard').is_dir():
++        parser.error('Name a normal Orchard source checkout')
++    project = Path(__file__).resolve().parents[1]
++    subprocess.run([sys.executable, str(project / 'desktop/build'), '--verify', str(args.desktop)],
++                   check=True, env={**os.environ, 'ORCHARD_CHECKOUT': str(args.orchard.resolve())})
++    record = produce(args.root, args.desktop, args.source_receipt, args.packages_lock,
++                     args.output, upper_mib=args.upper_mib, plan_only=args.plan_only)
++    print(record['status'])
++
++
++if __name__ == '__main__':
++    main()
+-- 
+2.47.3
+

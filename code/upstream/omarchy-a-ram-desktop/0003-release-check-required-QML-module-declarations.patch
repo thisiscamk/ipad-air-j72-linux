@@ -1,0 +1,190 @@
+From 5d68ee7732153b75d17aa46de0a9aa8b236882d0 Mon Sep 17 00:00:00 2001
+From: thisiscamk <100883750+thisiscamk@users.noreply.github.com>
+Date: Tue, 3 Nov 2026 21:31:44 +0800
+Subject: [PATCH] release: check required QML module declarations
+
+Retain the normal static QML module metadata imported by QtQml and validate selected module imports and qmldir dependencies. Record disabled plugin sources separately from required imports and omit Qt Designer data from the compact runtime profile.
+
+The corrected normal-root static plan passes with 3758 files and 293944222 expanded bytes. Record the preceding successful host SquashFS result separately from the still unqualified runtime and corrected-image rebuild.
+
+Assisted-by: LLM
+---
+ docs/ram-desktop.md       | 23 +++++++++++++++---
+ release/ram_desktop.py    | 50 +++++++++++++++++++++++++++++++++++++--
+ tests/test_ram_desktop.py | 23 ++++++++++++++++++
+ 3 files changed, 91 insertions(+), 5 deletions(-)
+
+diff --git a/docs/ram-desktop.md b/docs/ram-desktop.md
+index 6163eda..185535f 100644
+--- a/docs/ram-desktop.md
++++ b/docs/ram-desktop.md
+@@ -49,7 +49,8 @@ standard library are included when needed. Optional GTK platform themes and
+ non-SQLite Qt SQL backends are outside this session.
+ 
+ The profile retains the normal default Jade Horse theme and the imported
+-QtQuick, QtQml, Qt and Quickshell module families. Other installed themes,
++QML, QtQuick, QtQml, Qt and Quickshell module families. Required module imports
++and `qmldir` dependencies must be present in the selection. Other installed themes,
+ KDE/Dolphin/designer plugins, optional Qt multimedia/3D QML, Python Tk and
+ Python development configuration are not part of this Qt desktop profile.
+ 
+@@ -67,6 +68,22 @@ This is an explicit first profile, not proof of every runtime `dlopen`, QML
+ import, helper or optional panel dependency. Missing files/dependencies and
+ limits refuse a build. Large applications such as browsers are not included.
+ 
++## Measured host build
++
++The first real normal-input build at source commit `5a93e04` produced a
++109,719,552-byte gzip SquashFS file (104.64 MiB), below the unchanged 128 MiB
++limit. Its filesystem superblock reports 109,715,658 bytes and 256 KiB blocks.
++The selected root was 293,882,327 expanded bytes; tablet-home ownership was
++1000, and the normal Labwc/cursor binaries were root-owned with mode 0755.
++
++That image establishes compressor and ownership results for the preceding
++selection. A subsequent static import audit added the normal `QML` module
++metadata required by QtQml's declarations; the corrected selection needs a
++fresh image. No mount/session lifecycle, GUI or device result is established
++by either the host size measurement or static import checks.
++
++## Memory bounds
++
+ - Selected regular files: at most 384 MiB and 25,000 files.
+ - Gzip SquashFS image: at most 128 MiB, 256 KiB blocks, one build worker.
+ - Writable overlay: default 64 MiB, configurable only between 16 and 128 MiB.
+@@ -116,8 +133,8 @@ The profile explicitly sets `C.UTF-8` and includes its locale data.
+ 
+ ## Gates before device use
+ 
+-Run the first real-root plan and inspect expanded size and closure; verify
+-the image compressor, generated root and normal component provenance. Check
++Rebuild after source/input changes and verify the generated image, expanded
++size, imports, ownership and normal component provenance. Check
+ normal startup/stop under a suitable Linux test environment, including failure
+ cleanup and file ownership. Then measure native device RAM, UI/input/keyboard,
+ USB-shell survival, unplugged operation and normal return to iOS. Host unit
+diff --git a/release/ram_desktop.py b/release/ram_desktop.py
+index dcbd510..e0a805b 100644
+--- a/release/ram_desktop.py
++++ b/release/ram_desktop.py
+@@ -21,7 +21,7 @@ PROGRAMS = ('labwc', 'qs', 'foot', 'bash', 'env', 'dbus-daemon', 'dbus-run-sessi
+             'awk', 'basename', 'dirname', 'mktemp', 'rmdir', 'gsettings')
+ TREES = (UI, 'usr/local/bin', 'home/tablet/.config/labwc', 'home/tablet/.config/foot',
+          'home/tablet/.config/fontconfig', 'home/tablet/.config/omarchy-ipad',
+-         'usr/lib/qt6/qml/QtQuick', 'usr/lib/qt6/qml/QtQml',
++         'usr/lib/qt6/qml/QtQuick', 'usr/lib/qt6/qml/QtQml', 'usr/lib/qt6/qml/QML',
+          'usr/lib/qt6/qml/Qt', 'usr/lib/qt6/qml/Quickshell',
+          'usr/lib/qt6/plugins/platforms',
+          'usr/lib/qt6/plugins/wayland-shell-integration',
+@@ -171,6 +171,8 @@ def selection(source, seeds, trees, *, expanded_limit=384 * 1024**2,
+                 continue
+             if label in ('usr/lib/qt6/qml/QtQuick/tooling', 'usr/lib/qt6/qml/QtQml/DesignSupport'):
+                 continue
++            if label.startswith('usr/lib/qt6/qml/') and path.name == 'designer':
++                continue
+             if resolved.startswith('usr/lib/python3.') and path.name.startswith('config-3.'):
+                 continue
+             if resolved.startswith('usr/lib/python3.') and path.name.startswith('_tkinter.'):
+@@ -300,6 +302,47 @@ def verify_component_selection(source, selected, desktop):
+             raise ValueError('Selected desktop symlink differs from normal component: ' + label)
+ 
+ 
++def verify_qml_imports(source, selected, *, disabled_plugins=()):
++    """Check static imports, including native module qmldir requirements.
++
++    This does not execute QML, prove type availability or resolve arbitrary
++    computed URLs. Disabled plugin source files remain in the image, but their
++    imports do not become requirements of this explicit compact profile.
++    """
++    modules, required, skipped = {}, {}, []
++    disabled_directories = []
++    for label in selected:
++        if label.startswith(UI + '/shell/plugins/') and label.endswith('manifest.json'):
++            manifest = json.loads(source.file(label).read_text())
++            if manifest.get('id') in disabled_plugins:
++                disabled_directories.append(str(PurePosixPath(label).parent) + '/')
++    for label in selected:
++        if Path(label).name == 'qmldir':
++            text = source.file(label).read_text()
++            declared = re.findall(r'^module\s+([\w.]+)', text, flags=re.M)
++            for name in declared:
++                if name in modules:
++                    raise ValueError('Ambiguous selected QML module: ' + name)
++                modules[name] = label
++            names = re.findall(r'^(?:default\s+)?(?:import|depends)\s+([\w.]+)', text, flags=re.M)
++        elif label.endswith(('.qml', '.js')):
++            if any(label.startswith(directory) for directory in disabled_directories):
++                skipped.append(label)
++                continue
++            text = source.file(label).read_text()
++            names = re.findall(r'^\s*import\s+([A-Za-z_][\w.]*)', text, flags=re.M)
++        else:
++            continue
++        for name in names:
++            required.setdefault(name, []).append(label)
++    missing = sorted(set(required) - set(modules))
++    if missing:
++        raise ValueError('Required QML import absent from selection: ' + ', '.join(missing))
++    return {'status': 'STATIC_DECLARATIONS_CHECKED_RUNTIME_UNTESTED',
++            'modules': modules, 'required_imports': required,
++            'disabled_plugin_sources_not_required': skipped}
++
++
+ def normal_components(cursor_tools, labwc_tools):
+     from release.public_root import cursor_files, labwc_files
+     overlay, receipts = {}, {}
+@@ -418,6 +461,8 @@ def produce(root, desktop, receipt, packages, output, *, cursor_tools, labwc_too
+                                  expanded_limit=expanded_limit)
+     verify_component_selection(source, selected, desktop)
+     overrides = compact_profile(source)
++    config = json.loads(overrides.get('home/tablet/.config/omarchy-ipad/shell.json', {}).get('data', b'{}'))
++    qml_imports = verify_qml_imports(source, selected, disabled_plugins=config.get('disabledPlugins', ()))
+     for label, override in overrides.items():
+         if override['original_sha256'] is not None and override['original_sha256'] != selected[label]['sha256']:
+             raise ValueError('Profile source changed during selection: ' + label)
+@@ -430,7 +475,8 @@ def produce(root, desktop, receipt, packages, output, *, cursor_tools, labwc_too
+               'expanded_bytes': profile_total, 'selected_source_bytes': total, 'expanded_limit': expanded_limit,
+               'compressed_limit': compressed_limit, 'upper_mib': upper_mib,
+               'device_tested': False, 'full_installed_omarchy': False,
+-              'source_archive_rechecked': False, 'component_inputs': component_inputs,
++              'source_archive_rechecked': False, 'qml_imports': qml_imports,
++              'component_inputs': component_inputs,
+               'component_overrides': {key: {'original_base_sha256': digest(source.root / key)
+                                            if (source.root / key).is_file() else None,
+                                            'sha256': selected[key]['sha256'], 'mode': value['mode'],
+diff --git a/tests/test_ram_desktop.py b/tests/test_ram_desktop.py
+index 2935d3c..f7244e1 100644
+--- a/tests/test_ram_desktop.py
++++ b/tests/test_ram_desktop.py
+@@ -291,6 +291,29 @@ class RamDesktop(unittest.TestCase):
+         self.assertEqual(set(selected), {theme + '/jade-horse/colors.toml',
+                          'usr/lib/qt6/plugins/platforms/libqwayland-generic.so'})
+ 
++    def test_qml_module_requirements_refuse_missing_core_metadata_and_ignore_optional_import(self):
++        self.put('usr/lib/qt6/qml/QtQml/qmldir',
++                 b'module QtQml\nimport QML 1.0\noptional import Unused.Module auto\n')
++        self.put('ui/shell.qml', b'import QtQml\nimport "local"\n')
++        source = ram.Source(self.root)
++        selected, _ = ram.selection(source, ['ui/shell.qml'], ['usr/lib/qt6/qml/QtQml'])
++        with self.assertRaisesRegex(ValueError, 'Required QML import absent.*QML'):
++            ram.verify_qml_imports(source, selected)
++        self.put('usr/lib/qt6/qml/QML/qmldir', b'module QML\nstatic\nsystem\n')
++        selected, _ = ram.selection(source, ['ui/shell.qml'], ['usr/lib/qt6/qml'])
++        result = ram.verify_qml_imports(source, selected)
++        self.assertEqual(set(result['required_imports']), {'QML', 'QtQml'})
++        self.assertIn('RUNTIME_UNTESTED', result['status'])
++        plugin = ram.UI + '/shell/plugins/lock/'
++        self.put(plugin + 'manifest.json', b'{"id":"omarchy.lock"}')
++        self.put(plugin + 'LockFeedSurface.qml', b'import Owe.LockFeed\n')
++        selected, _ = ram.selection(source, ['ui/shell.qml'], ['usr/lib/qt6/qml', plugin])
++        with self.assertRaisesRegex(ValueError, 'Required QML import absent.*Owe.LockFeed'):
++            ram.verify_qml_imports(source, selected)
++        result = ram.verify_qml_imports(source, selected, disabled_plugins=['omarchy.lock'])
++        self.assertEqual(result['disabled_plugin_sources_not_required'], [plugin + 'LockFeedSurface.qml'])
++        self.assertEqual(set(result['required_imports']), {'QML', 'QtQml'})
++
+ 
+ if __name__ == '__main__':
+     unittest.main()
+-- 
+2.47.3
+

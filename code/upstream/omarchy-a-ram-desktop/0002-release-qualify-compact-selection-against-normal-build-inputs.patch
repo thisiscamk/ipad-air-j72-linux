@@ -1,0 +1,567 @@
+From 5a93e04d199c7cb1b59439f28f7ec3585d759592 Mon Sep 17 00:00:00 2001
+From: thisiscamk <100883750+thisiscamk@users.noreply.github.com>
+Date: Tue, 3 Nov 2026 21:16:53 +0800
+Subject: [PATCH] release: qualify compact selection against normal build
+ inputs
+
+Require verified normal cursor and Labwc components through a read-only source overlay with installed ownership. Record component replacements separately from base selections and explicit compact UI overrides.
+
+Hide unavailable app and power launchers, restrict the bar and Home bindings to the RAM session, retain the default theme and required Qt families, and omit unneeded optional development, Tk and 3D payloads. The real normal root plan selects 293882327 bytes under the existing RAM limits; lifecycle and hardware remain unqualified.
+
+Assisted-by: LLM
+---
+ docs/ram-desktop.md        |  26 ++++-
+ release/ram_desktop.py     | 209 +++++++++++++++++++++++++++++++++----
+ tests/test_ram_desktop.py  |  87 ++++++++++++++-
+ tools/build-ram-desktop.py |   6 +-
+ 4 files changed, 298 insertions(+), 30 deletions(-)
+
+diff --git a/docs/ram-desktop.md b/docs/ram-desktop.md
+index 44e2620..6163eda 100644
+--- a/docs/ram-desktop.md
++++ b/docs/ram-desktop.md
+@@ -9,13 +9,14 @@ receipts and runtime source for review.
+ 
+ Use the kept root directory produced by the normal `system/assemble-rootfs`,
+ its `rootfs.tar.gz.json` and `packages.lock`, and the matching verified normal
+-`desktop/build` component. Run in that Arch native build environment so file
++`desktop/build`, cursor-helper and Labwc components. Run in that Arch native build environment so file
+ ownership can be preserved. Nothing is extracted from the historical lab root.
+ 
+ ```sh
+ python3 tools/build-ram-desktop.py \
+   --root STAGED_ROOT --desktop DESKTOP_COMPONENT \
+   --source-receipt ROOTFS_RECEIPT --packages-lock PACKAGES_LOCK \
++  --cursor-tools CURSOR_COMPONENT --labwc-tools LABWC_COMPONENT \
+   --orchard ORCHARD_CHECKOUT --output NEW_PLAN --plan-only
+ ```
+ 
+@@ -30,6 +31,14 @@ The source root must be the normal base stage. The finished release root
+ rewrites the UI manifest; accepting that later stage needs a separate matching
+ receipt contract, rather than ignoring a manifest mismatch.
+ 
++The cursor and Labwc inputs pass the same verifiers as the normal finished
++release. Their binaries, licenses and Labwc corresponding source are selected
++through a read-only logical overlay, without changing or duplicating the base
++root. They get the normal release's root ownership and modes in the subset.
++`component_inputs` records the verified receipts; `component_overrides` records
++their selected bytes and any replaced base file's hash separately. Source
++selection, component replacements and generated UI overrides remain distinct.
++
+ ## Selection and limits
+ 
+ The initial profile keeps Labwc, Quickshell, the normal keyboard and UI,
+@@ -39,6 +48,21 @@ CA certificates and D-Bus/input data. Script interpreters and the Python
+ standard library are included when needed. Optional GTK platform themes and
+ non-SQLite Qt SQL backends are outside this session.
+ 
++The profile retains the normal default Jade Horse theme and the imported
++QtQuick, QtQml, Qt and Quickshell module families. Other installed themes,
++KDE/Dolphin/designer plugins, optional Qt multimedia/3D QML, Python Tk and
++Python development configuration are not part of this Qt desktop profile.
++
++The compact profile adds an explicit normal user menu extension that hides
++the installed-system menu entries and offers Terminal and Keyboard. The bar
++contains Menu, Clock and Keyboard; unavailable service panels, idle locking
++and power actions are disabled. Labwc retains compositor window actions,
++Foot and menu bindings; Home opens the menu. Browser/file-manager launchers
++are not exposed in this profile. These generated configuration overrides have
++separate original/generated hashes in `profile_overrides`; the verified normal
++component and its default menu remain unchanged. Source-selection hashes are
++not presented as hashes of overridden output files.
++
+ This is an explicit first profile, not proof of every runtime `dlopen`, QML
+ import, helper or optional panel dependency. Missing files/dependencies and
+ limits refuse a build. Large applications such as browsers are not included.
+diff --git a/release/ram_desktop.py b/release/ram_desktop.py
+index 33ffe9d..dcbd510 100644
+--- a/release/ram_desktop.py
++++ b/release/ram_desktop.py
+@@ -9,6 +9,7 @@ import shlex
+ import shutil
+ import stat
+ import subprocess
++import xml.etree.ElementTree as ET
+ 
+ PROJECT = Path(__file__).resolve().parents[1]
+ UI = 'home/tablet/.local/share/omarchy-ipad'
+@@ -20,10 +21,18 @@ PROGRAMS = ('labwc', 'qs', 'foot', 'bash', 'env', 'dbus-daemon', 'dbus-run-sessi
+             'awk', 'basename', 'dirname', 'mktemp', 'rmdir', 'gsettings')
+ TREES = (UI, 'usr/local/bin', 'home/tablet/.config/labwc', 'home/tablet/.config/foot',
+          'home/tablet/.config/fontconfig', 'home/tablet/.config/omarchy-ipad',
+-         'usr/lib/qt6/qml', 'usr/lib/qt6/plugins',
++         'usr/lib/qt6/qml/QtQuick', 'usr/lib/qt6/qml/QtQml',
++         'usr/lib/qt6/qml/Qt', 'usr/lib/qt6/qml/Quickshell',
++         'usr/lib/qt6/plugins/platforms',
++         'usr/lib/qt6/plugins/wayland-shell-integration',
++         'usr/lib/qt6/plugins/wayland-decoration-client',
++         'usr/lib/qt6/plugins/wayland-graphics-integration-client',
++         'usr/lib/qt6/plugins/imageformats', 'usr/lib/qt6/plugins/iconengines',
++         'usr/lib/qt6/plugins/tls', 'usr/lib/qt6/plugins/networkinformation',
++         'usr/lib/qt6/plugins/sqldrivers',
+          'usr/lib/udev/rules.d', 'usr/share/X11/xkb', 'etc/fonts',
+          'usr/share/fontconfig', 'usr/share/libinput', 'usr/share/dbus-1',
+-         'etc/dbus-1', 'usr/lib/locale/C.utf8', 'etc/ssl/certs', 'usr/share/glib-2.0/schemas')
++         'usr/lib/locale/C.utf8', 'etc/ssl/certs', 'usr/share/glib-2.0/schemas')
+ FILES = ('etc/passwd', 'etc/group', 'etc/nsswitch.conf', 'etc/hosts',
+          'home/tablet/.bashrc', 'usr/lib/systemd/systemd-udevd', 'usr/lib/udev/libinput-device-group',
+          'usr/libexec/omarchy-wtype',
+@@ -58,15 +67,29 @@ def normalized(name):
+ 
+ 
+ class Source:
+-    def __init__(self, root):
++    def __init__(self, root, components=None):
+         self.root = Path(root).absolute()
+         if self.root.is_symlink() or not self.root.is_dir():
+             raise ValueError('Expected a real staged root directory')
+         self.links = {}
++        self.components = components or {}
++
++    def file(self, label):
++        entry = self.components.get(label)
++        return entry['path'] if entry else self.root / label
++
++    def attributes(self, label):
++        entry = self.components.get(label)
++        if entry:
++            return entry['mode'], 0, 0
++        info = self.file(label).stat()
++        return stat.S_IMODE(info.st_mode), info.st_uid, info.st_gid
+ 
+     def resolve(self, name):
+         name = normalized(name)
+         for _ in range(32):
++            if name in self.components:
++                return name
+             parts = name.split('/')
+             for index in range(len(parts)):
+                 label = '/'.join(parts[:index + 1])
+@@ -110,7 +133,7 @@ def selection(source, seeds, trees, *, expanded_limit=384 * 1024**2,
+         label = source.resolve(name)
+         if label in selected:
+             return
+-        path = source.root / label
++        path = source.file(label)
+         if not path.is_file() or path.is_symlink():
+             raise ValueError('Missing selected regular file: ' + label)
+         info = path.stat()
+@@ -119,8 +142,13 @@ def selection(source, seeds, trees, *, expanded_limit=384 * 1024**2,
+         total += info.st_size
+         if total > expanded_limit or len(selected) >= 25000:
+             raise ValueError('RAM desktop subset exceeds its declared limit')
+-        selected[label] = {'bytes': info.st_size, 'sha256': digest(path),
+-                           'mode': stat.S_IMODE(info.st_mode), 'uid': info.st_uid, 'gid': info.st_gid}
++        mode, uid, gid = source.attributes(label)
++        sha = digest(path)
++        if source.components.get(label, {}).get('sha256', sha) != sha:
++            raise ValueError('Normal component changed after verification: ' + label)
++        selected[label] = {'bytes': info.st_size, 'sha256': sha,
++                           'mode': mode, 'uid': uid, 'gid': gid,
++                           'source': source.components.get(label, {}).get('component', 'base')}
+         pending.append(label)
+ 
+     for seed in seeds:
+@@ -139,11 +167,21 @@ def selection(source, seeds, trees, *, expanded_limit=384 * 1024**2,
+             if path.name in ('__pycache__', 'test', 'tests', 'idlelib', 'tkinter', 'site-packages'):
+                 continue
+             label = path.relative_to(source.root).as_posix()
++            if resolved == UI + '/themes' and path.name != 'jade-horse':
++                continue
++            if label in ('usr/lib/qt6/qml/QtQuick/tooling', 'usr/lib/qt6/qml/QtQml/DesignSupport'):
++                continue
++            if resolved.startswith('usr/lib/python3.') and path.name.startswith('config-3.'):
++                continue
++            if resolved.startswith('usr/lib/python3.') and path.name.startswith('_tkinter.'):
++                continue
+             # This session uses the native Wayland QPA and SQLite only. GTK
+             # platform themes and optional SQL backends require other desktops.
+             if '/plugins/platformthemes/' in label or ('/plugins/sqldrivers/' in label and
+                                                         path.name != 'libqsqlite.so'):
+                 continue
++            if resolved == 'usr/lib/qt6/plugins/platforms' and not path.name.startswith('libqwayland'):
++                continue
+             actual = source.root / source.resolve(label)
+             if actual.is_dir():
+                 tree_files(label)
+@@ -157,7 +195,7 @@ def selection(source, seeds, trees, *, expanded_limit=384 * 1024**2,
+     python_added = False
+     while pending:
+         label = pending.popleft()
+-        with (source.root / label).open('rb') as stream:
++        with source.file(label).open('rb') as stream:
+             head = stream.readline(4096)
+         if head.startswith(b'#!'):
+             fields = shlex.split(head[2:].decode().strip())
+@@ -176,7 +214,7 @@ def selection(source, seeds, trees, *, expanded_limit=384 * 1024**2,
+             for library in libraries:
+                 if library.is_dir():
+                     tree_files(library.relative_to(source.root).as_posix())
+-        needed, paths, interpreter = dependencies(source.root / label)
++        needed, paths, interpreter = dependencies(source.file(label))
+         if interpreter:
+             add(interpreter)
+         origin = str(PurePosixPath(label).parent)
+@@ -187,7 +225,7 @@ def selection(source, seeds, trees, *, expanded_limit=384 * 1024**2,
+             raise ValueError('Unsupported ELF search variable')
+         for name in needed:
+             candidates = [normalized(p + '/' + name) for p in [*paths, 'usr/lib', 'lib']]
+-            found = next((p for p in candidates if (source.root / source.resolve(p)).is_file()), None)
++            found = next((p for p in candidates if source.file(source.resolve(p)).is_file()), None)
+             if found is None:
+                 raise ValueError(f'Unresolved ELF dependency: {label} needs {name}')
+             add(found)
+@@ -204,29 +242,30 @@ def stage(source, selected, target):
+         if not (source.root / label).is_symlink() or os.readlink(source.root / label) != link:
+             raise ValueError('Source symlink changed during staging: ' + label)
+     for label in selected:
+-        src, dst = source.root / label, target / label
++        src, dst = source.file(label), target / label
+         if source.resolve(label) != label:
+             raise ValueError('Source path changed during staging: ' + label)
+         info = src.stat()
+         expected = selected[label]
+         if (digest(src) != expected['sha256'] or info.st_size != expected['bytes'] or
+-                (stat.S_IMODE(info.st_mode), info.st_uid, info.st_gid) !=
++                source.attributes(label) !=
+                 (expected['mode'], expected['uid'], expected['gid'])):
+             raise ValueError('Source changed during staging: ' + label)
+         dst.parent.mkdir(parents=True, exist_ok=True)
+         shutil.copy2(src, dst)
+         if digest(dst) != selected[label]['sha256']:
+             raise ValueError('Subset copy differs: ' + label)
+-        info = src.stat()
+-        if (info.st_uid, info.st_gid) != (dst.stat().st_uid, dst.stat().st_gid):
+-            os.chown(dst, info.st_uid, info.st_gid)
++        dst.chmod(expected['mode'])
++        if (expected['uid'], expected['gid']) != (dst.stat().st_uid, dst.stat().st_gid):
++            os.chown(dst, expected['uid'], expected['gid'])
+         directories.update(str(p) for p in PurePosixPath(label).parents if str(p) != '.')
+     for label in sorted(directories, key=lambda n: n.count('/'), reverse=True):
+         src, dst = source.root / label, target / label
+-        info = src.stat()
+-        dst.chmod(stat.S_IMODE(info.st_mode))
+-        if (info.st_uid, info.st_gid) != (dst.stat().st_uid, dst.stat().st_gid):
+-            os.chown(dst, info.st_uid, info.st_gid)
++        info = src.stat() if src.is_dir() else None
++        mode, uid, gid = (stat.S_IMODE(info.st_mode), info.st_uid, info.st_gid) if info else (0o755, 0, 0)
++        dst.chmod(mode)
++        if (uid, gid) != (dst.stat().st_uid, dst.stat().st_gid):
++            os.chown(dst, uid, gid)
+     for label, link in sorted(source.links.items(), key=lambda pair: pair[0].count('/')):
+         dst = target / label
+         if dst.exists() or dst.is_symlink():
+@@ -261,26 +300,150 @@ def verify_component_selection(source, selected, desktop):
+             raise ValueError('Selected desktop symlink differs from normal component: ' + label)
+ 
+ 
+-def produce(root, desktop, receipt, packages, output, *, compressed_limit=128 * 1024**2,
++def normal_components(cursor_tools, labwc_tools):
++    from release.public_root import cursor_files, labwc_files
++    overlay, receipts = {}, {}
++    for name, directory, verify in (('cursor', Path(cursor_tools), cursor_files),
++                                    ('labwc', Path(labwc_tools), labwc_files)):
++        files = verify(directory)
++        record = json.loads((directory / 'manifest.json').read_text())
++        receipts[name] = {'manifest_sha256': digest(directory / 'manifest.json'), 'receipt': record}
++        for label, (data, mode) in files.items():
++            # Generated helper receipts remain in the outer build receipt;
++            # install the normal binaries, licenses and corresponding source.
++            if label.startswith('etc/omarchy/'):
++                continue
++            original = 'wtype' if label == 'usr/libexec/omarchy-wtype' else Path(label).name
++            path = directory / original
++            if digest(path) != hashlib.sha256(data).hexdigest():
++                raise ValueError('Normal component destination mapping differs: ' + label)
++            overlay[label] = {'path': path, 'mode': mode, 'component': name,
++                              'sha256': hashlib.sha256(data).hexdigest()}
++    return overlay, receipts
++
++
++def compact_profile(source):
++    """Use normal user overrides; keep verified component bytes as inputs."""
++    shell_path = 'home/tablet/.config/omarchy-ipad/shell.json'
++    rc_path = 'home/tablet/.config/labwc/rc.xml'
++    menu_path = UI + '/default/omarchy/omarchy-menu.jsonc'
++    menu_raw = (source.root / menu_path).read_text()
++    # Match the normal menu reader's JSONC contract: whole-line comments and
++    # trailing commas. Refuse unsupported input instead of guessing at rows.
++    menu = json.loads(re.sub(r',(\s*[}\]])', r'\1',
++                            re.sub(r'^\s*//[^\n]*(?:\n|$)', '', menu_raw, flags=re.M)))
++    entries = menu.get('items', menu)
++    if not isinstance(entries, dict) or not entries or any(
++            not isinstance(key, str) or not isinstance(value, dict) for key, value in entries.items()):
++        raise ValueError('Unsupported normal menu definition')
++    extension = {key: {'when': 'false'} for key in entries}
++    extension.update({
++        'root': {'label': 'Omarchy A RAM'},
++        'ram-terminal': {'parent': 'root', 'label': 'Terminal', 'action': 'foot'},
++        'ram-keyboard': {'parent': 'root', 'label': 'Keyboard', 'action': 'omarchy-keyboard toggle'},
++    })
++    config = json.loads((source.root / shell_path).read_text())
++    if config.get('version') != 1:
++        raise ValueError('Unsupported normal shell configuration')
++    allowed = {'omarchy.bar', 'omarchy.menu', 'omarchy.clock', 'ipadlinux.keyboard'}
++    plugins = {json.loads(p.read_text())['id'] for p in
++               (source.root / UI / 'shell/plugins').rglob('*manifest.json')}
++    if not allowed.issubset(plugins):
++        raise ValueError('Missing normal compact-profile plugins')
++    config.update(idle={'screensaver': 0, 'lock': 0},
++                  disabledPlugins=sorted(plugins - allowed), plugins=[])
++    config['bar'] = {'position': 'top', 'background': 'opaque', 'layout': {
++        'left': [{'id': 'omarchy.menu'}], 'centerBegin': [],
++        'center': [{'id': 'omarchy.clock', 'format': 'HH:mm'}], 'centerEnd': [],
++        'right': [{'id': 'ipadlinux.keyboard'}]}}
++    rc = ET.fromstring((source.root / rc_path).read_bytes())
++    keyboard = rc.find('keyboard')
++    if keyboard is None:
++        raise ValueError('Missing normal Labwc keyboard bindings')
++    for defaults in keyboard.findall('default'):
++        keyboard.remove(defaults)
++    menu_command = 'omarchy-shell shell toggle omarchy.menu \'{"menu":"root"}\''
++    for binding in list(keyboard.findall('keybind')):
++        for action in binding.findall('action'):
++            if action.get('name') != 'Execute':
++                continue
++            command = action.get('command', '')
++            if command.startswith('omarchy-shell ') or binding.get('key') == 'XF86HomePage':
++                action.set('command', menu_command)
++            elif command != 'foot':
++                keyboard.remove(binding)
++                break
++    encoded = lambda value: (json.dumps(value, sort_keys=True, indent=2) + '\n').encode()
++    files = {shell_path: encoded(config), rc_path: ET.tostring(rc, encoding='utf-8', xml_declaration=True),
++             'home/tablet/.config/omarchy/extensions/omarchy-menu.jsonc': encoded(extension)}
++    owner = (source.root / 'home/tablet').stat()
++    result = {}
++    for label, data in files.items():
++        original = source.root / label
++        if original.is_symlink() or (label.endswith('/extensions/omarchy-menu.jsonc') and original.exists()):
++            raise ValueError('Compact profile requires a clean normal base root')
++        result[label] = {'data': data, 'original_sha256': digest(original) if original.is_file() else None,
++                         'sha256': hashlib.sha256(data).hexdigest(), 'bytes': len(data),
++                         'uid': owner.st_uid, 'gid': owner.st_gid, 'mode': 0o644}
++    return result
++
++
++def apply_profile(subset, overrides):
++    for label, override in overrides.items():
++        path = subset / label
++        parents = []
++        parent = path.parent
++        while not parent.exists():
++            parents.append(parent)
++            parent = parent.parent
++        path.parent.mkdir(parents=True, exist_ok=True)
++        for parent in parents:
++            parent.chmod(0o755)
++            os.chown(parent, override['uid'], override['gid'])
++        path.write_bytes(override['data'])
++        path.chmod(override['mode'])
++        os.chown(path, override['uid'], override['gid'])
++
++
++def produce(root, desktop, receipt, packages, output, *, cursor_tools, labwc_tools,
++            compressed_limit=128 * 1024**2,
+             expanded_limit=384 * 1024**2, upper_mib=64, plan_only=False):
+     output = Path(output)
+     if output.exists() or output.is_symlink() or not 16 <= upper_mib <= 128:
+         raise ValueError('Choose a new output and an upper limit of 16..128 MiB')
+     provenance = verify_inputs(root, desktop, receipt, packages)
+-    source = Source(root)
+-    selected, total = selection(source, [*FILES, *('usr/bin/' + p for p in PROGRAMS)], TREES,
++    overlay, component_inputs = normal_components(cursor_tools, labwc_tools)
++    source = Source(root, overlay)
++    selected, total = selection(source, [*FILES, *overlay, *('usr/bin/' + p for p in PROGRAMS)], TREES,
+                                  expanded_limit=expanded_limit)
+     verify_component_selection(source, selected, desktop)
++    overrides = compact_profile(source)
++    for label, override in overrides.items():
++        if override['original_sha256'] is not None and override['original_sha256'] != selected[label]['sha256']:
++            raise ValueError('Profile source changed during selection: ' + label)
++    profile_total = total + sum(value['bytes'] - selected.get(key, {}).get('bytes', 0)
++                                for key, value in overrides.items())
++    if profile_total > expanded_limit:
++        raise ValueError('RAM desktop profile exceeds its declared limit')
+     record = {'schema': 1, 'kind': 'ram-desktop-candidate', 'status': 'HOST_PLAN_ONLY',
+               'source': provenance, 'selected': selected, 'symlinks': source.links,
+-              'expanded_bytes': total, 'expanded_limit': expanded_limit,
++              'expanded_bytes': profile_total, 'selected_source_bytes': total, 'expanded_limit': expanded_limit,
+               'compressed_limit': compressed_limit, 'upper_mib': upper_mib,
+               'device_tested': False, 'full_installed_omarchy': False,
+-              'source_archive_rechecked': False}
++              'source_archive_rechecked': False, 'component_inputs': component_inputs,
++              'component_overrides': {key: {'original_base_sha256': digest(source.root / key)
++                                           if (source.root / key).is_file() else None,
++                                           'sha256': selected[key]['sha256'], 'mode': value['mode'],
++                                           'uid': 0, 'gid': 0, 'component': value['component']}
++                                      for key, value in overlay.items()},
++              'profile': 'compact-console-desktop-v1',
++              'profile_overrides': {key: {k: v for k, v in value.items() if k != 'data'}
++                                    for key, value in overrides.items()}}
+     output.mkdir(parents=True)
+     if not plan_only:
+         subset = output / '.subset'
+         stage(source, selected, subset)
++        apply_profile(subset, overrides)
+         project = output / 'project'
+         image = project / 'rootfs/usr/share/omarchy/desktop.squashfs'
+         image.parent.mkdir(parents=True)
+diff --git a/tests/test_ram_desktop.py b/tests/test_ram_desktop.py
+index 52bd713..2935d3c 100644
+--- a/tests/test_ram_desktop.py
++++ b/tests/test_ram_desktop.py
+@@ -7,6 +7,7 @@ import struct
+ import tempfile
+ import unittest
+ from unittest.mock import patch
++import xml.etree.ElementTree as ET
+ 
+ from release import ram_desktop as ram
+ 
+@@ -106,6 +107,8 @@ class RamDesktop(unittest.TestCase):
+         (self.root / 'usr/bin/python3').symlink_to('python3.13')
+         self.put('usr/lib/python3.13/tomllib/__init__.py')
+         self.put('usr/lib/python3.13/site-packages/unused.py')
++        self.put('usr/lib/python3.13/lib-dynload/_tkinter.fixture.so')
++        self.put('usr/lib/python3.13/config-3.13/Makefile')
+         self.put('unique-fixture-data/file')
+         (self.root / 'data-alias').symlink_to('/unique-fixture-data')
+         selected, _ = ram.selection(ram.Source(self.root), ['usr/bin/script'], ['data-alias'])
+@@ -113,6 +116,8 @@ class RamDesktop(unittest.TestCase):
+                          'usr/lib/python3.13/tomllib/__init__.py',
+                          'unique-fixture-data/file'}.issubset(selected))
+         self.assertNotIn('usr/lib/python3.13/site-packages/unused.py', selected)
++        self.assertNotIn('usr/lib/python3.13/lib-dynload/_tkinter.fixture.so', selected)
++        self.assertNotIn('usr/lib/python3.13/config-3.13/Makefile', selected)
+         self.put('usr/bin/script', b'#!/usr/bin/env -S python3 -I\n')
+         with self.assertRaisesRegex(ValueError, 'Unsupported env'):
+             ram.selection(ram.Source(self.root), ['usr/bin/script'], [])
+@@ -194,14 +199,17 @@ class RamDesktop(unittest.TestCase):
+             Path(command[2]).write_bytes(b'synthetic image')
+ 
+         with patch.object(ram, 'PROGRAMS', ()), patch.object(ram, 'FILES', ('usr/bin/app',)), \
+-                patch.object(ram, 'TREES', ()), patch.object(ram.subprocess, 'run', side_effect=compress) as run:
++                patch.object(ram, 'TREES', ()), patch.object(ram, 'compact_profile', return_value={}), \
++                patch.object(ram, 'normal_components', return_value=({}, {})), \
++                patch.object(ram.subprocess, 'run', side_effect=compress) as run:
+             output = Path(self.temp.name) / 'plan'
+-            plan = ram.produce(self.root, desktop, receipt, packages, output, plan_only=True)
++            inputs = {'cursor_tools': 'unused-fixture', 'labwc_tools': 'unused-fixture'}
++            plan = ram.produce(self.root, desktop, receipt, packages, output, plan_only=True, **inputs)
+             self.assertEqual(plan['status'], 'HOST_PLAN_ONLY')
+             self.assertFalse((output / 'project').exists())
+             run.assert_not_called()
+             built = Path(self.temp.name) / 'built'
+-            result = ram.produce(self.root, desktop, receipt, packages, built)
++            result = ram.produce(self.root, desktop, receipt, packages, built, **inputs)
+             self.assertEqual(result['status'], 'HOST_BUILT_DEVICE_UNTESTED')
+             self.assertFalse((built / '.subset').exists())
+             self.assertEqual((built / 'project/init').read_bytes(),
+@@ -210,7 +218,78 @@ class RamDesktop(unittest.TestCase):
+             self.assertFalse(result['device_tested'])
+             with self.assertRaisesRegex(ValueError, 'Compressed desktop exceeds'):
+                 ram.produce(self.root, desktop, receipt, packages,
+-                            Path(self.temp.name) / 'too-large', compressed_limit=1)
++                            Path(self.temp.name) / 'too-large', compressed_limit=1, **inputs)
++
++    def test_compact_profile_keeps_verified_inputs_and_omits_unavailable_actions(self):
++        shell = 'home/tablet/.config/omarchy-ipad/shell.json'
++        rc = 'home/tablet/.config/labwc/rc.xml'
++        menu = ram.UI + '/default/omarchy/omarchy-menu.jsonc'
++        self.put(shell, b'{"version":1,"idle":{"lock":300}}')
++        self.put(menu, b'{\n// supported comment\n"browser":{"action":"firefox"},\n'
++                      b'"files":{"action":"dolphin"},\n"power":{"action":"systemctl poweroff"},\n}')
++        self.put(rc, b'<labwc_config><keyboard><default/>'
++                    b'<keybind key="W-b"><action name="Execute" command="firefox"/></keybind>'
++                    b'<keybind key="W-Return"><action name="Execute" command="foot"/></keybind>'
++                    b'<keybind key="XF86HomePage"><action name="Execute" command="omarchy-tablet-power home"/></keybind>'
++                    b'<keybind key="W-w"><action name="Close"/></keybind>'
++                    b'</keyboard></labwc_config>')
++        for name in ('omarchy.bar', 'omarchy.menu', 'omarchy.clock', 'ipadlinux.keyboard', 'omarchy.lock'):
++            self.put(ram.UI + '/shell/plugins/' + name + '/manifest.json',
++                     json.dumps({'id': name}).encode())
++        original = {name: (self.root / name).read_bytes() for name in (shell, rc, menu)}
++        overrides = ram.compact_profile(ram.Source(self.root))
++        self.assertEqual({name: (self.root / name).read_bytes() for name in original}, original)
++        self.assertNotIn(menu, overrides)  # The immutable default remains byte-identical.
++        settings = json.loads(overrides[shell]['data'])
++        self.assertEqual(settings['idle']['lock'], 0)
++        self.assertIn('omarchy.lock', settings['disabledPlugins'])
++        extension = json.loads(overrides['home/tablet/.config/omarchy/extensions/omarchy-menu.jsonc']['data'])
++        self.assertTrue(all(extension[name]['when'] == 'false' for name in ('browser', 'files', 'power')))
++        self.assertEqual({value['action'] for value in extension.values() if 'action' in value},
++                         {'foot', 'omarchy-keyboard toggle'})
++        keyboard = ET.fromstring(overrides[rc]['data']).find('keyboard')
++        self.assertIsNone(keyboard.find('default'))
++        bindings = {binding.get('key'): binding for binding in keyboard.findall('keybind')}
++        self.assertNotIn('W-b', bindings)
++        self.assertEqual(bindings['W-w'].find('action').get('name'), 'Close')
++        self.assertIn('omarchy.menu', bindings['XF86HomePage'].find('action').get('command'))
++        target = Path(self.temp.name) / 'profile'
++        target.mkdir()
++        ram.apply_profile(target, overrides)
++        for name, value in overrides.items():
++            self.assertEqual(ram.digest(target / name), value['sha256'])
++            self.assertEqual((target / name).stat().st_mode & 0o777, value['mode'])
++
++    def test_readonly_component_overlay_uses_normal_runtime_path_for_closure(self):
++        self.put('usr/bin/labwc', b'base package')
++        self.put('usr/lib/libnative.so')
++        component = Path(self.temp.name) / 'normal-labwc'
++        component.write_bytes(b'source-built component')
++        source = ram.Source(self.root, {'usr/bin/labwc': {
++            'path': component, 'mode': 0o755, 'component': 'labwc'}})
++        selected, _ = ram.selection(source, ['usr/bin/labwc'], [], dependencies=lambda path:
++                                    (['libnative.so'], ['$ORIGIN/../lib'], None)
++                                    if path == component else ([], [], None))
++        self.assertEqual(selected['usr/bin/labwc']['source'], 'labwc')
++        self.assertEqual(selected['usr/bin/labwc']['uid'], 0)
++        self.assertEqual(selected['usr/bin/labwc']['mode'], 0o755)
++        self.assertEqual(selected['usr/bin/labwc']['sha256'], ram.digest(component))
++        self.assertIn('usr/lib/libnative.so', selected)
++        self.assertEqual((self.root / 'usr/bin/labwc').read_bytes(), b'base package')
++        source.components['usr/bin/labwc']['sha256'] = '0' * 64
++        with self.assertRaisesRegex(ValueError, 'changed after verification'):
++            ram.selection(source, ['usr/bin/labwc'], [])
++
++    def test_profile_retains_default_theme_and_wayland_plugin_without_optional_installed_payloads(self):
++        theme = ram.UI + '/themes'
++        self.put(theme + '/jade-horse/colors.toml')
++        self.put(theme + '/other-theme/background.webp')
++        self.put('usr/lib/qt6/plugins/platforms/libqwayland-generic.so')
++        self.put('usr/lib/qt6/plugins/platforms/libqxcb.so')
++        selected, _ = ram.selection(ram.Source(self.root), [],
++                                    [theme, 'usr/lib/qt6/plugins/platforms'])
++        self.assertEqual(set(selected), {theme + '/jade-horse/colors.toml',
++                         'usr/lib/qt6/plugins/platforms/libqwayland-generic.so'})
+ 
+ 
+ if __name__ == '__main__':
+diff --git a/tools/build-ram-desktop.py b/tools/build-ram-desktop.py
+index 54226c7..35c25c3 100755
+--- a/tools/build-ram-desktop.py
++++ b/tools/build-ram-desktop.py
+@@ -12,7 +12,8 @@ from release.ram_desktop import produce
+ 
+ def main():
+     parser = argparse.ArgumentParser(description=__doc__)
+-    for option in ('root', 'desktop', 'source-receipt', 'packages-lock', 'output', 'orchard'):
++    for option in ('root', 'desktop', 'source-receipt', 'packages-lock', 'cursor-tools',
++                   'labwc-tools', 'output', 'orchard'):
+         parser.add_argument('--' + option, type=Path, required=True)
+     parser.add_argument('--plan-only', action='store_true')
+     parser.add_argument('--upper-mib', type=int, default=64)
+@@ -23,7 +24,8 @@ def main():
+     subprocess.run([sys.executable, str(project / 'desktop/build'), '--verify', str(args.desktop)],
+                    check=True, env={**os.environ, 'ORCHARD_CHECKOUT': str(args.orchard.resolve())})
+     record = produce(args.root, args.desktop, args.source_receipt, args.packages_lock,
+-                     args.output, upper_mib=args.upper_mib, plan_only=args.plan_only)
++                     args.output, cursor_tools=args.cursor_tools, labwc_tools=args.labwc_tools,
++                     upper_mib=args.upper_mib, plan_only=args.plan_only)
+     print(record['status'])
+ 
+ 
+-- 
+2.47.3
+

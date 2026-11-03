@@ -50,9 +50,18 @@ a reusable distribution-owned RAM desktop project from the **normal Omarchy
 components and Arch root**, using gzip SquashFS and bounded writable RAM.
 The tested USB console stays outside its manually started desktop chroot.
 
-The full root producer and coherent native kernel build are running. The RAM
-project producer also passes 124 host tests (11 new closure/provenance/budget
-fixtures); its real-root size and runtime lifecycle are still unqualified. No source-built desktop image or native touch success is claimed yet.
+The normal signed Arch root has built successfully. Its 1,265,877,734-byte
+archive alone exceeds the iPad's RAM, so the full installed root stays on the
+host. The [compact RAM producer](code/upstream/omarchy-a-ram-desktop) now builds
+a **104.64 MiB gzip SquashFS** from those normal inputs. Its selected expanded
+files total 293,944,222 bytes. All 128 host tests pass, including 15 RAM fixtures;
+independent extraction checks confirm critical file hashes and ownership.
+The native kernel is still compiling. Native touch, desktop lifecycle, working
+memory and input on this new source-built combination remain unqualified.
+
+The working terminal touch/IME change is also being prepared as a separate,
+opt-in source component. Its actual C callback checks pass; compilation and
+integration are in progress. Normal signed Foot remains the default.
 
 ## Next qualification
 

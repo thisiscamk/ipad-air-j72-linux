@@ -1,0 +1,37 @@
+{
+  "status": "HOST_BUILD_ONLY_DEVICE_UNQUALIFIED",
+  "repository": "OrchardLinux/omarchy-a",
+  "base_commit": "fa25972a83a279bdd7e5edc9ff6013cd211562fb",
+  "source_commit": "efc3c6cb8b508cbeed81b0c39f5706f3bbf9f3b6",
+  "image_selection_commit": "5d68ee7732153b75d17aa46de0a9aa8b236882d0",
+  "audit_followup_changes_payload": false,
+  "host_suite": {
+    "count": 128,
+    "result": "PASS"
+  },
+  "ram_fixtures": 15,
+  "actual_image": {
+    "compressed_bytes": 109719552,
+    "expanded_bytes": 293944222,
+    "sha256": "3bfa549bfb0a4b762c2b04d40979487268a9cefafc0976afd420fab879a3a408",
+    "compression": "gzip SquashFS",
+    "compressed_limit_bytes": 134217728,
+    "expanded_limit_bytes": 402653184,
+    "critical_file_hashes_and_ownership": "PASS",
+    "qml_modules": 77,
+    "required_imports": 52
+  },
+  "device_tested": false,
+  "runtime_mounts_or_chroot_executed": false,
+  "apple_firmware_or_unit_data_published": false,
+  "files": {
+    "0001-release-prepare-a-bounded-RAM-desktop-project.patch": "ae437c96102865ba354ba7db7f1dfaf1cebb9f8aa5bc01cbe7b2a0c68ba99631",
+    "0002-release-qualify-compact-selection-against-normal-build-inputs.patch": "bff389313bf2799f2438267d654413d93cb1303c19de5b70125c7b16c8834413",
+    "0003-release-check-required-QML-module-declarations.patch": "151dd6de46e302675f4ec53b69c4fc9bb0a9816a9d59c64bdf7dbe5bd9d89924",
+    "0004-release-keep-shared-widget-sources-in-import-audit.patch": "617831e3709e5265c0025f08fb08366f425e2dad11029ff56f679c6f7a2b2211"
+  },
+  "published_patch_replay": {
+    "result": "PASS",
+    "tree": "f6d4db8f3d8bc88e3d32f4968e5ee3352a0fe68b"
+  }
+}

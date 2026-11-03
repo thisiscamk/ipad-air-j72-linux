@@ -1,0 +1,49 @@
+From efc3c6cb8b508cbeed81b0c39f5706f3bbf9f3b6 Mon Sep 17 00:00:00 2001
+From: thisiscamk <100883750+thisiscamk@users.noreply.github.com>
+Date: Tue, 3 Nov 2026 21:33:48 +0800
+Subject: [PATCH] release: keep shared widget sources in import audit
+
+Only folder-owned plugin manifests exclude an entire disabled source directory. Individual widget manifests may share a directory, so conservatively audit those sibling files even when one widget is disabled. The selected payload bytes are unchanged.
+
+Assisted-by: LLM
+---
+ release/ram_desktop.py    | 4 +++-
+ tests/test_ram_desktop.py | 7 +++++++
+ 2 files changed, 10 insertions(+), 1 deletion(-)
+
+diff --git a/release/ram_desktop.py b/release/ram_desktop.py
+index e0a805b..bf781e3 100644
+--- a/release/ram_desktop.py
++++ b/release/ram_desktop.py
+@@ -312,7 +312,9 @@ def verify_qml_imports(source, selected, *, disabled_plugins=()):
+     modules, required, skipped = {}, {}, []
+     disabled_directories = []
+     for label in selected:
+-        if label.startswith(UI + '/shell/plugins/') and label.endswith('manifest.json'):
++        # A named *.manifest.json can share its directory with active widgets;
++        # only a folder-owned manifest.json can exclude the whole source tree.
++        if label.startswith(UI + '/shell/plugins/') and Path(label).name == 'manifest.json':
+             manifest = json.loads(source.file(label).read_text())
+             if manifest.get('id') in disabled_plugins:
+                 disabled_directories.append(str(PurePosixPath(label).parent) + '/')
+diff --git a/tests/test_ram_desktop.py b/tests/test_ram_desktop.py
+index f7244e1..1925cba 100644
+--- a/tests/test_ram_desktop.py
++++ b/tests/test_ram_desktop.py
+@@ -313,6 +313,13 @@ class RamDesktop(unittest.TestCase):
+         result = ram.verify_qml_imports(source, selected, disabled_plugins=['omarchy.lock'])
+         self.assertEqual(result['disabled_plugin_sources_not_required'], [plugin + 'LockFeedSurface.qml'])
+         self.assertEqual(set(result['required_imports']), {'QML', 'QtQml'})
++        shared = ram.UI + '/shell/plugins/shared/'
++        self.put(shared + 'Widget.manifest.json', b'{"id":"omarchy.widget"}')
++        self.put(shared + 'Sibling.qml', b'import Required.BySibling\n')
++        selected, _ = ram.selection(source, ['ui/shell.qml'],
++                                   ['usr/lib/qt6/qml', ram.UI + '/shell/plugins'])
++        with self.assertRaisesRegex(ValueError, 'Required QML import absent.*Required.BySibling'):
++            ram.verify_qml_imports(source, selected, disabled_plugins=['omarchy.lock', 'omarchy.widget'])
+ 
+ 
+ if __name__ == '__main__':
+-- 
+2.47.3
+
