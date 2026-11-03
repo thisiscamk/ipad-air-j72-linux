@@ -1,5 +1,5 @@
 {
-  "status": "SELFCHECK_AND_INITIAL_DESKTOP_PASS_OWNER_AND_LONG_RUN_PENDING",
+  "status": "SELFCHECK_AND_OWNER_INPUT_PASS_LONG_RUN_GATE_FAILED_BEFORE_CHARGING",
   "module_sha256": "0ad27c0475fc1c63df7008e68f7f5422b4fc00a6e0801f52c40d7b829adb5509",
   "start_stop_selfcheck_pass": true,
   "physical_restoration_pass": true,
@@ -19,8 +19,29 @@
     "phase_resync_frames": 0,
     "phase_resync_failures": 84
   },
-  "owner_input_check_pending": true,
+  "owner_input_check_pending": false,
   "long_run_qualified": false,
   "charging_started": false,
-  "resync_benefit_proved": false
+  "resync_benefit_proved": false,
+  "owner_menu_typing_keyboard_pass": true,
+  "hub_move_pass": true,
+  "final_input_snapshot": {
+    "input_frames": 4502,
+    "input_bad_layouts": 1,
+    "input_timeouts": 0,
+    "xfer_errors": 0,
+    "recovery_stop_reason": 0,
+    "phase_resync_headers": 495,
+    "phase_resync_frames": 0,
+    "phase_resync_failures": 495
+  },
+  "normal_desktop_input_cleanup_pass": true,
+  "normal_provider_cleanup_pass": true,
+  "independent_baseline_verified": true,
+  "raw_layout_report_saved_privately": true,
+  "raw_report_classification": "checksum-valid native report, contact state 1",
+  "ios_reboot_requested": true,
+  "ios_charging_verified": true,
+  "ios_owner_unlocked_and_charging": true,
+  "ios_diagnostic_confirmations": 2
 }

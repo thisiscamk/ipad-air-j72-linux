@@ -16,15 +16,20 @@ No current override or 90-minute power measurement occurred. Normal cleanup,
 independent baseline restoration and iOS charging after unlock pass.
 [Diagnosis and result](TOUCH-FOLLOWUP-2026-11-03.md).
 
-The next changed boot adds the [bounded touch resync candidate](code/touch/data-resync35/)
-and capture-before-shutdown. Host tests/build/preflight pass; hardware behaviour
-is untested. The three rejected layouts remain unexplained. Keep all input,
+The latest changed boot tested the [bounded touch resync candidate](code/touch/data-resync35/)
+and capture-before-shutdown. Host tests/build/preflight and owner input pass, but one rejected layout
+stopped progression before charging. Its captured checksum-valid report contains
+contact state 1, outside our decoder whitelist. The original three reports remain
+unexplained. The extra retry recovered no frames in 495 attempts; benefit is
+unproved. A separate [state-1 inactive candidate](code/touch/state135/) and V3 host runner
+now pass offline tests/build/preflight. They are device untested; use them for
+the next changed DFU. Keep all input,
 source and battery health gates intact. This is now a combined touch/power
 qualification, not an isolated change to charging policy.
 
 ## Concrete change and scope
 
-Use the same #35 cold payload and new bounded-resync touch candidate.
+Use the same #35 cold payload and new state-1 inactive touch candidate (retaining the prior resync policy).
 The power-policy change remains the separate
 [voltage-hold restart candidate](code/charging/voltage-resume35/): voltage/SOC
 holds may resume at 36.6–38°C. Initial starts, actual thermal recovery,
@@ -38,7 +43,7 @@ Host tests/build pass; device behaviour and net gain are unproved.
 1. Verify current iOS/source state, host boot, same powered hub/marked port and
    no boot/test owner. Refresh source qualification if its identity changed.
 2. Use the proven direct-Pi DFU path and a new log filename. Boot the unchanged
-   #35 payload; stage the new resync worker before radio/desktop: `tools/run-j72-touch-resync35.py --stage`.
+   #35 payload; stage the new state-1 worker before radio/desktop: `tools/run-j72-touch-state135.py --stage`.
    Reap one boot owner before starting another. The failed unchanged hub boot
    handoff is not part of this trial.
 3. Start existing Wi-Fi/HTTPS/pinned SSH and the RAM-only desktop. At brightness
@@ -59,13 +64,13 @@ Host tests/build pass; device behaviour and net gain are unproved.
 Workspace commands after steps 1–4 and the qualified hub transfer:
 
 ```sh
-sudo -n python3 tools/run-j72-voltage-session35.py --preflight --touch-resync35
-sudo -n python3 tools/run-j72-voltage-session35.py --run --touch-resync35 --readcheck PATH_TO_THIS_BOOTS_READCHECK
+sudo -n python3 tools/run-j72-state1-session35.py --preflight --touch-state135
+sudo -n python3 tools/run-j72-state1-session35.py --run --touch-state135 --readcheck PATH_TO_THIS_BOOTS_READCHECK
 # Separate follow-up, once the session is running; it waits for test owners:
-sudo -n python3 tools/ensure-j72-ios-charging.py --run --voltage-resume35
+sudo -n python3 tools/ensure-j72-state1-ios-charging.py --run --touch-state135
 ```
 
-[Host source references](code/charging/voltage-resume35/workspace-reference-v2/).
+[V3 host source references](code/touch/state135/workspace-reference-v3/).
 These require the private research workspace; they are not public turnkey tools.
 Do not run the original morning driver or load its original charging module
 for this comparison. Storage qualification remains separate: the new

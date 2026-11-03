@@ -1,0 +1,31 @@
+{
+  "status": "OFFLINE_STATE1_BUILD_TESTS_IMPORTS_PASS_DEVICE_UNTESTED",
+  "uts_version": "#35 SMP PREEMPT Mon Nov 2 07:00:00 +08 2026",
+  "module_sha256": "7b9f2aa8d3fd58650c6ef737fdd13c483fe4dec82136a54b7c988a57b96f7dd8",
+  "base_module_sha256": "0ad27c0475fc1c63df7008e68f7f5422b4fc00a6e0801f52c40d7b829adb5509",
+  "kernel_files_unchanged": true,
+  "prior_candidate_unchanged": true,
+  "private_inputs_unchanged": true,
+  "active_states_unchanged": true,
+  "unknown_states_still_rejected": true,
+  "wire_checksums_and_layout_bounds_unchanged": true,
+  "data_phase_retry_unchanged": true,
+  "recovery_timeout_cleanup_unchanged": true,
+  "actual_emitter_exhaustive_state_tests": true,
+  "private_rejected_report_replay_pass": true,
+  "module_strong_imports": 69,
+  "device_tested": false,
+  "files": {
+    "j72-classic-contacts.h": "a87314308592ef77daa9b1c0aa9070e9003ae72dc78b9892a1c0b3e096fe0c5e",
+    "Makefile": "98d7643bc92d1e047db68fed6afcc9314db7f703d0518efb07a0c73294e1dc2b",
+    "j72_touch_session.c": "5daea8a9d2d6c66848685e96a7d8b98e6ea760ebe591e12ef8ff12169ca13ecd",
+    "test-recovery-window.c": "de47dfbb0e155e371c1daa9ec6a5a541dc33a12f8e2d4052858cfa0cc52f3ab1",
+    "test-data-phase.c": "2649e37bff7db3846e9f1d94e4b724e11204814b58058fa4969b9bdd6d0904b4",
+    "run-j72-touch-state135.py": "2ad5473df023bb03bd821cf1323a573aeddbd81de6556caca3d710589baf2c38",
+    "state1.patch": "430588b63a298862bcbfce77080ac43d4ed20e9fd4270e523e91a2170d1ca069",
+    "prepare-j72-touch-state135.py": "dd30d772825a2a01f569dbb864fe70ce8161f1bf2345b07adf6ecf5add29b308",
+    "j72-data-phase.h": "3ef3c33dcaade7d2ea01fa4ec5b57c9b3108582b03377ed91359beb1ba28387b",
+    "test-emitter.py": "ecc9e05ffc64b179964f2ccdb36bc1dd2056a8c6fad9257ab70b1f3776f14c97",
+    "j72-recovery-window.h": "34405939eb327f6cdd6604665cbd574fd53985652e0e12a8032a8e4017db78af"
+  }
+}

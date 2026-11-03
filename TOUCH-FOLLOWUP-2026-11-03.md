@@ -59,3 +59,32 @@ zero rejected layouts, SPI errors or timeouts. It also has 84 eligible headers,
 zero recovered resync frames and 84 resync failures: the extra retry has not
 proved useful. Owner input verification and the longer guarded test are pending.
 Charging has not started in this boot.
+
+## Owner check passed; actual refusal captured
+
+The owner confirmed menu, Foot typing and keyboard reopening, then moved to the
+powered hub. The next input health check found one rejected layout. No charging
+module was loaded and no current override occurred. The test stopped before
+charging. The stopped-ring capture now works: the sole rejected report was
+retained and its checksum/layout checks reproduced the refusal. It is a native
+`0x44` report, header 24, one contact, stride 30, **contact state `1`**. Our decoder
+accepts only 0/3/4/5/7, so it rejects this state before emitting any event.
+
+Final input counts: 4,502 valid frames, one layout rejection, zero recoveries,
+SPI errors or timeouts. There were 495 eligible extra retries and zero recovered
+resync frames. This boot does not establish a benefit from that transport change.
+Normal desktop/input/provider cleanup and independent baseline `02` pass. A
+normal iOS reboot completed; the owner unlocked and confirmed charging. Two
+fresh diagnostic samples independently confirm charging on the hub.
+
+The [upstream Apple Z2 parser](https://linux.googlesource.com/linux/kernel/git/torvalds/linux/+/81122fba08fa3ccafab6ed272a5c6f2203923a7e/drivers/input/touchscreen/apple_z2.c)
+reports states 3/4 as active and other states as inactive. That is a reference
+for a narrow follow-up experiment, **not proof of the meaning of state 1 on J72**.
+We will retain complete packet/bounds/duplicate-ID validation and reject other
+unknown states. No parser change is yet qualified. The three uncaptured reports
+from the prior attempt remain unexplained. Raw packets stay private.
+
+The [separate state-1 inactive candidate](code/touch/state135/) now passes actual
+emitter/private-report replay, exhaustive state tests, warning-free build/import
+checks and V3 host preflight. It is device untested. The device remains in iOS
+charging; use the new runbook selector for the next changed DFU.

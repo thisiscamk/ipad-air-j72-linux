@@ -47,11 +47,17 @@ rejections stopped the idle/precharge gate. The charging candidate only loaded
 disabled: no current override or net-charge observation occurred. Normal cleanup
 and iOS charging after unlock pass. [Follow-up diagnosis](TOUCH-FOLLOWUP-2026-11-03.md).
 
-The next input candidate retries one checksum-valid E1 header in the data phase;
-complete frame/contact validation and strict observation gates remain unchanged.
-It builds/tests offline but may not explain the three layouts. The revised host
-path saves stopped rejected reports before reboot. If input passes, continue
-charging in that same boot. Account for both changes when interpreting results.
+The later bounded-resync boot passed the owner input check, then stopped before
+charging on one rejected layout. This time the report was captured: checksum-valid
+native structure with contact state 1, outside our whitelist. None of 495 extra
+retries recovered a frame. Cleanup and iOS charging pass.
+
+The [next state-1 inactive candidate](code/touch/state135/) follows upstream Z2
+inactive semantics for that observed state, while retaining other unknown-state,
+packet and layout refusals. Actual emitter/private replay/build and V3 host
+preflight pass; device execution remains untested. Capture before shutdown is now
+proved on device. Continue guarded charging in that same boot only if input passes.
+The combined touch/power qualification does not isolate a power-policy effect.
 
 ## 2. Finish the storage qualification tools offline
 

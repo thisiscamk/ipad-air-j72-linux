@@ -11,7 +11,10 @@ measurements and guarded charging into one Linux boot.
 The follow-up charging candidate loaded disabled, but three touch layout
 rejections stopped precharge checks before arming. No power observation ran.
 Normal cleanup/iOS charging after unlock pass. The [next changed batch](NEXT-POWER-COMPARISON.md)
-adds bounded touch resync and capture before shutdown; input gates remain strict.
+tests the separate state-1 inactive candidate after a captured native report
+identified that refusal. The prior resync trial recovered no frames in 495
+extra retries and stopped before charging. Capture-before-shutdown and normal
+cleanup now pass on device. Input gates remain strict.
 
 ## 1. A repeatable known-hub workload
 
@@ -33,7 +36,8 @@ expired windows and actual thermal recovery retain the cool gate. Actual
 thermal history is latched. Hard active cutoffs, source/current/window/fault
 and restoration rules remain intact. Host tests/build pass; **device untested**.
 Keep brightness, governor, Wi-Fi, ASP and the qualified touch worker fixed for
-the comparison; integrate every hold. Avoid adding touch resync to the same trial.
+the comparison; integrate every hold. The current touch changes mean this is
+a combined-workload qualification, not an isolated power-policy comparison.
 
 Completion evidence for this workload:
 

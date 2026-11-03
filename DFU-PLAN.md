@@ -5,10 +5,14 @@ passed desktop/owner/read-only storage checks, but three rejected touch layouts
 stopped precharge checks before arming. Normal cleanup and iOS charging after
 unlock are confirmed. See [the diagnosis](TOUCH-FOLLOWUP-2026-11-03.md).
 
-**Next changed batch:** bounded touch data-phase resync plus capture before
-shutdown, then the guarded charging test in the same boot only if input passes.
-Host build/tests/preflight pass; device execution is untested. No internal
-filesystem was mounted or written.
+**Latest batch:** bounded data-phase resync and owner input passed initially,
+but one checksum-valid report with contact state 1 stopped progression before
+charging. The report was captured; normal cleanup and iOS charging pass.
+
+**Next changed batch:** separate state-1 inactive handling, then guarded charging
+in the same boot if input passes. Actual emitter/private-report replay, build and
+V3 preflight pass; device execution is untested. No internal filesystem was
+mounted or written.
 
 ## Morning boot (completed)
 
@@ -32,7 +36,7 @@ All new tools must be ready before asking the owner to move a cable or press but
 
 | Batch | Work in that boot | Readiness / condition |
 | --- | --- | --- |
-| C0 — Known-hub power comparison | Same #35 cold payload; new bounded-resync touch worker and existing voltage-hold charging candidate. Strict input gates, brightness 802, Wi-Fi/read-only ASP, full integration and restoration. Capture failures before reboot. | [Prepared runbook](NEXT-POWER-COMPARISON.md); warning-free build, 49 core scenarios and two branch replays pass. Device untested. Previous precharge attempt aborted on 3 rejected layouts. New input build/tests and v2 preflight pass; next changed direct-Pi DFU is ready. |
+| C0 — Known-hub power comparison | Same #35 cold payload; new state-1 inactive touch worker and existing voltage-hold charging candidate. Strict input gates, brightness 802, Wi-Fi/read-only ASP, full integration and restoration. Capture failures before reboot. | [Prepared runbook](NEXT-POWER-COMPARISON.md); warning-free build, 49 core scenarios and two branch replays pass. Device untested. Previous precharge attempt aborted on 3 rejected layouts. The latest resync attempt captured state 1 and did not start charging. Separate inactive-state build/tests and V3 preflight pass; next changed direct-Pi DFU is ready. |
 | Q1 — Recovery/RAM scratch qualification | Exact RAM recovery identity, owned-media inventory and guarded disposable RAM APFS/native-I/O experiment. | New harness not built/qualified yet. Preserve the proven v3 rescue image. No internal mutation. |
 | Q2 — Conditional follow-up qualification | Resolve a measured Q1/backend issue or finish native writer/flush testing on disposable media. | Only if required. Explain the concrete change; combine compatible checks in Q1 where possible. |
 | W1 — Approved installation recovery | With internal APFS unmounted, verify the approved shrink, commit exact GPT changes and write/fully verify the image. | Requires qualified backend, refreshed evidence and separate exact internal-write approval. A proposed normal-iOS resize precedes this boot. |

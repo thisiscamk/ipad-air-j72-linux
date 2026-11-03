@@ -1,0 +1,25 @@
+{
+  "status": "HOST_SOURCE_TESTS_PREFLIGHT_PASS_DEVICE_UNTESTED",
+  "state1_actual_emitter_exhaustive_tests": true,
+  "actual_private_report_replay": true,
+  "failure_capture_tests": 6,
+  "state1_observer_tests": 2,
+  "session_receipt_tests": 5,
+  "charging_return_tests": 6,
+  "previous_v2_manifest_unchanged": true,
+  "files": {
+    "run-j72-state1-session35.py": "3804f15598771738aa7a1f0157070f490d1a2a3b63ef5db6181d5af63d7bd7da",
+    "run-j72-state1-observation35.py": "e50f096e1de1790f0037d3859e0e01d26098d42c6d488df4459e6b775a741807",
+    "j72_state1_failure_capture.py": "b4435afdcdf47de46af4f3dc4c9f19eb21ca230669d051408933f4c4695e65de",
+    "test-j72-state1-failure-capture.py": "0d9259903aa84b0e8ad1da28d05fdaa7acfa484fb75dcfd49a4ed10eeb237831",
+    "test-j72-state1-observation35.py": "e3e33ad61c37b6f93191716228787c5a659730b404fde52a1618a11b8396b9b1",
+    "test-j72-state1-session35.py": "d6f738110e982a394ba1944d42e596109f9b99c20c2f03c5e8d11f2d9e97550c",
+    "ensure-j72-state1-ios-charging.py": "61cc2ed095fe105c88ae9204ac994c1b7a38a55cf01f8118b6a37df6b44e42a7",
+    "test-ensure-j72-state1-ios-charging.py": "d6819bab8a8325c4dd9ce92efb9498692662391bb1077ff46896b7c3f0eeabc2",
+    "j72_observation_health.py": "a830a82004e0d6d5861146577631fd8921270f84e292ec898354bb3453e043f5",
+    "j72_wifi_ssh.py": "6cf5bfd83beca4ba4865f43a95a9b1839e61ac0dfafbb275a52ee9454f75f724",
+    "analyze-j72-session-anomalies.py": "bf5f27fc4098ea239cc7117ebe2448cd12b467cac7a5cf8ddeb2fed280fa9f43",
+    "analyze-j72-reader-audit.py": "27a7a7a060a6263454fcab06b4df77eac2217ef90f3b95b2f2d8c11f987544cd",
+    "run-j72-touch-state135.py": "2ad5473df023bb03bd821cf1323a573aeddbd81de6556caca3d710589baf2c38"
+  }
+}

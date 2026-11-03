@@ -1,0 +1,39 @@
+--- a/j72_touch_session.c
++++ b/j72_touch_session.c
+@@ -580,11 +580,17 @@
+  input_mt_sync_frame(touch_input);input_sync(touch_input);
+  input_active=false;
+ }
++/* Captured checksum-valid J72 state 1: use upstream Z2 inactive semantics.
++ * Only states 3/4 emit positions. Other unobserved states remain rejected. */
++static unsigned int contact_state1_policy=1,contact_state1_frames;
++module_param(contact_state1_policy,uint,0400);
++module_param(contact_state1_frames,uint,0400);
+ static bool emit_touch_input(const u8 *body,unsigned int size)
+ {
+  struct j72_contact contacts[J72_CONTACT_MAX];unsigned int count,i;int slot;
+  if(j72_classic_contacts(body,size,contacts,&count)){input_bad_layouts++;return false;}
+  /* Parser validates the WHOLE report before any event can be emitted. */
++ for(i=0;i<count;i++)if(contacts[i].state==1){contact_state1_frames++;break;}
+  input_active=false;
+  for(i=0;i<count;i++){
+   struct j72_contact *c=&contacts[i];bool active=c->state==3||c->state==4;
+@@ -1187,6 +1193,7 @@
+   hardware_cleanup_ok=false;recovery_stop_reason=0;
+   input_frames=input_bad_layouts=input_timeouts=input_recoveries=0;
+   phase_resync_headers=phase_resync_frames=phase_resync_failures=0;
++  contact_state1_frames=0;
+   layout_anomalies=wire_anomalies=0;
+   /* Registration probes synchronously in THIS worker. The diagnostic probe
+    * deliberately detaches after full restoration; init never blocks on it.
+--- a/j72-classic-contacts.h
++++ b/j72-classic-contacts.h
+@@ -23,7 +23,7 @@
+  if(n>(len-offset)/stride)return -4;
+  for(i=0;i<n;i++){
+   const unsigned char *c=p+offset+i*stride;
+-  if(c[1]!=0 && c[1]!=3 && c[1]!=4 && c[1]!=5 && c[1]!=7)return -5;
++  if(c[1]!=0 && c[1]!=1 && c[1]!=3 && c[1]!=4 && c[1]!=5 && c[1]!=7)return -5;
+   for(j=0;j<i;j++)if(out[j].id==c[0])return -6;
+   out[i].id=c[0];out[i].state=c[1];
+   out[i].x=j72_signed16(c+4);out[i].y=j72_signed16(c+6);

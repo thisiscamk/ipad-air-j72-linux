@@ -46,8 +46,12 @@ New read-only counters report policy, headers, emitted resync frames and failure
 physical restoration, Wi-Fi/HTTPS/SSH, RAM desktop and fresh native read-only
 checks pass. At the initial snapshot, 706 valid frames and no rejected layouts,
 SPI errors or timeouts were recorded. All 84 admitted extra retries failed to
-deliver a resync frame; no benefit is proved. Owner input and long-run checks
-remain pending; charging has not started.
+deliver a resync frame; no benefit is proved. The owner then confirmed menu, Foot typing and keyboard reopening. At stop,
+4,502 valid frames and one rejected layout were recorded, with zero SPI errors
+or timeouts. All 495 extra retries failed to deliver a resync frame. The saved
+checksum-valid native report contains contact state `1`, rejected by the strict
+decoder. Long-run qualification failed **before charging**; normal cleanup and
+independent baseline checks pass. Raw reports remain private.
 The old qualified candidate, #35 kernel and cold payload are preserved.
 
 ## Next device sequence
