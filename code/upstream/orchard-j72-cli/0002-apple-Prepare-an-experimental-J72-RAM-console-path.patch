@@ -1,0 +1,739 @@
+From da46ad2dd4eb44366a9038d1fe41171fc1bf1dae Mon Sep 17 00:00:00 2001
+From: thisiscamk <100883750+thisiscamk@users.noreply.github.com>
+Date: Tue, 3 Nov 2026 19:37:39 +0800
+Subject: [PATCH 2/3] apple: Prepare an experimental J72 RAM console path
+
+Select the pinned A7 bootstrap explicitly in the board descriptor, verify the host binary and direct Pi USB topology before launch, and preserve the existing palera1n default. Stop the entire bootstrap process group after success as well as failure.
+
+Add a non-probing serial/NCM/SSH console payload and register the inherited J72 DTB for apple-4k builds. Keep installation disabled and native hardware features unqualified until this exact revision is tested.
+
+Assisted-by: LLM
+---
+ devices/j72/README.md             |  58 ++++++++++
+ devices/j72/device.toml           |  54 +++++++++
+ docs/bring-up/j72.md              |   4 +-
+ examples/usb-console/README.md    |  18 +++
+ examples/usb-console/init         |  23 ++++
+ examples/usb-console/orchard.toml |   7 ++
+ schemas/v1/device.schema.json     |   8 ++
+ src/orchard/apple/boot.py         |  45 +++++---
+ src/orchard/apple/bootstrap.py    |  68 ++++++++++++
+ src/orchard/apple/device.py       |   6 +-
+ src/orchard/boot.py               |  17 ++-
+ tests/test_a7_bootstrap.py        | 179 ++++++++++++++++++++++++++++++
+ tests/test_ram.py                 |  19 ++++
+ 13 files changed, 483 insertions(+), 23 deletions(-)
+ create mode 100644 devices/j72/README.md
+ create mode 100644 devices/j72/device.toml
+ create mode 100644 examples/usb-console/README.md
+ create mode 100755 examples/usb-console/init
+ create mode 100644 examples/usb-console/orchard.toml
+ create mode 100644 src/orchard/apple/bootstrap.py
+ create mode 100644 tests/test_a7_bootstrap.py
+
+diff --git a/devices/j72/README.md b/devices/j72/README.md
+new file mode 100644
+index 0000000..6a85a2d
+--- /dev/null
++++ b/devices/j72/README.md
+@@ -0,0 +1,58 @@
++# iPad Air 1 Cellular: experimental native Orchard path
++
++Identity: iPad4,2 / J72AP, A7 CPID `0x8960`, BDID `0x12`.
++The descriptor selects `apple-4k` and the inherited `s5l8960x-j72.dtb`.
++Internal installation is disabled. The exact native Orchard image has not
++been tested on this device, so its features are not marked working.
++
++The [lab report](../../docs/bring-up/j72.md) records the separate development
++kernel that demonstrated a desktop, touch, keyboard, Wi-Fi and bounded
++charging. Those measurements do not qualify the current native kernel,
++device tree, firmware format or desktop image.
++
++## First native RAM test
++
++Use Linux aarch64 or x86_64 with the official checkra1n **0.1337.3** binary
++named `checkra1n-0.1337.3` on `PATH` or in `~/.local/bin`. Orchard verifies
++the architecture-specific SHA-256 before executing it. It does not download
++the bootstrap tool. The existing palera1n path remains the default for other
++descriptors. macOS A7 bootstrap is not implemented here.
++
++On Pi 4, use a direct Pi USB port. Orchard checks the actual sysfs topology
++and refuses an external hub before starting the bootstrap. One invocation
++starts one process group; failure or uncertain outcome requires inspection
++before a new attempt. No automatic A7 port reset or boot retry is added.
++
++Build with an explicitly selected kernel tree and Pongo image:
++
++```sh
++/path/to/orchard/bin/orchard build /path/to/orchard/examples/usb-console \
++    --device j72 --kernel-tree /path/to/kernel-tree --pongo /path/to/Pongo.bin
++/path/to/orchard/bin/orchard run /path/to/orchard/examples/usb-console --no-build
++```
++
++The measured lab bootstrap used PongoOS 2.6.3; substituting another Pongo
++image needs its own hardware test. A successful build is not a boot result.
++The initial payload starts the standard Orchard USB serial/NCM/SSH session
++without coldplug, optional driver loading, storage mounts or charging policy.
++After checking readiness, use `orchard shell` or `orchard exec -- uname -a`.
++Keep this first test bounded and return to iOS for charging.
++
++## Remaining integration
++
++1. Qualify this exact CLI/kernel/loader/payload combination, both USB shells
++   and normal return to iOS; record artifact hashes and commands.
++2. Add native A7 SPI match data and transfer handling, then J72 clock,
++   regulator, reset and attention bindings and native `apple_z2` N1 support.
++3. Extend the verified [firmware recipe](../../docs/bring-up/j72-firmware.md)
++   with the matching native N1 output and private device calibration flow.
++4. Port battery and source-aware charging into the existing power drivers;
++   qualify source transitions and sustained desktop charging.
++5. Port the demonstrated USB Wi-Fi path into the native DT/driver/profile,
++   then qualify the omarchy-a build with touch, keyboard, Wi-Fi and power.
++6. Qualify storage read-only before proposing any installation or local boot.
++
++The kernel topics stay in source worktrees until their exact revisions work
++on hardware, then become Orchard patch-series changes. Desktop changes go
++to omarchy-a separately. A tethered launch after a shutdown remains distinct
++from fully PC-free startup.
+diff --git a/devices/j72/device.toml b/devices/j72/device.toml
+new file mode 100644
+index 0000000..a86ad05
+--- /dev/null
++++ b/devices/j72/device.toml
+@@ -0,0 +1,54 @@
++# Initial native Orchard path, distinct from the previously measured lab stack.
++schema = 1
++kind = "hardware.device"
++
++[device]
++profile = "j72"
++name = "iPad Air 1 (Cellular)"
++apple_products = ["iPad4,2"]
++dt_compatible = ["apple,j72"]
++
++[match.dfu]
++chip = 0x8960
++board = 0x12
++
++[boot]
++methods = ["checkm8-pongo"]
++bootstrap = "checkra1n-a7"
++
++[kernel]
++platform = "apple-4k"
++dtb = "s5l8960x-j72"
++
++[firmware]
++recipe = "firmware.json"
++
++[support]
++install = false
++status = "experimental"
++caveats = [
++  "Native Orchard build/run path is not yet tested on this device; start with examples/usb-console.",
++  "Pi 4 A7 bootstrap requires a direct USB port and pinned checkra1n 0.1337.3; hub handoff is not qualified.",
++  "The separate lab desktop demonstrated touch and Wi-Fi; these have not yet been ported to this native kernel/device tree.",
++  "No native charging policy is qualified. Return to iOS for charging after a bounded RAM test.",
++  "Internal-storage installation is disabled.",
++]
++wifi = false
++usb_serial = false
++usb_network = false
++
++[features]
++display = "untested"
++touch = "missing"
++wifi = "missing"
++bluetooth = "missing"
++storage = "missing"
++battery = "missing"
++charging = "missing"
++backlight = "missing"
++buttons = "untested"
++audio = "missing"
++camera = "missing"
++cellular = "missing"
++suspend = "missing"
++gpu = "missing"
+diff --git a/docs/bring-up/j72.md b/docs/bring-up/j72.md
+index dc02ad8..4a5a700 100644
+--- a/docs/bring-up/j72.md
++++ b/docs/bring-up/j72.md
+@@ -4,7 +4,9 @@ Status updated on 2026-11-01 for one owner's iPad. This field report records
+ working hardware paths and measurements for a future J72 device contribution.
+ The results come from a local development kernel and RAM overlays. They do
+ not establish that this Orchard revision builds or boots a J72 image, and
+-this report does not register a device descriptor or an installation path.
++this report alone does not establish a native boot or installation path.
++The [experimental J72 descriptor](../../devices/j72/README.md) now prepares
++a console-only native CLI test; its feature flags remain unqualified.
+ 
+ ## Development source
+ 
+diff --git a/examples/usb-console/README.md b/examples/usb-console/README.md
+new file mode 100644
+index 0000000..aa63be8
+--- /dev/null
++++ b/examples/usb-console/README.md
+@@ -0,0 +1,18 @@
++# USB console
++
++A small RAM payload for checking a new board's kernel and Orchard host link.
++It starts USB serial and key-authenticated SSH through Orchard's normal
++`usb-session` helper. It does not load optional drivers or mount storage.
++Drivers built into the selected kernel can still probe devices described by
++that board's device tree.
++
++```sh
++/path/to/orchard/bin/orchard build examples/usb-console --device BOARD
++/path/to/orchard/bin/orchard run examples/usb-console --no-build
++/path/to/orchard/bin/orchard shell
++/path/to/orchard/bin/orchard exec -- uname -a
++```
++
++Use the checkout's launcher explicitly. Build success does not establish
++that a new board boots, and this payload supplies no desktop or charging
++policy. Restart into the device's normal OS when the test is finished.
+diff --git a/examples/usb-console/init b/examples/usb-console/init
+new file mode 100755
+index 0000000..8b024a0
+--- /dev/null
++++ b/examples/usb-console/init
+@@ -0,0 +1,23 @@
++#!/bin/busybox sh
++# RAM-only console: no coldplug, storage mounts or optional driver loading.
++set -eu
++export PATH=/usr/sbin:/usr/bin:/sbin:/bin
++/bin/busybox --install -s /bin
++mount -t proc -o nosuid,nodev,noexec proc /proc
++mount -t sysfs -o nosuid,nodev,noexec sysfs /sys
++mount -t devtmpfs -o nosuid devtmpfs /dev
++mount -t tmpfs -o nosuid,nodev tmpfs /run
++mkdir -p /dev/pts /var/run /tmp
++mount -t devpts devpts /dev/pts
++exec </dev/console >/dev/console 2>&1
++echo /bin/false > /proc/sys/kernel/modprobe
++echo /bin/false > /proc/sys/kernel/hotplug
++
++# Standard Orchard transport: ACM serial, NCM networking and Dropbear.
++sh /usr/libexec/orchard/usb-session || echo 'USB session failed; see above'
++echo "$(cat /etc/hostname): RAM console; no optional drivers loaded or storage mounted."
++echo 'Physical USB root shell is unauthenticated; connect only to a trusted host.'
++while :; do
++    setsid -c sh -i </dev/ttyGS0 >/dev/ttyGS0 2>&1 || true
++    sleep 1
++done
+diff --git a/examples/usb-console/orchard.toml b/examples/usb-console/orchard.toml
+new file mode 100644
+index 0000000..759a8fd
+--- /dev/null
++++ b/examples/usb-console/orchard.toml
+@@ -0,0 +1,7 @@
++name = "usb-console"
++
++# Serial and key-authenticated SSH without device discovery or driver loading.
++[payload]
++transport = true
++modules = false
++firmware = false
+diff --git a/schemas/v1/device.schema.json b/schemas/v1/device.schema.json
+index 9e89292..f2d5430 100644
+--- a/schemas/v1/device.schema.json
++++ b/schemas/v1/device.schema.json
+@@ -101,6 +101,14 @@
+             "type": "string",
+             "pattern": "^[a-z0-9][a-z0-9._-]*$"
+           }
++        },
++        "bootstrap": {
++          "type": "string",
++          "enum": [
++            "palera1n",
++            "checkra1n-a7"
++          ],
++          "description": "Host bootstrap for checkm8-pongo; omitted uses palera1n. A7 experimental boot uses the pinned checkra1n tool."
+         }
+       },
+       "required": [
+diff --git a/src/orchard/apple/boot.py b/src/orchard/apple/boot.py
+index b6fd70e..6cdc63d 100644
+--- a/src/orchard/apple/boot.py
++++ b/src/orchard/apple/boot.py
+@@ -11,6 +11,7 @@ from orchard.integrity import digest
+ from orchard.state import DeviceState, private_directory
+ from orchard.transports import pongo
+ from . import replug, usb
++from .bootstrap import checkra1n_a7, require_direct_pi
+ 
+ 
+ def wait_mode(device, mode, *, chip, board, product, seconds=30):
+@@ -69,9 +70,11 @@ def run_process_group(argv, *, timeout, **kwargs):
+         with subprocess.Popen(argv, start_new_session=True, **kwargs) as process:
+             try:
+                 returncode = process.wait(timeout=timeout)
+-            except BaseException:
+-                os.killpg(process.pid, signal.SIGKILL)
+-                raise
++            finally:
++                try:
++                    os.killpg(process.pid, signal.SIGKILL)
++                except ProcessLookupError:
++                    pass
+     finally:
+         if previous is not None:
+             signal.signal(signal.SIGTERM, previous)
+@@ -79,19 +82,29 @@ def run_process_group(argv, *, timeout, **kwargs):
+         raise subprocess.CalledProcessError(returncode, argv)
+ 
+ 
+-def start_pongo(device, image, log, say, *, chip, board, product, seconds=30, quiet=False):
++def start_pongo(device, image, log, say, *, chip, board, product, seconds=30, quiet=False, bootstrap='palera1n'):
+     """Start Pongo once on the selected device in DFU; never retried.
+ 
+     Every boot path goes through here so they share the cable hint, the
+     process-group cleanup and the failure message.
+     """
+     from orchard.host_setup import palera1n
+-    executable = palera1n()
+-    if not executable:
+-        raise ValueError('palera1n is required on the host to boot Pongo')
++    if bootstrap == 'palera1n':
++        executable = palera1n()
++        if not executable:
++            raise ValueError('palera1n is required on the host to boot Pongo')
++        argv = [executable, '-p', '-k', str(image)]
++    elif bootstrap == 'checkra1n-a7':
++        if chip != 0x8960:
++            raise ValueError('checkra1n-a7 requires an A7 CPID 0x8960 descriptor')
++        executable = checkra1n_a7()
++        require_direct_pi(device['location'])
++        argv = [executable, '-E', '-p', '-v', '-n', '-k', str(image)]
++    else:
++        raise ValueError('Unknown Pongo bootstrap: ' + str(bootstrap))
+     usb.selected(device['location'], device['ecid'], chip=chip, board=board, mode='dfu')
+     # Resolved while the device is present: its sysfs node goes away after checkm8.
+-    control = replug.port_control(device['location'])
++    control = replug.port_control(device['location']) if bootstrap == 'palera1n' else None
+     if control:
+         say('If the Apple logo stays for about 15 seconds, reconnect the cable at the device once.')
+     else:
+@@ -100,7 +113,7 @@ def start_pongo(device, image, log, say, *, chip, board, product, seconds=30, qu
+     if watcher:
+         watcher.start()
+     try:
+-        run_process_group([executable, '-p', '-k', str(image)],
++        run_process_group(argv,
+                           stdout=log, stderr=subprocess.STDOUT, timeout=120)
+     except (OSError, subprocess.SubprocessError) as error:
+         raise RuntimeError('Pongo bootstrap failed or outcome unknown; inspect USB before any retry. '
+@@ -114,7 +127,7 @@ def start_pongo(device, image, log, say, *, chip, board, product, seconds=30, qu
+     return wait_mode(device, 'pongo', chip=chip, board=board, product=product, seconds=seconds)
+ 
+ 
+-def pongo_from_dfu(device, image, progress, *, profile, chip, board, product, quiet=False):
++def pongo_from_dfu(device, image, progress, *, profile, chip, board, product, quiet=False, bootstrap='palera1n'):
+     """Start Pongo when the device is in DFU, logging palera1n under the device's state.
+ 
+     A device already in Pongo is used as it is.
+@@ -122,15 +135,15 @@ def pongo_from_dfu(device, image, progress, *, profile, chip, board, product, qu
+     if device['mode'] != 'dfu':
+         return
+     logs = private_directory(DeviceState(profile, device['ecid']).root / 'logs')
+-    with tempfile.NamedTemporaryFile(prefix='palera1n-', suffix='.log', dir=logs, delete=False) as log:
+-        start_pongo(device, image, log, progress.phase, chip=chip, board=board, product=product, quiet=quiet)
++    with tempfile.NamedTemporaryFile(prefix=bootstrap+'-', suffix='.log', dir=logs, delete=False) as log:
++        start_pongo(device, image, log, progress.phase, chip=chip, board=board, product=product, quiet=quiet, bootstrap=bootstrap)
+ 
+ 
+-def boot(device, assets, manifest, progress, *, profile, chip, board, product):
++def boot(device, assets, manifest, progress, *, profile, chip, board, product, bootstrap='palera1n'):
+     if device['mode'] == 'linux':
+         progress.phase('Using running recovery; no reboot or upload (timing starts at resume)')
+         return
+-    pongo_from_dfu(device, assets['pongo'], progress, profile=profile, chip=chip, board=board, product=product)
++    pongo_from_dfu(device, assets['pongo'], progress, profile=profile, chip=chip, board=board, product=product, bootstrap=bootstrap)
+     usb.selected(device['location'], device['ecid'], chip=chip, board=board)
+     progress.reset_transfer()
+     pongo.upload(assets['recovery'], device['location'], manifest['assets']['recovery']['sha256'], progress.transfer)
+@@ -138,12 +151,12 @@ def boot(device, assets, manifest, progress, *, profile, chip, board, product):
+     wait_mode(device, 'linux', chip=chip, board=board, product=product, seconds=120)
+ 
+ 
+-def start_loader(device, loader, progress, *, profile, chip, board, product, seconds=30, quiet=False):
++def start_loader(device, loader, progress, *, profile, chip, board, product, seconds=30, quiet=False, bootstrap='palera1n'):
+     """Boot the bare m1n1 loader ({'pongo', 'm1n1'} files) through Pongo; return its proxy serial port."""
+     if device['mode'] not in ('dfu', 'pongo'):
+         raise ValueError('Put the device in DFU mode first; a running system is not rebooted')
+     pongo_from_dfu(device, loader['pongo'], progress, profile=profile, chip=chip, board=board, product=product,
+-                   quiet=quiet)
++                   quiet=quiet, bootstrap=bootstrap)
+     before = set(usb.m1n1_ports())
+     if not quiet:
+         progress.phase('Loading the bootloader')
+diff --git a/src/orchard/apple/bootstrap.py b/src/orchard/apple/bootstrap.py
+new file mode 100644
+index 0000000..b079997
+--- /dev/null
++++ b/src/orchard/apple/bootstrap.py
+@@ -0,0 +1,68 @@
++"""Descriptor-selected Pongo bootstrap tools; host checks never touch a device."""
++from pathlib import Path
++import os
++import platform
++import re
++import shutil
++
++from orchard.integrity import digest
++
++NAMES = ('palera1n', 'checkra1n-a7')
++# Official 0.1337.3 tools used for the measured A7 handoff. Never substitute
++# the newer palera1n-embedded checkra1n merely because it has the same name.
++CHECKRA1N_SHA256 = {
++    'aarch64': '078053c11e9a301f0e71b87b6b854e6c8a69c87972325dd0c90deeeba1c3cb70',
++    'x86_64': '53154d87594cf67c56659f24547f1b5bb5336f84ea58c2d42f25a7b2df81a964',
++}
++
++
++def name(description):
++    value = description.get('boot', {}).get('bootstrap', 'palera1n')
++    if value not in NAMES:
++        raise ValueError('Unknown Pongo bootstrap: ' + str(value))
++    return value
++
++
++def checkra1n_a7():
++    """Find and verify the supported host binary, without executing it."""
++    machine = platform.machine()
++    machine = 'aarch64' if machine == 'arm64' else machine
++    if platform.system() != 'Linux' or machine not in CHECKRA1N_SHA256:
++        raise ValueError('checkra1n-a7 currently requires a Linux aarch64 or x86_64 host')
++    tool = shutil.which('checkra1n-0.1337.3')
++    if not tool:
++        local = Path.home() / '.local/bin/checkra1n-0.1337.3'
++        if local.is_file() and os.access(local, os.X_OK):
++            tool = str(local)
++    if not tool:
++        raise ValueError('A7 boot needs the pinned checkra1n-0.1337.3 host tool on PATH or in ~/.local/bin')
++    if digest(Path(tool)) != CHECKRA1N_SHA256[machine]:
++        raise ValueError('checkra1n-0.1337.3 host checksum mismatch; no bootstrap was started')
++    return tool
++
++
++def require_direct_pi(location, *, root=Path('/sys/bus/usb/devices'),
++                      model_file=Path('/proc/device-tree/model')):
++    """Keep the measured Pi 4 A7 path direct; do not assume a bus/port number."""
++    try:
++        model = model_file.read_bytes().rstrip(b'\0\r\n')
++    except FileNotFoundError:
++        return  # Other Linux hosts do not expose this board identity.
++    if not model.startswith(b'Raspberry Pi 4 Model B'):
++        return
++    if not isinstance(location, str) or not re.fullmatch(r'\d+-\d+(?:\.\d+)*', location):
++        raise ValueError('Cannot verify the A7 direct Pi USB location')
++
++    def identity(path):
++        return tuple((path/key).read_text().strip().lower()
++                     for key in ('idVendor', 'idProduct'))
++    try:
++        parent = (root/location).resolve(strict=True).parent
++        if identity(parent) == ('1d6b', '0002'):
++            return
++        if (identity(parent) == ('2109', '3431') and
++                identity(parent.parent) == ('1d6b', '0002')):
++            return
++    except OSError as error:
++        raise ValueError('Cannot verify the A7 direct Pi USB topology') from error
++    raise ValueError('A7 boot on Pi 4 requires a direct Pi USB port; move only the iPad cable from the hub')
+diff --git a/src/orchard/apple/device.py b/src/orchard/apple/device.py
+index 2efc5a8..e9a0ef5 100644
+--- a/src/orchard/apple/device.py
++++ b/src/orchard/apple/device.py
+@@ -16,6 +16,7 @@ from orchard.apple.adt_tree import parse
+ from orchard.transports import ssh
+ from orchard import firmware
+ from .adt import validate as validate_adt
++from .bootstrap import name as bootstrap_name
+ 
+ 
+ # The recovery's USB product; its serial string names the board (BOARD:j71b).
+@@ -32,6 +33,7 @@ class Device:
+         self.PRODUCT = RECOVERY_PRODUCT if descriptor['match'].get('linux', {}).get('recovery') else None
+         self.CHIP = descriptor['match']['dfu']['chip']
+         self.BOARD = descriptor['match']['dfu']['board']
++        self.BOOTSTRAP = bootstrap_name(descriptor)
+         dtb = descriptor.get('kernel', {}).get('dtb')
+         self.DEVICETREE = dtb + '.dtb' if dtb else None
+         support = descriptor.get('support', {})
+@@ -83,9 +85,9 @@ class Device:
+     def boot(self, device: SelectedDevice, assets: BootAssets,
+              manifest: BootRequest, progress: Progress) -> None:
+         return apple_boot.boot(device, assets, manifest, progress,
+-                               profile=self.PROFILE, chip=self.CHIP, board=self.BOARD, product=self.PRODUCT)
++                               profile=self.PROFILE, chip=self.CHIP, board=self.BOARD, product=self.PRODUCT, bootstrap=self.BOOTSTRAP)
+ 
+     def start_loader(self, device: SelectedDevice, loader: Dict[str, Path], progress: Progress,
+                      quiet: bool = False) -> str:
+         return apple_boot.start_loader(device, loader, progress, profile=self.PROFILE,
+-                                       chip=self.CHIP, board=self.BOARD, product=self.PRODUCT, quiet=quiet)
++                                       chip=self.CHIP, board=self.BOARD, product=self.PRODUCT, quiet=quiet, bootstrap=self.BOOTSTRAP)
+diff --git a/src/orchard/boot.py b/src/orchard/boot.py
+index d8ddfc2..c70df29 100644
+--- a/src/orchard/boot.py
++++ b/src/orchard/boot.py
+@@ -10,6 +10,7 @@ import sys
+ 
+ from .host_setup import palera1n
+ from .ram import verify_ram
++from .apple.bootstrap import name as bootstrap_name, checkra1n_a7
+ 
+ 
+ def confirm_boot(*, mismatch=False):
+@@ -49,11 +50,17 @@ def boot_ram(output, *, yes=False):
+                     if all(device.get(name) == d['match']['dfu'][name] for name in ('chip', 'board'))]
+         description = matching[0] if matching else (descriptions[0] if len(descriptions) == 1 else None)
+         mismatch = not matching
++        bootstrap = bootstrap_name(matching[0]) if matching else 'palera1n'
+         ecid = device.get('ecid')
+         if not ecid:
+             raise ValueError('Missing device ECID')
+-        if device['mode'] == 'dfu' and not palera1n():
+-            raise ValueError('Install palera1n before booting')
++        if device['mode'] == 'dfu':
++            if bootstrap == 'palera1n' and not palera1n():
++                raise ValueError('Install palera1n before booting')
++            if bootstrap == 'checkra1n-a7':
++                if chip != 0x8960:
++                    raise ValueError('checkra1n-a7 requires an A7 CPID 0x8960 descriptor')
++                checkra1n_a7()
+         name = description['device']['name'] if not mismatch else device.get('product') or 'Unrecognized device'
+         print(f'{name}, ECID {ecid:x}, USB {device["location"]}, mode {device["mode"]}.')
+         print("Experimental RAM boot; the payload's /init determines what runs.")
+@@ -73,9 +80,11 @@ def boot_ram(output, *, yes=False):
+         verify_ram(output)
+         usb.selected(device['location'], ecid, chip=chip, board=board, mode=device['mode'])
+         if device['mode'] == 'dfu':
+-            with (output / 'palera1n.log').open('wb') as log:
++            log_name = 'palera1n.log' if bootstrap == 'palera1n' else bootstrap+'.log'
++            options = {} if bootstrap == 'palera1n' else {'bootstrap': bootstrap}
++            with (output / log_name).open('wb') as log:
+                 start_pongo(device, output / 'pongo.bin', log, print,
+-                            chip=chip, board=board, product='', seconds=60)
++                            chip=chip, board=board, product='', seconds=60, **options)
+         usb.selected(device['location'], ecid, chip=chip, board=board)
+         pongo.upload(output / 'linux.bin', device['location'], receipt['files']['linux.bin'])
+     print('Upload/boot request sent; Linux readiness has NOT been verified.')
+diff --git a/tests/test_a7_bootstrap.py b/tests/test_a7_bootstrap.py
+new file mode 100644
+index 0000000..842570c
+--- /dev/null
++++ b/tests/test_a7_bootstrap.py
+@@ -0,0 +1,179 @@
++"""A7 host selection and process ownership; no physical USB operations."""
++from contextlib import nullcontext
++import hashlib
++import os
++from pathlib import Path
++import subprocess
++import tempfile
++import time
++import unittest
++from unittest.mock import Mock, patch
++
++from orchard.apple import bootstrap, boot
++from orchard import boot as ram_boot
++
++
++class A7Bootstrap(unittest.TestCase):
++    def setUp(self):
++        temporary = tempfile.TemporaryDirectory()
++        self.addCleanup(temporary.cleanup)
++        self.root = Path(temporary.name)
++        self.device = dict(mode='dfu', chip=0x8960, board=0x12,
++                           ecid=123, location='3-7.2')
++        self.description = {'device': {'name': 'iPad Air Cellular'},
++                            'match': {'dfu': {'chip': 0x8960, 'board': 0x12}},
++                            'boot': {'bootstrap': 'checkra1n-a7'}}
++
++    def test_selection_is_explicit_and_old_descriptors_keep_palera1n(self):
++        self.assertEqual(bootstrap.name({}), 'palera1n')
++        self.assertEqual(bootstrap.name(self.description), 'checkra1n-a7')
++        with self.assertRaisesRegex(ValueError, 'Unknown Pongo'):
++            bootstrap.name({'boot': {'bootstrap': 'untrusted-command'}})
++
++    def test_host_tool_is_hash_checked_without_execution(self):
++        tool = self.root / 'checkra1n-0.1337.3'
++        tool.write_bytes(b'not executable machine code')
++        tool.chmod(0o700)
++        expected = hashlib.sha256(tool.read_bytes()).hexdigest()
++        with patch.object(bootstrap.platform, 'system', return_value='Linux'), \
++                patch.object(bootstrap.platform, 'machine', return_value='arm64'), \
++                patch.object(bootstrap.shutil, 'which', return_value=str(tool)), \
++                patch.dict(bootstrap.CHECKRA1N_SHA256, {'aarch64': expected}):
++            self.assertEqual(bootstrap.checkra1n_a7(), str(tool))
++            tool.write_bytes(b'changed')
++            with self.assertRaisesRegex(ValueError, 'checksum mismatch'):
++                bootstrap.checkra1n_a7()
++
++    def test_missing_unsupported_and_local_tool(self):
++        with patch.object(bootstrap.platform, 'system', return_value='Linux'), \
++                patch.object(bootstrap.platform, 'machine', return_value='aarch64'), \
++                patch.object(bootstrap.shutil, 'which', return_value=None), \
++                patch.object(Path, 'home', return_value=self.root):
++            with self.assertRaisesRegex(ValueError, 'pinned checkra1n'):
++                bootstrap.checkra1n_a7()
++            tool = self.root / '.local/bin/checkra1n-0.1337.3'
++            tool.parent.mkdir(parents=True)
++            tool.write_bytes(b'test tool')
++            tool.chmod(0o600)
++            with self.assertRaisesRegex(ValueError, 'pinned checkra1n'):
++                bootstrap.checkra1n_a7()
++            tool.chmod(0o700)
++            with patch.dict(bootstrap.CHECKRA1N_SHA256,
++                            {'aarch64': hashlib.sha256(tool.read_bytes()).hexdigest()}):
++                self.assertEqual(bootstrap.checkra1n_a7(), str(tool))
++        for system, machine in [('Darwin', 'arm64'), ('Linux', 'armv7l')]:
++            with patch.object(bootstrap.platform, 'system', return_value=system), \
++                    patch.object(bootstrap.platform, 'machine', return_value=machine), \
++                    self.assertRaisesRegex(ValueError, 'Linux aarch64 or x86_64'):
++                bootstrap.checkra1n_a7()
++
++    def test_dynamic_pi_topology_accepts_root_and_onboard_hub_only(self):
++        model = self.root / 'model'
++        model.write_bytes(b'Raspberry Pi 4 Model B Rev 1.5\0')
++        sysfs = self.root / 'sysfs'
++        sysfs.mkdir()
++        root_hub = self.root / 'usb3'
++        def node(path, vendor, product):
++            path.mkdir(parents=True)
++            (path/'idVendor').write_text(vendor)
++            (path/'idProduct').write_text(product)
++        node(root_hub, '1d6b', '0002')
++        node(root_hub/'3-7', '2109', '3431')
++        node(root_hub/'3-7'/'3-7.2', '05ac', '1227')
++        node(root_hub/'3-8', '1234', '5678')
++        node(root_hub/'3-8'/'3-8.2', '05ac', '1227')
++        for location, target in [('3-7', root_hub/'3-7'),
++                                 ('3-7.2', root_hub/'3-7'/'3-7.2'),
++                                 ('3-8.2', root_hub/'3-8'/'3-8.2')]:
++            (sysfs/location).symlink_to(target)
++        for location in ['3-7', '3-7.2']:
++            bootstrap.require_direct_pi(location, root=sysfs, model_file=model)
++        for location in ['3-8.2', '3-9', '../usb3', None]:
++            with self.subTest(location=location), self.assertRaises(ValueError):
++                bootstrap.require_direct_pi(location, root=sysfs, model_file=model)
++        model.write_bytes(b'Other Linux host')
++        bootstrap.require_direct_pi('not a sysfs location', root=sysfs, model_file=model)
++
++    def test_a7_argv_once_and_no_port_reset_watcher(self):
++        with patch.object(boot, 'checkra1n_a7', return_value='/pinned/checkra1n') as tool, \
++                patch.object(boot, 'require_direct_pi') as topology, \
++                patch.object(boot.usb, 'selected') as selected, \
++                patch.object(boot.replug, 'port_control') as control, \
++                patch.object(boot.replug, 'PortReset') as watcher, \
++                patch.object(boot, 'run_process_group') as run, \
++                patch.object(boot, 'wait_mode', return_value={'mode': 'pongo'}) as wait:
++            result = boot.start_pongo(self.device, Path('/Pongo.bin'), Mock(name='log'), Mock(),
++                                      chip=0x8960, board=0x12, product='', bootstrap='checkra1n-a7')
++            self.assertEqual(result, {'mode': 'pongo'})
++            tool.assert_called_once_with()
++            topology.assert_called_once_with('3-7.2')
++            selected.assert_called_once_with('3-7.2', 123, chip=0x8960, board=0x12, mode='dfu')
++            self.assertEqual(run.call_args.args[0],
++                             ['/pinned/checkra1n', '-E', '-p', '-v', '-n', '-k', '/Pongo.bin'])
++            run.assert_called_once()
++            wait.assert_called_once()
++            control.assert_not_called()
++            watcher.assert_not_called()
++            run.side_effect = subprocess.TimeoutExpired('test', 120)
++            wait.reset_mock()
++            with self.assertRaisesRegex(RuntimeError, 'outcome unknown'):
++                boot.start_pongo(self.device, '/Pongo.bin', Mock(), Mock(),
++                                 chip=0x8960, board=0x12, product='', bootstrap='checkra1n-a7')
++            self.assertEqual(run.call_count, 2)  # two separate requests, no retry
++            wait.assert_not_called()
++
++    def test_wrong_chip_and_bad_topology_fail_before_usb_or_process(self):
++        with patch.object(boot, 'checkra1n_a7', return_value='/tool'), \
++                patch.object(boot, 'require_direct_pi', side_effect=ValueError('external hub')), \
++                patch.object(boot.usb, 'selected') as selected, \
++                patch.object(boot, 'run_process_group') as run:
++            for chip, message in [(0x8010, 'A7 CPID'), (0x8960, 'external hub')]:
++                with self.subTest(chip=chip), self.assertRaisesRegex(ValueError, message):
++                    boot.start_pongo(self.device, '/Pongo.bin', Mock(), Mock(),
++                                     chip=chip, board=0x12, product='', bootstrap='checkra1n-a7')
++            selected.assert_not_called()
++            run.assert_not_called()
++
++    def test_successful_parent_cannot_leave_an_active_bootstrap_child(self):
++        pidfile = self.root / 'child.pid'
++        boot.run_process_group(['sh', '-c', f'sleep 300 & echo $! > {pidfile}; exit 0'], timeout=5)
++        child = int(pidfile.read_text())
++        for _ in range(50):
++            try:
++                state = Path(f'/proc/{child}/stat').read_text().rsplit(')', 1)[1].split()[0]
++            except (FileNotFoundError, ProcessLookupError):
++                return
++            if state == 'Z':
++                return
++            time.sleep(0.02)
++        os.kill(child, 9)
++        self.fail('child survived successful bootstrap parent exit')
++
++    def test_ram_dispatch_uses_matching_descriptor_and_pongo_needs_no_tool(self):
++        receipt = dict(boards=['j72'], files={'linux.bin': 'digest'})
++        with patch.object(ram_boot, 'verify_ram', return_value=receipt), \
++                patch('orchard.hardware.device', return_value=self.description), \
++                patch('orchard.state.operation_lock', return_value=nullcontext()), \
++                patch.object(boot.usb, 'sole_target', return_value=self.device), \
++                patch.object(boot.usb, 'selected'), \
++                patch.object(ram_boot, 'checkra1n_a7', return_value='/tool') as tool, \
++                patch.object(ram_boot, 'palera1n', return_value='/palera') as palera, \
++                patch.object(boot, 'start_pongo') as start, \
++                patch.object(boot.pongo, 'upload') as upload, patch('builtins.print'):
++            ram_boot.boot_ram(self.root, yes=True)
++            self.assertEqual(start.call_args.kwargs['bootstrap'], 'checkra1n-a7')
++            tool.assert_called_once()
++            palera.assert_not_called()
++            self.assertTrue((self.root/'checkra1n-a7.log').exists())
++            start.reset_mock()
++            tool.reset_mock()
++            self.device['mode'] = 'pongo'
++            ram_boot.boot_ram(self.root, yes=True)
++            start.assert_not_called()
++            tool.assert_not_called()
++            self.assertEqual(upload.call_count, 2)
++            self.device.update(mode='dfu', chip=0x8010)
++            ram_boot.boot_ram(self.root, yes=True)
++            self.assertNotIn('bootstrap', start.call_args.kwargs)
++            palera.assert_called_once()
++            tool.assert_not_called()
+diff --git a/tests/test_ram.py b/tests/test_ram.py
+index cab1b49..6082db3 100644
+--- a/tests/test_ram.py
++++ b/tests/test_ram.py
+@@ -418,6 +418,25 @@ class RamTests(unittest.TestCase):
+                 self.assertEqual(sorted(dtbs), sorted(build.digest(self.kernel / 'dtbs' / (dtb + '.dtb'))
+                                                       for dtb in boards[platform].values()))
+ 
++    def test_j72_usb_console_packages_standard_transport_without_optional_modules(self):
++        directory = self.base / 'console'
++        shutil.copytree(self.hardware / 'examples/usb-console', directory)
++        for dtb in ram.boards_by_platform(self.hardware)['apple-4k'].values():
++            (self.kernel / 'dtbs' / (dtb + '.dtb')).write_bytes(dtb.encode())
++        with patch.object(build, 'prepare_components', return_value=self.components), \
++                patch('orchard.apple.usb.devices', side_effect=AssertionError('unexpected USB access')), \
++                patch('orchard.firmware.ensure', side_effect=AssertionError('unexpected firmware fetch')):
++            output = ram.build_directory(directory, hardware=self.hardware, device='j72')
++        receipt = ram.verify_ram(output)
++        self.assertEqual(receipt['platform'], 'apple-4k')
++        self.assertIn('j72', receipt['boards'])
++        self.assertFalse(receipt['firmware'])
++        archive = gzip.decompress((output / 'initramfs.cpio.gz').read_bytes())
++        self.assertIn(b'usr/libexec/orchard/usb-session\0', archive)
++        self.assertIn(b'etc/orchard/authorized_keys\0', archive)
++        self.assertIn(b'ssh-ed25519 ', archive)
++        self.assertNotIn(b'test.ko\0', archive)
++
+     def test_an_undescribed_board_lists_the_platforms(self):
+         (self.base / 'orchard.local.toml').write_text('device = "experimental"\n')
+         with self.assertRaisesRegex(ValueError, r'No hardware support describes experimental.*apple-16k: .*j71b'):

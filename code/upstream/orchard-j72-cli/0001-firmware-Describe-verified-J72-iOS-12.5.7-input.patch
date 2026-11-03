@@ -1,0 +1,150 @@
+From 845890b8eca6d01615f53f513dca7f31b3290014 Mon Sep 17 00:00:00 2001
+From: thisiscamk <100883750+thisiscamk@users.noreply.github.com>
+Date: Tue, 3 Nov 2026 19:24:52 +0800
+Subject: [PATCH 1/3] firmware: Describe verified J72 iOS 12.5.7 input
+
+Pin the Apple IPSW and logical J72.mtprops input. Leave outputs empty for the initial console path until native N1 conversion is qualified. Existing Orchard byte-range, UDIF, APFS and decmpfs acquisition already reproduces the private logical file without reader changes.
+
+Test the no-download producer path and synthetic type-4 compressed/stored resource blocks. Verify the complete Apple archive hash and exact J72 BuildManifest identity locally.
+
+Assisted-by: LLM
+---
+ devices/j72/firmware.json         | 21 +++++++++++++
+ docs/bring-up/j72-firmware.md     | 42 ++++++++++++++++++++++++++
+ tests/test_j72_firmware_recipe.py | 50 +++++++++++++++++++++++++++++++
+ 3 files changed, 113 insertions(+)
+ create mode 100644 devices/j72/firmware.json
+ create mode 100644 docs/bring-up/j72-firmware.md
+ create mode 100644 tests/test_j72_firmware_recipe.py
+
+diff --git a/devices/j72/firmware.json b/devices/j72/firmware.json
+new file mode 100644
+index 0000000..7fed17d
+--- /dev/null
++++ b/devices/j72/firmware.json
+@@ -0,0 +1,21 @@
++{
++  "schema": 2,
++  "device": "iPad4,2",
++  "ipsw": {
++    "version": "12.5.7",
++    "build": "16H81",
++    "url": "https://updates.cdn-apple.com/2023FCSWinter/fullrestores/032-14132/A3C10B93-0E34-405D-8A92-92AA354BABF0/iPad_64bit_12.5.7_16H81_Restore.ipsw",
++    "bytes": 2961469678,
++    "sha256": "780aa5b20fa9fb5770c18311663bd098dbbf8e89311675a19b4860303edc0cd9"
++  },
++  "inputs": {
++    "J72.mtprops": {
++      "ipsw": {
++        "rootfs": "usr/share/firmware/multitouch/J72.mtprops"
++      },
++      "device": "/usr/share/firmware/multitouch/J72.mtprops",
++      "sha256": "69f27fe207cc5810a748dac3dfe640b1c5a755709f49513b4b5125660784f0fc"
++    }
++  },
++  "outputs": []
++}
+diff --git a/docs/bring-up/j72-firmware.md b/docs/bring-up/j72-firmware.md
+new file mode 100644
+index 0000000..6542aaa
+--- /dev/null
++++ b/docs/bring-up/j72-firmware.md
+@@ -0,0 +1,42 @@
++# J72 firmware inputs
++
++The J72 recipe identifies iPad Air Cellular (`iPad4,2`, J72AP) inputs from
++iOS 12.5.7 build 16H81. Firmware and per-device calibration remain private.
++
++`outputs` is deliberately empty. The initial native console boot needs no
++firmware output; it must not install the experimental RAM worker's private
++firmware bundle as if it were a qualified native driver input. Orchard's
++firmware producer skips unused inputs, so this recipe does not download an
++IPSW for a console build.
++
++The recipe's complete 2,961,469,678-byte IPSW was downloaded from the stated
++Apple CDN URL and its SHA-256 verified. Its BuildManifest identifies iOS
++12.5.7/16H81 and J72AP with CPID `0x8960`, BDID `0x12`, and product `iPad4,2`.
++
++## Touch input and remaining conversion work
++
++`J72.mtprops` is the decoded logical file, not its empty on-disk data fork.
++Its SHA-256 is
++`69f27fe207cc5810a748dac3dfe640b1c5a755709f49513b4b5125660784f0fc`
++and its logical size is 80,301 bytes. It uses a `com.apple.decmpfs` type-4
++attribute and a `com.apple.ResourceFork` containing zlib blocks. The existing
++Orchard resource-fork decoder reproduces the privately extracted file exactly.
++
++The iOS 12.5.7 system image is APFS. Orchard's existing UDIF reader, APFS volume
++lookup, extended-attribute lookup and type-4 decompression read this path
++without changes, producing bytes equal to the private logical file. This is
++the system image; recovery RAM images are separate inputs and may use another
++filesystem. No HFS+ reader is needed for this firmware recipe.
++
++The normal `Ipsw.system_file()` path was also checked against the Apple CDN:
++it fetched 2,067,491 bytes by range and returned the same 80,301-byte logical
++file. That check covers ZIP member selection, UDIF, APFS and decompression.
++It does not convert the file or qualify touch hardware.
++
++A native touch output must not be added until J72 firmware conversion and its
++native driver are qualified together on hardware. Successful extraction alone
++does not qualify a boot packet or the per-device calibration sequence.
++
++The existing Gen1 converter targets a different board's firmware protocol.
++Its presence is not evidence that it can convert J72's N1 personality. No
++native J72 touch firmware format or device calibration output is claimed here.
+diff --git a/tests/test_j72_firmware_recipe.py b/tests/test_j72_firmware_recipe.py
+new file mode 100644
+index 0000000..19d1c6f
+--- /dev/null
++++ b/tests/test_j72_firmware_recipe.py
+@@ -0,0 +1,50 @@
++"""The console-only J72 recipe does not fetch an unqualified touch output."""
++from contextlib import nullcontext
++import json
++from pathlib import Path
++import struct
++import tempfile
++import unittest
++from unittest.mock import Mock, patch
++import zlib
++
++from orchard import firmware, recipe
++from orchard.apple import apfs
++
++ROOT = Path(__file__).resolve().parents[1]
++
++
++class J72FirmwareRecipe(unittest.TestCase):
++    def test_console_firmware_needs_no_download(self):
++        description = recipe.check(json.loads((ROOT / 'devices/j72/firmware.json').read_text()))
++        self.assertEqual(recipe.needed_inputs(description), [])
++        self.assertEqual(recipe.run(description, Mock(side_effect=AssertionError('unexpected input'))), {})
++        with tempfile.TemporaryDirectory() as directory, \
++                patch.object(firmware, 'recipe_for', return_value=description), \
++                patch.object(firmware, 'cache_root', return_value=Path(directory)), \
++                patch('orchard.apple.remote_ipsw.Ipsw', side_effect=AssertionError('unexpected download')):
++            clock, progress = Mock(), Mock()
++            clock.exclude.return_value = nullcontext()
++            output = firmware.ensure('j72', clock, progress, allow_download=False)
++            self.assertTrue(output.is_dir())
++            self.assertEqual(list(output.iterdir()), [])
++            progress.phase.assert_called_once_with('Verified cached firmware')
++
++    def test_existing_type4_resource_decoder_handles_compressed_and_stored_blocks(self):
++        # Entirely synthetic, with the same two-block storage form as the input.
++        first, second = b'a' * 65536, b'synthetic logical file tail'
++        pieces = [zlib.compress(first), b'\xff' + second]
++        base = 0x104
++        table = bytearray(struct.pack('<I', len(pieces)))
++        offset = 4 + 8 * len(pieces)
++        for piece in pieces:
++            table.extend(struct.pack('<II', offset, len(piece)))
++            offset += len(piece)
++        fork = struct.pack('>I', 0x100).ljust(base, b'\0') + table + b''.join(pieces)
++        self.assertEqual(apfs._resource_fork(4, fork, len(first + second)), first + second)
++        with self.assertRaisesRegex(ValueError, 'size mismatch'):
++            apfs._resource_fork(4, fork, len(first + second) + 1)
++
++
++if __name__ == '__main__':
++    unittest.main()

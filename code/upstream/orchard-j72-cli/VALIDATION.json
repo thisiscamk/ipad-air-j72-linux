@@ -1,0 +1,28 @@
+{
+  "status": "OFFLINE_SOURCE_BUILD_TESTS_PASS_DEVICE_UNTESTED",
+  "upstream_base": "6b5fca68c56868651113ede0063a3061d0b22914",
+  "integrated_commit": "e9946443f4901125fc24a5895aa3c9a70629d665",
+  "commits": {
+    "firmware": "845890b",
+    "j72_device_and_bootstrap": "da46ad2",
+    "shared_tools_integrated": "e994644",
+    "shared_tools_standalone": "8480fd2"
+  },
+  "unit_tests": {
+    "count": 510,
+    "skipped": 0,
+    "result": "PASS",
+    "umask": "022"
+  },
+  "native_image_build": "PASS_CHECKOUT_ORCHARD_BUILD",
+  "image_bytes": 11852965,
+  "payload_components_and_cpio": "PASS",
+  "hardware_tested": false,
+  "internal_storage_install": false,
+  "kernel_topics_exported": false,
+  "files": {
+    "0003-build-Reuse-verified-nightly-tools-for-RAM-payloads.patch": "ac3e374f38884ea39444a141d162f22848ae0f7e0ab607b90d8bae362889e320",
+    "0001-firmware-Describe-verified-J72-iOS-12.5.7-input.patch": "441e1ab2290485a9b8e662ede09451435fbc3d8b9064370deb78627198660710",
+    "0002-apple-Prepare-an-experimental-J72-RAM-console-path.patch": "4f988e67bba692a6359113aae450036f8653f6fde05e9ffcf9965acc2f72801c"
+  }
+}

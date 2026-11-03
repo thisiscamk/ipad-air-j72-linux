@@ -4,6 +4,24 @@ Prepared 3 November 2026. This is an implementation and review
 plan, not a support declaration. No internal-storage writes are authorized.
 The latest device trial stopped before charging on seven captured state-2 reports; normal cleanup and iOS charging pass.
 
+## Prepared native CLI candidate
+
+The [source review bundle](code/upstream/orchard-j72-cli/) contains the
+experimental descriptor, verified firmware recipe, explicit A7 bootstrap and
+standard USB console, plus a separately scoped shared-tools reuse fix.
+A real 11.9 MB image builds through the checkout's `orchard build` command
+using verified components from the exact matching nightly. Its first hardware
+qualification will test `orchard run`, serial/SSH, command execution and
+RAM-only file transfer before porting the desktop features. Device untested.
+
+Native SPI actual-function fixtures pass 72 cases, with 4 KiB/16 KiB object and
+binding gates passed. A separate generic brcmfmac USB reply-validation topic
+passes 1,056 actual-function checks; native Wi-Fi PHY/ready/power ownership and
+DT integration remain open. Neither source topic has been hardware-qualified
+or exported into Orchard's applied series. The larger new-SPI kernel build
+was stopped deliberately once the matching published base was verified; its
+incremental output is retained, not recorded as a completed full build.
+
 ## Agreed destination
 
 Build the iPad Air 1 Cellular (`iPad4,2`, J72AP, CPID `0x8960`, BDID `0x12`)

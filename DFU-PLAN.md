@@ -1,5 +1,26 @@
 # Remaining DFU batches — 3 November 2026
 
+## Current integration sequence
+
+The owner has asked to progress toward normal `orchard build` and `orchard run`
+commands. The [native CLI candidate](code/upstream/orchard-j72-cli/) is prepared
+for the next authorized direct-Pi DFU:
+
+- [x] Experimental J72 descriptor and explicit A7 bootstrap.
+- [x] Real firmware recipe and existing remote extractor verification.
+- [x] Standard CLI build of a coherent native RAM console image.
+- [x] Component/CPIO inspection and focused host tests.
+- [x] Final complete Orchard test gate: 510 tests pass, no skips.
+- [ ] One native CLI RAM boot: serial/SSH, `exec`, RAM-only push/pull, normal iOS return.
+- [ ] Native touch, Wi-Fi and power integration, followed by the Omarchy A desktop.
+
+The native console supplies no desktop or charging policy. The lab's separate
+inactive-state-1/2 candidate and guarded charging sequence remain prepared
+below. No native feature is declared working from build tests alone, and no
+internal-storage write is authorized.
+
+## Lab endurance follow-up
+
 The morning observation completed with a net-charge failure. The later attempt
 passed desktop/owner/read-only storage checks, but three rejected touch layouts
 stopped precharge checks before arming. Normal cleanup and iOS charging after
@@ -9,7 +30,7 @@ unlock are confirmed. See [the diagnosis](TOUCH-FOLLOWUP-2026-11-03.md).
 seven native state-2 reports at the precharge gate. No charging started. Normal
 cleanup and iOS charging pass.
 
-**Next changed batch:** inactive handling of captured states 1/2, then guarded
+**Prepared lab batch:** inactive handling of captured states 1/2, then guarded
 charging in the same boot if input passes. All eight actual reports, exhaustive
 emitter tests, build and V4 preflight pass; device execution is untested.
 Module unloading is disabled in this kernel; a fresh DFU is required. No internal

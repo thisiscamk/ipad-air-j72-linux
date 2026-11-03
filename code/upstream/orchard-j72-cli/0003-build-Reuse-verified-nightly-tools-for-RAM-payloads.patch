@@ -1,0 +1,110 @@
+From e9946443f4901125fc24a5895aa3c9a70629d665 Mon Sep 17 00:00:00 2001
+From: thisiscamk <100883750+thisiscamk@users.noreply.github.com>
+Date: Tue, 3 Nov 2026 19:43:20 +0800
+Subject: [PATCH 3/3] build: Reuse verified nightly tools for RAM payloads
+
+Use the existing source-key and asset-checksum verified published producer before compiling static tools for a RAM build. Reuse that prepared BusyBox and stage only known tool executables, leaving component-cache metadata outside the payload. Explicit BusyBox overrides and the local-build policy remain intact.
+
+Assisted-by: LLM
+---
+ src/orchard/build.py           |  4 ++++
+ src/orchard/ram.py             |  6 ++++--
+ tests/test_published_kernel.py | 15 +++++++++++++++
+ tests/test_ram.py              |  6 +++++-
+ 4 files changed, 28 insertions(+), 3 deletions(-)
+
+diff --git a/src/orchard/build.py b/src/orchard/build.py
+index 8ec30cd..d5fc49a 100644
+--- a/src/orchard/build.py
++++ b/src/orchard/build.py
+@@ -522,7 +522,11 @@ def _prepare_tools(hardware, components):
+ 
+ def prepare_tools(hardware=None, cache=None, *, device):
+     """The directory of static recovery tools for RAM images, built or reused."""
++    from . import published
+     hardware, cache = _build_context(hardware, cache, device)
++    tools = published.tools(hardware, cache)
++    if tools is not None:
++        return tools
+     with component_lock(cache):
+         return _prepare_tools(hardware, cache / 'components-v2')
+ 
+diff --git a/src/orchard/ram.py b/src/orchard/ram.py
+index 837733d..4fa2c0b 100644
+--- a/src/orchard/ram.py
++++ b/src/orchard/ram.py
+@@ -233,9 +233,10 @@ def _build_directory(directory, *, hardware, cache, kernel, busybox, loader, pon
+             raise ValueError(f'Symlinks in rootfs are not supported yet: {path}')
+         if path.is_file():
+             files[str(path.relative_to(overlay))] = path
++    from .published import TOOLS
+     tools = build.prepare_tools(hardware, cache, device=representative)
+     for tool in sorted(tools.iterdir()):
+-        if tool.name != 'busybox' and tool.is_file():
++        if tool.name in TOOLS and tool.name != 'busybox' and tool.is_file():
+             files.setdefault(TOOL_DESTINATIONS.get(tool.name, 'usr/bin') + '/' + tool.name, tool)
+     if settings['transport']:
+         from . import ram_session
+@@ -247,7 +248,8 @@ def _build_directory(directory, *, hardware, cache, kernel, busybox, loader, pon
+     if tree is not None:
+         print(f'Kernel from the tree {tree}', flush=True)
+     components = build.prepare_components(hardware, cache, device=representative, kernel=kernel,
+-                                          busybox=busybox, loader=loader, pongo=pongo, kernel_tree=tree)
++                                          busybox=busybox if busybox is not None else tools / 'busybox',
++                                          loader=loader, pongo=pongo, kernel_tree=tree)
+     hostname = re.sub(r'[^A-Za-z0-9_-]', '-', directory.name).strip('-_')[:63] or 'orchard-ram'
+     assemble_ram(hardware, output, **components, init=init, files=files, modules=settings['modules'],
+                  hostname=hostname, platform=platform, boards=boards)
+diff --git a/tests/test_published_kernel.py b/tests/test_published_kernel.py
+index 02a2bd6..5f00d11 100644
+--- a/tests/test_published_kernel.py
++++ b/tests/test_published_kernel.py
+@@ -151,3 +151,18 @@ class PublishedShared(unittest.TestCase):
+         with self.release():
+             self.assertIsNone(published.m1n1(ROOT, self.cache))
+             self.assertIsNone(published.tools(ROOT, self.cache))
++
++    def test_ram_tools_reuse_the_verified_published_producer_without_local_build(self):
++        from orchard import build
++        with self.release(), mock.patch.object(build, '_prepare_tools', side_effect=AssertionError('local build')), \
++                contextlib.redirect_stdout(io.StringIO()):
++            tools = build.prepare_tools(ROOT, self.cache, device='j71b')
++        for name in published.TOOLS:
++            self.assertEqual((tools / name).read_bytes(), b'tool')
++
++    def test_ram_tools_preserve_explicit_local_build_policy(self):
++        from orchard import build
++        os.environ['ORCHARD_PUBLISHED'] = 'off'
++        with self.release(), mock.patch.object(build, '_prepare_tools', return_value=self.cache/'local') as local:
++            self.assertEqual(build.prepare_tools(ROOT, self.cache, device='j71b'), self.cache/'local')
++        local.assert_called_once_with(ROOT, self.cache/'components-v2')
+diff --git a/tests/test_ram.py b/tests/test_ram.py
+index 6082db3..1ce5b28 100644
+--- a/tests/test_ram.py
++++ b/tests/test_ram.py
+@@ -516,7 +516,7 @@ class RamTests(unittest.TestCase):
+                 ram.build_directory(directory)
+                 # Components are per platform; its first board selects them.
+                 prepare.assert_called_once_with(self.hardware, self.base / 'shared-cache', device='d10', kernel=None,
+-                                                busybox=None, loader=None, pongo=None, kernel_tree=None)
++                                                busybox=self.tools / 'busybox', loader=None, pongo=None, kernel_tree=None)
+                 ram.verify_ram(directory / 'out/apple-16k')
+                 if directory.name == 'charger 001':
+                     archive = gzip.decompress((directory / 'out/apple-16k/initramfs.cpio.gz').read_bytes())
+@@ -526,12 +526,16 @@ class RamTests(unittest.TestCase):
+         directory = self.base / 'tools-project'
+         directory.mkdir()
+         shutil.copyfile(self.init, directory / 'init')
++        (self.tools / 'component.json').write_text('{"private-host-path": "not a tool"}')
++        (self.tools / 'published.json').write_text('{"tag": "not a tool"}')
+         with patch.object(build, 'prepare_components', return_value=self.components), \
+                 patch.object(build, 'cache_root', return_value=self.base / 'shared-cache'):
+             ram.build_directory(directory)
+         archive = gzip.decompress((directory / 'out/apple-16k/initramfs.cpio.gz').read_bytes())
+         self.assertIn(b'usr/sbin/wpa_supplicant', archive)
+         self.assertNotIn(b'usr/bin/busybox', archive)
++        self.assertNotIn(b'usr/bin/component.json', archive)
++        self.assertNotIn(b'usr/bin/published.json', archive)
+ 
+     def test_firmware_is_a_layer_for_the_booted_board_outside_the_project(self):
+         from orchard import firmware
