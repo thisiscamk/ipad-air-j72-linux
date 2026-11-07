@@ -1,0 +1,40 @@
+# Historical reports
+
+These reports explain earlier decisions. They are not the current runbook.
+Use [current status](../J72-PROGRESS.md), [replication](../QUICKSTART.md) and
+[current source](../code/current/README.md) for today's state.
+
+## Preserved before the 7 November cleanup
+
+- [Old landing page](pre-cleanup-2026-11-07/README.md)
+- [Old progress report](pre-cleanup-2026-11-07/J72-PROGRESS.md)
+- [Original RAM bring-up process](pre-cleanup-2026-11-07/PROCESS.md)
+- [Old roadmap](pre-cleanup-2026-11-07/ROADMAP.md)
+- [Old source overview](pre-cleanup-2026-11-07/CODE-README.md)
+
+## Original reports (stable links retained)
+
+- [DFU-PLAN](../DFU-PLAN.md)
+- [FINISHING-PLAN](../FINISHING-PLAN.md)
+- [INDEPENDENCE-PLAN](../INDEPENDENCE-PLAN.md)
+- [INSTALL-TRANSACTION-PLAN](../INSTALL-TRANSACTION-PLAN.md)
+- [INTERNAL-STORAGE-PLAN](../INTERNAL-STORAGE-PLAN.md)
+- [NATIVE-CLI-BOOT-2026-11-03](../NATIVE-CLI-BOOT-2026-11-03.md)
+- [NATIVE-POWER-INTEGRATION-PLAN](../NATIVE-POWER-INTEGRATION-PLAN.md)
+- [NATIVE-TOUCH-BOOT-2026-11-04](../NATIVE-TOUCH-BOOT-2026-11-04.md)
+- [NATIVE-TOUCH-PREPARATION](../NATIVE-TOUCH-PREPARATION.md)
+- [NEXT-POWER-COMPARISON](../NEXT-POWER-COMPARISON.md)
+- [NEXT-SESSION-PLAN](../NEXT-SESSION-PLAN.md)
+- [ORCHARD-POWER-PLAN](../ORCHARD-POWER-PLAN.md)
+- [PI-CHARGING-PLAN](../PI-CHARGING-PLAN.md)
+- [POWER-COMPLETION-PLAN](../POWER-COMPLETION-PLAN.md)
+- [RAM-APFS-REHEARSAL-PLAN](../RAM-APFS-REHEARSAL-PLAN.md)
+- [SESSION-2026-11-03](../SESSION-2026-11-03.md)
+- [SPACE-CREATION-REVIEW](../SPACE-CREATION-REVIEW.md)
+- [STORAGE-MORNING-PLAN](../STORAGE-MORNING-PLAN.md)
+- [TOUCH-FOLLOWUP-2026-11-03](../TOUCH-FOLLOWUP-2026-11-03.md)
+- [UPSTREAM-INTEGRATION-PLAN](../UPSTREAM-INTEGRATION-PLAN.md)
+- [UPSTREAM-REVIEW-2026-11-03](../UPSTREAM-REVIEW-2026-11-03.md)
+- [WIFI-PLAN](../WIFI-PLAN.md)
+
+Earlier snapshots: [DFU plan](DFU-PLAN-BEFORE-2026-11-03.md), [roadmap](ROADMAP-BEFORE-2026-11-03.md).

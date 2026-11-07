@@ -1,0 +1,73 @@
+{
+  "schema": 1,
+  "updated": "2026-11-07",
+  "source_only": true,
+  "files": {
+    "README.md": "8c5715daaa2c57470a70d92ffe89c440f7aa8df642e966c22b2fff8d3e17ad7f",
+    "VALIDATION.json": "fedcf0cbc4586326755cb64fa22b5e61dc92d48513cf02138fafe34eb58a5e7a",
+    "audio/Makefile": "1295fa6ad6d3b8165111fb6ea1612446219d9729efc7141a988db517f361c1b5",
+    "audio/README.md": "d4bdd82b96da26f935cdc43b403c0a777d20c307610e6a626d80e2e66dbbc35e",
+    "audio/apple-sio-core.c": "e2bd5071b203df84a8ee91ffef45f6b340653397b480fe4aaf96fbe1d9003250",
+    "audio/apple-sio-core.mod.c": "d17d29901798eca01c752cdc9db14904bcbfc8da167662a0e64dfe4a836a817d",
+    "audio/apple-sio-dma.c": "32cc825c35625973c430a55abcb6f4f60f12881f909a4dd3f2641fb7e9be93f0",
+    "audio/apple-sio-dma.mod.c": "bcf4ddb3b009447799379536680e77f55dbce7c7ad7e5291005e0ad045c05c8f",
+    "audio/audio.dts": "98512882147e2416f34d617d11e57e9c667158b053389b273a8e1f5c671cb967",
+    "audio/dmaengine.h": "09d1c31b6a025adc25a6529854642689ab4302ae19007923f9cfa68f7733ec28",
+    "audio/j72_audio_overlay.c": "08e8a51e755e154c2f21a2a4698b9082e4db1f7a172c09efb6d9c506b5870bbb",
+    "audio/j72_audio_overlay.mod.c": "d58cece78f0cd9d5c51df34781da71f69a565ba0dca9bc3d33c73a4e9b33a78e",
+    "audio/j72_mca.c": "7b2eea2e020954406f7ca22fc877b4d220020350cdb8d4f45ce80775a70eb923",
+    "audio/j72_mca.mod.c": "41d839bcb0c0caefbd8a72f8218bd9be7d8beb5d2cb38d87725cc2c316466c66",
+    "audio/make-overlay-header.py": "978e3af0ed515a726470b25ed16804f41f1ec3945761c2edb4d27508795f6305",
+    "audio/runtime/mute-controls.py": "b2067e60c93aaf18979c48689362751aac2106f4288a642e4a5ac3aa64b6eb60",
+    "audio/runtime/orchard-j72-audio.service": "1fa7836e3bfc592fb4b97e85f53ad61504965b4a86bc01ecd595c38bd43a5332",
+    "audio/runtime/start-audio.py": "001d2087581a0bca609638a8e66e24835e9085090ae297f996b156e27c07f9ae",
+    "audio/stage-runtime.py": "5e74da26e945390f77bd81951315197ca37abd4d4a15f834534618908cd8ef02",
+    "audio/virt-dma.c": "471a96dc86b8d79f65780874687f64f8deeccb93e98f616c67e57a6b206512f0",
+    "audio/virt-dma.h": "695955f347bf51c852fd527c46943277694f812416d3e142991a6f120c3ddad3",
+    "audio/virt-dma.mod.c": "2840c5bd6f2a33c2a61fb5d5b062764a894ac388b8d040bec98c0b200b0bfc49",
+    "charging/README.md": "5294a74cedf179af688769960143c7e5bfc78d8ac04f64dd2ea692bf95eb5942",
+    "charging/config/j72-charging/README.txt": "fe2b98dbb2a80e7e45376d2943e49ea4a62f26d830e63cfb66e3f4091efbba5d",
+    "charging/config/j72-charging/hardware.json": "d964690f13ef3e82b15f8983a07bca88e4d9d678668b08461dffdf5a343dbd31",
+    "charging/config/j72-charging/orchard-j72-charge-auto.service": "b6e510c9933d83ca86d31240a1337ab65c0ca25356396ab0aaf2c0a043f6f6ba",
+    "charging/config/j72-charging/orchard-j72-charge.service": "2c46077065d9d41234ff82fcbb74d986a70f43deaec7e7a09edd9cf870bc6d11",
+    "charging/kernel/Makefile": "96143b90ebcecf3ea49b7270f1c1544f63df16f563f0f8892011eae6c97acdaf",
+    "charging/kernel/j72_external_power_v1.c": "0eb9ac0733715555f7badb5502486733c3e080bb54c31fac5d0c6d560cc93445",
+    "charging/tools/j72-charge-auto-host.py": "09c7218c279d159c8a23e5bc329bd5865d7abe0eeaf676ddd8ba6e01359c630f",
+    "charging/tools/j72-charge-auto-target.py": "f08a7ecb790ece3cee04a2f32d3a43fca84a6a097ab723f6a2b4c10620147b66",
+    "charging/tools/j72-charge-profile.py": "436d3d2a7e3489bcbad9eeae3684edc9b005be19263ca66f9029f3b439eb4df2",
+    "charging/tools/j72-charge-supervisor.py": "48011e1d580a0ab5551b657b487902f8d5d732fac06d14a1ce2b3548dad5e7d0",
+    "charging/tools/j72_charge_profile.py": "571d4ac429cf7ef0a6b0a5bc8a1ca13758b426d7cb6ea8f93364a93fc0487bff",
+    "charging/tools/test-j72-charge-auto.py": "64e037859cf99e7fb78a1ba78309bd825f2c4690122989b57e1e1bb3d9cddbc7",
+    "charging/tools/test-j72-charge-profile.py": "0fdae93c8add21ad0e156f60a82f15a6992dfe5641969b9073d8c596be6bd138",
+    "charging/tools/test-j72-charge-supervisor.py": "63aa1af914e071fdc95c8e172154a807ad4afc086e7fae165775a1fbdc639131",
+    "kernel/0001-j72-installed-kernel-snapshot.patch": "98284e8956aa8e8284cb70ecec44ded3e7bbf0967446645def3d8ef05887bc45",
+    "kernel/0002-j72-gauge-cache-wait.patch": "c1ef15281fac9425048d790fc45aa49fd504f62fbb42bdf1b0f0ac4359254e9c",
+    "orchard/0001-j72-orchard-integration-snapshot.patch": "11ab025433f2bfbcb40d02b4979e09e1e5485b25ee9b980f2fcbfb56681cf6fc",
+    "wifi/README.md": "7db7620b05a655e7ae5b1b70aacc20718934d8a3b405f6d4432772fd511da332",
+    "wifi/j72-wifi-start.py": "b4bb35d7173455791d59e1de0bc6b16bd8c5e88283fa119152effc20e7eeded4",
+    "wifi/orchard-j72-wifi.service": "4f3858d8d485020cc9c0e1821398bd6f5b80bd9a700bdcfd5ec2c84f3e5a5a8c"
+  },
+  "sources": {
+    "kernel": {
+      "url": "https://github.com/OrchardLinux/linux.git",
+      "base": "4cec5aa77c69ac1fd7c605ab8159714ea9024a08",
+      "snapshot_commit": "8daddcf25deb6f8eb8ddeabac0f7ae3f11e4b096",
+      "working_tree_delta": "0002-j72-gauge-cache-wait.patch",
+      "kernel_release": "7.3.0-rc1-j72-pw1-orchard-apple-4k"
+    },
+    "orchard": {
+      "url": "https://github.com/OrchardLinux/orchard.git",
+      "base": "a6ffc904bf8acb7af2fd0fc94f84ca194bd82ed2",
+      "snapshot_commit": "a89b69072bc730bbb8c1d164e4faefdc102368e0"
+    }
+  },
+  "audio": {
+    "scope": "48kHz stereo S16 playback; both channels heard",
+    "core_source_sha256": "e2bd5071b203df84a8ee91ffef45f6b340653397b480fe4aaf96fbe1d9003250",
+    "mca_source_sha256": "7b2eea2e020954406f7ca22fc877b4d220020350cdb8d4f45ce80775a70eb923",
+    "firmware_included": false,
+    "fresh_boot_tested": false,
+    "headphone_or_capture_tested": false
+  },
+  "privacy": "Test ECID/boot identifiers are synthetic; firmware and private deployment outputs excluded."
+}

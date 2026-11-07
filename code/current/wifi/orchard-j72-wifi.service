@@ -1,0 +1,17 @@
+[Unit]
+Description=J72 internal HSIC Wi-Fi hardware
+ConditionDeviceTree=apple,j72
+After=systemd-modules-load.service systemd-udev-trigger.service
+Before=NetworkManager.service
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+ExecStart=/usr/lib/orchard/j72-wifi-start.py start
+ExecStop=/usr/lib/orchard/j72-wifi-start.py stop
+TimeoutStartSec=120
+TimeoutStopSec=45
+Restart=no
+
+[Install]
+WantedBy=multi-user.target

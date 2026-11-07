@@ -1,3 +1,5 @@
+> **Historical report / superseded plan.** Start with the [current status](J72-PROGRESS.md) and [replication guide](QUICKSTART.md). Statements below describe their original session, not current support.
+
 # J72 integration with Orchard and Omarchy A
 
 Prepared 3 November 2026. This is an implementation and review

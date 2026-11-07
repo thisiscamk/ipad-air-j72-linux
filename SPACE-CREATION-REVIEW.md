@@ -1,3 +1,5 @@
+> **Historical report / superseded plan.** Start with the [current status](J72-PROGRESS.md) and [replication guide](QUICKSTART.md). Statements below describe their original session, not current support.
+
 # Latest host filesystem rehearsal
 
 The conditional 1536 MiB budget now has an actual **host-file ext4 rehearsal**:

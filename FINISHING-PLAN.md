@@ -1,3 +1,5 @@
+> **Historical report / superseded plan.** Start with the [current status](J72-PROGRESS.md) and [replication guide](QUICKSTART.md). Statements below describe their original session, not current support.
+
 # Plan from the current RAM desktop to an installed J72 tablet
 
 Updated 3 November 2026. This is the current project plan; dated session reports

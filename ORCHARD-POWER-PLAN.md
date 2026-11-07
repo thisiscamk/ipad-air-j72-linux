@@ -1,3 +1,5 @@
+> **Historical report / superseded plan.** Start with the [current status](J72-PROGRESS.md) and [replication guide](QUICKSTART.md). Statements below describe their original session, not current support.
+
 # Reusing Orchard charging support for J72
 
 Reviewed Orchard `main` at `4f15a70b9c59687fe8cd72b6ea2fbb2823c54d92`

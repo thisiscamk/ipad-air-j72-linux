@@ -23,3 +23,7 @@ modules.order
 __pycache__/
 code/**/private/
 code/**/build/
+
+# Locally generated public overlay artifacts; firmware stays private too.
+code/current/audio/audio-blob.h
+*.dtbo

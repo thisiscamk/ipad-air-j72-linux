@@ -1,3 +1,5 @@
+> **Historical report / superseded plan.** Start with the [current status](J72-PROGRESS.md) and [replication guide](QUICKSTART.md). Statements below describe their original session, not current support.
+
 # 3 November follow-up: charging stopped at the input gate
 
 The owner confirmed menu, Foot typing and keyboard reopening, then moved the

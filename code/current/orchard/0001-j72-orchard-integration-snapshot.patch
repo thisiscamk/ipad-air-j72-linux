@@ -1,0 +1,4048 @@
+diff --git a/devices/j72/device.toml b/devices/j72/device.toml
+new file mode 100644
+index 0000000..5984c30
+--- /dev/null
++++ b/devices/j72/device.toml
+@@ -0,0 +1,59 @@
++# Initial native Orchard path, distinct from the previously measured lab stack.
++schema = 1
++kind = "hardware.device"
++
++[device]
++profile = "j72"
++name = "iPad Air 1 (Cellular)"
++apple_products = ["iPad4,2"]
++dt_compatible = ["apple,j72"]
++
++[match.dfu]
++chip = 0x8960
++board = 0x12
++
++# Standard recovery identity already qualified; storage writes remain missing.
++[match.linux]
++recovery = true
++
++[boot]
++methods = ["checkm8-pongo"]
++
++[kernel]
++platform = "apple-4k"
++dtb = "s5l8960x-j72"
++
++[firmware]
++recipe = "firmware.json"
++
++[support]
++status = "experimental"
++
++# Native7.3 input, bounded ASP write/flush and ext4 scratch tests passed.
++# Normal partition access, restart persistence and installed boot remain untested.
++[features]
++display = "working"
++screen_off = "untested"
++backlight = "working"
++touch = "working"
++buttons = "working"
++accelerometer = "missing"
++gyroscope = "missing"
++light_sensor = "missing"
++touch_id = "none"
++storage_read = "working"
++storage_write = "untested"
++wifi = "missing"
++bluetooth_input = "missing"
++bluetooth_audio = "missing"
++cellular = "missing"
++battery = "missing"
++charging = "missing"
++charging_control = "missing"
++suspend = "missing"
++resume = "missing"
++usb_serial = "working"
++usb_network = "working"
++audio_output = "missing"
++audio_input = "missing"
++camera = "missing"
+diff --git a/devices/j72/firmware.json b/devices/j72/firmware.json
+new file mode 100644
+index 0000000..771994c
+--- /dev/null
++++ b/devices/j72/firmware.json
+@@ -0,0 +1,37 @@
++{
++  "schema": 2,
++  "device": "iPad4,2",
++  "ipsw": {
++    "version": "12.5.7",
++    "build": "16H81",
++    "url": "https://updates.cdn-apple.com/2023FCSWinter/fullrestores/032-14132/A3C10B93-0E34-405D-8A92-92AA354BABF0/iPad_64bit_12.5.7_16H81_Restore.ipsw",
++    "bytes": 2961469678,
++    "sha256": "780aa5b20fa9fb5770c18311663bd098dbbf8e89311675a19b4860303edc0cd9"
++  },
++  "inputs": {
++    "J72.mtprops": {
++      "ipsw": {
++        "rootfs": "usr/share/firmware/multitouch/J72.mtprops"
++      },
++      "device": "/usr/share/firmware/multitouch/J72.mtprops",
++      "sha256": "69f27fe207cc5810a748dac3dfe640b1c5a755709f49513b4b5125660784f0fc"
++    }
++  },
++  "outputs": [
++    {
++      "destination": "lib/firmware/apple/j72-fwstart.z2fw",
++      "sha256": "73ca290607695ca841867a2bf76cab4bc2f5c33b9ab5ac171de5b5580a7c0c09",
++      "steps": [
++        {
++          "step": "z2fw-from-z2-packet@2",
++          "input": "J72.mtprops",
++          "profile": "C1F15,1",
++          "calibration_address": 268472320,
++          "calibration_size": 1024,
++          "prox_address": 268473856,
++          "prox_size": 128
++        }
++      ]
++    }
++  ]
++}
+diff --git a/docs/bring-up/j72-firmware.md b/docs/bring-up/j72-firmware.md
+new file mode 100644
+index 0000000..9083c74
+--- /dev/null
++++ b/docs/bring-up/j72-firmware.md
+@@ -0,0 +1,101 @@
++# J72 firmware inputs
++
++The J72 recipe identifies iPad Air Cellular (`iPad4,2`, J72AP) inputs from
++iOS 12.5.7 build 16H81. Firmware and per-device calibration remain private.
++
++The recipe generates only `apple/j72-fwstart.z2fw` through the model-selected
++native N1 converter. Its output is the same 57,256-byte input that passed the
++J72 native RAM touch tests. It contains no unit calibration. A console payload
++can keep its existing `firmware = false` project setting.
++
++This enables standard firmware preparation for future recovery/installation;
++it does not qualify installed startup or enable storage installation. The J72
++descriptor still has installation disabled.
++
++The recipe's complete 2,961,469,678-byte IPSW was downloaded from the stated
++Apple CDN URL and its SHA-256 verified. Its BuildManifest identifies iOS
++12.5.7/16H81 and J72AP with CPID `0x8960`, BDID `0x12`, and product `iPad4,2`.
++
++## Touch input and remaining conversion work
++
++`J72.mtprops` is the decoded logical file, not its empty on-disk data fork.
++Its SHA-256 is
++`69f27fe207cc5810a748dac3dfe640b1c5a755709f49513b4b5125660784f0fc`
++and its logical size is 80,301 bytes. It uses a `com.apple.decmpfs` type-4
++attribute and a `com.apple.ResourceFork` containing zlib blocks. The existing
++Orchard resource-fork decoder reproduces the privately extracted file exactly.
++
++The iOS 12.5.7 system image is APFS. Orchard's existing UDIF reader, APFS volume
++lookup, extended-attribute lookup and type-4 decompression read this path
++without changes, producing bytes equal to the private logical file. This is
++the system image; recovery RAM images are separate inputs and may use another
++filesystem. No HFS+ reader is needed for this firmware recipe.
++
++The normal `Ipsw.system_file()` path was also checked against the Apple CDN:
++it fetched 2,067,491 bytes by range and returned the same 80,301-byte logical
++file. That check covers ZIP member selection, UDIF, APFS and decompression.
++It does not convert the file or qualify touch hardware.
++
++The generated bytes passed native RAM firmware startup, touch interaction and
++normal supply cleanup on this J72. Installed-system automatic startup remains
++unqualified; extraction or package assembly alone does not establish it.
++
++## Native N1 candidate contract
++
++The model-selected `z2fw-from-z2-packet@2` step preserves existing Z2FW
++version-1 framing. The active recipe names `apple/j72-fwstart.z2fw` with these
++parameters:
++
++```json
++{
++  "step": "z2fw-from-z2-packet@2",
++  "input": "J72.mtprops",
++  "profile": "C1F15,1",
++  "calibration_address": 268472320,
++  "calibration_size": 1024,
++  "prox_address": 268473856,
++  "prox_size": 128
++}
++```
++
++The four records, in order, are:
++
++| Record | Content |
++|---|---|
++| CONFIG (4) | Eleven little-endian u32 words: `0x818`, nine zeros, `0x103`; mode 0 and explicit legacy full-word HBPP counts |
++| SEND (1) | A 144-byte legacy blob loading 128 zero proximity bytes at `0x10009600` |
++| CALIBRATION (6) | Three little-endian u32 words: address `0x10009000`, maximum 1024 bytes, provider 0 |
++| SEND (1) | The unchanged 57,016-byte `Constructed Firmware` packet from `C1F15,1` |
++
++The generated candidate is 57,256 bytes, SHA-256
++`73ca290607695ca841867a2bf76cab4bc2f5c33b9ab5ac171de5b5580a7c0c09`.
++The proximity and firmware wire packets match the private working RAM worker
++byte for byte. An independent reconstruction of the dynamic 1008-byte and
++16-byte calibration chunks also matches that worker. These byte comparisons are separate from hardware results. Native RAM tests
++on 4 November confirmed startup, menu/terminal touch and keyboard interaction;
++normal removal returned all three supplies to disabled with zero users. No
++installed-system or storage qualification is claimed.
++
++The native N1 driver owns warm-up, reset, HBPP readiness, register calibration,
++the 65 ms calibration wait, execute and runtime discovery. Those commands must
++not also appear in this firmware file. In particular, `z2fw-from-mtprops@3`
++includes a different driver's INIT and register sequence and is not suitable
++for this native N1 loader.
++
++## Per-device calibration
++
++The firmware output contains no owner's calibration. Provider 0 consumes
++`apple,z2-cal-blob` on the touchscreen node. Existing m1n1 code copies the
++running unit's ADT `multi-touch-calibration` into that property through the
++`touchscreen0` FDT alias. Unresolved `syscfg/` references are not copied.
++
++The native driver must require exactly 1024 bytes, reject absent, all-zero and
++all-`0xff` data before powering the controller, then send it in 1008-byte and
++16-byte chunks. It must not substitute another unit's calibration or an IPSW
++default. The zero proximity packet is a separate, observed model initialization;
++it does not replace this mandatory unit calibration.
++
++Before qualifying an output, test the exact native kernel, providers, device
++tree, m1n1 and privately generated firmware together. Check the calibration
++property's presence and size without publishing its bytes, then verify boot,
++touch events, coordinates, release handling and normal cleanup on the device.
+diff --git a/docs/firmware-recipes.md b/docs/firmware-recipes.md
+index ec20c4b..c7d639f 100644
+--- a/docs/firmware-recipes.md
++++ b/docs/firmware-recipes.md
+@@ -116,6 +116,8 @@ The CLI used to do that; it isn't needed for recipes any more.
+ | `z2fw-from-mtprops@1` | `input`, `profile`, `packet`, `load_address`, `hbpp_version` | Z2 touch firmware with calibration records |
+ | `z2fw-from-mtprops@2` | `input`, `profile`, `packet` | Z2 touch firmware from an mtprops packet array (iPhone 7 Plus) |
+ | `z2fw-from-mtprops@3` | `input`, `profile`, `packet`, `touch_maximum`, `prox_maximum`, `fll_mval`, `ref_clk_div`, `clk32_clock_enable` | Legacy Gen1 Z2 touch firmware (iPhone 6), with full word counts, bounded calibration from the ADT and the board's kernel clock policy |
++| `z2fw-from-z2-packet@1` | `input`, `profile`, `calibration_address`, `calibration_size` | One legacy Z2 packet, with SPI mode 0 and a dynamic multi-touch calibration record |
++| `z2fw-from-z2-packet@2` | `input`, `profile`, `calibration_address`, `calibration_size`, `prox_address`, `prox_size` | N1's four-record contract: SPI mode 0/HBPP 0x103, a zero proximity initialization packet, dynamic multi-touch calibration, and the unchanged legacy packet; reset, register calibration and execute remain in the native driver |
+ | `z2fw-from-mtfw@1` | `profile`, `otp_preflight` | Z2 touch firmware from an MTFW HBPP item list (iPad 7); each calibration loads Apple's default, then its record |
+ 
+ Before it extracts anything, the CLI checks that it implements every step a
+diff --git a/kernel/configs/apple-16k/config b/kernel/configs/apple-16k/config
+index 82fc1e2..8466e52 100644
+--- a/kernel/configs/apple-16k/config
++++ b/kernel/configs/apple-16k/config
+@@ -5088,6 +5088,7 @@ CONFIG_COMMON_CLK=y
+ 
+ # CONFIG_LMK04832 is not set
+ CONFIG_COMMON_CLK_APPLE_NCO=m
++CONFIG_COMMON_CLK_APPLE_S5L8960X_TOUCH=y
+ CONFIG_COMMON_CLK_APPLE_T8010_TOUCH=y
+ # CONFIG_COMMON_CLK_MAX9485 is not set
+ # CONFIG_COMMON_CLK_SI5341 is not set
+diff --git a/kernel/configs/apple-4k/config b/kernel/configs/apple-4k/config
+index acac27d..f8bef5f 100644
+--- a/kernel/configs/apple-4k/config
++++ b/kernel/configs/apple-4k/config
+@@ -5090,6 +5090,7 @@ CONFIG_COMMON_CLK=y
+ 
+ # CONFIG_LMK04832 is not set
+ CONFIG_COMMON_CLK_APPLE_NCO=m
++CONFIG_COMMON_CLK_APPLE_S5L8960X_TOUCH=y
+ CONFIG_COMMON_CLK_APPLE_T8010_TOUCH=y
+ # CONFIG_COMMON_CLK_MAX9485 is not set
+ # CONFIG_COMMON_CLK_SI5341 is not set
+diff --git a/kernel/patches/devices/s5l8960x/0001-arm64-dts-apple-describe-disabled-J72-touch-resource.patch b/kernel/patches/devices/s5l8960x/0001-arm64-dts-apple-describe-disabled-J72-touch-resource.patch
+new file mode 100644
+index 0000000..536e8c0
+--- /dev/null
++++ b/kernel/patches/devices/s5l8960x/0001-arm64-dts-apple-describe-disabled-J72-touch-resource.patch
+@@ -0,0 +1,115 @@
++From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
++From: thisiscamk <100883750+thisiscamk@users.noreply.github.com>
++Date: Tue, 3 Nov 2026 20:29:01 +0800
++Subject: [PATCH] arm64: dts: apple: describe disabled J72 touch resources
++
++Describe SPI2 and the PWM-derived reference clock, J72 SPI and display-sync pin routes, and the D2089 touch supply relationships. Keep all new providers disabled until the dependent touchscreen consumer and its normal startup path are integrated and qualified.
++
++Assisted-by: LLM
++---
++ arch/arm64/boot/dts/apple/s5l8960x-j72.dts | 49 ++++++++++++++++++++++
++ arch/arm64/boot/dts/apple/s5l8960x.dtsi    | 27 ++++++++++++
++ 2 files changed, 76 insertions(+)
++
++diff --git a/arch/arm64/boot/dts/apple/s5l8960x-j72.dts b/arch/arm64/boot/dts/apple/s5l8960x-j72.dts
++index afb71b888..cdf306a4a 100644
++--- a/arch/arm64/boot/dts/apple/s5l8960x-j72.dts
+++++ b/arch/arm64/boot/dts/apple/s5l8960x-j72.dts
++@@ -12,3 +12,52 @@ / {
++ 	compatible = "apple,j72", "apple,s5l8960x", "apple,arm-platform";
++ 	model = "Apple iPad Air (Cellular)";
++ };
+++
+++&pinctrl {
+++	spi2_pins: spi2-pins {
+++		pinmux = <APPLE_PINMUX(76, 1)>,
+++			 <APPLE_PINMUX(77, 1)>,
+++			 <APPLE_PINMUX(78, 1)>,
+++			 <APPLE_PINMUX(79, 1)>;
+++	};
+++
+++	spi2_idle_pins: spi2-idle-pins {
+++		pinmux = <APPLE_PINMUX(79, 0)>;
+++	};
+++
+++	touch_sync_active: touch-sync-active-pins {
+++		pinmux = <APPLE_PINMUX(119, 1)>;
+++	};
+++
+++	touch_sync_inactive: touch-sync-inactive-pins {
+++		pinmux = <APPLE_PINMUX(119, 0)>;
+++	};
+++};
+++
+++&{/soc/i2c@20a110000/pmic@3c} {
+++	touch_analog_bias: regulator-touch-analog-bias {
+++		compatible = "apple,d2089-touch-analog-bias-regulator";
+++		regulator-name = "touch-analog-bias";
+++		status = "disabled";
+++	};
+++
+++	touch_analog: regulator-touch-analog {
+++		compatible = "apple,d2089-touch-analog-regulator";
+++		regulator-name = "touch-analog";
+++		status = "disabled";
+++		bias-supply = <&touch_analog_bias>;
+++	};
+++
+++	touch_core: regulator-touch-core {
+++		compatible = "apple,d2089-touch-core-regulator";
+++		regulator-name = "touch-core";
+++		status = "disabled";
+++	};
+++};
+++
+++/* The consumer enables these resources only in the touchscreen topic. */
+++&spi2 {
+++	pinctrl-names = "default", "sleep";
+++	pinctrl-0 = <&spi2_pins>;
+++	pinctrl-1 = <&spi2_idle_pins>;
+++};
++diff --git a/arch/arm64/boot/dts/apple/s5l8960x.dtsi b/arch/arm64/boot/dts/apple/s5l8960x.dtsi
++index 2a747bec0..6fe4bf914 100644
++--- a/arch/arm64/boot/dts/apple/s5l8960x.dtsi
+++++ b/arch/arm64/boot/dts/apple/s5l8960x.dtsi
++@@ -26,6 +26,12 @@ clkref: clock-ref {
++ 		clock-output-names = "clkref";
++ 	};
++ 
+++	spi2_clk: clock-spi2 {
+++		compatible = "fixed-clock";
+++		#clock-cells = <0>;
+++		clock-frequency = <60000000>;
+++	};
+++
++ 	cpus {
++ 		#address-cells = <2>;
++ 		#size-cells = <0>;
++@@ -90,6 +96,27 @@ serial0: serial@20a0a0000 {
++ 			status = "disabled";
++ 		};
++ 
+++		spi2: spi@20a088000 {
+++			compatible = "apple,s5l8960x-spi";
+++			reg = <0x2 0x0a088000 0x0 0x4000>;
+++			interrupts = <AIC_IRQ 138 IRQ_TYPE_LEVEL_HIGH>;
+++			clocks = <&spi2_clk>;
+++			power-domains = <&ps_spi2>;
+++			#address-cells = <1>;
+++			#size-cells = <0>;
+++			status = "disabled";
+++		};
+++
+++		touchclk: clock-controller@20a118000 {
+++			compatible = "apple,s5l8960x-touch-clock";
+++			reg = <0x2 0x0a118000 0x0 0x4000>;
+++			clocks = <&clkref>;
+++			power-domains = <&ps_pwm0>;
+++			#clock-cells = <0>;
+++			clock-frequency = <32768>;
+++			status = "disabled";
+++		};
+++
++ 		i2c0: i2c@20a110000 {
++ 			compatible = "apple,s5l8960x-i2c", "apple,i2c";
++ 			reg = <0x2 0x0a110000 0x0 0x1000>;
+diff --git a/kernel/patches/devices/s5l8960x/0002-arm64-dts-apple-connect-the-J72-N1-touchscreen-resou.patch b/kernel/patches/devices/s5l8960x/0002-arm64-dts-apple-connect-the-J72-N1-touchscreen-resou.patch
+new file mode 100644
+index 0000000..2650816
+--- /dev/null
++++ b/kernel/patches/devices/s5l8960x/0002-arm64-dts-apple-connect-the-J72-N1-touchscreen-resou.patch
+@@ -0,0 +1,68 @@
++From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
++From: thisiscamk <100883750+thisiscamk@users.noreply.github.com>
++Date: Tue, 3 Nov 2026 20:56:53 +0800
++Subject: [PATCH] arm64: dts: apple: connect the J72 N1 touchscreen resources
++
++Describe SPI2 native chip select, reset and attention pins, the independent touch reference clock, D2089 analog/core supplies and display-sync states. Enable the prerequisite providers and keep the touchscreen consumer as a separately loaded module for qualification.
++
++Add touchscreen0 for normal m1n1 per-unit calibration handoff and use the private-firmware converter output name. No calibration or Apple firmware bytes are embedded in the static DT.
++
++ARM64 W=1 objects and J72 DTB compile; current binding meta-validation and compiled J72/existing example schema checks pass. Native power/touch and shutdown remain unqualified until hardware testing.
++
++Assisted-by: LLM
++---
++ arch/arm64/boot/dts/apple/s5l8960x-j72.dts | 44 ++++++++++++++++++++++
++ 1 file changed, 44 insertions(+)
++
++diff --git a/arch/arm64/boot/dts/apple/s5l8960x-j72.dts b/arch/arm64/boot/dts/apple/s5l8960x-j72.dts
++index cdf306a4a..a80e2acac 100644
++--- a/arch/arm64/boot/dts/apple/s5l8960x-j72.dts
+++++ b/arch/arm64/boot/dts/apple/s5l8960x-j72.dts
++@@ -61,3 +61,47 @@ &spi2 {
++ 	pinctrl-0 = <&spi2_pins>;
++ 	pinctrl-1 = <&spi2_idle_pins>;
++ };
+++
+++&{/aliases} {
+++	touchscreen0 = &touchscreen;
+++};
+++
+++&touchclk {
+++	status = "okay";
+++};
+++
+++&touch_analog_bias {
+++	status = "okay";
+++};
+++
+++&touch_analog {
+++	status = "okay";
+++};
+++
+++&touch_core {
+++	status = "okay";
+++};
+++
+++&spi2 {
+++	status = "okay";
+++
+++	touchscreen: touchscreen@0 {
+++		compatible = "apple,j72-touchscreen";
+++		reg = <0>;
+++		spi-max-frequency = <1000000>;
+++		interrupt-parent = <&pinctrl>;
+++		interrupts = <111 IRQ_TYPE_EDGE_FALLING>;
+++		attn-gpios = <&pinctrl 111 GPIO_ACTIVE_LOW>;
+++		reset-gpios = <&pinctrl 15 GPIO_ACTIVE_LOW>;
+++		clocks = <&touchclk>;
+++		ana-supply = <&touch_analog>;
+++		core-supply = <&touch_core>;
+++		pinctrl-names = "display-sync-active", "display-sync-inactive";
+++		pinctrl-0 = <&touch_sync_active>;
+++		pinctrl-1 = <&touch_sync_inactive>;
+++		touchscreen-size-x = <14621>;
+++		touchscreen-size-y = <19539>;
+++		touchscreen-inverted-y;
+++		firmware-name = "apple/j72-fwstart.z2fw";
+++	};
+++};
+diff --git a/kernel/patches/drivers/clk/0005-dt-bindings-clock-describe-S5L8960X-touch-reference-.patch b/kernel/patches/drivers/clk/0005-dt-bindings-clock-describe-S5L8960X-touch-reference-.patch
+new file mode 100644
+index 0000000..3a9ad31
+--- /dev/null
++++ b/kernel/patches/drivers/clk/0005-dt-bindings-clock-describe-S5L8960X-touch-reference-.patch
+@@ -0,0 +1,75 @@
++From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
++From: thisiscamk <100883750+thisiscamk@users.noreply.github.com>
++Date: Tue, 3 Nov 2026 20:28:58 +0800
++Subject: [PATCH] dt-bindings: clock: describe S5L8960X touch reference output
++
++Describe the PWM0 channel 2 reference clock separately from the later FPWM block and the PMGR touch dividers.
++
++Assisted-by: LLM
++---
++ .../clock/apple,s5l8960x-touch-clock.yaml     | 56 +++++++++++++++++++
++ 1 file changed, 56 insertions(+)
++ create mode 100644 Documentation/devicetree/bindings/clock/apple,s5l8960x-touch-clock.yaml
++
++diff --git a/Documentation/devicetree/bindings/clock/apple,s5l8960x-touch-clock.yaml b/Documentation/devicetree/bindings/clock/apple,s5l8960x-touch-clock.yaml
++new file mode 100644
++index 000000000..c3845b550
++--- /dev/null
+++++ b/Documentation/devicetree/bindings/clock/apple,s5l8960x-touch-clock.yaml
++@@ -0,0 +1,56 @@
+++# SPDX-License-Identifier: GPL-2.0-only OR BSD-2-Clause
+++%YAML 1.2
+++---
+++$id: http://devicetree.org/schemas/clock/apple,s5l8960x-touch-clock.yaml#
+++$schema: http://devicetree.org/meta-schemas/core.yaml#
+++
+++title: Apple S5L8960X touchscreen reference clock
+++
+++maintainers:
+++  - asahi@lists.linux.dev
+++
+++description:
+++  PWM0 channel 2 generates the touchscreen reference clock. Its count and
+++  control register layout differs from the later Apple FPWM block. The
+++  clock is nominally 32768 Hz, rounded to an even number of reference-clock
+++  cycles for a symmetric waveform. Other PWM channels are not described.
+++
+++properties:
+++  compatible:
+++    const: apple,s5l8960x-touch-clock
+++
+++  reg:
+++    maxItems: 1
+++
+++  clocks:
+++    maxItems: 1
+++
+++  power-domains:
+++    maxItems: 1
+++
+++  '#clock-cells':
+++    const: 0
+++
+++  clock-frequency:
+++    const: 32768
+++
+++required:
+++  - compatible
+++  - reg
+++  - clocks
+++  - power-domains
+++  - '#clock-cells'
+++  - clock-frequency
+++
+++additionalProperties: false
+++
+++examples:
+++  - |
+++    clock-controller@a118000 {
+++        compatible = "apple,s5l8960x-touch-clock";
+++        reg = <0x0a118000 0x4000>;
+++        clocks = <&clkref>;
+++        power-domains = <&ps_pwm0>;
+++        #clock-cells = <0>;
+++        clock-frequency = <32768>;
+++    };
+diff --git a/kernel/patches/drivers/clk/0006-clk-apple-add-S5L8960X-touchscreen-reference-clock.patch b/kernel/patches/drivers/clk/0006-clk-apple-add-S5L8960X-touchscreen-reference-clock.patch
+new file mode 100644
+index 0000000..091d94b
+--- /dev/null
++++ b/kernel/patches/drivers/clk/0006-clk-apple-add-S5L8960X-touchscreen-reference-clock.patch
+@@ -0,0 +1,246 @@
++From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
++From: thisiscamk <100883750+thisiscamk@users.noreply.github.com>
++Date: Tue, 3 Nov 2026 20:28:59 +0800
++Subject: [PATCH] clk: apple: add S5L8960X touchscreen reference clock
++
++Provide the PWM0 channel 2 output through the common clock and runtime power frameworks. Generate a symmetric waveform from the parent clock and nominal reference frequency, bound the update wait, verify writes and restore the inactive configuration on failure or unprepare. Refuse an already configured channel until its handover semantics are qualified.
++
++Assisted-by: LLM
++---
++ drivers/clk/Kconfig                    |   9 ++
++ drivers/clk/Makefile                   |   2 +
++ drivers/clk/clk-apple-s5l8960x-touch.c | 195 +++++++++++++++++++++++++
++ 3 files changed, 206 insertions(+)
++ create mode 100644 drivers/clk/clk-apple-s5l8960x-touch.c
++
++diff --git a/drivers/clk/Kconfig b/drivers/clk/Kconfig
++index 65b616d2c..2882134a7 100644
++--- a/drivers/clk/Kconfig
+++++ b/drivers/clk/Kconfig
++@@ -66,6 +66,15 @@ config COMMON_CLK_APPLE_NCO
++ 	  found on Apple SoCs such as t8103 (M1). The blocks are typically
++ 	  generators of audio clocks.
++ 
+++config COMMON_CLK_APPLE_S5L8960X_TOUCH
+++	bool "Clock driver for Apple S5L8960X touchscreens"
+++	depends on ARCH_APPLE || COMPILE_TEST
+++	default ARCH_APPLE
+++	help
+++	  Support the touchscreen reference clock generated by PWM0 channel 2
+++	  on Apple S5L8960X devices. The driver controls this clock through the
+++	  common clock and power-domain frameworks.
+++
++ config COMMON_CLK_APPLE_T8010_TOUCH
++ 	bool "Clock driver for Apple T7000/T8010 touchscreens"
++ 	depends on ARCH_APPLE || COMPILE_TEST
++diff --git a/drivers/clk/Makefile b/drivers/clk/Makefile
++index 4f18f4a89..ddd2afe04 100644
++--- a/drivers/clk/Makefile
+++++ b/drivers/clk/Makefile
++@@ -184,3 +184,5 @@ endif
++ obj-y					+= xilinx/
++ obj-$(CONFIG_ARCH_ZYNQ)			+= zynq/
++ obj-$(CONFIG_COMMON_CLK_ZYNQMP)         += zynqmp/
+++
+++obj-$(CONFIG_COMMON_CLK_APPLE_S5L8960X_TOUCH) += clk-apple-s5l8960x-touch.o
++diff --git a/drivers/clk/clk-apple-s5l8960x-touch.c b/drivers/clk/clk-apple-s5l8960x-touch.c
++new file mode 100644
++index 000000000..5102fc503
++--- /dev/null
+++++ b/drivers/clk/clk-apple-s5l8960x-touch.c
++@@ -0,0 +1,195 @@
+++// SPDX-License-Identifier: GPL-2.0-only OR MIT
+++/* Apple S5L8960X touchscreen reference clock, generated by PWM0 channel 2. */
+++
+++#include <linux/clk-provider.h>
+++#include <linux/io.h>
+++#include <linux/iopoll.h>
+++#include <linux/math64.h>
+++#include <linux/module.h>
+++#include <linux/of.h>
+++#include <linux/platform_device.h>
+++#include <linux/pm_runtime.h>
+++
+++#define S5L_TOUCH_COUNT_ON	0x10
+++#define S5L_TOUCH_COUNT_OFF	0x14
+++#define S5L_TOUCH_CTRL		0x20
+++#define S5L_TOUCH_ENABLE		BIT(0)
+++#define S5L_TOUCH_UPDATE		BIT(1)
+++#define S5L_TOUCH_OUTPUT_ENABLE	BIT(14)
+++
+++struct apple_s5l_touch_clk {
+++	struct clk_hw hw;
+++	struct device *dev;
+++	void __iomem *base;
+++	u32 rate;
+++	u32 saved_on;
+++	u32 saved_off;
+++	u32 saved_ctrl;
+++	bool prepared;
+++};
+++
+++#define to_apple_s5l_touch_clk(_hw) \
+++	container_of(_hw, struct apple_s5l_touch_clk, hw)
+++
+++static u32 apple_s5l_touch_half_period(unsigned long parent_rate, u32 rate)
+++{
+++	u64 half;
+++
+++	if (!rate)
+++		return 0;
+++
+++	half = DIV_ROUND_CLOSEST_ULL((u64)parent_rate, (u64)rate * 2);
+++	if (!half || half > U32_MAX)
+++		return 0;
+++
+++	return half;
+++}
+++
+++static void apple_s5l_touch_clk_restore(struct apple_s5l_touch_clk *clk)
+++{
+++	/* Stop before restoring the two channel-2 count words. */
+++	writel(0, clk->base + S5L_TOUCH_CTRL);
+++	readl(clk->base + S5L_TOUCH_CTRL);
+++	writel(clk->saved_on, clk->base + S5L_TOUCH_COUNT_ON);
+++	writel(clk->saved_off, clk->base + S5L_TOUCH_COUNT_OFF);
+++	writel(clk->saved_ctrl, clk->base + S5L_TOUCH_CTRL);
+++	readl(clk->base + S5L_TOUCH_CTRL);
+++}
+++
+++static int apple_s5l_touch_clk_prepare(struct clk_hw *hw)
+++{
+++	struct apple_s5l_touch_clk *clk = to_apple_s5l_touch_clk(hw);
+++	unsigned long parent_rate = clk_hw_get_rate(clk_hw_get_parent(hw));
+++	u32 half, ctrl;
+++	int ret;
+++
+++	half = apple_s5l_touch_half_period(parent_rate, clk->rate);
+++	if (!half)
+++		return -EINVAL;
+++
+++	ret = pm_runtime_resume_and_get(clk->dev);
+++	if (ret < 0)
+++		return ret;
+++
+++	clk->saved_ctrl = readl(clk->base + S5L_TOUCH_CTRL);
+++	/* An already configured channel needs a separate handover policy. */
+++	if (clk->saved_ctrl) {
+++		ret = -EBUSY;
+++		goto out_power;
+++	}
+++	clk->saved_on = readl(clk->base + S5L_TOUCH_COUNT_ON);
+++	clk->saved_off = readl(clk->base + S5L_TOUCH_COUNT_OFF);
+++
+++	writel(half, clk->base + S5L_TOUCH_COUNT_ON);
+++	writel(half, clk->base + S5L_TOUCH_COUNT_OFF);
+++	writel(S5L_TOUCH_ENABLE | S5L_TOUCH_UPDATE | S5L_TOUCH_OUTPUT_ENABLE,
+++	       clk->base + S5L_TOUCH_CTRL);
+++	ret = readl_poll_timeout(clk->base + S5L_TOUCH_CTRL, ctrl,
+++				 !(ctrl & S5L_TOUCH_UPDATE), 1, 1000);
+++	if (ret)
+++		goto restore;
+++	if (ctrl != (S5L_TOUCH_ENABLE | S5L_TOUCH_OUTPUT_ENABLE) ||
+++	    readl(clk->base + S5L_TOUCH_COUNT_ON) != half ||
+++	    readl(clk->base + S5L_TOUCH_COUNT_OFF) != half) {
+++		ret = -EIO;
+++		goto restore;
+++	}
+++
+++	clk->prepared = true;
+++	return 0;
+++
+++restore:
+++	apple_s5l_touch_clk_restore(clk);
+++out_power:
+++	pm_runtime_put_sync(clk->dev);
+++	return ret;
+++}
+++
+++static void apple_s5l_touch_clk_unprepare(struct clk_hw *hw)
+++{
+++	struct apple_s5l_touch_clk *clk = to_apple_s5l_touch_clk(hw);
+++
+++	apple_s5l_touch_clk_restore(clk);
+++	if (readl(clk->base + S5L_TOUCH_CTRL) != clk->saved_ctrl ||
+++	    readl(clk->base + S5L_TOUCH_COUNT_ON) != clk->saved_on ||
+++	    readl(clk->base + S5L_TOUCH_COUNT_OFF) != clk->saved_off)
+++		dev_err(clk->dev, "touch clock restoration readback failed\n");
+++	clk->prepared = false;
+++	pm_runtime_put_sync(clk->dev);
+++}
+++
+++static int apple_s5l_touch_clk_is_prepared(struct clk_hw *hw)
+++{
+++	return to_apple_s5l_touch_clk(hw)->prepared;
+++}
+++
+++static unsigned long
+++apple_s5l_touch_clk_recalc_rate(struct clk_hw *hw, unsigned long parent_rate)
+++{
+++	struct apple_s5l_touch_clk *clk = to_apple_s5l_touch_clk(hw);
+++	u32 half = apple_s5l_touch_half_period(parent_rate, clk->rate);
+++
+++	return half ? div64_u64(parent_rate, (u64)half * 2) : 0;
+++}
+++
+++static const struct clk_ops apple_s5l_touch_clk_ops = {
+++	.prepare = apple_s5l_touch_clk_prepare,
+++	.unprepare = apple_s5l_touch_clk_unprepare,
+++	.is_prepared = apple_s5l_touch_clk_is_prepared,
+++	.recalc_rate = apple_s5l_touch_clk_recalc_rate,
+++};
+++
+++static int apple_s5l_touch_clk_probe(struct platform_device *pdev)
+++{
+++	struct device *dev = &pdev->dev;
+++	struct clk_parent_data parent = { .index = 0 };
+++	struct clk_init_data init = {
+++		.ops = &apple_s5l_touch_clk_ops,
+++		.parent_data = &parent,
+++		.num_parents = 1,
+++	};
+++	struct apple_s5l_touch_clk *clk;
+++	int ret;
+++
+++	clk = devm_kzalloc(dev, sizeof(*clk), GFP_KERNEL);
+++	if (!clk)
+++		return -ENOMEM;
+++	clk->dev = dev;
+++	clk->base = devm_platform_ioremap_resource(pdev, 0);
+++	if (IS_ERR(clk->base))
+++		return PTR_ERR(clk->base);
+++
+++	ret = of_property_read_u32(dev->of_node, "clock-frequency", &clk->rate);
+++	if (ret || clk->rate != 32768)
+++		return dev_err_probe(dev, -EINVAL, "unsupported touch reference rate\n");
+++
+++	ret = devm_pm_runtime_enable(dev);
+++	if (ret)
+++		return ret;
+++
+++	init.name = dev_name(dev);
+++	clk->hw.init = &init;
+++	ret = devm_clk_hw_register(dev, &clk->hw);
+++	if (ret)
+++		return ret;
+++
+++	return devm_of_clk_add_hw_provider(dev, of_clk_hw_simple_get, &clk->hw);
+++}
+++
+++static const struct of_device_id apple_s5l_touch_clk_of_match[] = {
+++	{ .compatible = "apple,s5l8960x-touch-clock" },
+++	{ }
+++};
+++MODULE_DEVICE_TABLE(of, apple_s5l_touch_clk_of_match);
+++
+++static struct platform_driver apple_s5l_touch_clk_driver = {
+++	.probe = apple_s5l_touch_clk_probe,
+++	.driver = {
+++		.name = "apple-s5l8960x-touch-clk",
+++		.of_match_table = apple_s5l_touch_clk_of_match,
+++	},
+++};
+++module_platform_driver(apple_s5l_touch_clk_driver);
+++
+++MODULE_DESCRIPTION("Apple S5L8960X touchscreen reference clock");
+++MODULE_LICENSE("Dual MIT/GPL");
+diff --git a/kernel/patches/drivers/clk/0007-clk-apple-clarify-S5L8960X-reference-driver-scope.patch b/kernel/patches/drivers/clk/0007-clk-apple-clarify-S5L8960X-reference-driver-scope.patch
+new file mode 100644
+index 0000000..8d32bc4
+--- /dev/null
++++ b/kernel/patches/drivers/clk/0007-clk-apple-clarify-S5L8960X-reference-driver-scope.patch
+@@ -0,0 +1,26 @@
++From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
++From: thisiscamk <100883750+thisiscamk@users.noreply.github.com>
++Date: Tue, 3 Nov 2026 20:32:18 +0800
++Subject: [PATCH] clk: apple: clarify S5L8960X reference driver scope
++
++Document the intentionally limited single-output interface in the Kconfig help.
++
++Assisted-by: LLM
++---
++ drivers/clk/Kconfig | 3 ++-
++ 1 file changed, 2 insertions(+), 1 deletion(-)
++
++diff --git a/drivers/clk/Kconfig b/drivers/clk/Kconfig
++index 2882134a7..21b068ddd 100644
++--- a/drivers/clk/Kconfig
+++++ b/drivers/clk/Kconfig
++@@ -73,7 +73,8 @@ config COMMON_CLK_APPLE_S5L8960X_TOUCH
++ 	help
++ 	  Support the touchscreen reference clock generated by PWM0 channel 2
++ 	  on Apple S5L8960X devices. The driver controls this clock through the
++-	  common clock and power-domain frameworks.
+++	  common clock and power-domain frameworks. Other PWM channels are not
+++	  exposed by this driver.
++ 
++ config COMMON_CLK_APPLE_T8010_TOUCH
++ 	bool "Clock driver for Apple T7000/T8010 touchscreens"
+diff --git a/kernel/patches/drivers/input/0020-Input-apple_z2-add-the-J72-N1-protocol-path.patch b/kernel/patches/drivers/input/0020-Input-apple_z2-add-the-J72-N1-protocol-path.patch
+new file mode 100644
+index 0000000..3da2809
+--- /dev/null
++++ b/kernel/patches/drivers/input/0020-Input-apple_z2-add-the-J72-N1-protocol-path.patch
+@@ -0,0 +1,1170 @@
++From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
++From: thisiscamk <100883750+thisiscamk@users.noreply.github.com>
++Date: Tue, 3 Nov 2026 20:39:46 +0800
++Subject: [PATCH] Input: apple_z2 - add the J72 N1 protocol path
++
++Select the A7 J72 N1 transport through compatible match data. Reuse the normal Z2FW v1 loader and HBPP helpers, with strict firmware and per-unit calibration admission before power-up. Require native reference clock, analog/core regulators, reset, attention and display-sync resources.
++
++Add the measured legacy packet layout and byte timing, atomic contact validation and queue-tag handling. Bound health recovery to six admissions per minute; stop on transport, unknown layout, active-contact timeout or cleanup failures. Preserve existing touchscreen variants and reject inherited enabled supply ownership.
++
++Host fixtures exercise actual C helpers, input emission, acquisition and provider fault paths. ARM64 W=1 touchscreen object builds. Native power/provider integration and cold touchscreen behavior remain unqualified until hardware testing; the inactive-state policy is a candidate derived from private captured reports.
++
++Assisted-by: LLM
++---
++ MAINTAINERS                              |   2 +
++ drivers/input/touchscreen/apple_z2.c     | 583 +++++++++++++++++++++--
++ drivers/input/touchscreen/apple_z2_j72.h | 210 ++++++++
++ 3 files changed, 767 insertions(+), 28 deletions(-)
++ create mode 100644 drivers/input/touchscreen/apple_z2_j72.h
++
++diff --git a/MAINTAINERS b/MAINTAINERS
++index a4a69643c..f37def2e8 100644
++--- a/MAINTAINERS
+++++ b/MAINTAINERS
++@@ -2691,6 +2691,7 @@ F:	drivers/i2c/busses/i2c-pasemi-core.c
++ F:	drivers/i2c/busses/i2c-pasemi-platform.c
++ F:	drivers/input/misc/macsmc-input.c
++ F:	drivers/input/touchscreen/apple_z2.c
+++F:	drivers/input/touchscreen/apple_z2_j72.h
++ F:	drivers/iommu/apple-dart.c
++ F:	drivers/iommu/io-pgtable-dart.c
++ F:	drivers/irqchip/irq-apple-aic.c
++@@ -2759,6 +2760,7 @@ S:	Maintained
++ F:	Documentation/devicetree/bindings/input/touchscreen/apple,z2-multitouch.yaml
++ F:	arch/arm64/boot/dts/apple/t8010-ipad7.dtsi
++ F:	drivers/input/touchscreen/apple_z2.c
+++F:	drivers/input/touchscreen/apple_z2_j72.h
++ 
++ APPLE SN2400 CHARGER AND HDQ MULTIPLEXER DRIVERS
++ M:	Paul Praschl <praschlpaul@g-p.at>
++diff --git a/drivers/input/touchscreen/apple_z2.c b/drivers/input/touchscreen/apple_z2.c
++index 9dc12b8d0..438d5a0a4 100644
++--- a/drivers/input/touchscreen/apple_z2.c
+++++ b/drivers/input/touchscreen/apple_z2.c
++@@ -29,6 +29,7 @@
++ #include <linux/workqueue.h>
++ 
++ #include "apple_z2_n61.h"
+++#include "apple_z2_j72.h"
++ 
++ #define APPLE_Z2_NUM_FINGERS_OFFSET      16
++ #define APPLE_Z2_FINGERS_OFFSET          24
++@@ -144,6 +145,7 @@ enum apple_z2_variant {
++ 	APPLE_Z2_VARIANT_D11,
++ 	APPLE_Z2_VARIANT_D111,
++ 	APPLE_Z2_VARIANT_N61,
+++	APPLE_Z2_VARIANT_J72,
++ };
++ 
++ struct apple_z2_hbpp_reg {
++@@ -234,6 +236,14 @@ struct apple_z2 {
++ 	struct pinctrl_state *sync_inactive;
++ 	struct gpio_desc *attn_gpio;
++ 	struct delayed_work rearm_work;
+++	struct delayed_work j72_work;
+++	struct apple_z2_j72_recovery j72_recovery;
+++	unsigned int j72_bad_frames;
+++	unsigned long j72_last_frame;
+++	bool j72_contacts_active;
+++	int j72_layout_error;
+++	int j72_spi_error;
+++	int j72_power_error;
++ 	unsigned int rearm_attempts;
++ 	unsigned int control_reads;
++ 	unsigned long control_since;
++@@ -302,10 +312,47 @@ static bool apple_z2_is_j71t(const struct apple_z2 *z2)
++ 	return z2->variant == APPLE_Z2_VARIANT_J71T;
++ }
++ 
+++static bool apple_z2_is_j72(const struct apple_z2 *z2)
+++{
+++	return z2->variant == APPLE_Z2_VARIANT_J72;
+++}
+++
+++static bool apple_z2_uses_n1(const struct apple_z2 *z2)
+++{
+++	return apple_z2_is_j71t(z2) || apple_z2_is_j72(z2);
+++}
+++
+++/* J72 requires byte-wise timing and a complete transfer before any decode. */
+++static int apple_z2_spi_transfer(struct apple_z2 *z2,
+++				 struct spi_transfer *xfers, unsigned int count)
+++{
+++	struct spi_message message;
+++	unsigned int expected = 0, i;
+++	int error;
+++
+++	if (!apple_z2_is_j72(z2))
+++		return spi_sync_transfer(z2->spidev, xfers, count);
+++	spi_message_init(&message);
+++	for (i = 0; i < count; i++) {
+++		xfers[i].bits_per_word = 8;
+++		xfers[i].speed_hz = 1000000;
+++		xfers[i].word_delay.value = 5;
+++		xfers[i].word_delay.unit = SPI_DELAY_UNIT_USECS;
+++		expected += xfers[i].len;
+++		spi_message_add_tail(&xfers[i], &message);
+++	}
+++	error = spi_sync(z2->spidev, &message);
+++	if (!error && message.actual_length != expected)
+++		error = -EIO;
+++	if (error)
+++		z2->j72_spi_error = error;
+++	return error;
+++}
+++
++ /* The generation-1 byte-stream runtime protocol of the iPad 5 and 6. */
++ static bool apple_z2_is_gen1(const struct apple_z2 *z2)
++ {
++-	return apple_z2_is_j71b(z2) || apple_z2_is_j71t(z2);
+++	return apple_z2_is_j71b(z2) || apple_z2_uses_n1(z2);
++ }
++ 
++ static bool apple_z2_uses_gen1_data(const struct apple_z2 *z2)
++@@ -387,6 +434,10 @@ static int apple_z2_hbpp_nop(struct apple_z2 *z2);
++ static void apple_z2_platform_power_off(struct apple_z2 *z2);
++ static int apple_z2_j71t_boot(struct apple_z2 *z2);
++ static int apple_z2_boot(struct apple_z2 *z2);
+++static int apple_z2_j72_power_on(struct apple_z2 *z2);
+++static void apple_z2_j72_power_off(struct apple_z2 *z2);
+++static int apple_z2_j72_finish_boot(struct apple_z2 *z2);
+++static void apple_z2_j72_work(struct work_struct *work);
++ 
++ static bool apple_z2_float_to_integer(const u8 *raw, s64 *value)
++ {
++@@ -850,7 +901,7 @@ static int apple_z2_gen1_exchange(struct apple_z2 *z2, u8 *buf, size_t len)
++ 		if (error)
++ 			goto restore_mode;
++ 	}
++-	error = spi_sync_transfer(z2->spidev, &xfer, 1);
+++	error = apple_z2_spi_transfer(z2, &xfer, 1);
++ restore_mode:
++ 	if (mode_changed) {
++ 		z2->spidev->mode = saved_mode;
++@@ -887,7 +938,7 @@ static int apple_z2_read_packet(struct apple_z2 *z2)
++ 	xfer.rx_buf = z2->rx_buf;
++ 	xfer.len = APPLE_Z2_CMD_SIZE;
++ 
++-	error = spi_sync_transfer(z2->spidev, &xfer, 1);
+++	error = apple_z2_spi_transfer(z2, &xfer, 1);
++ 	if (error)
++ 		return error;
++ 	apple_z2_post_z2_xfer_delay(z2);
++@@ -978,7 +1029,7 @@ static int apple_z2_read_packet(struct apple_z2 *z2)
++ 		xfer.tx_buf = z2->rx_buf;
++ 		xfer.rx_buf = z2->rx_buf;
++ 		xfer.len = wire_len;
++-		error = spi_sync_transfer(z2->spidev, &xfer, 1);
+++		error = apple_z2_spi_transfer(z2, &xfer, 1);
++ 	} else {
++ 		error = spi_read(z2->spidev, z2->rx_buf, pkt_len);
++ 	}
++@@ -1167,7 +1218,7 @@ static int apple_z2_z2_raw_xfer_locked(struct apple_z2 *z2, const char *tag,
++ 	int error;
++ 
++ 	apple_z2_apply_z2_delays(z2);
++-	error = spi_sync_transfer(z2->spidev, &xfer, 1);
+++	error = apple_z2_spi_transfer(z2, &xfer, 1);
++ 	if (error) {
++ 		dev_err(&z2->spidev->dev, "%s transfer failed: %d\n",
++ 			tag, error);
++@@ -1312,7 +1363,7 @@ static int apple_z2_read_report_info_locked(struct apple_z2 *z2, u8 report,
++ 	}
++ 
++ 	if (z2->rx_buf[0] != APPLE_Z2_CMD_REPORT_INFO ||
++-	    (z2->rx_buf[1] != report && !apple_z2_is_j71t(z2)) ||
+++	    (z2->rx_buf[1] != report && !apple_z2_uses_n1(z2)) ||
++ 	    !apple_z2_z2_checksum_valid(z2->rx_buf, APPLE_Z2_CMD_SIZE))
++ 		return -EPROTO;
++ 
++@@ -1383,7 +1434,7 @@ static int apple_z2_read_report_locked(struct apple_z2 *z2, u8 report,
++ 		xfer.tx_buf = z2->rx_buf;
++ 		xfer.rx_buf = z2->rx_buf;
++ 		xfer.len = data_len;
++-		error = spi_sync_transfer(z2->spidev, &xfer, 1);
+++		error = apple_z2_spi_transfer(z2, &xfer, 1);
++ 	}
++ 	if (error)
++ 		return error;
++@@ -2375,10 +2426,15 @@ static void apple_z2_platform_power_off(struct apple_z2 *z2)
++ {
++ 	int error;
++ 
+++	if (apple_z2_is_j72(z2)) {
+++		apple_z2_j72_power_off(z2);
+++		return;
+++	}
+++
++ 	if (apple_z2_is_gen1(z2))
++ 		apple_z2_gen1_restore_irq_type(z2);
++ 
++-	if (apple_z2_is_j71t(z2)) {
+++	if (apple_z2_uses_n1(z2)) {
++ 		gpiod_set_value_cansleep(z2->reset_gpio, 1);
++ 		error = z2->sync_active ?
++ 			pinctrl_select_state(z2->sync_pinctrl,
++@@ -2646,12 +2702,15 @@ static int apple_z2_platform_power_on(struct apple_z2 *z2)
++ {
++ 	int error;
++ 
+++	if (apple_z2_is_j72(z2))
+++		return apple_z2_j72_power_on(z2);
+++
++ 	if (z2->platform_powered)
++ 		return 0;
++ 
++ 	if (apple_z2_is_j71b(z2))
++ 		return apple_z2_j71b_power_on(z2);
++-	if (apple_z2_is_j71t(z2))
+++	if (apple_z2_uses_n1(z2))
++ 		return apple_z2_j71t_power_on(z2);
++ 	if (apple_z2_uses_ipad_protocol(z2))
++ 		return apple_z2_j172_power_on(z2);
++@@ -2892,7 +2951,7 @@ static int apple_z2_hbpp_xfer(struct apple_z2 *z2, unsigned int len)
++ 	};
++ 
++ 	memset(z2->rx_buf, 0, len);
++-	return spi_sync_transfer(z2->spidev, &xfer, 1);
+++	return apple_z2_spi_transfer(z2, &xfer, 1);
++ }
++ 
++ /* ATN_ACK (iOS 0xfffffff005ea23c0): 1a a1, the reply is a BE16 status. */
++@@ -2959,6 +3018,11 @@ static int apple_z2_hbpp_read_reg(struct apple_z2 *z2, u32 addr, u32 *value)
++ 
++ 	memcpy(z2->tx_buf, result, sizeof(result));
++ 	error = apple_z2_hbpp_xfer(z2, sizeof(result));
+++	if (!error && apple_z2_is_j72(z2) &&
+++	    (get_unaligned_be16(z2->rx_buf) != 0x4c39 ||
+++	     apple_z2_hbpp_sum(z2->rx_buf + 2, 4) !=
+++				get_unaligned_be16(z2->rx_buf + 6)))
+++		error = -EBADMSG;
++ 	if (!error)
++ 		*value = apple_z2_hbpp_get32(z2->rx_buf + 2);
++ 	return error;
++@@ -3009,10 +3073,10 @@ static int apple_z2_hbpp_send(struct apple_z2 *z2, const u8 *data, size_t len)
++ 	u16 reply = 0;
++ 	int error = 0;
++ 
++-	for (i = 0; i < APPLE_Z2_HBPP_ATTEMPTS; i++) {
+++	for (i = 0; i < (apple_z2_is_j72(z2) ? 1 : APPLE_Z2_HBPP_ATTEMPTS); i++) {
++ 		if (i)
++ 			usleep_range(1000, 2000);
++-		error = spi_sync_transfer(z2->spidev, &xfer, 1);
+++		error = apple_z2_spi_transfer(z2, &xfer, 1);
++ 		if (!error)
++ 			error = apple_z2_hbpp_ack(z2, &reply);
++ 		if (!error && reply == APPLE_Z2_HBPP_ACK_BLOB)
++@@ -3037,10 +3101,15 @@ static int apple_z2_n1_send_calibration(struct apple_z2 *z2,
++ 	int cal_size;
++ 	int error;
++ 
+++	if (apple_z2_is_j72(z2) &&
+++	    (strcmp(property, CAL_PROP_NAME) || address != 0x10009000 || max_size != 1024))
+++		return -EINVAL;
++ 	if (!device_property_present(&z2->spidev->dev, property))
++-		return 0;
+++		return apple_z2_is_j72(z2) ? -ENOENT : 0;
++ 
++ 	cal_size = device_property_count_u8(&z2->spidev->dev, property);
+++	if (apple_z2_is_j72(z2) && cal_size != 1024)
+++		return -EINVAL;
++ 	if (cal_size <= 0)
++ 		return cal_size ?: -EINVAL;
++ 	if (cal_size > max_size)
++@@ -3091,15 +3160,23 @@ static int apple_z2_n1_detect(struct apple_z2 *z2)
++ 		return -ENODEV;
++ 	}
++ 
+++	if (apple_z2_is_j72(z2) &&
+++	    get_unaligned_be16(z2->rx_buf) != 0x4879 &&
+++	    get_unaligned_be16(z2->rx_buf + 2) != 0x4879)
+++		return -ENODEV;
++ 	error = apple_z2_hbpp_read_reg(z2, APPLE_Z2_N1_VERSION_REG, &version);
++ 	if (error)
++ 		return error;
++-	if (!version || version == U32_MAX) {
+++	if ((apple_z2_is_j72(z2) && version != 0x434d15c1) ||
+++	    !version || version == U32_MAX) {
++ 		dev_err(&z2->spidev->dev, "invalid controller version %#x\n",
++ 			version);
++ 		return -ENODEV;
++ 	}
++ 
+++	if (apple_z2_is_j72(z2) &&
+++	    get_unaligned_be16(z2->rx_buf) != 0x4c39)
+++		return -EBADMSG;
++ 	dev_dbg(&z2->spidev->dev, "N1 controller %#x\n", version);
++ 	return 0;
++ }
++@@ -3123,6 +3200,8 @@ static int apple_z2_n1_start_firmware(struct apple_z2 *z2)
++ 	error = apple_z2_hbpp_read_reg(z2, APPLE_Z2_N1_VERSION_REG, &version);
++ 	if (error)
++ 		return error;
+++	if (apple_z2_is_j72(z2) && version != 0x434d15c1)
+++		return -ENODEV;
++ 
++ 	for (i = 0; i < n1->num_calib_regs; i++) {
++ 		value = n1->calib_regs[i].value;
++@@ -3397,7 +3476,7 @@ static int apple_z2_send_firmware_raw_xfer(struct apple_z2 *z2,
++ 	xfer.bits_per_word = 8;
++ 	apple_z2_avoid_short_dma(z2, &xfer);
++ 
++-	error = spi_sync_transfer(z2->spidev, &xfer, 1);
+++	error = apple_z2_spi_transfer(z2, &xfer, 1);
++ 	if (error)
++ 		return error;
++ 	if (flags & APPLE_Z2_RAW_XFER_RX_BIT_REVERSE) {
++@@ -3546,6 +3625,8 @@ static int apple_z2_upload_firmware(struct apple_z2 *z2)
++ 	if (error)
++ 		return dev_err_probe(&z2->spidev->dev, error,
++ 				     "unable to load firmware\n");
+++	if (apple_z2_is_j72(z2) && !apple_z2_j72_firmware(fw->data, fw->size))
+++		return -EINVAL;
++ 	if (fw->size < sizeof(*fw_hdr))
++ 		return -EINVAL;
++ 
++@@ -3569,7 +3650,7 @@ static int apple_z2_upload_firmware(struct apple_z2 *z2)
++ 		 * interrupt; its packets are checked through ATN_ACK, and its
++ 		 * calibration uses the HBPP14 records.
++ 		 */
++-		if (apple_z2_is_j71t(z2) &&
+++		if (apple_z2_uses_n1(z2) &&
++ 		    (load_cmd == LOAD_COMMAND_INIT_PAYLOAD ||
++ 		     load_cmd == LOAD_COMMAND_WAIT_IRQ ||
++ 		     load_cmd == LOAD_COMMAND_SEND_CALIBRATION))
++@@ -3582,7 +3663,7 @@ static int apple_z2_upload_firmware(struct apple_z2 *z2)
++ 
++ 			if (size > fw->size - fw_idx)
++ 				return -EINVAL;
++-			if (apple_z2_is_j71t(z2)) {
+++			if (apple_z2_uses_n1(z2)) {
++ 				error = apple_z2_hbpp_send(z2, blob, size);
++ 				if (error)
++ 					return error;
++@@ -3648,7 +3729,7 @@ static int apple_z2_upload_firmware(struct apple_z2 *z2)
++ 
++ 			if (!apple_z2_is_iphone7_plus(z2) &&
++ 			    !apple_z2_uses_ipad_protocol(z2) &&
++-			    !apple_z2_is_n61(z2) && !apple_z2_is_j71t(z2))
+++			    !apple_z2_is_n61(z2) && !apple_z2_uses_n1(z2))
++ 				return -EINVAL;
++ 			if (size != sizeof(struct apple_z2_fw_calibration) ||
++ 			    size > fw->size - fw_idx)
++@@ -3662,7 +3743,7 @@ static int apple_z2_upload_firmware(struct apple_z2 *z2)
++ 				return -EINVAL;
++ 			fw_idx += size;
++ 
++-			if (apple_z2_is_j71t(z2)) {
+++			if (apple_z2_uses_n1(z2)) {
++ 				error = apple_z2_n1_send_calibration(z2, property,
++ 								     address,
++ 								     max_size);
++@@ -3719,7 +3800,9 @@ static int apple_z2_upload_firmware(struct apple_z2 *z2)
++ 		fw_idx = round_up(fw_idx, 4);
++ 	}
++ 
++-	if (apple_z2_is_j71t(z2))
+++	if (apple_z2_is_j72(z2))
+++		return apple_z2_j72_finish_boot(z2);
+++	if (apple_z2_uses_n1(z2))
++ 		return apple_z2_n1_finish_boot(z2);
++ 
++ 	if (apple_z2_is_n61(z2)) {
++@@ -3803,6 +3886,8 @@ static int apple_z2_apply_initial_config(struct apple_z2 *z2)
++ 	error = request_firmware(&fw, z2->fw_name, &z2->spidev->dev);
++ 	if (error)
++ 		return error;
+++	if (apple_z2_is_j72(z2) && !apple_z2_j72_firmware(fw->data, fw->size))
+++		return -EINVAL;
++ 	if (fw->size < sizeof(*fw_hdr))
++ 		return -EINVAL;
++ 
++@@ -3860,7 +3945,7 @@ static int apple_z2_boot_preamble(struct apple_z2 *z2, bool full_duplex)
++ 	}
++ 
++ 	apple_z2_apply_z2_delays(z2);
++-	error = spi_sync_transfer(z2->spidev, &xfer, 1);
+++	error = apple_z2_spi_transfer(z2, &xfer, 1);
++ 	if (error)
++ 		return error;
++ 
++@@ -3881,7 +3966,7 @@ static int apple_z2_iphone7_plus_post_boot_preamble(struct apple_z2 *z2)
++ 	memset(z2->rx_buf, 0, xfer.len);
++ 	apple_z2_apply_z2_delays(z2);
++ 
++-	return spi_sync_transfer(z2->spidev, &xfer, 1);
+++	return apple_z2_spi_transfer(z2, &xfer, 1);
++ }
++ 
++ static int apple_z2_n61_boot(struct apple_z2 *z2)
++@@ -3976,7 +4061,7 @@ static int apple_z2_boot(struct apple_z2 *z2)
++ 	bool irq_enabled = false;
++ 	int error;
++ 
++-	if (apple_z2_is_j71t(z2))
+++	if (apple_z2_uses_n1(z2))
++ 		return apple_z2_j71t_boot(z2);
++ 	if (apple_z2_is_n61(z2))
++ 		return apple_z2_n61_boot(z2);
++@@ -4091,6 +4176,404 @@ static const struct apple_z2_chip_info apple_z2_j71b_info = {
++ 	.recover_control_stall = true,
++ };
++ 
+++/* J72 supplies and the reference clock have independent native providers. */
+++static void apple_z2_j72_power_off(struct apple_z2 *z2)
+++{
+++	int error;
+++
+++	error = gpiod_set_value_cansleep(z2->reset_gpio, 1);
+++	if (error)
+++		goto failed;
+++	error = pinctrl_select_state(z2->sync_pinctrl, z2->sync_inactive);
+++	if (error)
+++		goto failed;
+++	if (z2->core_enabled) {
+++		error = regulator_disable(z2->core_supply);
+++		if (error)
+++			goto failed;
+++		z2->core_enabled = false;
+++	}
+++	if (z2->ana_enabled) {
+++		error = regulator_disable(z2->ana_supply);
+++		if (error)
+++			goto failed;
+++		z2->ana_enabled = false;
+++	}
+++	if (z2->clk_enabled) {
+++		clk_disable_unprepare(z2->clk);
+++		z2->clk_enabled = false;
+++	}
+++	z2->platform_powered = false;
+++	return;
+++
+++failed:
+++	z2->j72_power_error = error;
+++	dev_err(&z2->spidev->dev,
+++		"J72 stop failed: %d; retaining remaining supply/clock owners\n", error);
+++}
+++
+++static int apple_z2_j72_power_on(struct apple_z2 *z2)
+++{
+++	int error;
+++
+++	if (z2->j72_power_error)
+++		return z2->j72_power_error;
+++	/* Never acquire and later disable a supply inherited from iOS. */
+++	error = regulator_is_enabled(z2->ana_supply);
+++	if (error)
+++		return error < 0 ? error : -EBUSY;
+++	error = regulator_is_enabled(z2->core_supply);
+++	if (error)
+++		return error < 0 ? error : -EBUSY;
+++	error = gpiod_set_value_cansleep(z2->reset_gpio, 1);
+++	if (error)
+++		return error;
+++	error = apple_z2_enable_clock(z2);
+++	if (error)
+++		return error;
+++	error = regulator_enable(z2->ana_supply);
+++	if (error)
+++		goto stop;
+++	z2->ana_enabled = true;
+++	error = regulator_enable(z2->core_supply);
+++	if (error)
+++		goto stop;
+++	z2->core_enabled = true;
+++	usleep_range(15000, 16000);
+++	z2->tx_buf[0] = 0x19;
+++	z2->tx_buf[1] = 0xc1;
+++	error = apple_z2_hbpp_xfer(z2, 2);
+++	if (error)
+++		goto stop;
+++	error = pinctrl_select_state(z2->sync_pinctrl, z2->sync_active);
+++	if (error)
+++		goto stop;
+++	usleep_range(10000, 11000);
+++	error = apple_z2_hbpp_nop(z2);
+++	if (error)
+++		goto stop;
+++	error = gpiod_set_value_cansleep(z2->reset_gpio, 0);
+++	if (error)
+++		goto stop;
+++	msleep(30);
+++	z2->platform_powered = true;
+++	return 0;
+++
+++stop:
+++	apple_z2_j72_power_off(z2);
+++	return error;
+++}
+++
+++/* Fixed, audited N1 getter: phase 1 retains phase 0's checksum. */
+++static int apple_z2_j72_get_report(struct apple_z2 *z2, u8 id, u16 len)
+++{
+++	unsigned int attempt, wire = len < 12 ? 16 : len + 5;
+++	struct spi_transfer xfer = {
+++		.tx_buf = z2->tx_buf,
+++		.rx_buf = z2->rx_buf,
+++		.len = wire,
+++	};
+++	u16 checksum;
+++	int error;
+++
+++	if (!len || len > 16)
+++		return -EINVAL;
+++	for (attempt = 0; attempt < 3; attempt++) {
+++		usleep_range(2000, 3000);
+++		memset(z2->tx_buf, 0, max(wire, 16U));
+++		z2->tx_buf[0] = len < 12 ? 0xe6 : 0xe7;
+++		z2->tx_buf[1] = id;
+++		put_unaligned_le16(len, z2->tx_buf + 3);
+++		error = apple_z2_z2_xfer_locked_delay(z2, "j72-get", false);
+++		if (error)
+++			return error;
+++		checksum = get_unaligned_le16(z2->tx_buf + 14);
+++		z2->tx_buf[2] = 1;
+++		if (wire != 16) {
+++			put_unaligned_le16(0, z2->tx_buf + 14);
+++			put_unaligned_le16(checksum, z2->tx_buf + wire - 2);
+++		}
+++		udelay(25);
+++
+++		error = apple_z2_spi_transfer(z2, &xfer, 1);
+++		if (error)
+++			return error;
+++		if (z2->rx_buf[0] == (len < 12 ? 0xe6 : 0xe7) &&
+++		    z2->rx_buf[1] == id && !z2->rx_buf[2] &&
+++		    apple_z2_j72_checksum(z2->rx_buf, wire))
+++			return 0;
+++	}
+++	return -EBADMSG;
+++}
+++
+++static int apple_z2_j72_write_report(struct apple_z2 *z2, u8 id, u8 value)
+++{
+++	int error;
+++
+++	memset(z2->tx_buf, 0, 16);
+++	z2->tx_buf[0] = 0xe4;
+++	z2->tx_buf[1] = id;
+++	z2->tx_buf[2] = 1;
+++	z2->tx_buf[3] = value;
+++	error = apple_z2_z2_xfer_locked_delay(z2, "j72-set", false);
+++	if (error)
+++		return error;
+++	usleep_range(2000, 3000);
+++	error = apple_z2_z2_cmd_locked_delay(z2, 0xe1, 0, "j72-status", false);
+++	if (error)
+++		return error;
+++	if (z2->rx_buf[0] != 0xe1 || z2->rx_buf[6] != 0xe4 ||
+++	    z2->rx_buf[7] != id || z2->rx_buf[8] ||
+++	    !apple_z2_j72_checksum(z2->rx_buf, 16))
+++		return -EPROTO;
+++	return 0;
+++}
+++
+++static int apple_z2_j72_device_info(struct apple_z2 *z2)
+++{
+++	int error;
+++
+++	error = apple_z2_n1_wake_locked(z2);
+++	if (!error)
+++		error = apple_z2_z2_cmd_locked_delay(z2, 0xe2, 0, "j72-e2", false);
+++	if (!error)
+++		error = apple_z2_z2_cmd_locked_delay(z2, 0xe2, 0, "j72-e2-reply", false);
+++	if (error)
+++		return error;
+++	if (z2->rx_buf[0] != 0xe2 || z2->rx_buf[2] != 1 ||
+++	    get_unaligned_le16(z2->rx_buf + 3) != APPLE_Z2_J72_MAX_PAYLOAD ||
+++	    !apple_z2_j72_checksum(z2->rx_buf, 16))
+++		return -EPROTO;
+++	return 0;
+++}
+++
+++static int apple_z2_j72_health(struct apple_z2 *z2)
+++{
+++	int error;
+++
+++	error = apple_z2_j72_device_info(z2);
+++	if (!error)
+++		error = apple_z2_j72_get_report(z2, 0x7f, 4);
+++	if (error)
+++		return error;
+++	if (memchr_inv(z2->rx_buf + 3, 0, 4))
+++		return -EPROTO;
+++	error = apple_z2_j72_get_report(z2, 0xc8, 1);
+++	if (!error && z2->rx_buf[3] != 0x19)
+++		error = -EPROTO;
+++	return error;
+++}
+++
+++static int apple_z2_j72_init_reports(struct apple_z2 *z2)
+++{
+++	const u8 *surface;
+++	int error;
+++
+++	z2->wake_valid = false;
+++	error = apple_z2_j72_device_info(z2);
+++	if (!error)
+++		error = apple_z2_j72_get_report(z2, 0xd9, 16);
+++	if (error)
+++		return error;
+++	surface = z2->rx_buf + 3;
+++	if ((s16)get_unaligned_le16(surface + 8) != -112 ||
+++	    (s16)get_unaligned_le16(surface + 10) != -112 ||
+++	    (s16)get_unaligned_le16(surface + 12) != 14508 ||
+++	    (s16)get_unaligned_le16(surface + 14) != 19426)
+++		return -EPROTO;
+++	error = apple_z2_set_surface(z2, surface);
+++	if (!error)
+++		error = apple_z2_j72_get_report(z2, 0xaf, 1);
+++	if (!error)
+++		error = apple_z2_j72_get_report(z2, 0xbf, 4);
+++	if (!error)
+++		error = apple_z2_j72_write_report(z2, 0xaf, 0);
+++	if (!error)
+++		error = apple_z2_j72_get_report(z2, 0xaf, 1);
+++	if (error)
+++		return error;
+++	if (z2->rx_buf[3])
+++		return -EPROTO;
+++	error = apple_z2_j72_get_report(z2, 0xac, 1);
+++	if (error)
+++		return error;
+++	if (z2->rx_buf[3] != 2)
+++		return -EPROTO;
+++	error = apple_z2_j72_get_report(z2, 0xc8, 1);
+++	if (error)
+++		return error;
+++	if (z2->rx_buf[3] != 8)
+++		return -EPROTO;
+++	error = apple_z2_j72_write_report(z2, 0xc8, 0x19);
+++	if (error)
+++		return error;
+++	msleep(20);
+++	return apple_z2_j72_health(z2);
+++}
+++
+++static int apple_z2_j72_emit(struct apple_z2 *z2, const u8 *body, size_t len)
+++{
+++	struct apple_z2_j72_contact contacts[APPLE_Z2_J72_MAX_CONTACTS];
+++	unsigned int count, i;
+++	int slot, error;
+++	bool active;
+++
+++	error = apple_z2_j72_contacts(body, len, contacts, &count);
+++	if (error)
+++		return error;
+++	z2->j72_contacts_active = false;
+++	for (i = 0; i < count; i++) {
+++		slot = input_mt_get_slot_by_key(z2->input_dev, contacts[i].id);
+++		if (slot < 0)
+++			continue;
+++		active = contacts[i].state == 3 || contacts[i].state == 4;
+++		input_mt_slot(z2->input_dev, slot);
+++		input_mt_report_slot_state(z2->input_dev, MT_TOOL_FINGER, active);
+++		if (active) {
+++			input_report_abs(z2->input_dev, ABS_MT_POSITION_X,
+++					 clamp(contacts[i].x + 112, 0, 14620));
+++			input_report_abs(z2->input_dev, ABS_MT_POSITION_Y,
+++					 clamp(19426 - contacts[i].y, 0, 19538));
+++			z2->j72_contacts_active = true;
+++		}
+++	}
+++	input_mt_sync_frame(z2->input_dev);
+++	input_sync(z2->input_dev);
+++	z2->j72_last_frame = jiffies;
+++	return 0;
+++}
+++
+++/* One complete EB exchange; only a validated reply consumes the queue tag. */
+++static int apple_z2_j72_read_frame(struct apple_z2 *z2)
+++{
+++	struct spi_transfer xfer = { .tx_buf = z2->tx_buf, .rx_buf = z2->rx_buf };
+++	unsigned int retry, wire;
+++	u16 length;
+++	u8 tag = z2->index_parity + 1;
+++	int error;
+++
+++	error = apple_z2_n1_wake_locked(z2);
+++	if (error)
+++		return error;
+++	memset(z2->tx_buf, 0, 16);
+++	z2->tx_buf[0] = 0xeb;
+++	z2->tx_buf[1] = tag;
+++	error = apple_z2_z2_xfer_locked_delay(z2, "j72-length", false);
+++	if (error)
+++		return error;
+++	error = apple_z2_j72_length(z2->rx_buf, &length);
+++	if (error)
+++		return error;
+++	if (!length) {
+++		z2->index_parity ^= 1;
+++		return 0;
+++	}
+++	for (retry = 0; retry < 2; retry++) {
+++		wire = length + 5;
+++		memset(z2->tx_buf, 0, max(wire, 16U));
+++		memset(z2->rx_buf, 0, max(wire, 16U));
+++		z2->tx_buf[0] = 0xeb;
+++		z2->tx_buf[1] = tag;
+++		z2->tx_buf[2] = 1;
+++		put_unaligned_le16(0xeb + tag + 1, z2->tx_buf + wire - 2);
+++		xfer.len = wire;
+++		error = apple_z2_spi_transfer(z2, &xfer, 1);
+++		if (error)
+++			return error;
+++		if (!retry && wire >= 16 && z2->rx_buf[0] == 0xe1 &&
+++		    !apple_z2_j72_length(z2->rx_buf, &length) && length >= 2)
+++			continue;
+++		if (!apple_z2_j72_packet(z2->rx_buf, wire))
+++			return -EBADMSG;
+++		error = apple_z2_j72_emit(z2, z2->rx_buf + 5, wire - 7);
+++		if (error) {
+++			z2->j72_layout_error = error;
+++			return error;
+++		}
+++		z2->index_parity ^= 1;
+++		return 0;
+++	}
+++	return -EBADMSG;
+++}
+++
+++static void apple_z2_j72_work(struct work_struct *work)
+++{
+++	struct apple_z2 *z2 = container_of(to_delayed_work(work), struct apple_z2, j72_work);
+++	u64 now;
+++	int error;
+++
+++	mutex_lock(&z2->io_lock);
+++	if (z2->stopping || !z2->booted)
+++		goto unlock;
+++	z2->j72_spi_error = 0;
+++	error = apple_z2_j72_read_frame(z2);
+++	if (z2->j72_spi_error || z2->j72_layout_error)
+++		goto failed;
+++	/* A silent or unrelated valid control response retains tag and budget. */
+++	if (error == -EBADMSG || error == -EMSGSIZE)
+++		z2->j72_bad_frames++;
+++	else if (error && error != -EAGAIN)
+++		goto failed;
+++	else if (!error)
+++		z2->j72_bad_frames = 0;
+++	if (z2->j72_bad_frames >= 3) {
+++		apple_z2_release_contacts(z2);
+++		z2->j72_contacts_active = false;
+++		now = div_u64(ktime_get_ns(), NSEC_PER_MSEC);
+++		if (!apple_z2_j72_recovery_admit(&z2->j72_recovery, now)) {
+++			error = -EOVERFLOW;
+++			goto failed;
+++		}
+++		z2->wake_valid = false;
+++		error = apple_z2_j72_health(z2);
+++		if (error)
+++			goto failed;
+++		z2->j72_bad_frames = 0;
+++	}
+++	if (z2->j72_contacts_active &&
+++	    time_after(jiffies, z2->j72_last_frame + msecs_to_jiffies(250))) {
+++		error = -ETIMEDOUT;
+++		goto failed;
+++	}
+++	schedule_delayed_work(&z2->j72_work, msecs_to_jiffies(25));
+++	goto unlock;
+++
+++failed:
+++	dev_err(&z2->spidev->dev, "J72 touch stopped after error %d (layout %d)\n",
+++		error, z2->j72_layout_error);
+++	apple_z2_release_contacts(z2);
+++	z2->j72_contacts_active = false;
+++	z2->booted = false;
+++	z2->stopping = true;
+++	apple_z2_j72_power_off(z2);
+++unlock:
+++	mutex_unlock(&z2->io_lock);
+++}
+++
+++static int apple_z2_j72_finish_boot(struct apple_z2 *z2)
+++{
+++	int error;
+++
+++	error = apple_z2_n1_start_firmware(z2);
+++	if (error)
+++		return error;
+++	mutex_lock(&z2->io_lock);
+++	z2->index_parity = 0;
+++	z2->j72_bad_frames = 0;
+++	z2->j72_layout_error = 0;
+++	z2->j72_contacts_active = false;
+++	memset(&z2->j72_recovery, 0, sizeof(z2->j72_recovery));
+++	error = apple_z2_j72_init_reports(z2);
+++	if (!error) {
+++		z2->stopping = false;
+++		z2->booted = true;
+++		z2->j72_last_frame = jiffies;
+++		schedule_delayed_work(&z2->j72_work, msecs_to_jiffies(25));
+++	}
+++	mutex_unlock(&z2->io_lock);
+++	return error;
+++}
+++
++ /*
++  * iPad 5 (J71t) N1, personality C1F15,1 (iOS AppleMultitouchN1SPI). The
++  * register calibration is N1's defaults with the C1F15,1 overrides
++@@ -4184,6 +4667,26 @@ static const struct apple_z2_chip_info apple_z2_j81_info = {
++ 	.shifted_reply_header = true,
++ };
++ 
+++static const struct apple_z2_n1_info apple_z2_j72_n1 = {
+++	.calib_regs = apple_z2_j71t_calib_regs,
+++	.num_calib_regs = ARRAY_SIZE(apple_z2_j71t_calib_regs),
+++	.execute_addr = 0x10003400,
+++	.execute_arg = 0x100,
+++	.cal_size = 0x400,
+++	.cal_chunk_size = 0x3f0,
+++	.control_delay_us = 25,
+++	.wake_holdoff_ms = 100,
+++	.interface = 1,
+++};
+++
+++static const struct apple_z2_chip_info apple_z2_j72_info = {
+++	.name = "iPad4,2 Touchscreen",
+++	.variant = APPLE_Z2_VARIANT_J72,
+++	.cs_setup_us = 10,
+++	.cs_hold_us = 10,
+++	.n1 = &apple_z2_j72_n1,
+++};
+++
++ static const struct apple_z2_chip_info apple_z2_j172_info = {
++ 	.name = "iPad 7 Touchscreen",
++ 	.variant = APPLE_Z2_VARIANT_J172,
++@@ -4260,6 +4763,7 @@ static int apple_z2_probe(struct spi_device *spi)
++ 	mutex_init(&z2->io_lock);
++ 	INIT_DELAYED_WORK(&z2->rearm_work, info->recover_control_stall ?
++ 			  apple_z2_control_rearm_work : apple_z2_n1_rearm_work);
+++	INIT_DELAYED_WORK(&z2->j72_work, apple_z2_j72_work);
++ 	spi_set_drvdata(spi, z2);
++ 
++ 	z2->reset_gpio = devm_gpiod_get(dev, "reset", GPIOD_OUT_HIGH);
++@@ -4277,13 +4781,21 @@ static int apple_z2_probe(struct spi_device *spi)
++ 			return dev_err_probe(dev, PTR_ERR(z2->core_supply),
++ 					     "unable to get core supply\n");
++ 	}
++-	if (apple_z2_is_j71t(z2)) {
+++	if (apple_z2_uses_n1(z2)) {
++ 		/* Claimed as an input so its pin is configured as one. */
++ 		z2->attn_gpio = devm_gpiod_get_optional(dev, "attn", GPIOD_IN);
++ 		if (IS_ERR(z2->attn_gpio))
++ 			return dev_err_probe(dev, PTR_ERR(z2->attn_gpio),
++ 					     "unable to get ATN GPIO\n");
++ 
+++		if (apple_z2_is_j72(z2)) {
+++			z2->core_supply = devm_regulator_get(dev, "core");
+++			if (IS_ERR(z2->core_supply))
+++				return dev_err_probe(dev, PTR_ERR(z2->core_supply),
+++						     "unable to get core supply\n");
+++			if (!z2->attn_gpio)
+++				return dev_err_probe(dev, -EINVAL, "missing ATN GPIO\n");
+++		}
++ 		z2->ana_supply = devm_regulator_get(dev, "ana");
++ 		if (IS_ERR(z2->ana_supply))
++ 			return dev_err_probe(dev, PTR_ERR(z2->ana_supply),
++@@ -4319,6 +4831,9 @@ static int apple_z2_probe(struct spi_device *spi)
++ 		}
++ 	}
++ 
+++	if (apple_z2_is_j72(z2) && (!z2->sync_active || !z2->sync_inactive))
+++		return dev_err_probe(dev, -EINVAL, "missing J72 display-sync states\n");
+++
++ 	z2->power_ana_gpio =
++ 		devm_gpiod_get_optional(dev, "power-ana", GPIOD_OUT_LOW);
++ 	if (IS_ERR(z2->power_ana_gpio))
++@@ -4340,7 +4855,7 @@ static int apple_z2_probe(struct spi_device *spi)
++ 		return dev_err_probe(dev, PTR_ERR(z2->display_sync1_gpio),
++ 				     "unable to get display-sync1 GPIO\n");
++ 
++-	if (apple_z2_is_n61(z2))
+++	if (apple_z2_is_n61(z2) || apple_z2_is_j72(z2))
++ 		z2->clk = devm_clk_get(dev, NULL);
++ 	else
++ 		z2->clk = devm_clk_get_optional(dev, NULL);
++@@ -4416,6 +4931,10 @@ static int apple_z2_probe(struct spi_device *spi)
++ 	input_set_abs_params(z2->input_dev, ABS_MT_POSITION_X, 0, 0, 0, 0);
++ 	input_set_abs_params(z2->input_dev, ABS_MT_POSITION_Y, 0, 0, 0, 0);
++ 	touchscreen_parse_properties(z2->input_dev, true, &z2->props);
+++	if (apple_z2_is_j72(z2) &&
+++	    (z2->props.max_x != 14620 || z2->props.max_y != 19538 ||
+++	     z2->props.invert_x || !z2->props.invert_y || z2->props.swap_x_y))
+++		return dev_err_probe(dev, -EINVAL, "invalid J72 surface mapping\n");
++ 	input_set_abs_params(z2->input_dev, ABS_MT_WIDTH_MAJOR, 0, 65535, 0, 0);
++ 	input_set_abs_params(z2->input_dev, ABS_MT_WIDTH_MINOR, 0, 65535, 0, 0);
++ 	input_set_abs_params(z2->input_dev, ABS_MT_TOUCH_MAJOR, 0, 65535, 0, 0);
++@@ -4425,8 +4944,9 @@ static int apple_z2_probe(struct spi_device *spi)
++ 
++ 	if (apple_z2_uses_ipad_protocol(z2)) {
++ 		slots = APPLE_Z2_J172_MAX_CONTACTS;
++-	} else if (apple_z2_is_j71t(z2)) {
++-		slots = APPLE_Z2_CLASSIC_MAX_CONTACTS;
+++	} else if (apple_z2_uses_n1(z2)) {
+++		slots = apple_z2_is_j72(z2) ? APPLE_Z2_J72_MAX_CONTACTS :
+++			APPLE_Z2_CLASSIC_MAX_CONTACTS;
++ 		mt_flags |= INPUT_MT_DROP_UNUSED;
++ 	} else if (apple_z2_is_iphone7_plus(z2) || apple_z2_is_n61(z2)) {
++ 		slots = 10;
++@@ -4452,11 +4972,14 @@ static void apple_z2_stop(struct apple_z2 *z2)
++ {
++ 	bool irq_on;
++ 
++-	if (apple_z2_is_j71t(z2) || z2->info->recover_control_stall) {
+++	if (apple_z2_is_j71t(z2) || z2->info->recover_control_stall ||
+++	    apple_z2_is_j72(z2)) {
++ 		mutex_lock(&z2->io_lock);
++ 		z2->stopping = true;
++ 		mutex_unlock(&z2->io_lock);
++ 		cancel_delayed_work_sync(&z2->rearm_work);
+++		if (apple_z2_is_j72(z2))
+++			cancel_delayed_work_sync(&z2->j72_work);
++ 	}
++ 
++ 	/* The iPad 5 interrupt thread may mask the interrupt itself. */
++@@ -4466,6 +4989,8 @@ static void apple_z2_stop(struct apple_z2 *z2)
++ 	mutex_unlock(&z2->io_lock);
++ 	if (irq_on)
++ 		disable_irq(z2->spidev->irq);
+++	if (apple_z2_is_j72(z2))
+++		apple_z2_release_contacts(z2);
++ 	gpiod_direction_output(z2->reset_gpio, 1);
++ 	z2->booted = false;
++ 	apple_z2_platform_power_off(z2);
++@@ -4500,6 +5025,7 @@ static const struct of_device_id apple_z2_of_match[] = {
++ 	{ .compatible = "apple,j493-touchbar", .data = &apple_z2_j493_info },
++ 	{ .compatible = "apple,j71b-touchscreen", .data = &apple_z2_j71b_info },
++ 	{ .compatible = "apple,j71t-touchscreen", .data = &apple_z2_j71t_info },
+++	{ .compatible = "apple,j72-touchscreen", .data = &apple_z2_j72_info },
++ 	{ .compatible = "apple,j81-touchscreen", .data = &apple_z2_j81_info },
++ 	{ .compatible = "apple,j172-touchscreen", .data = &apple_z2_j172_info },
++ 	{ .compatible = "apple,d11-touchscreen", .data = &apple_z2_d11_info },
++@@ -4514,6 +5040,7 @@ static struct spi_device_id apple_z2_of_id[] = {
++ 	{ .name = "j493-touchbar", .driver_data = (kernel_ulong_t)&apple_z2_j493_info },
++ 	{ .name = "j71b-touchscreen", .driver_data = (kernel_ulong_t)&apple_z2_j71b_info },
++ 	{ .name = "j71t-touchscreen", .driver_data = (kernel_ulong_t)&apple_z2_j71t_info },
+++	{ .name = "j72-touchscreen", .driver_data = (kernel_ulong_t)&apple_z2_j72_info },
++ 	{ .name = "j81-touchscreen", .driver_data = (kernel_ulong_t)&apple_z2_j81_info },
++ 	{ .name = "j172-touchscreen", .driver_data = (kernel_ulong_t)&apple_z2_j172_info },
++ 	{ .name = "d11-touchscreen", .driver_data = (kernel_ulong_t)&apple_z2_d11_info },
++diff --git a/drivers/input/touchscreen/apple_z2_j72.h b/drivers/input/touchscreen/apple_z2_j72.h
++new file mode 100644
++index 000000000..e98838b5e
++--- /dev/null
+++++ b/drivers/input/touchscreen/apple_z2_j72.h
++@@ -0,0 +1,210 @@
+++/* SPDX-License-Identifier: GPL-2.0-only */
+++#ifndef _APPLE_Z2_J72_H
+++#define _APPLE_Z2_J72_H
+++
+++#include <linux/errno.h>
+++#include <linux/string.h>
+++#include <linux/types.h>
+++#include <linux/unaligned.h>
+++
+++#define APPLE_Z2_J72_MAX_CONTACTS 10
+++#define APPLE_Z2_J72_MAX_PAYLOAD 2454
+++#define APPLE_Z2_J72_FW_PACKET_SIZE 57016
+++#define APPLE_Z2_J72_RECOVERIES 6
+++#define APPLE_Z2_J72_RECOVERY_MS 60000ULL
+++
+++struct apple_z2_j72_contact {
+++	u8 id;
+++	u8 state;
+++	s16 x;
+++	s16 y;
+++};
+++
+++struct apple_z2_j72_recovery {
+++	u64 times[APPLE_Z2_J72_RECOVERIES];
+++	unsigned int count;
+++	unsigned int next;
+++};
+++
+++static inline bool apple_z2_j72_checksum(const u8 *p, size_t len)
+++{
+++	u16 sum = 0;
+++	size_t i;
+++
+++	if (len < 2)
+++		return false;
+++	for (i = 0; i < len - 2; i++)
+++		sum += p[i];
+++	return sum == get_unaligned_le16(p + len - 2);
+++}
+++
+++/* A valid E-class control reply is not necessarily an EB length reply. */
+++static inline int apple_z2_j72_length(const u8 *p, u16 *length)
+++{
+++	unsigned int i;
+++	bool zero = true;
+++
+++	for (i = 0; i < 14; i++)
+++		zero &= !p[i];
+++	if (zero)
+++		return -EAGAIN;
+++	if ((p[0] & 0xf0) != 0xe0 || !apple_z2_j72_checksum(p, 16))
+++		return -EBADMSG;
+++	if (p[0] != 0xe1)
+++		return -EAGAIN;
+++	*length = get_unaligned_le16(p + 1);
+++	if (*length > APPLE_Z2_J72_MAX_PAYLOAD || (*length && *length < 2))
+++		return -EMSGSIZE;
+++	return 0;
+++}
+++
+++static inline bool apple_z2_j72_packet(const u8 *p, size_t len)
+++{
+++	unsigned int header = 0;
+++	unsigned int i;
+++	u16 inner;
+++
+++	if (len < 7 || len > APPLE_Z2_J72_MAX_PAYLOAD + 5 ||
+++	    (p[0] != 0xea && p[0] != 0xeb))
+++		return false;
+++	for (i = 0; i < 5; i++)
+++		header += p[i];
+++	inner = get_unaligned_le16(p + 2);
+++	return !(header & 0xff) && inner >= 2 && (size_t)inner + 5 == len &&
+++	       apple_z2_j72_checksum(p + 5, inner);
+++}
+++
+++/* Validate the whole native report before the caller changes any input slot. */
+++static inline int apple_z2_j72_contacts(const u8 *p, size_t len,
+++				      struct apple_z2_j72_contact *out,
+++				      unsigned int *count)
+++{
+++	unsigned int n, i, j;
+++	const u8 *contact;
+++
+++	if (len < 24 || p[0] != 0x44)
+++		return -EPROTO;
+++	if (p[2] != 24 || get_unaligned_le16(p + 14) || p[17] != 30)
+++		return -EPROTO;
+++	n = p[16];
+++	if (n > APPLE_Z2_J72_MAX_CONTACTS || n > (len - 24) / 30)
+++		return -EMSGSIZE;
+++	for (i = 0; i < n; i++) {
+++		contact = p + 24 + i * 30;
+++		switch (contact[1]) {
+++		case 0:
+++		case 1:
+++		case 2:
+++		case 3:
+++		case 4:
+++		case 5:
+++		case 7:
+++			break;
+++		default:
+++			return -EPROTO;
+++		}
+++		for (j = 0; j < i; j++)
+++			if (out[j].id == contact[0])
+++				return -EPROTO;
+++		out[i].id = contact[0];
+++		out[i].state = contact[1];
+++		out[i].x = (s16)get_unaligned_le16(contact + 4);
+++		out[i].y = (s16)get_unaligned_le16(contact + 6);
+++	}
+++	*count = n;
+++	return 0;
+++}
+++
+++static inline bool apple_z2_j72_recovery_admit(struct apple_z2_j72_recovery *r,
+++					     u64 now)
+++{
+++	unsigned int last;
+++
+++	if (r->count > APPLE_Z2_J72_RECOVERIES ||
+++	    r->next >= APPLE_Z2_J72_RECOVERIES)
+++		return false;
+++	last = (r->next + APPLE_Z2_J72_RECOVERIES - 1) % APPLE_Z2_J72_RECOVERIES;
+++	if (r->count && now < r->times[last])
+++		return false;
+++	if (r->count == APPLE_Z2_J72_RECOVERIES &&
+++	    now - r->times[r->next] < APPLE_Z2_J72_RECOVERY_MS)
+++		return false;
+++	r->times[r->next] = now;
+++	r->next = (r->next + 1) % APPLE_Z2_J72_RECOVERIES;
+++	if (r->count < APPLE_Z2_J72_RECOVERIES)
+++		r->count++;
+++	return true;
+++}
+++
+++/* HBPP 0x103: full payload word count and two big-endian 16-bit halves. */
+++static inline bool apple_z2_j72_blob(const u8 *p, size_t len, u32 address,
+++				   unsigned int payload_size, bool zero)
+++{
+++	u16 header = 0;
+++	u32 sum = 0;
+++	unsigned int i;
+++
+++	if (len != payload_size + 16 || (payload_size & 3) ||
+++	    get_unaligned_be16(p) != 0x18e1 ||
+++	    get_unaligned_be16(p + 2) != 0x3001 ||
+++	    get_unaligned_be16(p + 4) != payload_size / 4 ||
+++	    get_unaligned_be16(p + 6) != (address & 0xffff) ||
+++	    get_unaligned_be16(p + 8) != address >> 16)
+++		return false;
+++	for (i = 4; i < 10; i++)
+++		header += p[i];
+++	if (header != get_unaligned_be16(p + 10))
+++		return false;
+++	for (i = 12; i < 12 + payload_size; i++) {
+++		if (zero && p[i])
+++			return false;
+++		sum += p[i];
+++	}
+++	return get_unaligned_be16(p + 12 + payload_size) == (sum & 0xffff) &&
+++	       get_unaligned_be16(p + 14 + payload_size) == sum >> 16;
+++}
+++
+++/* The normal Z2FW v1 ABI; no firmware bytes or owner calibration here. */
+++static inline bool apple_z2_j72_firmware(const u8 *p, size_t len)
+++{
+++	static const u32 commands[] = { 4, 1, 6, 1 };
+++	static const u32 sizes[] = { 44, 144, 12, APPLE_Z2_J72_FW_PACKET_SIZE };
+++	size_t offset = 8;
+++	unsigned int record, i;
+++
+++	if (len < 8 || get_unaligned_le32(p) != 0x5746325a ||
+++	    get_unaligned_le32(p + 4) != 1)
+++		return false;
+++	for (record = 0; record < 4; record++) {
+++		if (offset > len || len - offset < 8 ||
+++		    get_unaligned_le32(p + offset) != commands[record] ||
+++		    get_unaligned_le32(p + offset + 4) != sizes[record])
+++			return false;
+++		offset += 8;
+++		if (sizes[record] > len - offset)
+++			return false;
+++		if (!record) {
+++			for (i = 0; i < 11; i++) {
+++				u32 expected = i == 0 ? 0x818 : i == 10 ? 0x103 : 0;
+++
+++				if (get_unaligned_le32(p + offset + i * 4) != expected)
+++					return false;
+++			}
+++		} else if (record == 1) {
+++			if (!apple_z2_j72_blob(p + offset, sizes[record],
+++					       0x10009600, 128, true))
+++				return false;
+++		} else if (record == 2) {
+++			if (get_unaligned_le32(p + offset) != 0x10009000 ||
+++			    get_unaligned_le32(p + offset + 4) != 1024 ||
+++			    get_unaligned_le32(p + offset + 8))
+++				return false;
+++		} else if (!apple_z2_j72_blob(p + offset, sizes[record], 0, 57000, false)) {
+++			return false;
+++		}
+++		offset += sizes[record];
+++	}
+++	return offset == len;
+++}
+++
+++#endif
+diff --git a/kernel/patches/drivers/input/0021-dt-bindings-input-apple-z2-describe-the-J72-N1-contr.patch b/kernel/patches/drivers/input/0021-dt-bindings-input-apple-z2-describe-the-J72-N1-contr.patch
+new file mode 100644
+index 0000000..1bb9f7a
+--- /dev/null
++++ b/kernel/patches/drivers/input/0021-dt-bindings-input-apple-z2-describe-the-J72-N1-contr.patch
+@@ -0,0 +1,125 @@
++From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
++From: thisiscamk <100883750+thisiscamk@users.noreply.github.com>
++Date: Tue, 3 Nov 2026 20:40:23 +0800
++Subject: [PATCH] dt-bindings: input: apple,z2: describe the J72 N1 controller
++
++Require the independent analog/core supplies, attention/reset pins, reference clock, display-sync states and measured portrait geometry. The bootloader supplies exactly 1024 bytes of nonblank unit calibration at runtime; static DTBs omit this private property.
++
++Remove the duplicate analog-supply key and retain its N61 applicability while allowing the new J72 resources. Preserve the existing J71t/J81 resource conditions.
++
++Assisted-by: LLM
++---
++ .../touchscreen/apple,z2-multitouch.yaml      | 69 +++++++++++++++++--
++ 1 file changed, 63 insertions(+), 6 deletions(-)
++
++diff --git a/Documentation/devicetree/bindings/input/touchscreen/apple,z2-multitouch.yaml b/Documentation/devicetree/bindings/input/touchscreen/apple,z2-multitouch.yaml
++index 0d508131f..495d16a7a 100644
++--- a/Documentation/devicetree/bindings/input/touchscreen/apple,z2-multitouch.yaml
+++++ b/Documentation/devicetree/bindings/input/touchscreen/apple,z2-multitouch.yaml
++@@ -19,6 +19,7 @@ properties:
++       - apple,j493-touchbar
++       - apple,j71b-touchscreen
++       - apple,j71t-touchscreen
+++      - apple,j72-touchscreen
++       - apple,j81-touchscreen
++       - apple,j172-touchscreen
++       - apple,d11-touchscreen
++@@ -46,7 +47,8 @@ properties:
++   ana-supply:
++     description:
++       Analog supply for the touchscreen controller, where a PMIC switch
++-      rather than a GPIO provides it
+++      rather than a GPIO provides it. On N61 this is the Chestnut
+++      high-voltage switch
++ 
++   hv-supply:
++     description: High-voltage analog supply for the touchscreen controller
++@@ -67,9 +69,6 @@ properties:
++   clocks:
++     maxItems: 1
++ 
++-  ana-supply:
++-    description: N61 analog touchscreen supply from the Chestnut high-voltage switch
++-
++   apple,z2-prox-cal-blob:
++     $ref: /schemas/types.yaml#/definitions/uint8-array
++     maxItems: 128
++@@ -95,8 +94,8 @@ properties:
++     maxItems: 4096
++     description:
++       Calibration blob supplied by the bootloader. N61 requires this
++-      per-unit data at driver probe; it can be absent from a static DTB
++-      before the bootloader adds it.
+++      per-unit data at driver probe; J72 requires exactly 1024 bytes. It
+++      can be absent from a static DTB before the bootloader adds it.
++ 
++   apple,z2-orb-gap-cal-blob:
++     $ref: /schemas/types.yaml#/definitions/uint8-array
++@@ -202,9 +201,67 @@ allOf:
++         - clocks
++         - ana-supply
++         - power-ldo-gpios
+++  - if:
+++      properties:
+++        compatible:
+++          const: apple,j72-touchscreen
+++    then:
+++      properties:
+++        pinctrl-names:
+++          items:
+++            - const: display-sync-active
+++            - const: display-sync-inactive
+++        touchscreen-size-x:
+++          const: 14621
+++        touchscreen-size-y:
+++          const: 19539
+++        touchscreen-inverted-x: false
+++        touchscreen-swapped-x-y: false
+++        firmware-name:
+++          const: apple/j72-fwstart.z2fw
+++        apple,z2-cal-blob:
+++          minItems: 1024
+++          maxItems: 1024
+++        power-ana-gpios: false
+++        power-ldo-gpios: false
+++        display-sync-gpios: false
+++        display-sync1-gpios: false
+++        hv-supply: false
+++        spi-cpha: false
+++        spi-cpol: false
+++        spi-max-frequency:
+++          maximum: 1000000
+++        apple,z2-bpw16-min-len: false
+++        apple,z2-no-init-ack: false
+++      required:
+++        - clocks
+++        - ana-supply
+++        - core-supply
+++        - attn-gpios
+++        - pinctrl-0
+++        - pinctrl-1
+++        - pinctrl-names
+++        - touchscreen-inverted-y
+++  - if:
+++      properties:
+++        compatible:
+++          enum:
+++            - apple,j71t-touchscreen
+++            - apple,j72-touchscreen
+++            - apple,j81-touchscreen
+++            - apple,n61-touchscreen
++     else:
++       properties:
++         ana-supply: false
+++  - if:
+++      properties:
+++        compatible:
+++          enum:
+++            - apple,j71t-touchscreen
+++            - apple,j72-touchscreen
+++            - apple,j81-touchscreen
+++    else:
+++      properties:
++         attn-gpios: false
++   - if:
++       properties:
+diff --git a/kernel/patches/drivers/input/0022-Input-apple_z2-bound-J72-power-faults-and-shutdown.patch b/kernel/patches/drivers/input/0022-Input-apple_z2-bound-J72-power-faults-and-shutdown.patch
+new file mode 100644
+index 0000000..fd1f3e6
+--- /dev/null
++++ b/kernel/patches/drivers/input/0022-Input-apple_z2-bound-J72-power-faults-and-shutdown.patch
+@@ -0,0 +1,184 @@
++From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
++From: thisiscamk <100883750+thisiscamk@users.noreply.github.com>
++Date: Tue, 3 Nov 2026 20:52:04 +0800
++Subject: [PATCH] Input: apple_z2 - bound J72 power faults and shutdown
++
++Keep the J72 final-firmware and execute delays in N1 match data while preserving existing N1 defaults. Its dedicated worker owns runtime reads; never dispatch J72 through the other classic IRQ paths.
++
++A regulator enable failure may follow a physical write or regulator-core rollback. Latch this ambiguity and issue no further power operations or reference-clock release. Likewise, never retry a failed parent-supply disable. These flags do not preserve devm resources after framework unwind; a fault requires return to iOS without rebind or unload.
++
++Cancel both workers on stop, make successful J72 stops idempotent, propagate cleanup errors from suspend and add a J72 shutdown callback. Framework readback and shutdown behavior still require hardware qualification.
++
++Actual C fault fixtures cover applied-write enable failures, duplicate stop/shutdown, every transport phase, bounded health recovery and pre-power firmware/calibration refusal. ARM64 W=1 object build passes.
++
++Assisted-by: LLM
++---
++ drivers/input/touchscreen/apple_z2.c | 64 ++++++++++++++++++++++++----
++ 1 file changed, 56 insertions(+), 8 deletions(-)
++
++diff --git a/drivers/input/touchscreen/apple_z2.c b/drivers/input/touchscreen/apple_z2.c
++index 438d5a0a4..fc54fccff 100644
++--- a/drivers/input/touchscreen/apple_z2.c
+++++ b/drivers/input/touchscreen/apple_z2.c
++@@ -159,6 +159,8 @@ struct apple_z2_hbpp_reg {
++  * @num_calib_regs:	number of entries in @calib_regs
++  * @execute_addr:	firmware entry point (fw-execute-addr)
++  * @execute_arg:	execute command argument
+++ * @firmware_delay_ms:	delay before the final firmware packet
+++ * @execute_delay_ms:	delay after execute; zero retains the 40 ms + 2 ms default
++  * @cal_size:		size of the unit's multi-touch calibration (MtCl)
++  * @cal_chunk_size:	largest calibration payload per HBPP packet
++  * @control_delay_us:	delay between the two phases of a control command
++@@ -179,6 +181,8 @@ struct apple_z2_n1_info {
++ 	unsigned int num_calib_regs;
++ 	u32 execute_addr;
++ 	u32 execute_arg;
+++	unsigned int firmware_delay_ms;
+++	unsigned int execute_delay_ms;
++ 	unsigned int cal_size;
++ 	unsigned int cal_chunk_size;
++ 	unsigned int control_delay_us;
++@@ -2269,6 +2273,8 @@ static irqreturn_t apple_z2_irq(int irq, void *data)
++ 	struct apple_z2 *z2 = data;
++ 	int error;
++ 
+++	if (apple_z2_is_j72(z2))
+++		return IRQ_HANDLED;
++ 	if (unlikely(!z2->booted)) {
++ 		complete(&z2->boot_irq);
++ 	} else if (apple_z2_is_j71t(z2)) {
++@@ -3241,8 +3247,12 @@ static int apple_z2_n1_start_firmware(struct apple_z2 *z2)
++ 	error = apple_z2_hbpp_xfer(z2, 12);
++ 	if (error)
++ 		return error;
++-	msleep(40);
++-	usleep_range(2000, 3000);
+++	if (n1->execute_delay_ms) {
+++		msleep(n1->execute_delay_ms);
+++	} else {
+++		msleep(40);
+++		usleep_range(2000, 3000);
+++	}
++ 
++ 	return 0;
++ }
++@@ -3664,6 +3674,10 @@ static int apple_z2_upload_firmware(struct apple_z2 *z2)
++ 			if (size > fw->size - fw_idx)
++ 				return -EINVAL;
++ 			if (apple_z2_uses_n1(z2)) {
+++				if (z2->info->n1->firmware_delay_ms &&
+++				    size == fw->size - fw_idx)
+++					usleep_range(z2->info->n1->firmware_delay_ms * 1000,
+++						     z2->info->n1->firmware_delay_ms * 1000 + 1000);
++ 				error = apple_z2_hbpp_send(z2, blob, size);
++ 				if (error)
++ 					return error;
++@@ -4181,6 +4195,10 @@ static void apple_z2_j72_power_off(struct apple_z2 *z2)
++ {
++ 	int error;
++ 
+++	/* A parent-supply failure can already have dropped a child use count. */
+++	if (z2->j72_power_error)
+++		return;
+++
++ 	error = gpiod_set_value_cansleep(z2->reset_gpio, 1);
++ 	if (error)
++ 		goto failed;
++@@ -4209,7 +4227,7 @@ static void apple_z2_j72_power_off(struct apple_z2 *z2)
++ failed:
++ 	z2->j72_power_error = error;
++ 	dev_err(&z2->spidev->dev,
++-		"J72 stop failed: %d; retaining remaining supply/clock owners\n", error);
+++		"J72 cleanup failed: %d; power operations halted until reboot\n", error);
++ }
++ 
++ static int apple_z2_j72_power_on(struct apple_z2 *z2)
++@@ -4233,11 +4251,11 @@ static int apple_z2_j72_power_on(struct apple_z2 *z2)
++ 		return error;
++ 	error = regulator_enable(z2->ana_supply);
++ 	if (error)
++-		goto stop;
+++		goto ambiguous;
++ 	z2->ana_enabled = true;
++ 	error = regulator_enable(z2->core_supply);
++ 	if (error)
++-		goto stop;
+++		goto ambiguous;
++ 	z2->core_enabled = true;
++ 	usleep_range(15000, 16000);
++ 	z2->tx_buf[0] = 0x19;
++@@ -4259,6 +4277,14 @@ static int apple_z2_j72_power_on(struct apple_z2 *z2)
++ 	z2->platform_powered = true;
++ 	return 0;
++ 
+++ambiguous:
+++	/* A failed verification can follow a physical write and core rollback. */
+++	z2->j72_power_error = error;
+++	dev_err(&z2->spidev->dev,
+++		"J72 supply enable failed: %d; physical state unverified, no further power I/O\n",
+++		error);
+++	return error;
+++
++ stop:
++ 	apple_z2_j72_power_off(z2);
++ 	return error;
++@@ -4672,6 +4698,8 @@ static const struct apple_z2_n1_info apple_z2_j72_n1 = {
++ 	.num_calib_regs = ARRAY_SIZE(apple_z2_j71t_calib_regs),
++ 	.execute_addr = 0x10003400,
++ 	.execute_arg = 0x100,
+++	.firmware_delay_ms = 15,
+++	.execute_delay_ms = 100,
++ 	.cal_size = 0x400,
++ 	.cal_chunk_size = 0x3f0,
++ 	.control_delay_us = 25,
++@@ -4989,8 +5017,18 @@ static void apple_z2_stop(struct apple_z2 *z2)
++ 	mutex_unlock(&z2->io_lock);
++ 	if (irq_on)
++ 		disable_irq(z2->spidev->irq);
++-	if (apple_z2_is_j72(z2))
+++	if (apple_z2_is_j72(z2)) {
+++		z2->booted = false;
+++		/* A failed parent disable must not be retried or rebalanced. */
+++		if (z2->j72_power_error ||
+++		    (!z2->platform_powered && !z2->clk_enabled &&
+++		     !z2->ana_enabled && !z2->core_enabled))
+++			return;
++ 		apple_z2_release_contacts(z2);
+++		apple_z2_j72_power_off(z2);
+++		apple_z2_reset_protocol(z2);
+++		return;
+++	}
++ 	gpiod_direction_output(z2->reset_gpio, 1);
++ 	z2->booted = false;
++ 	apple_z2_platform_power_off(z2);
++@@ -5002,11 +5040,20 @@ static void apple_z2_remove(struct spi_device *spi)
++ 	apple_z2_stop(spi_get_drvdata(spi));
++ }
++ 
+++static void apple_z2_shutdown(struct spi_device *spi)
+++{
+++	struct apple_z2 *z2 = spi_get_drvdata(spi);
+++
+++	if (apple_z2_is_j72(z2))
+++		apple_z2_stop(z2);
+++}
+++
++ static int apple_z2_suspend(struct device *dev)
++ {
++-	apple_z2_stop(spi_get_drvdata(to_spi_device(dev)));
+++	struct apple_z2 *z2 = spi_get_drvdata(to_spi_device(dev));
++ 
++-	return 0;
+++	apple_z2_stop(z2);
+++	return apple_z2_is_j72(z2) ? z2->j72_power_error : 0;
++ }
++ 
++ static int apple_z2_resume(struct device *dev)
++@@ -5060,6 +5107,7 @@ static struct spi_driver apple_z2_driver = {
++ 	.id_table = apple_z2_of_id,
++ 	.probe    = apple_z2_probe,
++ 	.remove   = apple_z2_remove,
+++	.shutdown = apple_z2_shutdown,
++ };
++ 
++ module_spi_driver(apple_z2_driver);
+diff --git a/kernel/patches/drivers/input/0023-dt-bindings-input-apple-z2-validate-conditional-reso.patch b/kernel/patches/drivers/input/0023-dt-bindings-input-apple-z2-validate-conditional-reso.patch
+new file mode 100644
+index 0000000..a3f7450
+--- /dev/null
++++ b/kernel/patches/drivers/input/0023-dt-bindings-input-apple-z2-validate-conditional-reso.patch
+@@ -0,0 +1,67 @@
++From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
++From: thisiscamk <100883750+thisiscamk@users.noreply.github.com>
++Date: Tue, 3 Nov 2026 20:52:05 +0800
++Subject: [PATCH] dt-bindings: input: apple,z2: validate conditional resource
++ exclusions
++
++Express the analog-supply and attention exclusions through normal if/then schemas, and type the two SPI mode flags explicitly. This retains existing supported resource sets and passes current schema meta-validation.
++
++Assisted-by: LLM
++---
++ .../touchscreen/apple,z2-multitouch.yaml      | 30 +++++++++++--------
++ 1 file changed, 17 insertions(+), 13 deletions(-)
++
++diff --git a/Documentation/devicetree/bindings/input/touchscreen/apple,z2-multitouch.yaml b/Documentation/devicetree/bindings/input/touchscreen/apple,z2-multitouch.yaml
++index 495d16a7a..29e4d0b13 100644
++--- a/Documentation/devicetree/bindings/input/touchscreen/apple,z2-multitouch.yaml
+++++ b/Documentation/devicetree/bindings/input/touchscreen/apple,z2-multitouch.yaml
++@@ -62,9 +62,11 @@ properties:
++   display-sync1-gpios:
++     maxItems: 1
++ 
++-  spi-cpha: true
+++  spi-cpha:
+++    type: boolean
++ 
++-  spi-cpol: true
+++  spi-cpol:
+++    type: boolean
++ 
++   clocks:
++     maxItems: 1
++@@ -245,22 +247,24 @@ allOf:
++   - if:
++       properties:
++         compatible:
++-          enum:
++-            - apple,j71t-touchscreen
++-            - apple,j72-touchscreen
++-            - apple,j81-touchscreen
++-            - apple,n61-touchscreen
++-    else:
+++          not:
+++            enum:
+++              - apple,j71t-touchscreen
+++              - apple,j72-touchscreen
+++              - apple,j81-touchscreen
+++              - apple,n61-touchscreen
+++    then:
++       properties:
++         ana-supply: false
++   - if:
++       properties:
++         compatible:
++-          enum:
++-            - apple,j71t-touchscreen
++-            - apple,j72-touchscreen
++-            - apple,j81-touchscreen
++-    else:
+++          not:
+++            enum:
+++              - apple,j71t-touchscreen
+++              - apple,j72-touchscreen
+++              - apple,j81-touchscreen
+++    then:
++       properties:
++         attn-gpios: false
++   - if:
+diff --git a/kernel/patches/drivers/input/0024-dt-bindings-input-apple-z2-preserve-compatible-array.patch b/kernel/patches/drivers/input/0024-dt-bindings-input-apple-z2-preserve-compatible-array.patch
+new file mode 100644
+index 0000000..cefb5db
+--- /dev/null
++++ b/kernel/patches/drivers/input/0024-dt-bindings-input-apple-z2-preserve-compatible-array.patch
+@@ -0,0 +1,59 @@
++From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
++From: thisiscamk <100883750+thisiscamk@users.noreply.github.com>
++Date: Tue, 3 Nov 2026 20:56:52 +0800
++Subject: [PATCH] dt-bindings: input: apple,z2: preserve compatible array
++ matching
++
++Keep the compatible enum in its normal positive position so dtschema converts it to an array schema. A nested not/enum compares the decoded compatible array against strings and incorrectly excludes existing J71t supply and attention properties.
++
++Current meta-validation, processed-schema validation of both existing examples and the compiled J72 node pass.
++
++Assisted-by: LLM
++---
++ .../touchscreen/apple,z2-multitouch.yaml      | 26 +++++++++++--------
++ 1 file changed, 15 insertions(+), 11 deletions(-)
++
++diff --git a/Documentation/devicetree/bindings/input/touchscreen/apple,z2-multitouch.yaml b/Documentation/devicetree/bindings/input/touchscreen/apple,z2-multitouch.yaml
++index 29e4d0b13..a9509d6dc 100644
++--- a/Documentation/devicetree/bindings/input/touchscreen/apple,z2-multitouch.yaml
+++++ b/Documentation/devicetree/bindings/input/touchscreen/apple,z2-multitouch.yaml
++@@ -247,24 +247,28 @@ allOf:
++   - if:
++       properties:
++         compatible:
++-          not:
++-            enum:
++-              - apple,j71t-touchscreen
++-              - apple,j72-touchscreen
++-              - apple,j81-touchscreen
++-              - apple,n61-touchscreen
+++          enum:
+++            - apple,j71t-touchscreen
+++            - apple,j72-touchscreen
+++            - apple,j81-touchscreen
+++            - apple,n61-touchscreen
++     then:
+++      properties:
+++        ana-supply: true
+++    else:
++       properties:
++         ana-supply: false
++   - if:
++       properties:
++         compatible:
++-          not:
++-            enum:
++-              - apple,j71t-touchscreen
++-              - apple,j72-touchscreen
++-              - apple,j81-touchscreen
+++          enum:
+++            - apple,j71t-touchscreen
+++            - apple,j72-touchscreen
+++            - apple,j81-touchscreen
++     then:
+++      properties:
+++        attn-gpios: true
+++    else:
++       properties:
++         attn-gpios: false
++   - if:
+diff --git a/kernel/patches/drivers/regulator/0007-dt-bindings-regulator-apple-pmic-describe-D2089-touc.patch b/kernel/patches/drivers/regulator/0007-dt-bindings-regulator-apple-pmic-describe-D2089-touc.patch
+new file mode 100644
+index 0000000..33b6409
+--- /dev/null
++++ b/kernel/patches/drivers/regulator/0007-dt-bindings-regulator-apple-pmic-describe-D2089-touc.patch
+@@ -0,0 +1,71 @@
++From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
++From: thisiscamk <100883750+thisiscamk@users.noreply.github.com>
++Date: Tue, 3 Nov 2026 20:28:54 +0800
++Subject: [PATCH] dt-bindings: regulator: apple-pmic: describe D2089 touch
++ supplies
++
++Describe the shared analog bias supply and its dependency from the D2089 touchscreen analog rail. Keep register programming inside the regulator provider.
++
++Assisted-by: LLM
++---
++ .../devicetree/bindings/mfd/apple,pmic.yaml    |  2 +-
++ .../regulator/apple,pmic-touch-regulator.yaml  | 18 +++++++++++++++++-
++ 2 files changed, 18 insertions(+), 2 deletions(-)
++
++diff --git a/Documentation/devicetree/bindings/mfd/apple,pmic.yaml b/Documentation/devicetree/bindings/mfd/apple,pmic.yaml
++index 947f83928..f8b685bc6 100644
++--- a/Documentation/devicetree/bindings/mfd/apple,pmic.yaml
+++++ b/Documentation/devicetree/bindings/mfd/apple,pmic.yaml
++@@ -73,7 +73,7 @@ patternProperties:
++   "^nvmem(@[0-9a-f]+)?$":
++     $ref: /schemas/nvmem/apple,pmic-nvmem.yaml
++ 
++-  "^regulator-touch-(analog|core|hv)$":
+++  "^regulator-touch-(analog(-bias)?|core|hv)$":
++     $ref: /schemas/regulator/apple,pmic-touch-regulator.yaml
++ 
++ required:
++diff --git a/Documentation/devicetree/bindings/regulator/apple,pmic-touch-regulator.yaml b/Documentation/devicetree/bindings/regulator/apple,pmic-touch-regulator.yaml
++index ad2902308..44df43011 100644
++--- a/Documentation/devicetree/bindings/regulator/apple,pmic-touch-regulator.yaml
+++++ b/Documentation/devicetree/bindings/regulator/apple,pmic-touch-regulator.yaml
++@@ -10,12 +10,22 @@ maintainers:
++   - Paul Praschl <praschlpaul@g-p.at>
++ 
++ description:
++-  Fixed touchscreen supply switches provided by the D2186, D2207, Adelyn,
+++  Fixed touchscreen supply switches provided by the D2089, D2186, D2207, Adelyn,
++   Angel and Chestnut PMICs. The compatible identifies both the PMIC and the physical supply;
++   register layout is an implementation detail of the regulator driver.
++ 
++ allOf:
++   - $ref: regulator.yaml#
+++  - if:
+++      properties:
+++        compatible:
+++          const: apple,d2089-touch-analog-regulator
+++    then:
+++      required:
+++        - bias-supply
+++    else:
+++      properties:
+++        bias-supply: false
++ 
++ properties:
++   compatible:
++@@ -23,9 +33,15 @@ properties:
++       - apple,adelyn-touch-core-regulator
++       - apple,angel-touch-analog-regulator
++       - apple,chestnut-touch-hv-regulator
+++      - apple,d2089-touch-analog-bias-regulator
+++      - apple,d2089-touch-analog-regulator
+++      - apple,d2089-touch-core-regulator
++       - apple,d2186-touch-core-regulator
++       - apple,d2207-touch-analog-regulator
++ 
+++  bias-supply:
+++    description: Shared D2089 analog bias supply used by LDOs 13 through 15
+++
++ required:
++   - compatible
++ 
+diff --git a/kernel/patches/drivers/regulator/0008-regulator-apple-pmic-touch-add-D2089-supplies-and-sh.patch b/kernel/patches/drivers/regulator/0008-regulator-apple-pmic-touch-add-D2089-supplies-and-sh.patch
+new file mode 100644
+index 0000000..358719d
+--- /dev/null
++++ b/kernel/patches/drivers/regulator/0008-regulator-apple-pmic-touch-add-D2089-supplies-and-sh.patch
+@@ -0,0 +1,111 @@
++From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
++From: thisiscamk <100883750+thisiscamk@users.noreply.github.com>
++Date: Tue, 3 Nov 2026 20:28:57 +0800
++Subject: [PATCH] regulator: apple-pmic-touch: add D2089 supplies and shared
++ bias
++
++The D2089 analog rail uses register 0x84 bit 2 and requires shared bits 0 and 1. Represent the dependency through the regulator supply relationship so users are counted and the last modelled user can turn it off. Refuse bias shutdown while any analog LDO in bits 2 through 4 remains enabled. The separate touchscreen core switch is register 0x85 bit 1. Preserve voltage registers and all unrelated bits.
++
++Assisted-by: LLM
++---
++ .../regulator/apple-pmic-touch-regulator.c    | 73 +++++++++++++++++++
++ 1 file changed, 73 insertions(+)
++
++diff --git a/drivers/regulator/apple-pmic-touch-regulator.c b/drivers/regulator/apple-pmic-touch-regulator.c
++index 6984db4fc..8f27cd616 100644
++--- a/drivers/regulator/apple-pmic-touch-regulator.c
+++++ b/drivers/regulator/apple-pmic-touch-regulator.c
++@@ -5,6 +5,7 @@
++  * Copyright (C) 2026 Paul Praschl
++  */
++ 
+++#include <linux/bits.h>
++ #include <linux/module.h>
++ #include <linux/of.h>
++ #include <linux/platform_device.h>
++@@ -19,6 +20,66 @@ static const struct regulator_ops apple_pmic_touch_regulator_ops = {
++ 	.is_enabled = regulator_is_enabled_regmap,
++ };
++ 
+++/*
+++ * D2089 LDOs 13..15 share the low two analog-bias bits at 0x84.
+++ * Model that dependency as a supply so the regulator core accounts for
+++ * users. Refuse to turn off the bias if an unmodelled LDO is still on.
+++ */
+++static int apple_d2089_touch_bias_disable(struct regulator_dev *rdev)
+++{
+++	struct regmap *map = rdev_get_regmap(rdev);
+++	unsigned int value;
+++	int ret;
+++
+++	ret = regmap_read(map, 0x84, &value);
+++	if (ret)
+++		return ret;
+++	if (value & GENMASK(4, 2))
+++		return -EBUSY;
+++
+++	return regulator_disable_regmap(rdev);
+++}
+++
+++static const struct regulator_ops apple_d2089_touch_bias_ops = {
+++	.enable = regulator_enable_regmap,
+++	.disable = apple_d2089_touch_bias_disable,
+++	.is_enabled = regulator_is_enabled_regmap,
+++};
+++
+++static const struct regulator_desc apple_d2089_touch_bias = {
+++	.name = "d2089-touch-analog-bias",
+++	.ops = &apple_d2089_touch_bias_ops,
+++	.type = REGULATOR_VOLTAGE,
+++	.owner = THIS_MODULE,
+++	.enable_reg = 0x84,
+++	.enable_mask = 0x03,
+++	.enable_val = 0x03,
+++	.disable_val = 0,
+++};
+++
+++static const struct regulator_desc apple_d2089_touch_analog = {
+++	.name = "d2089-touch-analog",
+++	.supply_name = "bias",
+++	.ops = &apple_pmic_touch_regulator_ops,
+++	.type = REGULATOR_VOLTAGE,
+++	.owner = THIS_MODULE,
+++	.enable_reg = 0x84,
+++	.enable_mask = 0x04,
+++	.enable_val = 0x04,
+++	.disable_val = 0,
+++};
+++
+++static const struct regulator_desc apple_d2089_touch_core = {
+++	.name = "d2089-touch-core",
+++	.ops = &apple_pmic_touch_regulator_ops,
+++	.type = REGULATOR_VOLTAGE,
+++	.owner = THIS_MODULE,
+++	.enable_reg = 0x85,
+++	.enable_mask = 0x02,
+++	.enable_val = 0x02,
+++	.disable_val = 0,
+++};
+++
++ static const struct regulator_desc apple_d2186_touch_core = {
++ 	.name = "d2186-touch-core",
++ 	.ops = &apple_pmic_touch_regulator_ops,
++@@ -133,6 +194,18 @@ static int apple_pmic_touch_regulator_probe(struct platform_device *pdev)
++ }
++ 
++ static const struct of_device_id apple_pmic_touch_regulator_of_match[] = {
+++	{
+++		.compatible = "apple,d2089-touch-analog-bias-regulator",
+++		.data = &apple_d2089_touch_bias,
+++	},
+++	{
+++		.compatible = "apple,d2089-touch-analog-regulator",
+++		.data = &apple_d2089_touch_analog,
+++	},
+++	{
+++		.compatible = "apple,d2089-touch-core-regulator",
+++		.data = &apple_d2089_touch_core,
+++	},
++ 	{
++ 		.compatible = "apple,d2186-touch-core-regulator",
++ 		.data = &apple_d2186_touch_core,
+diff --git a/kernel/patches/drivers/regulator/0009-regulator-apple-pmic-touch-refuse-inherited-D2089-ra.patch b/kernel/patches/drivers/regulator/0009-regulator-apple-pmic-touch-refuse-inherited-D2089-ra.patch
+new file mode 100644
+index 0000000..40fe25e
+--- /dev/null
++++ b/kernel/patches/drivers/regulator/0009-regulator-apple-pmic-touch-refuse-inherited-D2089-ra.patch
+@@ -0,0 +1,69 @@
++From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
++From: thisiscamk <100883750+thisiscamk@users.noreply.github.com>
++Date: Tue, 3 Nov 2026 20:35:28 +0800
++Subject: [PATCH] regulator: apple-pmic-touch: refuse inherited D2089 rail
++ state
++
++Refuse firmware-enabled analog bias, analog LDO or core state before
++registering a D2089 regulator. This prevents adopting an unqualified
++supply through regulator-core enabled-state shortcuts or unused-supply
++cleanup. An unreadable initial state is also a probe failure.
++
++Assisted-by: LLM
++---
++ .../regulator/apple-pmic-touch-regulator.c    | 28 +++++++++++++++++++
++ 1 file changed, 28 insertions(+)
++
++diff --git a/drivers/regulator/apple-pmic-touch-regulator.c b/drivers/regulator/apple-pmic-touch-regulator.c
++index 8f27cd616..18e03c5a4 100644
++--- a/drivers/regulator/apple-pmic-touch-regulator.c
+++++ b/drivers/regulator/apple-pmic-touch-regulator.c
++@@ -167,6 +167,28 @@ static const struct regulator_desc apple_chestnut_touch_hv = {
++ 	.off_on_delay = 1000,
++ };
++ 
+++static int apple_d2089_touch_admit(struct regmap *map,
+++				   const struct regulator_desc *desc)
+++{
+++	unsigned int mask, value;
+++	int ret;
+++
+++	if (desc == &apple_d2089_touch_bias)
+++		mask = GENMASK(4, 0);
+++	else if (desc == &apple_d2089_touch_analog ||
+++		 desc == &apple_d2089_touch_core)
+++		mask = desc->enable_mask;
+++	else
+++		return 0;
+++
+++	ret = regmap_read(map, desc->enable_reg, &value);
+++	if (ret)
+++		return ret;
+++
+++	/* Do not adopt a firmware-enabled supply without a handover policy. */
+++	return value & mask ? -EBUSY : 0;
+++}
+++
++ static int apple_pmic_touch_regulator_probe(struct platform_device *pdev)
++ {
++ 	const struct regulator_desc *desc;
++@@ -174,6 +196,7 @@ static int apple_pmic_touch_regulator_probe(struct platform_device *pdev)
++ 	struct device *dev = &pdev->dev;
++ 	struct regulator_dev *rdev;
++ 	struct regmap *regmap;
+++	int ret;
++ 
++ 	desc = device_get_match_data(dev);
++ 	if (!desc)
++@@ -184,6 +207,11 @@ static int apple_pmic_touch_regulator_probe(struct platform_device *pdev)
++ 		return dev_err_probe(dev, -ENODEV,
++ 				     "parent PMIC has no regmap\n");
++ 
+++	ret = apple_d2089_touch_admit(regmap, desc);
+++	if (ret)
+++		return dev_err_probe(dev, ret,
+++				     "touch supply initial state is not qualified\n");
+++
++ 	config.dev = dev;
++ 	config.of_node = dev->of_node;
++ 	config.init_data = of_get_regulator_init_data(dev, dev->of_node, desc);
+diff --git a/kernel/patches/drivers/regulator/0010-regulator-apple-pmic-touch-verify-D2089-hardware-sta.patch b/kernel/patches/drivers/regulator/0010-regulator-apple-pmic-touch-verify-D2089-hardware-sta.patch
+new file mode 100644
+index 0000000..c597673
+--- /dev/null
++++ b/kernel/patches/drivers/regulator/0010-regulator-apple-pmic-touch-verify-D2089-hardware-sta.patch
+@@ -0,0 +1,129 @@
++From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
++From: thisiscamk <100883750+thisiscamk@users.noreply.github.com>
++Date: Tue, 3 Nov 2026 20:48:27 +0800
++Subject: [PATCH] regulator: apple-pmic-touch: verify D2089 hardware state
++
++Verify the owned enable bits with bypassed regmap reads after D2089
++updates. Propagate read errors and mismatches instead of treating an
++acknowledged I2C write as proof of state. Reject partial bias state in
++is_enabled and bypass any future register cache for baseline admission
++and the shared-rail guard. Existing PMIC operations remain unchanged.
++
++Assisted-by: LLM
++---
++ .../regulator/apple-pmic-touch-regulator.c    | 65 +++++++++++++++++--
++ 1 file changed, 58 insertions(+), 7 deletions(-)
++
++diff --git a/drivers/regulator/apple-pmic-touch-regulator.c b/drivers/regulator/apple-pmic-touch-regulator.c
++index 18e03c5a4..1f893138e 100644
++--- a/drivers/regulator/apple-pmic-touch-regulator.c
+++++ b/drivers/regulator/apple-pmic-touch-regulator.c
++@@ -20,6 +20,57 @@ static const struct regulator_ops apple_pmic_touch_regulator_ops = {
++ 	.is_enabled = regulator_is_enabled_regmap,
++ };
++ 
+++static int apple_d2089_touch_update(struct regulator_dev *rdev, bool enable)
+++{
+++	const struct regulator_desc *desc = rdev->desc;
+++	unsigned int value, expected = enable ? desc->enable_val : 0;
+++	int ret;
+++
+++	ret = enable ? regulator_enable_regmap(rdev) :
+++		       regulator_disable_regmap(rdev);
+++	if (ret)
+++		return ret;
+++
+++	ret = regmap_read_bypassed(rdev_get_regmap(rdev), desc->enable_reg, &value);
+++	if (ret)
+++		return ret;
+++
+++	return (value & desc->enable_mask) == expected ? 0 : -EIO;
+++}
+++
+++static int apple_d2089_touch_enable(struct regulator_dev *rdev)
+++{
+++	return apple_d2089_touch_update(rdev, true);
+++}
+++
+++static int apple_d2089_touch_disable(struct regulator_dev *rdev)
+++{
+++	return apple_d2089_touch_update(rdev, false);
+++}
+++
+++static int apple_d2089_touch_is_enabled(struct regulator_dev *rdev)
+++{
+++	const struct regulator_desc *desc = rdev->desc;
+++	unsigned int value;
+++	int ret;
+++
+++	ret = regmap_read_bypassed(rdev_get_regmap(rdev), desc->enable_reg, &value);
+++	if (ret)
+++		return ret;
+++
+++	value &= desc->enable_mask;
+++	if (!value)
+++		return 0;
+++
+++	return value == desc->enable_val ? 1 : -EIO;
+++}
+++
+++static const struct regulator_ops apple_d2089_touch_regulator_ops = {
+++	.enable = apple_d2089_touch_enable,
+++	.disable = apple_d2089_touch_disable,
+++	.is_enabled = apple_d2089_touch_is_enabled,
+++};
+++
++ /*
++  * D2089 LDOs 13..15 share the low two analog-bias bits at 0x84.
++  * Model that dependency as a supply so the regulator core accounts for
++@@ -31,19 +82,19 @@ static int apple_d2089_touch_bias_disable(struct regulator_dev *rdev)
++ 	unsigned int value;
++ 	int ret;
++ 
++-	ret = regmap_read(map, 0x84, &value);
+++	ret = regmap_read_bypassed(map, 0x84, &value);
++ 	if (ret)
++ 		return ret;
++ 	if (value & GENMASK(4, 2))
++ 		return -EBUSY;
++ 
++-	return regulator_disable_regmap(rdev);
+++	return apple_d2089_touch_disable(rdev);
++ }
++ 
++ static const struct regulator_ops apple_d2089_touch_bias_ops = {
++-	.enable = regulator_enable_regmap,
+++	.enable = apple_d2089_touch_enable,
++ 	.disable = apple_d2089_touch_bias_disable,
++-	.is_enabled = regulator_is_enabled_regmap,
+++	.is_enabled = apple_d2089_touch_is_enabled,
++ };
++ 
++ static const struct regulator_desc apple_d2089_touch_bias = {
++@@ -60,7 +111,7 @@ static const struct regulator_desc apple_d2089_touch_bias = {
++ static const struct regulator_desc apple_d2089_touch_analog = {
++ 	.name = "d2089-touch-analog",
++ 	.supply_name = "bias",
++-	.ops = &apple_pmic_touch_regulator_ops,
+++	.ops = &apple_d2089_touch_regulator_ops,
++ 	.type = REGULATOR_VOLTAGE,
++ 	.owner = THIS_MODULE,
++ 	.enable_reg = 0x84,
++@@ -71,7 +122,7 @@ static const struct regulator_desc apple_d2089_touch_analog = {
++ 
++ static const struct regulator_desc apple_d2089_touch_core = {
++ 	.name = "d2089-touch-core",
++-	.ops = &apple_pmic_touch_regulator_ops,
+++	.ops = &apple_d2089_touch_regulator_ops,
++ 	.type = REGULATOR_VOLTAGE,
++ 	.owner = THIS_MODULE,
++ 	.enable_reg = 0x85,
++@@ -181,7 +232,7 @@ static int apple_d2089_touch_admit(struct regmap *map,
++ 	else
++ 		return 0;
++ 
++-	ret = regmap_read(map, desc->enable_reg, &value);
+++	ret = regmap_read_bypassed(map, desc->enable_reg, &value);
++ 	if (ret)
++ 		return ret;
++ 
+diff --git a/kernel/patches/drivers/spi/0008-dt-bindings-spi-apple-Describe-the-S5L8960X-PIO-cont.patch b/kernel/patches/drivers/spi/0008-dt-bindings-spi-apple-Describe-the-S5L8960X-PIO-cont.patch
+new file mode 100644
+index 0000000..b46fccc
+--- /dev/null
++++ b/kernel/patches/drivers/spi/0008-dt-bindings-spi-apple-Describe-the-S5L8960X-PIO-cont.patch
+@@ -0,0 +1,40 @@
++From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
++From: thisiscamk <100883750+thisiscamk@users.noreply.github.com>
++Date: Tue, 3 Nov 2026 18:58:51 +0800
++Subject: [PATCH] dt-bindings: spi: apple: Describe the S5L8960X PIO controller
++
++Add the S5L8960X compatible to the existing Apple controller binding.
++Like the existing S8000 PIO-only controller, this variant does not
++expose the descriptor DMA interface.
++
++This describes the controller interface only; a J72 board descriptor and
++exact-revision hardware qualification remain separate work.
++
++Assisted-by: LLM
++---
++ Documentation/devicetree/bindings/spi/apple,spi.yaml | 5 ++++-
++ 1 file changed, 4 insertions(+), 1 deletion(-)
++
++diff --git a/Documentation/devicetree/bindings/spi/apple,spi.yaml b/Documentation/devicetree/bindings/spi/apple,spi.yaml
++index 00c0c594f..db1cc355c 100644
++--- a/Documentation/devicetree/bindings/spi/apple,spi.yaml
+++++ b/Documentation/devicetree/bindings/spi/apple,spi.yaml
++@@ -12,7 +12,9 @@ allOf:
++       properties:
++         compatible:
++           contains:
++-            const: apple,s8000-spi
+++            enum:
+++              - apple,s5l8960x-spi
+++              - apple,s8000-spi
++     then:
++       properties:
++         dmas: false
++@@ -30,6 +32,7 @@ properties:
++           - const: apple,t8103-spi
++       - items:
++           - enum:
+++              - apple,s5l8960x-spi
++               - apple,s8000-spi
++               - apple,t7000-spi
++               - apple,t8010-spi
+diff --git a/kernel/patches/drivers/spi/0009-spi-apple-Add-the-S5L8960X-explicit-PIO-transfer-pat.patch b/kernel/patches/drivers/spi/0009-spi-apple-Add-the-S5L8960X-explicit-PIO-transfer-pat.patch
+new file mode 100644
+index 0000000..34ca19d
+--- /dev/null
++++ b/kernel/patches/drivers/spi/0009-spi-apple-Add-the-S5L8960X-explicit-PIO-transfer-pat.patch
+@@ -0,0 +1,264 @@
++From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
++From: thisiscamk <100883750+thisiscamk@users.noreply.github.com>
++Date: Tue, 3 Nov 2026 18:58:51 +0800
++Subject: [PATCH] spi: apple: Add the S5L8960X explicit PIO transfer path
++
++Select the S5L8960X register and transfer policy through match data.
++Measured J72 transfers require RUN before explicit TXDATA, AUTO_TX only
++for receive-only clocking, normal bit-13 LSB-first semantics, and RX
++draining during transmit-only payloads. Bound all unreceived explicit
++words to the 16-word FIFO and fail stalled or invalid FIFO states with
++the controller stopped.
++
++Retain byte-wide transfers, inter-word delay and an expected-wire-time
++plus 200ms timeout; use wide multiplication for large transfer
++deadlines. Existing T7000, S8000, T8010 and M-series transfer
++implementations and match data remain unchanged.
++
++The measured reference is thisiscamk/ipad-air-j72-linux code/spi/spi-
++apple.c, SHA256:
++
++5537f16910e83406c9a40f52495262739f41a36070b3959437069910c1548fe8
++
++Preserve the Asahi/SiFive notices. Earlier S5L work is from Martin
++Puskac via mattonik/ipad-nixos b94d42f78e04c5465e290340a5b6879bbc5956b6.
++This ports the measured policy to the current driver; it does not claim
++that this native revision has booted.
++
++The bounded PIO servicing structure follows the existing S8000 path by
++Berkay Kosebay (Orchard drivers/spi patch 0006); its register ordering
++and transfer function remain unchanged.
++
++Host compilation of the actual new transfer body passes bounded MMIO
++fixtures with undefined/bounds sanitizers. Full kernel/schema builds,
++resource ownership and physical-controller regressions remain pending.
++
++Assisted-by: LLM
++---
++ drivers/spi/spi-apple.c | 155 ++++++++++++++++++++++++++++++++++++++--
++ 1 file changed, 151 insertions(+), 4 deletions(-)
++
++diff --git a/drivers/spi/spi-apple.c b/drivers/spi/spi-apple.c
++index dc5154e1b..129799a27 100644
++--- a/drivers/spi/spi-apple.c
+++++ b/drivers/spi/spi-apple.c
++@@ -15,6 +15,9 @@
++ #include <linux/gpio/consumer.h>
++ #include <linux/interrupt.h>
++ #include <linux/io.h>
+++#include <linux/ktime.h>
+++#include <linux/limits.h>
+++#include <linux/math64.h>
++ #include <linux/module.h>
++ #include <linux/of.h>
++ #include <linux/of_device.h>
++@@ -46,6 +49,8 @@
++ #define APPLE_SPI_CFG_T8010_BASE	0x0010401e
++ #define APPLE_SPI_CFG_T7000_BASE	0x00004018
++ #define APPLE_SPI_CFG_S8000_BASE	0x00004018
+++#define APPLE_SPI_CFG_S5L8960X_BASE	0x00044038
+++#define APPLE_SPI_CFG_S5L8960X_AUTO_TX	BIT(0)
++ #define APPLE_SPI_CFG_T8010_PIOEN	BIT(5)
++ #define APPLE_SPI_CFG_T8010_16BIT	BIT(15)
++ 
++@@ -124,10 +129,11 @@ struct apple_spi_hw {
++ 	/* T7000: the SPI version 1 configuration register layout. */
++ 	bool spi_v1;
++ 	/*
++-	 * S8000: the T8010 register layout, driven by byte-wide PIO only,
++-	 * without the descriptor format, DMA or the interrupt registers.
+++	 * Byte-wide polled PIO, without descriptor DMA or interrupt registers.
++ 	 */
++ 	bool pio_only;
+++	/* S5L8960X: start before TXDATA; AUTO_TX is receive-only. */
+++	bool s5l8960x;
++ 	unsigned int min_clk_div;
++ 	u32 default_word_delay;
++ 	u32 cfg_base;
++@@ -196,6 +202,17 @@ static void apple_spi_t8010_clear_status(struct apple_spi *spi)
++ 
++ static void apple_spi_init(struct apple_spi *spi)
++ {
+++	if (spi->hw->s5l8960x) {
+++		reg_write(spi, APPLE_SPI_PIN, APPLE_SPI_PIN_CS);
+++		reg_write(spi, APPLE_SPI_CTRL,
+++			  APPLE_SPI_CTRL_RX_RESET | APPLE_SPI_CTRL_TX_RESET);
+++		reg_write(spi, APPLE_SPI_CFG, spi->hw->cfg_base);
+++		reg_write(spi, APPLE_SPI_STATUS,
+++			  reg_read(spi, APPLE_SPI_STATUS));
+++		reg_write(spi, APPLE_SPI_WORD_DELAY, 0);
+++		return;
+++	}
+++
++ 	if (spi->hw->legacy_status) {
++ 		reg_write(spi, APPLE_SPI_CTRL, 0);
++ 		/* S8000: leave the native chip select inactive (high). */
++@@ -917,6 +934,125 @@ static int apple_spi_transfer_one_t7000(struct spi_controller *ctlr,
++ 	return apple_spi_transfer_one_legacy_pio(ctlr, device, t);
++ }
++ 
+++/*
+++ * S5L8960X clocks constant MOSI in AUTO_TX mode, even with TXDATA queued.
+++ * Explicit payloads must start before their first TXDATA write and drain
+++ * RX also for transmit-only transfers. Limit all unreceived explicit words
+++ * to the FIFO depth, including those already in the shift register.
+++ */
+++static int apple_spi_transfer_one_s5l8960x(struct spi_controller *ctlr,
+++					   struct spi_device *device,
+++					   struct spi_transfer *t)
+++{
+++	struct apple_spi *spi = spi_controller_get_devdata(ctlr);
+++	unsigned int bits_per_word = t->bits_per_word ?: device->bits_per_word;
+++	unsigned long rate = clk_get_rate(spi->clk);
+++	unsigned int sent = 0, received = 0, iterations = 0;
+++	const u8 *tx = t->tx_buf;
+++	u8 *rx = t->rx_buf;
+++	u32 cfg, div, status, tx_level, rx_level, word_delay;
+++	u64 wire_us, delay_cycles;
+++	ktime_t deadline;
+++	int delay_ns, ret;
+++
+++	if (!t->len)
+++		return 0;
+++	if (!bits_per_word)
+++		bits_per_word = 8;
+++	if (bits_per_word != 8 || !rate || (!tx && !rx))
+++		return -EINVAL;
+++
+++	ret = apple_spi_t8010_calc_div(spi, t->speed_hz ?: device->max_speed_hz,
+++				       &div);
+++	if (ret)
+++		return ret;
+++	t->effective_speed_hz = rate / div;
+++	delay_ns = spi_delay_to_ns(&t->word_delay, t);
+++	if (delay_ns < 0)
+++		return delay_ns;
+++	delay_cycles = DIV_ROUND_UP_ULL((u64)rate * delay_ns, NSEC_PER_SEC);
+++	if (delay_cycles > U16_MAX)
+++		return -EINVAL;
+++	word_delay = delay_cycles;
+++
+++	cfg = spi->hw->cfg_base;
+++	if (device->mode & SPI_CPHA)
+++		cfg |= APPLE_SPI_CFG_CPHA;
+++	if (device->mode & SPI_CPOL)
+++		cfg |= APPLE_SPI_CFG_CPOL;
+++	/* Pad sampling on J72 confirms that set bit 13 means LSB-first. */
+++	if (device->mode & SPI_LSB_FIRST)
+++		cfg |= APPLE_SPI_CFG_LSB_FIRST;
+++	if (!tx)
+++		cfg |= APPLE_SPI_CFG_S5L8960X_AUTO_TX;
+++
+++	wire_us = DIV_ROUND_UP_ULL((u64)t->len * 8 * USEC_PER_SEC,
+++				   t->effective_speed_hz);
+++	wire_us += mul_u64_u64_div_u64((u64)t->len * word_delay,
+++				       USEC_PER_SEC, rate) + 1;
+++	deadline = ktime_add_us(ktime_get(), wire_us +
+++				  APPLE_SPI_TIMEOUT_MS * USEC_PER_MSEC);
+++
+++	reg_write(spi, APPLE_SPI_CTRL,
+++		  APPLE_SPI_CTRL_RX_RESET | APPLE_SPI_CTRL_TX_RESET);
+++	reg_write(spi, APPLE_SPI_CLKDIV, div);
+++	reg_write(spi, APPLE_SPI_WORD_DELAY, word_delay);
+++	reg_write(spi, APPLE_SPI_STATUS, reg_read(spi, APPLE_SPI_STATUS));
+++	reg_write(spi, APPLE_SPI_CFG, cfg);
+++	reg_write(spi, APPLE_SPI_TXCNT, tx ? t->len : 0);
+++	reg_write(spi, APPLE_SPI_RXCNT, t->len);
+++	reg_write(spi, APPLE_SPI_CTRL, APPLE_SPI_CTRL_RUN);
+++
+++	ret = 0;
+++	while (received < t->len) {
+++		status = reg_read(spi, APPLE_SPI_STATUS);
+++		tx_level = FIELD_GET(APPLE_SPI_STATUS_T8010_TXFIFO, status);
+++		rx_level = FIELD_GET(APPLE_SPI_STATUS_T8010_RXFIFO, status);
+++		if (tx_level > APPLE_SPI_FIFO_DEPTH ||
+++		    rx_level > APPLE_SPI_FIFO_DEPTH ||
+++		    rx_level > (tx ? sent : t->len) - received) {
+++			ret = -EIO;
+++			break;
+++		}
+++
+++		while (rx_level--) {
+++			u8 value = reg_read(spi, APPLE_SPI_RXDATA);
+++
+++			if (rx)
+++				rx[received] = value;
+++			received++;
+++		}
+++		while (tx && sent < t->len && tx_level < APPLE_SPI_FIFO_DEPTH &&
+++		       sent - received < APPLE_SPI_FIFO_DEPTH) {
+++			reg_write(spi, APPLE_SPI_TXDATA, tx[sent]);
+++			sent++;
+++			tx_level++;
+++		}
+++		if (ktime_after(ktime_get(), deadline)) {
+++			ret = -ETIMEDOUT;
+++			break;
+++		}
+++		if (!(++iterations & 0xff))
+++			cond_resched();
+++		cpu_relax();
+++	}
+++
+++	if (!ret) {
+++		/* Allow the final word and its programmed delay before CS falls. */
+++		fsleep(DIV_ROUND_UP(8 * USEC_PER_SEC, t->effective_speed_hz) +
+++		       DIV_ROUND_UP_ULL((u64)word_delay * USEC_PER_SEC, rate) + 2);
+++	}
+++	/* Stop both explicit clocks and receive-only clock generation. */
+++	reg_write(spi, APPLE_SPI_CTRL, 0);
+++	reg_write(spi, APPLE_SPI_CFG, cfg & ~APPLE_SPI_CFG_S5L8960X_AUTO_TX);
+++	reg_read(spi, APPLE_SPI_CTRL);
+++	if (ret)
+++		dev_err(&ctlr->dev, "S5L8960X PIO failed: %d tx %u/%u rx %u/%u\n",
+++			ret, sent, tx ? t->len : 0, received, t->len);
+++
+++	return ret;
+++}
+++
++ static void apple_spi_tx(struct apple_spi *spi, const void **tx_ptr, u32 *left,
++ 			 unsigned int bytes_per_word)
++ {
++@@ -1154,7 +1290,7 @@ static int apple_spi_probe(struct platform_device *pdev)
++ 	ctlr->bus_num = pdev->id;
++ 	ctlr->num_chipselect = 1;
++ 	ctlr->mode_bits = SPI_CPHA | SPI_CPOL;
++-	if (!spi->hw->legacy_status)
+++	if (!spi->hw->legacy_status || spi->hw->s5l8960x)
++ 		ctlr->mode_bits |= SPI_LSB_FIRST;
++ 	if (spi->hw->pio_only)
++ 		ctlr->bits_per_word_mask = SPI_BPW_MASK(8);
++@@ -1164,7 +1300,9 @@ static int apple_spi_probe(struct platform_device *pdev)
++ 		ctlr->bits_per_word_mask = SPI_BPW_RANGE_MASK(1, 32);
++ 	ctlr->prepare_message = apple_spi_prepare_message;
++ 	ctlr->set_cs = apple_spi_set_cs;
++-	if (spi->hw->pio_only)
+++	if (spi->hw->s5l8960x)
+++		ctlr->transfer_one = apple_spi_transfer_one_s5l8960x;
+++	else if (spi->hw->pio_only)
++ 		ctlr->transfer_one = apple_spi_transfer_one_legacy_pio;
++ 	else if (spi->hw->spi_v1)
++ 		ctlr->transfer_one = apple_spi_transfer_one_t7000;
++@@ -1230,6 +1368,14 @@ static const struct apple_spi_hw apple_spi_hw_s8000 = {
++ 	.cfg_base = APPLE_SPI_CFG_S8000_BASE,
++ };
++ 
+++static const struct apple_spi_hw apple_spi_hw_s5l8960x = {
+++	.legacy_status = true,
+++	.pio_only = true,
+++	.s5l8960x = true,
+++	.min_clk_div = 1,
+++	.cfg_base = APPLE_SPI_CFG_S5L8960X_BASE,
+++};
+++
++ static const struct apple_spi_hw apple_spi_hw_t8010 = {
++ 	.legacy_status = true,
++ 	.has_descriptor_dma = true,
++@@ -1249,6 +1395,7 @@ static const struct apple_spi_hw apple_spi_hw_default = {
++ };
++ 
++ static const struct of_device_id apple_spi_of_match[] = {
+++	{ .compatible = "apple,s5l8960x-spi", .data = &apple_spi_hw_s5l8960x, },
++ 	{ .compatible = "apple,t7000-spi", .data = &apple_spi_hw_t7000, },
++ 	{ .compatible = "apple,s8000-spi", .data = &apple_spi_hw_s8000, },
++ 	{ .compatible = "apple,t8010-spi", .data = &apple_spi_hw_t8010, },
+diff --git a/kernel/patches/drivers/spi/0010-spi-apple-restore-optional-S5L8960X-idle-pins-on-det.patch b/kernel/patches/drivers/spi/0010-spi-apple-restore-optional-S5L8960X-idle-pins-on-det.patch
+new file mode 100644
+index 0000000..7d10d65
+--- /dev/null
++++ b/kernel/patches/drivers/spi/0010-spi-apple-restore-optional-S5L8960X-idle-pins-on-det.patch
+@@ -0,0 +1,56 @@
++From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
++From: thisiscamk <100883750+thisiscamk@users.noreply.github.com>
++Date: Tue, 3 Nov 2026 20:29:00 +0800
++Subject: [PATCH] spi: apple: restore optional S5L8960X idle pins on detach
++
++Select the controller sleep pin state after children have detached and before releasing its retained power reference. Restrict this cleanup to the new S5L8960X match data.
++
++Assisted-by: LLM
++---
++ drivers/spi/spi-apple.c | 19 +++++++++++++++++++
++ 1 file changed, 19 insertions(+)
++
++diff --git a/drivers/spi/spi-apple.c b/drivers/spi/spi-apple.c
++index 129799a27..8ef0f11b5 100644
++--- a/drivers/spi/spi-apple.c
+++++ b/drivers/spi/spi-apple.c
++@@ -23,6 +23,7 @@
++ #include <linux/of_device.h>
++ #include <linux/platform_device.h>
++ #include <linux/pm_runtime.h>
+++#include <linux/pinctrl/consumer.h>
++ #include <linux/scatterlist.h>
++ #include <linux/spi/spi.h>
++ #include <linux/unaligned.h>
++@@ -1244,6 +1245,16 @@ static int apple_spi_transfer_one(struct spi_controller *ctlr,
++ 	return ret;
++ }
++ 
+++static void apple_spi_s5l8960x_idle_pins(void *data)
+++{
+++	struct device *dev = data;
+++	int ret;
+++
+++	ret = pinctrl_pm_select_sleep_state(dev);
+++	if (ret)
+++		dev_err(dev, "failed to restore SPI idle pins: %d\n", ret);
+++}
+++
++ static int apple_spi_probe(struct platform_device *pdev)
++ {
++ 	struct apple_spi *spi;
++@@ -1351,6 +1362,14 @@ static int apple_spi_probe(struct platform_device *pdev)
++ 			return ret;
++ 	}
++ 
+++	if (spi->hw->s5l8960x) {
+++		ret = devm_add_action_or_reset(&pdev->dev,
+++					       apple_spi_s5l8960x_idle_pins,
+++					       &pdev->dev);
+++		if (ret)
+++			return ret;
+++	}
+++
++ 	apple_spi_init(spi);
++ 
++ 	ret = devm_spi_register_controller(&pdev->dev, ctlr);
+diff --git a/runtime/recovery/storage-fence b/runtime/recovery/storage-fence
+index b42c3ad..217891c 100755
+--- a/runtime/recovery/storage-fence
++++ b/runtime/recovery/storage-fence
+@@ -6,6 +6,10 @@
+ # read-only after blockdev --setrw. Writes /run/orchard/storage-ready, or
+ # /run/orchard/storage-failed with the step that failed.
+ set -eu
++# The A7 J72 has ANS1/ASP storage rather than the NVMe controllers below.
++if [ -r /proc/device-tree/compatible ] && tr '\000' '\n' < /proc/device-tree/compatible | grep -qx 'apple,j72'; then
++    exec python3 /usr/libexec/orchard/storage-j72.py
++fi
+ step=load
+ failed() {
+     rc=$?
+diff --git a/runtime/recovery/storage-j72.py b/runtime/recovery/storage-j72.py
+new file mode 100755
+index 0000000..318546d
+--- /dev/null
++++ b/runtime/recovery/storage-j72.py
+@@ -0,0 +1,133 @@
++#!/usr/bin/python3
++"""Initialize and fence the J72's real ASP namespace once per recovery boot.
++
++No format, reset, unload or controller retry. The unqualified read-only
++prototype cannot satisfy this fence; installation stays blocked until a
++qualified driver exposes the normal writable disk and its partitions.
++"""
++import json
++from pathlib import Path
++import subprocess
++import sys
++import time
++
++COMPATIBLE = Path('/proc/device-tree/compatible')
++SYS_BLOCK = Path('/sys/class/block')
++DEV = Path('/dev')
++RUN = Path('/run/orchard')
++MOUNTINFO = Path('/proc/self/mountinfo')
++MODULE_SECONDS = 90
++DEVICE_SECONDS = 30
++DISK = 'asp0n1'
++
++
++def command(*argv):
++    result = subprocess.run(argv, capture_output=True, timeout=15)
++    if result.returncode:
++        raise RuntimeError(f'{argv[0]} failed (exit {result.returncode})')
++
++
++def wait_for(predicate, seconds, detail):
++    deadline = time.monotonic() + seconds
++    while not predicate():
++        if time.monotonic() >= deadline:
++            raise RuntimeError(detail)
++        time.sleep(0.2)
++
++
++def require_unused_storage():
++    blocks = list(SYS_BLOCK.glob('asp*n*'))
++    numbers = {(block / 'dev').read_text().strip() for block in blocks}
++    for line in MOUNTINFO.read_text().splitlines():
++        fields = line.split()
++        separator = fields.index('-')
++        source = fields[separator + 2]
++        if fields[2] in numbers or source.startswith('/dev/asp'):
++            raise RuntimeError('ASP storage is already mounted; no initialization')
++    for block in blocks:
++        if any((block / 'holders').iterdir()):
++            raise RuntimeError('ASP storage has an active block holder: ' + block.name)
++
++
++def initialize(record, save):
++    if b'apple,j72' not in COMPATIBLE.read_bytes().split(b'\0'):
++        raise RuntimeError('The ASP storage fence requires the J72 device tree')
++    require_unused_storage()
++    record['step'] = 'load'
++    with (RUN / 'j72-asp-load.log').open('x') as log:
++        process = subprocess.Popen(['modprobe', 'asp'], stdin=subprocess.DEVNULL,
++                                   stdout=log, stderr=subprocess.STDOUT, start_new_session=True)
++        record.update(module_load_attempted=True, module_pid=process.pid)
++        save()
++        deadline = time.monotonic() + MODULE_SECONDS
++        while process.poll() is None:
++            if time.monotonic() >= deadline:
++                record['module_terminal'] = False
++                save()
++                raise RuntimeError(f'ASP module load is still pending at PID {process.pid}; inspect that same process, no retry')
++            time.sleep(0.2)
++        record.update(module_terminal=True, module_exit=process.returncode)
++        save()
++        if process.returncode:
++            raise RuntimeError(f'ASP module load refused (exit {process.returncode}); no retry')
++    record['step'] = 'namespace'
++    save()
++    disk = SYS_BLOCK / DISK
++    wait_for(lambda: disk.is_dir() and (DEV / DISK).is_block_device(), DEVICE_SECONDS,
++             'The real ASP user namespace did not appear')
++    if (disk / 'queue/logical_block_size').read_text().strip() != '4096':
++        raise RuntimeError('Unexpected J72 ASP logical block size')
++    if (disk / 'ro').read_text().strip() != '0':
++        raise RuntimeError('ASP is read-only; writable driver qualification is required')
++    record['step'] = 'partitions'
++    save()
++    wait_for(lambda: bool(list(SYS_BLOCK.glob(DISK + 'p*/partition'))), DEVICE_SECONDS,
++             'ASP partition discovery is unavailable; no storage readiness')
++    require_unused_storage()
++    for block in sorted(SYS_BLOCK.glob(DISK + 'p*')):
++        if not (block / 'partition').is_file():
++            continue
++        command('blockdev', '--setro', str(DEV / block.name))
++        if (block / 'ro').read_text().strip() != '1':
++            raise RuntimeError('Could not fence ASP partition ' + block.name)
++    record['step'] = 'namespaces'
++    save()
++    for block in sorted(SYS_BLOCK.glob('asp*n*')):
++        if (block / 'partition').exists() or block.name == DISK:
++            continue
++        command('blockdev', '--setro', str(DEV / block.name))
++        if (block / 'ro').read_text().strip() != '1':
++            raise RuntimeError('Could not fence auxiliary ASP namespace ' + block.name)
++    record.update(status='READY', step='done', disk=str(DEV / DISK), partitions_read_only=True)
++    save()
++    (RUN / 'storage-ready').write_text('ready\n')
++
++
++def main():
++    RUN.mkdir(parents=True, exist_ok=True)
++    try:
++        # A consumed attempt is an admission record, not a claim that its
++        # process is still live. Preserve its PID/status for inspection.
++        with (RUN / 'j72-asp-fence-entered').open('x') as once:
++            once.write('ENTERED\n')
++    except FileExistsError:
++        print('J72 ASP initialization was already attempted; inspect its existing record', file=sys.stderr)
++        return 1
++    for name in ('storage-ready', 'storage-failed'):
++        (RUN / name).unlink(missing_ok=True)
++    record = {'status': 'RUNNING', 'step': 'identity', 'module_load_attempted': False}
++    def save():
++        (RUN / 'j72-asp-storage.json').write_text(json.dumps(record, indent=2) + '\n')
++    save()
++    try:
++        initialize(record, save)
++    except Exception as error:
++        record.update(status='READINESS_REFUSED', error=str(error))
++        save()
++        (RUN / 'storage-failed').write_text(record['step'] + ': ' + str(error) + '\n')
++        return 1
++    return 0
++
++
++if __name__ == '__main__':
++    sys.exit(main())
+diff --git a/src/orchard/apple/z2packet.py b/src/orchard/apple/z2packet.py
+index 1864db0..bc4fb57 100644
+--- a/src/orchard/apple/z2packet.py
++++ b/src/orchard/apple/z2packet.py
+@@ -13,6 +13,7 @@ from orchard.apple import z2fw
+ 
+ # SPI mode bits in the Z2FW config record's valid mask (apple_z2.c).
+ CONFIG_CPHA, CONFIG_CPOL = 1 << 3, 1 << 4
++CONFIG_HBPP_VERSION = 1 << 11
+ 
+ PREFIX = b'\x18\xe1\x30\x01'
+ 
+@@ -53,3 +54,45 @@ def convert(mtprops: bytes, profile: str, calibration_address: int, calibration_
+                                        calibration_size, []),
+                (z2fw.SEND, packet)]
+     return z2fw.container(records)
++
++
++def convert_n1(mtprops: bytes, profile: str, calibration_address: int,
++               calibration_size: int, prox_address: int, prox_size: int) -> bytes:
++    """N1's legacy packet, zero proximity initialization and dynamic unit data.
++
++    The native N1 driver owns reset, readiness, register calibration and
++    execute; this file contains no INIT, register-write or execute commands.
++    Unlike HBPP14, the packet word count includes every payload word.
++    """
++    document = plistlib.loads(mtprops)
++    if not isinstance(document, dict):
++        raise ValueError('Expected N1 mtprops profile dictionary')
++    entry = document.get(profile)
++    if isinstance(entry, dict) and 'Firmware Config' in entry:
++        raise ValueError('N1 packet with an unsupported firmware config')
++    packet = extract(mtprops, profile)
++    firmware_address, firmware = z2fw.decode_blob(packet, hbpp_version=0x103)
++    providers = []
++    # Validate both ranges together, including overlap and address overflow.
++    z2fw.calibration_record('prox-calibration', prox_address, prox_size, providers)
++    calibration = z2fw.calibration_record('multi-touch-calibration', calibration_address,
++                                         calibration_size, providers)
++    prox_address = providers[0]['address']
++    prox_size = providers[0]['maximum']
++    if any(item['address'] % 4 or item['maximum'] % 4 for item in providers):
++        raise ValueError('N1 calibration ranges must be word aligned')
++    if any(item['address'] < firmware_address + len(firmware) and
++           firmware_address < item['address'] + ((item['maximum'] + 3) & ~3)
++           for item in providers):
++        raise ValueError('N1 calibration overlaps the firmware load range')
++    # The legacy length field is u16, in words. Do not wrap it.
++    if prox_size // 4 > 0xffff:
++        raise ValueError('N1 proximity initialization is too large')
++    header = struct.pack('>H', prox_size // 4) + z2fw.xe32(prox_address)
++    prox = PREFIX + header + struct.pack('>H', sum(header)) + bytes(prox_size + 4)
++    validate_prox_address, validate_prox = z2fw.decode_blob(prox, hbpp_version=0x103)
++    if validate_prox_address != prox_address or validate_prox != bytes(prox_size):
++        raise ValueError('N1 proximity initialization roundtrip mismatch')
++    config = [CONFIG_CPHA | CONFIG_CPOL | CONFIG_HBPP_VERSION] + [0] * 9 + [0x103]
++    return z2fw.container([(z2fw.CONFIG, struct.pack('<11I', *config)),
++                           (z2fw.SEND, prox), calibration, (z2fw.SEND, packet)])
+diff --git a/src/orchard/image/platform.py b/src/orchard/image/platform.py
+index d3d0496..8b865a8 100644
+--- a/src/orchard/image/platform.py
++++ b/src/orchard/image/platform.py
+@@ -31,8 +31,9 @@ SCHEMA = 1
+ # What the initrd loads before it looks for the root, in order. Everything
+ # else storage needs is built in; modprobe adds dependencies from modules.dep.
+ # nvme is PCIe storage; nvme-apple is the Apple ANS2 controller of the A11
+-# (d221). A platform may lack either one, but not both.
+-STORAGE_MODULES = ('nvme', 'nvme-apple')
++# (d221). The A7 J72 uses the native ASP user namespace. Include a provider
++# only when its module is present in this platform's coherent kernel bundle.
++STORAGE_MODULES = ('nvme', 'nvme-apple', 'asp')
+ # Where system/defaults may put files: vendor configuration under /usr/lib,
+ # and the boards' ALSA UCM profiles where alsa-lib looks for them.
+ DEFAULTS_UNDER = ('usr/lib/', 'usr/share/alsa/ucm2/')
+diff --git a/src/orchard/image/runtime.py b/src/orchard/image/runtime.py
+index 577717a..09ae2f7 100644
+--- a/src/orchard/image/runtime.py
++++ b/src/orchard/image/runtime.py
+@@ -63,7 +63,7 @@ def recovery_files():
+     prefix = 'usr/libexec/orchard/'
+     source = PROJECT / 'runtime/recovery'
+     result = {prefix + name: ((source / name).read_bytes(), 0o755)
+-              for name in ('device.py', 'identity.py', 'storage-fence', 'start.py')}
++              for name in ('device.py', 'identity.py', 'storage-fence', 'storage-j72.py', 'start.py')}
+     result[prefix + 'adt.py'] = ((PROJECT / 'src/orchard/apple/adt.py').read_bytes(), 0o644)
+     result['usr/bin/orchard-device'] = (b'#!/bin/sh\nexec /usr/bin/python3 /usr/libexec/orchard/device.py "$@"\n', 0o755)
+     return result
+diff --git a/src/orchard/install_device.py b/src/orchard/install_device.py
+index 57f23da..57a96d5 100644
+--- a/src/orchard/install_device.py
++++ b/src/orchard/install_device.py
+@@ -106,6 +106,22 @@ def run(*argv, input=None, timeout=120):
+     return result.stdout
+ 
+ 
++def format_timeout(disk):
++    """The qualified J72 ASP path submits 4 KiB requests at about 1 MiB/s.
++
++    A 48.9 GB root initializes about 730 MiB of inode tables before its
++    journal, so its unchanged ext4 format needs longer than five minutes.
++    """
++    if disk == '/dev/asp0n1':
++        try:
++            compatible = Path('/proc/device-tree/compatible').read_bytes().split(b'\0')
++        except FileNotFoundError:
++            compatible = []
++        if b'apple,j72' in compatible:
++            return 1800
++    return 300
++
++
+ # --- partition table -------------------------------------------------------
+ 
+ def node(disk, number):
+@@ -764,7 +780,7 @@ def install(plan, stream):
+         run('blockdev', '--setrw', root_node)
+         run('mke2fs', '-t', 'ext4', '-b', '4096', '-m', '0', '-U', plan['root']['fs_uuid'],
+             '-L', plan['root']['label'], '-E', 'nodiscard,lazy_itable_init=0,lazy_journal_init=0',
+-            root_node, timeout=300)
++            root_node, timeout=format_timeout(disk))
+         emit('step', step='format-root', state='done')
+         TARGET.mkdir(parents=True, exist_ok=True)
+         run('mount', '-t', 'ext4', root_node, str(TARGET))
+@@ -823,12 +839,27 @@ def install(plan, stream):
+     emit('finished', root=plan['root']['partuuid'], boot=plan['boot']['partuuid'])
+ 
+ 
++def inspection_disk():
++    """The recovery's internal disk; an explicit operator override wins.
++
++    The A7 J72 exposes its ANS1 NAND through ASP rather than NVMe. Inspect
++    that real namespace so the standard free-space plan carries the correct
++    disk path through installation. Other boards retain their existing path.
++    """
++    if 'ORCHARD_INSTALL_DISK' in os.environ:
++        return os.environ['ORCHARD_INSTALL_DISK']
++    try:
++        compatible = Path('/proc/device-tree/compatible').read_bytes().split(b'\0')
++    except FileNotFoundError:
++        return DEFAULT_DISK
++    return '/dev/asp0n1' if b'apple,j72' in compatible else DEFAULT_DISK
++
++
+ def main(argv):
+-    disk = os.environ.get('ORCHARD_INSTALL_DISK', DEFAULT_DISK)
+     try:
+         if argv[1:] == ['inspect']:
+             wait_for_storage()
+-            inspect(disk)
++            inspect(inspection_disk())
+         elif len(argv) == 3 and argv[1] == 'run':
+             wait_for_storage()
+             install(json.loads(Path(argv[2]).read_text()), sys.stdin.buffer)
+diff --git a/src/orchard/recipe.py b/src/orchard/recipe.py
+index eb30079..4c6f926 100644
+--- a/src/orchard/recipe.py
++++ b/src/orchard/recipe.py
+@@ -61,6 +61,11 @@ def _z2_packet(step, data, expected):
+     return z2packet.convert(data, step['profile'], step['calibration_address'], step['calibration_size'])
+ 
+ 
++def _z2_packet_n1(step, data, expected):
++    return z2packet.convert_n1(data, step['profile'], step['calibration_address'],
++                               step['calibration_size'], step['prox_address'], step['prox_size'])
++
++
+ def _z2fw_packets(step, data, expected):
+     profile = _touch_profile(data, step['profile'])
+     output, _ = z2fw.convert_packets(profile, apple_xml(profile['Firmware Config']), packet=step['packet'])
+@@ -98,6 +103,10 @@ STEPS = {
+     # mtprops with one complete preconstructed Z2 boot packet (iPad 5), wrapped unmodified.
+     'z2fw-from-z2-packet@1': (_z2_packet, {'profile': str, 'calibration_address': int,
+                                            'calibration_size': int}),
++    # N1 legacy Z2 packet, zero proximity initialization, dynamic unit calibration.
++    'z2fw-from-z2-packet@2': (_z2_packet_n1, {'profile': str, 'calibration_address': int,
++                                         'calibration_size': int, 'prox_address': int,
++                                         'prox_size': int}),
+     # mtprops with an array of preconstructed packets (iPhone 7 Plus), makez2fw's layout.
+     'z2fw-from-mtprops@2': (_z2fw_packets, {'profile': str, 'packet': str}),
+     # Legacy Gen1 data-form mtprops (iPhone 6), Corellium's bootstrap and board calibration bounds.
+diff --git a/src/orchard/service.py b/src/orchard/service.py
+index 74daa68..c9d15b6 100644
+--- a/src/orchard/service.py
++++ b/src/orchard/service.py
+@@ -210,7 +210,10 @@ def install(manifest=None, *, input_fn=input, secrets_fn=ask_secrets, progress=N
+         secrets = None
+         with assets['root'].open('rb') as source:
+             events = remote.run(connection, ['run', remote.DIRECTORY + '/plan.json'],
+-                                source=source, size=root['bytes'], progress=progress)
++                                source=source, size=root['bytes'], progress=progress,
++                                # J72's qualified 4 KiB ASP path is about 1 MiB/s;
++                                # format plus extraction can exceed one hour.
++                                timeout=7200 if adapter.PROFILE == 'j72' else 3600)
+         finished = [e for e in events if e.get('event') == 'finished']
+         if len(finished) != 1:
+             raise RuntimeError('The device did not confirm the installation; '
+diff --git a/tests/test_install_device.py b/tests/test_install_device.py
+index 8f531dd..763a66c 100644
+--- a/tests/test_install_device.py
++++ b/tests/test_install_device.py
+@@ -9,6 +9,24 @@ from orchard import install_device as D
+ from orchard.image import platform
+ 
+ 
++class FormatTimeout(unittest.TestCase):
++    def test_j72_asp_gets_time_for_synchronous_inode_initialization(self):
++        with patch.object(Path, 'read_bytes', return_value=b'apple,j72\0apple,t7000\0'):
++            self.assertEqual(D.format_timeout('/dev/asp0n1'), 1800)
++
++    def test_other_boards_and_disk_paths_keep_the_original_bound(self):
++        for compatible, disk in ((b'apple,j71b\0', '/dev/asp0n1'),
++                                 (b'apple,j72-test\0', '/dev/asp0n1'),
++                                 (b'apple,j72\0', '/dev/nvme0n1')):
++            with self.subTest(compatible=compatible, disk=disk), \
++                 patch.object(Path, 'read_bytes', return_value=compatible):
++                self.assertEqual(D.format_timeout(disk), 300)
++
++    def test_a_host_without_device_tree_keeps_the_original_bound(self):
++        with patch.object(Path, 'read_bytes', side_effect=FileNotFoundError):
++            self.assertEqual(D.format_timeout('/dev/asp0n1'), 300)
++
++
+ class StorageFence(unittest.TestCase):
+     def setUp(self):
+         work = tempfile.TemporaryDirectory()
+diff --git a/tests/test_install_flow.py b/tests/test_install_flow.py
+index a99c894..ecc4688 100644
+--- a/tests/test_install_flow.py
++++ b/tests/test_install_flow.py
+@@ -49,7 +49,7 @@ def layout(partitions, free):
+ 
+ 
+ class InstallFlow(unittest.TestCase):
+-    def run_install(self, disk, answers, outcome='ok', account=True, ready=None):
++    def run_install(self, disk, answers, outcome='ok', account=True, ready=None, profile='device'):
+         work = tempfile.TemporaryDirectory()
+         self.addCleanup(work.cleanup)
+         root = Path(work.name)
+@@ -59,7 +59,7 @@ class InstallFlow(unittest.TestCase):
+         image.write_bytes(b'root-stream')
+         layer.write_bytes(b'platform-layer')
+         mixin.write_bytes(b'firmware-bundle')
+-        adapter = Mock(NAME='Supported tablet', PROFILE='device', INSTALL=True, STATUS='supported',
++        adapter = Mock(NAME='Supported tablet', PROFILE=profile, INSTALL=True, STATUS='supported',
+                        FEATURES={}, REBOOT_MESSAGE='reboot', DEVICETREE='t8010-j171.dtb')
+         adapter.prepare_mixin.return_value = (mixin, {'bytes': 15, 'sha256': 'b' * 64})
+         fake = root / 'fake.py'
+@@ -83,14 +83,25 @@ class InstallFlow(unittest.TestCase):
+              patch('orchard.computer_key.public_keys', return_value=['ssh-ed25519 ' + 'A' * 68]), \
+              patch('orchard.computer_key.remember_user') as remembered, \
+              patch('orchard.service.check_started', return_value=None) as check, \
++             patch.object(install_remote, 'run', wraps=install_remote.run) as remote_run, \
+              patch('orchard.state.cache_root', return_value=root / 'cache'):
+             output = io.StringIO()
+             result = install(input_fn=lambda text: prompts.append(text) or next(replies),
+                              secrets_fn=lambda account: {'password': 'long enough', 'pin': '424242'},
+                              progress=Progress(output))
+         self.check = check
++        self.remote_run = remote_run
+         return result, store, prompts, output.getvalue()
+ 
++    def test_only_j72_extends_the_combined_format_and_extraction_bound(self):
++        disk = layout([], [{'start': 256, 'blocks': 20 * GIB // 4096}])
++        for profile, seconds in (('j72', 7200), ('device', 3600)):
++            with self.subTest(profile=profile):
++                self.run_install(disk, ['', '', ''], profile=profile)
++                install_call = self.remote_run.call_args
++                self.assertEqual(install_call.args[1][0], 'run')
++                self.assertEqual(install_call.kwargs['timeout'], seconds)
++
+     def test_free_space_install_uploads_script_plan_secrets_and_streams_the_root(self):
+         disk = layout([{'number': 1, 'start': 6, 'blocks': 3 * GIB // 4096, 'type': APFS,
+                         'partuuid': '00000000-0000-4000-8000-000000000001'}],
+diff --git a/tests/test_j72_firmware_recipe.py b/tests/test_j72_firmware_recipe.py
+new file mode 100644
+index 0000000..23bae37
+--- /dev/null
++++ b/tests/test_j72_firmware_recipe.py
+@@ -0,0 +1,55 @@
++"""The model-selected J72 native firmware recipe and input extraction."""
++import json
++from pathlib import Path
++import struct
++import unittest
++from unittest.mock import Mock
++import zlib
++
++from orchard import recipe
++from orchard.apple import apfs
++
++ROOT = Path(__file__).resolve().parents[1]
++
++
++class J72FirmwareRecipe(unittest.TestCase):
++    def test_native_recipe_names_only_pinned_j72_touch_input(self):
++        description = recipe.check(json.loads((ROOT / 'devices/j72/firmware.json').read_text()))
++        self.assertEqual(recipe.needed_inputs(description), ['J72.mtprops'])
++        self.assertEqual(len(description['outputs']), 1)
++        output = description['outputs'][0]
++        self.assertEqual(output['destination'], 'lib/firmware/apple/j72-fwstart.z2fw')
++        self.assertEqual(output['sha256'],
++                         '73ca290607695ca841867a2bf76cab4bc2f5c33b9ab5ac171de5b5580a7c0c09')
++        step = output['steps'][0]
++        self.assertEqual(step['step'], 'z2fw-from-z2-packet@2')
++        self.assertEqual(step['profile'], 'C1F15,1')
++        self.assertEqual(step['calibration_size'], 1024)
++        self.assertEqual(step['prox_size'], 128)
++        with self.assertRaisesRegex(ValueError, 'Firmware input differs'):
++            recipe.run(description, lambda name: b'wrong model or input')
++
++    def test_unrequested_outputs_do_not_read_firmware_inputs(self):
++        description = recipe.check(json.loads((ROOT / 'devices/j72/firmware.json').read_text()))
++        self.assertEqual(recipe.needed_inputs(description, outputs=[]), [])
++        self.assertEqual(recipe.run(description,
++                                    Mock(side_effect=AssertionError('unexpected input')), outputs=[]), {})
++
++    def test_existing_type4_resource_decoder_handles_compressed_and_stored_blocks(self):
++        # Entirely synthetic, with the same two-block storage form as the input.
++        first, second = b'a' * 65536, b'synthetic logical file tail'
++        pieces = [zlib.compress(first), b'\xff' + second]
++        base = 0x104
++        table = bytearray(struct.pack('<I', len(pieces)))
++        offset = 4 + 8 * len(pieces)
++        for piece in pieces:
++            table.extend(struct.pack('<II', offset, len(piece)))
++            offset += len(piece)
++        fork = struct.pack('>I', 0x100).ljust(base, b'\0') + table + b''.join(pieces)
++        self.assertEqual(apfs._resource_fork(4, fork, len(first + second)), first + second)
++        with self.assertRaisesRegex(ValueError, 'size mismatch'):
++            apfs._resource_fork(4, fork, len(first + second) + 1)
++
++
++if __name__ == '__main__':
++    unittest.main()
+diff --git a/tests/test_j72_install_disk.py b/tests/test_j72_install_disk.py
+new file mode 100644
+index 0000000..cc2038e
+--- /dev/null
++++ b/tests/test_j72_install_disk.py
+@@ -0,0 +1,27 @@
++"""Select the actual J72 ASP namespace without changing other boards or overrides."""
++from pathlib import Path
++import os
++import unittest
++from unittest.mock import patch
++from orchard import install_device as D
++
++class InstallDisk(unittest.TestCase):
++    def test_j72_inspection_waits_for_storage_then_uses_asp(self):
++        calls=[]
++        with patch.dict(os.environ, {}, clear=True), patch.object(Path,'read_bytes',return_value=b'apple,j72\0apple,s5l8960x\0'), patch.object(D,'wait_for_storage',side_effect=lambda:calls.append('ready')), patch.object(D,'inspect',side_effect=lambda disk:calls.append(disk)):
++            self.assertEqual(D.main(['install_device.py','inspect']),0)
++        self.assertEqual(calls,['ready','/dev/asp0n1'])
++
++    def test_existing_operator_override_is_preserved_without_device_tree_read(self):
++        with patch.dict(os.environ,{'ORCHARD_INSTALL_DISK':'/dev/explicit-operator-target'},clear=True), patch.object(Path,'read_bytes',side_effect=AssertionError('Override must not read hardware identity')):
++            self.assertEqual(D.inspection_disk(),'/dev/explicit-operator-target')
++
++    def test_other_boards_and_absent_device_tree_keep_nvme_default(self):
++        with patch.dict(os.environ,{},clear=True):
++            for data in (b'apple,j71b\0',b'apple,n61\0',b'apple,j72b\0',b''):
++                with self.subTest(data=data),patch.object(Path,'read_bytes',return_value=data):
++                    self.assertEqual(D.inspection_disk(),D.DEFAULT_DISK)
++            with patch.object(Path,'read_bytes',side_effect=FileNotFoundError):
++                self.assertEqual(D.inspection_disk(),D.DEFAULT_DISK)
++
++if __name__=='__main__':unittest.main()
+diff --git a/tests/test_j72_storage_fence.py b/tests/test_j72_storage_fence.py
+new file mode 100644
+index 0000000..c94c37c
+--- /dev/null
++++ b/tests/test_j72_storage_fence.py
+@@ -0,0 +1,132 @@
++"""Exercise recovery admission and refusal without loading host storage modules."""
++import importlib.util
++import json
++from pathlib import Path
++import tempfile
++import unittest
++from unittest.mock import Mock, patch
++
++ROOT = Path(__file__).resolve().parents[1]
++
++
++class StorageFence(unittest.TestCase):
++    def setUp(self):
++        self.temporary = tempfile.TemporaryDirectory()
++        self.addCleanup(self.temporary.cleanup)
++        self.root = Path(self.temporary.name)
++        spec = importlib.util.spec_from_file_location('j72_storage', ROOT / 'runtime/recovery/storage-j72.py')
++        self.fence = importlib.util.module_from_spec(spec)
++        spec.loader.exec_module(self.fence)
++        for name in ('COMPATIBLE', 'MOUNTINFO', 'SYS_BLOCK', 'DEV', 'RUN'):
++            setattr(self.fence, name, self.root / name.lower())
++        self.fence.COMPATIBLE.write_bytes(b'apple,j72\0apple,s5l8960x\0')
++        self.fence.MOUNTINFO.write_text('1 0 0:1 / / rw - tmpfs tmpfs rw\n')
++        for path in (self.fence.SYS_BLOCK, self.fence.DEV):
++            path.mkdir()
++        self.block('asp0n1', '0', '240:0')
++        self.block('asp0n1p1', '0', '240:1', partition=True)
++        self.block('asp0n2', '0', '240:2')
++        self.process = Mock(pid=12345, returncode=0)
++        self.process.poll.return_value = 0
++        self.commands = []
++        def command(*argv):
++            # Simulate the block layer's setro response; assert admission
++            # never offers readiness before every actual block is fenced.
++            self.assertFalse((self.fence.RUN / 'storage-ready').exists())
++            self.commands.append(argv)
++            self.assertEqual(argv[:2], ('blockdev', '--setro'))
++            (self.fence.SYS_BLOCK / Path(argv[2]).name / 'ro').write_text('1\n')
++        for p in (patch.object(self.fence.subprocess, 'Popen', return_value=self.process),
++                  patch.object(self.fence, 'command', side_effect=command),
++                  patch.object(Path, 'is_block_device', return_value=True)):
++            p.start()
++            self.addCleanup(p.stop)
++        self.fence.MODULE_SECONDS = self.fence.DEVICE_SECONDS = 0
++
++    def block(self, name, ro, number, partition=False):
++        block = self.fence.SYS_BLOCK / name
++        (block / 'holders').mkdir(parents=True)
++        (block / 'queue').mkdir()
++        (block / 'queue/logical_block_size').write_text('4096\n')
++        (block / 'ro').write_text(ro + '\n')
++        (block / 'dev').write_text(number + '\n')
++        if partition:
++            (block / 'partition').write_text('1\n')
++
++    def result(self):
++        return json.loads((self.fence.RUN / 'j72-asp-storage.json').read_text())
++
++    def refused(self, reason):
++        self.assertEqual(self.fence.main(), 1)
++        self.assertFalse((self.fence.RUN / 'storage-ready').exists())
++        self.assertEqual(self.result()['status'], 'READINESS_REFUSED')
++        self.assertIn(reason, self.result()['error'])
++
++    def test_success_fences_retained_partition_and_auxiliary_not_user_disk(self):
++        self.assertEqual(self.fence.main(), 0)
++        self.assertEqual([Path(c[2]).name for c in self.commands], ['asp0n1p1', 'asp0n2'])
++        self.assertEqual((self.fence.SYS_BLOCK / 'asp0n1/ro').read_text(), '0\n')
++        self.assertEqual((self.fence.RUN / 'storage-ready').read_text(), 'ready\n')
++        self.assertEqual(self.result()['status'], 'READY')
++
++    def test_readonly_diagnostic_provider_cannot_enable_installation(self):
++        (self.fence.SYS_BLOCK / 'asp0n1/ro').write_text('1\n')
++        self.refused('read-only')
++        self.assertEqual(self.commands, [])
++
++    def test_missing_partitions_cannot_enable_installation(self):
++        (self.fence.SYS_BLOCK / 'asp0n1p1/partition').unlink()
++        self.refused('partition discovery')
++        self.assertEqual(self.commands, [])
++
++    def test_pending_module_preserves_same_actor_and_forbids_retry(self):
++        self.process.poll.return_value = None
++        self.refused('still pending at PID 12345')
++        self.assertFalse(self.result()['module_terminal'])
++        first = (self.fence.RUN / 'j72-asp-storage.json').read_bytes()
++        self.assertEqual(self.fence.main(), 1)
++        self.assertEqual((self.fence.RUN / 'j72-asp-storage.json').read_bytes(), first)
++        self.fence.subprocess.Popen.assert_called_once()
++        self.process.kill.assert_not_called()
++        self.process.terminate.assert_not_called()
++
++    def test_similar_board_never_loads_asp(self):
++        self.fence.COMPATIBLE.write_bytes(b'apple,j72b\0')
++        self.refused('requires the J72')
++        self.fence.subprocess.Popen.assert_not_called()
++
++    def test_mount_alias_device_number_refuses_before_module_load(self):
++        self.fence.MOUNTINFO.write_text('2 1 240:1 / /mnt ro - apfs /dev/retained-alias ro\n')
++        self.refused('already mounted')
++        self.fence.subprocess.Popen.assert_not_called()
++
++    def test_block_holder_refuses_before_module_load(self):
++        (self.fence.SYS_BLOCK / 'asp0n1/holders/loop0').touch()
++        self.refused('active block holder')
++        self.fence.subprocess.Popen.assert_not_called()
++
++    def test_new_mount_during_module_load_refuses_before_setro(self):
++        def poll():
++            self.fence.MOUNTINFO.write_text('2 1 240:1 / /mnt ro - apfs /dev/asp0n1p1 ro\n')
++            return 0
++        self.process.poll.side_effect = poll
++        self.refused('already mounted')
++        self.assertEqual(self.commands, [])
++
++    def test_fence_readback_failure_never_claims_readiness(self):
++        self.fence.command.side_effect = lambda *args: None
++        self.refused('Could not fence ASP partition')
++
++    def test_recovery_packages_helper_and_keeps_other_board_fence(self):
++        from orchard.image.runtime import recovery_files
++        files = recovery_files()
++        self.assertEqual(files['usr/libexec/orchard/storage-j72.py'],
++                         ((ROOT / 'runtime/recovery/storage-j72.py').read_bytes(), 0o755))
++        body = files['usr/libexec/orchard/storage-fence'][0].decode()
++        self.assertIn("grep -qx 'apple,j72'", body)
++        self.assertIn('exec python3 /usr/libexec/orchard/storage-j72.py', body)
++        self.assertIn('modprobe nvme\n', body)
++
++
++if __name__ == '__main__':
++    unittest.main()
+diff --git a/tests/test_platform_layer.py b/tests/test_platform_layer.py
+index 5d60377..c72b249 100644
+--- a/tests/test_platform_layer.py
++++ b/tests/test_platform_layer.py
+@@ -115,6 +115,39 @@ class PlatformLayer(unittest.TestCase):
+                           base + 'kernel/drivers/nvme/host/nvme-core.ko',
+                           base + 'kernel/drivers/nvme/host/nvme.ko'])
+ 
++    def test_an_asp_only_kernel_stages_its_provider_and_dependency(self):
++        import io
++        from orchard.image.runtime import module_files
++        module_root = self.bundle / 'lib/modules' / RELEASE
++        (module_root / 'kernel/drivers/block').mkdir()
++        (module_root / 'kernel/drivers/soc').mkdir()
++        (module_root / 'kernel/drivers/block/asp.ko').write_bytes(b'asp-provider-fixture')
++        (module_root / 'kernel/drivers/soc/apple-rtkit.ko').write_bytes(b'rtkit-dependency-fixture')
++        (module_root / 'modules.dep').write_text(
++            'kernel/drivers/x.ko:\n'
++            'kernel/drivers/soc/apple-rtkit.ko:\n'
++            'kernel/drivers/block/asp.ko: kernel/drivers/soc/apple-rtkit.ko\n')
++        release, files = module_files(self.bundle / 'lib/modules')
++        stream = io.BytesIO(gzip.decompress(platform.initrd(files, release, self.busybox)))
++        names = {}
++        while True:
++            header = stream.read(110)
++            fields = [int(header[i:i + 8], 16) for i in range(6, 110, 8)]
++            name = stream.read(fields[11])[:-1].decode()
++            stream.read(-(110 + fields[11]) % 4)
++            if name == 'TRAILER!!!':
++                break
++            names[name] = stream.read(fields[6])
++            stream.read(-fields[6] % 4)
++        prefix = f'lib/modules/{release}/'
++        self.assertEqual(names['etc/orchard/modules'], b'asp\n')
++        self.assertEqual(names[prefix + 'kernel/drivers/block/asp.ko'], b'asp-provider-fixture')
++        self.assertEqual(names[prefix + 'kernel/drivers/soc/apple-rtkit.ko'], b'rtkit-dependency-fixture')
++        self.assertEqual(sorted(name for name in names if name.endswith('.ko')),
++                         [prefix + 'kernel/drivers/block/asp.ko',
++                          prefix + 'kernel/drivers/soc/apple-rtkit.ko'])
++        self.assertEqual(names['init'], (ROOT / 'boot/initramfs/root/init').read_bytes())
++
+     def test_the_initrd_refuses_a_kernel_without_a_storage_module(self):
+         from orchard.image.runtime import module_files
+         module_root = self.bundle / 'lib/modules' / RELEASE
+diff --git a/tests/test_z2packet_n1.py b/tests/test_z2packet_n1.py
+new file mode 100644
+index 0000000..fe10e28
+--- /dev/null
++++ b/tests/test_z2packet_n1.py
+@@ -0,0 +1,110 @@
++"""N1 firmware recipe contract, on synthetic bytes without Apple firmware."""
++import hashlib
++import plistlib
++import struct
++import unittest
++
++from orchard import recipe
++from orchard.apple import z2fw, z2packet
++
++
++def fixture():
++    payload = bytes(range(16))
++    header = struct.pack('>H', len(payload) // 4) + bytes(4)
++    packet = z2packet.PREFIX + header + struct.pack('>H', sum(header))
++    packet += payload + z2fw.xe32(sum(payload))
++    return {'C1F15,1': {'PreconstructedBootloadPacketType': 'Z2',
++                       'Constructed Firmware': packet}}
++
++
++def convert(document=None, **kwargs):
++    params = {'profile': 'C1F15,1', 'calibration_address': 0x10009000,
++              'calibration_size': 1024, 'prox_address': 0x10009600, 'prox_size': 128}
++    return z2packet.convert_n1(plistlib.dumps(fixture() if document is None else document),
++                                **(params | kwargs))
++
++
++class N1PacketConversion(unittest.TestCase):
++    def test_four_records_keep_firmware_verbatim_and_calibration_dynamic(self):
++        records = z2fw.decode_container(convert())
++        self.assertEqual([code for code, _ in records], [4, 1, 6, 1])
++        self.assertEqual(struct.unpack('<11I', records[0][1]),
++                         (0x818, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0x103))
++        self.assertEqual(len(records[1][1]), 144)
++        self.assertEqual(z2fw.decode_blob(records[1][1], hbpp_version=0x103),
++                         (0x10009600, bytes(128)))
++        with self.assertRaisesRegex(ValueError, 'length mismatch'):
++            z2fw.decode_blob(records[1][1], hbpp_version=0x104)
++        self.assertEqual(records[2][1], struct.pack('<III', 0x10009000, 1024, 0))
++        self.assertEqual(records[3][1], fixture()['C1F15,1']['Constructed Firmware'])
++        self.assertEqual(z2packet.convert(plistlib.dumps(fixture()), 'C1F15,1',
++                                          0x10009000, 1024),
++                         z2fw.container([(4, struct.pack('<11I', 0x18, *([0] * 10))),
++                                          records[2], records[3]]))
++
++    def test_invalid_profiles_and_wire_packets_are_refused(self):
++        original = fixture()['C1F15,1']
++        packet = original['Constructed Firmware']
++        bad_checksum = packet[:-5] + bytes([packet[-5] ^ 1]) + packet[-4:]
++        cases = [([], 'profile dictionary'), ({}, 'No preconstructed'),
++                 ({'C1F15,1': []}, 'No preconstructed'),
++                 ({'C1F15,1': original | {'PreconstructedBootloadPacketType': 'HBPP14'}},
++                  'No preconstructed'),
++                 ({'C1F15,1': original | {'Constructed Firmware': [packet]}},
++                  'no constructed firmware'),
++                 ({'C1F15,1': original | {'Firmware Config': {}}}, 'unsupported firmware config'),
++                 ({'C1F15,1': original | {'Constructed Firmware': packet[:-1]}}, 'length mismatch'),
++                 ({'C1F15,1': original | {'Constructed Firmware': bad_checksum}}, 'checksum')]
++        for document, error in cases:
++            with self.subTest(error=error), self.assertRaisesRegex(ValueError, error):
++                convert(document)
++        for offset in (0, 4, 6, 10):
++            corrupt = bytearray(packet)
++            corrupt[offset] ^= 1
++            with self.subTest(offset=offset), self.assertRaises(ValueError):
++                convert({'C1F15,1': original | {'Constructed Firmware': bytes(corrupt)}})
++
++    def test_calibration_range_errors_refuse_before_output(self):
++        for kwargs in ({'prox_size': 0}, {'prox_size': True}, {'prox_size': -4},
++                       {'prox_size': 127}, {'prox_size': 0x40000},
++                       {'prox_address': 0}, {'prox_address': 0x10009601},
++                       {'prox_address': 0xfffffffc},
++                       {'calibration_size': 0}, {'calibration_size': True},
++                       {'calibration_size': 1023}, {'calibration_size': 0x40001},
++                       {'calibration_size': 0x604}, {'calibration_address': 0x10009001},
++                       {'calibration_address': 0x10009600}, {'calibration_address': 4}):
++            with self.subTest(kwargs=kwargs), self.assertRaises(ValueError):
++                convert(**kwargs)
++
++    def test_normal_recipe_checks_both_hashes_and_exact_parameters(self):
++        data, output = plistlib.dumps(fixture()), convert()
++        step = {'step': 'z2fw-from-z2-packet@2', 'input': 'mtprops', 'profile': 'C1F15,1',
++                'calibration_address': 0x10009000, 'calibration_size': 1024,
++                'prox_address': 0x10009600, 'prox_size': 128}
++        document = {'schema': 2, 'device': 'iPad4,2',
++                    'ipsw': {'version': '12.5.7', 'build': '16H81', 'bytes': 1,
++                             'sha256': '0' * 64, 'url': 'https://updates.cdn-apple.com/test.ipsw'},
++                    'inputs': {'mtprops': {'ipsw': {'rootfs': 'test.mtprops'},
++                                          'sha256': hashlib.sha256(data).hexdigest()}},
++                    'outputs': [{'destination': 'lib/firmware/apple/test-n1.z2fw',
++                                 'sha256': hashlib.sha256(output).hexdigest(), 'steps': [step]}]}
++        recipe.check(document)
++        self.assertEqual(recipe.run(document, lambda _: data),
++                         {'lib/firmware/apple/test-n1.z2fw': output})
++        with self.assertRaisesRegex(ValueError, 'input differs'):
++            recipe.run(document, lambda _: b'tampered')
++        document['outputs'][0]['sha256'] = '1' * 64
++        with self.assertRaisesRegex(ValueError, 'output differs'):
++            recipe.run(document, lambda _: data)
++        for field in ('prox_address', 'prox_size'):
++            value = step.pop(field)
++            with self.assertRaisesRegex(ValueError, 'Wrong parameters'):
++                recipe.check(document)
++            step[field] = value
++        step['prox_size'] = True
++        with self.assertRaisesRegex(ValueError, 'must be int'):
++            recipe.check(document)
++
++
++if __name__ == '__main__':
++    unittest.main()

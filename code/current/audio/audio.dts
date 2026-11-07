@@ -1,0 +1,45 @@
+/dts-v1/;
+/plugin/;
+/ { compatible="apple,j72";
+ fragment@0 { target-path="/"; __overlay__ {
+  j72_spi3_clock: j72-audio-spi-clock { compatible="fixed-clock"; #clock-cells=<0>; clock-frequency=<60000000>; };
+
+ }; };
+ fragment@1 { target-path="/soc"; __overlay__ {
+  #address-cells=<2>; #size-cells=<2>;
+  j72_sio: sio@20ae00000 {
+   compatible="apple,s5l8960x-sio"; reg=<2 0x0ae00000 0 0x2000>; reg-names="a7iop";
+   interrupt-parent=<&aic>; interrupts=<0 133 4>,<0 132 4>,<0 135 4>,<0 134 4>;
+   power-domains=<&ps_sio>; firmware-name="apple/s5l8960x-smartio.bin"; #dma-cells=<1>;
+  };
+  j72_mca: mca@20a0c0000 {
+   compatible="orchard,j72-mca-v1-test";
+   reg=<2 0x0a0c0000 0 0x4000>,<2 0x0a002000 0 4>,<2 0x0a003000 0 0x1000>;
+   reg-names="mca","mclk","switch"; power-domains=<&ps_mca0>;
+   #sound-dai-cells=<0>; #clock-cells=<0>;
+   dmas=<&j72_sio 0x28>; dma-names="tx";
+  };
+  spi@20a08c000 {
+   compatible="apple,s5l8960x-spi"; reg=<2 0x0a08c000 0 0x4000>;
+   interrupt-parent=<&aic>; interrupts=<0 139 4>;
+   clocks=<&j72_spi3_clock>; power-domains=<&ps_spi3>;
+   cs-gpios=<&pinctrl 99 1>; #address-cells=<1>; #size-cells=<0>;
+   j72_codec: audio-codec@0 {
+    compatible="cirrus,cs42l81"; reg=<0>; spi-max-frequency=<100000>;
+    #sound-dai-cells=<0>; clocks=<&j72_mca>; clock-names="mclk";
+    mute-gpios=<&pinctrl 94 1>; cirrus,speaker-max-gain=<0xfffffed4>;
+   };
+  };
+ }; };
+ fragment@2 { target-path="/"; __overlay__ {
+  sound-j72-test {
+   compatible="simple-audio-card";
+   simple-audio-card,name="J72 Audio Test";
+   simple-audio-card,format="i2s";
+   simple-audio-card,bitclock-master=<&codec_dai>;
+   simple-audio-card,frame-master=<&codec_dai>;
+   simple-audio-card,cpu { sound-dai=<&j72_mca>; };
+   codec_dai: simple-audio-card,codec { sound-dai=<&j72_codec>; };
+  };
+ }; };
+};

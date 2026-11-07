@@ -1,3 +1,5 @@
+> **Historical report / superseded plan.** Start with the [current status](J72-PROGRESS.md) and [replication guide](QUICKSTART.md). Statements below describe their original session, not current support.
+
 # Next session: one boot for input, storage power and charging
 
 Prepared 2 November 2026; executed in the 3 November morning session. This is the

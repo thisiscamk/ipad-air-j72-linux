@@ -1,0 +1,20 @@
+[Unit]
+Description=J72 automatic charging admission on a qualified powered hub
+After=network.target
+
+[Service]
+Type=simple
+ExecStart=/usr/local/libexec/orchard-j72-charge-auto --config /etc/orchard-j72-charge-auto/config.json
+Restart=on-failure
+RestartSec=10
+UMask=0077
+MemoryMax=64M
+TimeoutStopSec=5
+KillMode=control-group
+NoNewPrivileges=yes
+ProtectHome=read-only
+PrivateTmp=yes
+LimitCORE=0
+
+[Install]
+WantedBy=multi-user.target

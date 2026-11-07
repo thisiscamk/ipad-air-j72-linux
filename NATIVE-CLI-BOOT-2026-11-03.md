@@ -1,3 +1,5 @@
+> **Historical report / superseded plan.** Start with the [current status](J72-PROGRESS.md) and [replication guide](QUICKSTART.md). Statements below describe their original session, not current support.
+
 # First native Orchard CLI boot on J72
 
 On 3 November 2026 the iPad Air 1 Cellular booted a native Orchard RAM console

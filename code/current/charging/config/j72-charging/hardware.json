@@ -1,0 +1,30 @@
+{
+  "schema": 1,
+  "id": "apple-j72-charge-1050-v1",
+  "compatible": "apple,j72",
+  "kernel_release": "7.3.0-rc1-j72-pw1-orchard-apple-4k",
+  "controller_input_limit_mA": 1050,
+  "source_kind": "owner-qualified-powered-JCH377-1500mA",
+  "supervisor_sha256": "48011e1d580a0ab5551b657b487902f8d5d732fac06d14a1ce2b3548dad5e7d0",
+  "modules": {
+    "bq27xxx_battery_hdq_uart": [
+      "a3e87cd3640c084c308543768e975090fafcf16eba1c7e79284cc6cf4db7cb2b",
+      "adb4c35c650cdb58e4179c7f78e2d9663f05690d"
+    ],
+    "j72_charge_maintain": [
+      "ff7e8a695b9d9e9523d3b919d43e827b32a992004a71c84d05d237147486d2a5",
+      "ac305c35e2b57462a2f605e76a32daceb17d72dd"
+    ]
+  },
+  "usb_device": {"idVendor": "05ac", "idProduct": "4145", "bcdDevice": "0703"},
+  "limits_documentation_only": {
+    "window_seconds": 3600,
+    "source_lease_ms": 2500,
+    "initial_max_temp_tenthC": 365,
+    "active_max_temp_tenthC": 380,
+    "initial_max_voltage_uV": 4100000,
+    "active_max_voltage_uV": 4200000,
+    "initial_max_soc": 90,
+    "active_max_soc": 95
+  }
+}

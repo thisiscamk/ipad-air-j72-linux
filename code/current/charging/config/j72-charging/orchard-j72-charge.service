@@ -1,0 +1,27 @@
+[Unit]
+Description=J72 guarded charging after qualified source admission
+ConditionDeviceTree=apple,j72
+ConditionPathExists=/run/orchard-j72-charge/source.json
+After=orchard-j72-external-power.service
+Requires=orchard-j72-external-power.service
+
+[Service]
+Type=notify
+NotifyAccess=main
+Environment=J72_CHARGE_SECONDS=43200
+EnvironmentFile=-/run/orchard-j72-charge/session.env
+ExecStart=/usr/lib/orchard/j72_charge_supervisor.py --grant /run/orchard-j72-charge/source.json --seconds ${J72_CHARGE_SECONDS} --log /var/log/orchard-j72-charge/session.jsonl
+ExecStopPost=/usr/lib/orchard/j72_charge_supervisor.py --stop
+WatchdogSec=4
+WatchdogSignal=SIGKILL
+LimitCORE=0
+MemoryMax=64M
+TimeoutStartSec=10
+TimeoutStopSec=5
+Restart=no
+KillMode=control-group
+UMask=0077
+NoNewPrivileges=yes
+ProtectHome=yes
+PrivateTmp=yes
+RestrictAddressFamilies=AF_UNIX

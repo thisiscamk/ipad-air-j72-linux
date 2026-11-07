@@ -1,3 +1,5 @@
+> **Historical report / superseded plan.** Start with the [current status](J72-PROGRESS.md) and [replication guide](QUICKSTART.md). Statements below describe their original session, not current support.
+
 # Latest: #35 hour completes with net loss during thermal hold
 
 The normal-brightness run entered a protective thermal hold after 44.7 minutes

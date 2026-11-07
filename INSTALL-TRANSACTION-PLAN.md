@@ -1,3 +1,5 @@
+> **Historical report / superseded plan.** Start with the [current status](J72-PROGRESS.md) and [replication guide](QUICKSTART.md). Statements below describe their original session, not current support.
+
 # J72 installation transaction and recovery preparation
 
 **Preparation, 2 November 2026. No internal installation or resize is authorized

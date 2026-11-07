@@ -1,3 +1,5 @@
+> **Historical report / superseded plan.** Start with the [current status](J72-PROGRESS.md) and [replication guide](QUICKSTART.md). Statements below describe their original session, not current support.
+
 # Native touch and Omarchy RAM desktop: first device result
 
 4 November 2026, Singapore time. One owner-authorized RAM boot on the

@@ -1,3 +1,5 @@
+> **Historical report / superseded plan.** Start with the [current status](J72-PROGRESS.md) and [replication guide](QUICKSTART.md). Statements below describe their original session, not current support.
+
 # Native touch and Omarchy build preparation
 
 **4 November update:** the [first native device test](NATIVE-TOUCH-BOOT-2026-11-04.md)

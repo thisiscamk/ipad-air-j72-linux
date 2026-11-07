@@ -1,3 +1,5 @@
+> **Historical report / superseded plan.** Start with the [current status](J72-PROGRESS.md) and [replication guide](QUICKSTART.md). Statements below describe their original session, not current support.
+
 # Latest preparation: first read-only root can use an iOS write backend
 
 The combined #35 desktop/Wi-Fi/native-read boot now passes; owner UI and normal

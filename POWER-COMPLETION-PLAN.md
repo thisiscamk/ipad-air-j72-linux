@@ -1,3 +1,5 @@
+> **Historical report / superseded plan.** Start with the [current status](J72-PROGRESS.md) and [replication guide](QUICKSTART.md). Statements below describe their original session, not current support.
+
 # Completing J72 power support
 
 Prepared 2 November; current status updated 3 November 2026. The bounded Linux

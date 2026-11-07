@@ -1,3 +1,5 @@
+> **Historical report / superseded plan.** Start with the [current status](J72-PROGRESS.md) and [replication guide](QUICKSTART.md). Statements below describe their original session, not current support.
+
 # Next prepared Linux charging comparison
 
 Prepared 3 November 2026. The previous run is complete: touch/cleanup pass,

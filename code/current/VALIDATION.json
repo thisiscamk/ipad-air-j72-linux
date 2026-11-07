@@ -1,0 +1,33 @@
+{
+  "date": "2026-11-07",
+  "scope": "public source/documentation cleanup; no device access",
+  "source_reconstruction": {
+    "kernel_tree": "ad8938bc17a2ab9151cb9067a601e3bd8f9d41c2",
+    "orchard_tree": "9c7228f29298c1e02992ecc7cc58d3876935e357",
+    "method": "apply against pinned public base in isolated Git index; compare complete resulting tree to lab source"
+  },
+  "offline_tests": {
+    "qualification_profile": 1,
+    "automatic_admission": 5,
+    "supervisor": 10,
+    "result": "pass"
+  },
+  "audio_build": {
+    "kernel": "7.3.0-rc1-j72-pw1-orchard-apple-4k",
+    "compiler": "LLVM/Clang 19",
+    "W": 1,
+    "external_modules": 5,
+    "result": "pass",
+    "hardware_execution_of_rebuilt_binaries": false
+  },
+  "audio_private_staging": {
+    "firmware_identity_and_module_ABI_checked": true,
+    "manifest_and_symlink_layout_checked": true,
+    "output_removed": true,
+    "result": "pass"
+  },
+  "documentation_links": "maintained entry points and archived copies checked locally",
+  "private_binary_publication": false,
+  "fresh_device_reproduction": false,
+  "upstream_changes_submitted": false
+}

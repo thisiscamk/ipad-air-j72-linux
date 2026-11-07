@@ -1,3 +1,5 @@
+> **Historical report / superseded plan.** Start with the [current status](J72-PROGRESS.md) and [replication guide](QUICKSTART.md). Statements below describe their original session, not current support.
+
 # 2 November: RAM recovery passes; compressed desktop starts on device
 
 RAM recovery now passes SSH authentication, HFS/md0 device identity, zero APFS
