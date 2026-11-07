@@ -1,4 +1,4 @@
-> **Historical report / superseded plan.** Start with the [current status](J72-PROGRESS.md) and [replication guide](QUICKSTART.md). Statements below describe their original session, not current support.
+> **Historical report / superseded plan.** Start with the [current status](../../J72-PROGRESS.md) and [replication guide](../../QUICKSTART.md). Statements below describe their original session, not current support.
 
 # Native touch and Omarchy build preparation
 
@@ -26,7 +26,7 @@ hardware owners are not being installed as native startup services.
 | Clock and power providers | 1,047 actual provider scenarios, readback/fault checks, 4k/16k builds and selected bindings | Untested |
 | N1 input driver | Saved contact reports, strict packet/contact validation, startup and cleanup fault fixtures | Full source kernel, DT and 71 modules build; complete console/GUI payload checks pass; hardware untested |
 
-The [source-only firmware converter](code/upstream/orchard-j72-n1-firmware)
+The [source-only firmware converter](../../code/upstream/orchard-j72-n1-firmware)
 contains no Apple bytes or unit calibration. The public J72 recipe keeps its
 outputs empty until the driver, providers, device tree and firmware work
 together on hardware. Kernel topic branches will be exported through Orchard's
@@ -60,7 +60,7 @@ The tested USB console stays outside its manually started desktop chroot.
 
 The normal signed Arch root has built successfully. Its 1,265,877,734-byte
 archive alone exceeds the iPad's RAM, so the full installed root stays on the
-host. The [compact RAM producer](code/upstream/omarchy-a-ram-desktop) now builds
+host. The [compact RAM producer](../../code/upstream/omarchy-a-ram-desktop) now builds
 a **104.64 MiB gzip SquashFS** from those normal inputs. Its selected expanded
 files total 293,944,222 bytes. All 128 host tests pass, including 15 RAM fixtures;
 independent extraction checks confirm critical file hashes and ownership.
@@ -68,9 +68,9 @@ The native kernel and complete console/GUI payloads now build successfully.
 Native touch, desktop lifecycle, working memory and input on this new
 source-built combination remain unqualified.
 
-The [terminal touch/IME component](code/upstream/omarchy-a-foot-touch-ime) also
+The [terminal touch/IME component](../../code/upstream/omarchy-a-foot-touch-ime) also
 builds successfully from pinned official Foot source. Its upstream config test
-and 460 actual C callback/IME checks pass. The [combined RAM profile](code/upstream/omarchy-a-ram-foot)
+and 460 actual C callback/IME checks pass. The [combined RAM profile](../../code/upstream/omarchy-a-ram-foot)
 passes 133 host tests and builds a **105.83 MiB** SquashFS with the patched
 terminal selected explicitly. Its default still uses signed Arch Foot.
 Repeated tap/keyboard behaviour in this native combination remains untested.

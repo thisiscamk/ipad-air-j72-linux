@@ -1,4 +1,4 @@
-> **Historical report / superseded plan.** Start with the [current status](J72-PROGRESS.md) and [replication guide](QUICKSTART.md). Statements below describe their original session, not current support.
+> **Historical report / superseded plan.** Start with the [current status](../../J72-PROGRESS.md) and [replication guide](../../QUICKSTART.md). Statements below describe their original session, not current support.
 
 # J72 installation transaction and recovery preparation
 
@@ -24,13 +24,13 @@ personal content is recorded; it does not authorize an unspecified disk change.
   checks. The actual captured-layout model examines 22 memory-only interruption
   outcomes. It has no device writer or automatic repair interface.
 
-Sources and sanitized results: [native-root preparation](code/storage/native-root-preparation/).
+Sources and sanitized results: [native-root preparation](../../code/storage/native-root-preparation/).
 
 The fresh normal-iOS query helper also passes with no writes: 4096-byte physical
 blocks, 1MiB read/write transfer limits, media-writable capability and unchanged
 126357602304-byte APFS minimum. No flush was issued. This is capability evidence,
 not writer, resize or durability qualification.
-[Device query result](code/storage/native-root-preparation/IOS-QUERY-RESULT.json).
+[Device query result](../../code/storage/native-root-preparation/IOS-QUERY-RESULT.json).
 
 ## New host I/O rehearsal and qualification boundary
 
@@ -39,7 +39,7 @@ A new disposable host disk now rehearses the actual ordered GPT writes and
 outside-fence sentinels. Nine I/O failure tests bring the storage model/I/O total
 to 44 methods. This exercises host regular-file mechanics; APFS size is simulated,
 and no native iOS writer, actual resize or flash durability is qualified.
-[Result](code/storage/native-root-preparation/HOST-WRITE-RESULT.json).
+[Result](../../code/storage/native-root-preparation/HOST-WRITE-RESULT.json).
 
 The first internal operation will remain an explicit reviewed trial. Host and
 potential RAM scratch tests cannot prove the first encrypted internal shrink in
@@ -130,8 +130,8 @@ qualification; do not mount internal filesystems simply to bypass that question.
 | Torn copy, foreign valid identity, changed MBR or uncertain filesystem size | Stop; no automatic repair or image write. |
 | Confirmed shrink, both exact proposed GPTs, full verified image | Candidate for a separately guarded read-only root test. |
 
-The [state model](code/storage/j72_install_state.py) never turns classification
-into write authorization. The [checkpoint checker](code/storage/j72_apfs_checkpoint_plan.py)
+The [state model](../../code/storage/j72_install_state.py) never turns classification
+into write authorization. The [checkpoint checker](../../code/storage/j72_apfs_checkpoint_plan.py)
 rejects unsupported layouts and bounded-read overflows. Its selected checkpoint
 checks cover mapping/object headers and checksums, not a general APFS repair engine.
 

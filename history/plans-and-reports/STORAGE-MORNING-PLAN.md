@@ -1,4 +1,4 @@
-> **Historical report / superseded plan.** Start with the [current status](J72-PROGRESS.md) and [replication guide](QUICKSTART.md). Statements below describe their original session, not current support.
+> **Historical report / superseded plan.** Start with the [current status](../../J72-PROGRESS.md) and [replication guide](../../QUICKSTART.md). Statements below describe their original session, not current support.
 
 # 2 November: RAM recovery passes; compressed desktop starts on device
 
@@ -26,8 +26,8 @@ A 1536 MiB partition is a candidate within the reported minimum, subject to a
 reviewed resize/write procedure. The compressed base may avoid snapshot removal
 for an interim local-root milestone. Native storage/root qualification, durable
 writes and unattended charging remain open.
-[Recovery result](code/storage/ios12-pongo-handoff/),
-[compressed test/source](code/storage/compressed-desktop/),
+[Recovery result](../../code/storage/ios12-pongo-handoff/),
+[compressed test/source](../../code/storage/compressed-desktop/),
 [space review](SPACE-CREATION-REVIEW.md).
 
 ## Earlier checkpoints
@@ -45,7 +45,7 @@ adds detailed guard output and checks root/device numbers, HFS/root flags and
 zero APFS mounts before permitting read-only inspection. It retains the fixed
 SSH commands and adds a metadata-only `diagnose` command. 25 actual-inspector
 cases and six transport cleanup/refusal cases pass offline; device test pending.
-[Updated code and measured result](code/storage/ios12-pongo-handoff/).
+[Updated code and measured result](../../code/storage/ios12-pongo-handoff/).
 
 ## Earlier checkpoints
 
@@ -66,7 +66,7 @@ image. It also automates the temporary no-preflight usbmuxd transport that
 reached SSH in the first test, with proxy cleanup and host-service restoration.
 Offline checks, including five transport cleanup/refusal cases, pass. The next
 DFU tests authentication and read-only storage inspection; it is not an install.
-[Code, separate device evidence and next candidate](code/storage/ios12-pongo-handoff/).
+[Code, separate device evidence and next candidate](../../code/storage/ios12-pongo-handoff/).
 
 ## Earlier checkpoints
 
@@ -84,7 +84,7 @@ and incorporates the181 recovery-cache records:1881 total. It requires the
 entire original RAM cache hash to match before upload, validates the full bundle,
 checks RAM copies and handoff metadata, and separates staging from boot.
 All offline checks pass; hardware staging and recovery boot remain untested.
-[Code and checks](code/storage/ios12-pongo-handoff/). No disk writes occurred.
+[Code and checks](../../code/storage/ios12-pongo-handoff/). No disk writes occurred.
 
 # 2 November: compact Pongo observer prepared after partial second capture
 
@@ -99,7 +99,7 @@ before reading the full console ring. Smaller reads were rejected as a design:
 Pongo discards leading output, rather than preserving it for later short reads.
 Eleven real C callback cases, eight frame refusals and idle-before-read transport
 checks pass offline. Runtime remains untested; this is a changed test, not a
-claimed fix. [Actual code/results](code/storage/ios12-pongo-compact/).
+claimed fix. [Actual code/results](../../code/storage/ios12-pongo-compact/).
 
 # 2 November: Pongo inventory captured; corrected probe needs a fresh session
 
@@ -113,7 +113,7 @@ read lost console access; an incompatible pointer conversion is suspected from
 source. The next test uses one corrected observer load in fresh Pongo and avoids
 those built-ins. Six real-source property cases and twelve malformed-frame
 refusals now pass, alongside the existing span/Mach-O/transport checks.
-[Actual source and separate device/offline results](code/storage/ios12-pongo-probe/).
+[Actual source and separate device/offline results](../../code/storage/ios12-pongo-probe/).
 No disk or snapshot writes occurred. Normal iOS return is pending owner confirmation.
 
 # Current recovery gate: inspect the proven Pongo handoff
@@ -122,7 +122,7 @@ The gaster route did not restore a pwned USB endpoint after its A7 reconnect
 prompt. It uploaded no bootloader or recovery image. The owner has returned the
 iPad to iOS. A different, read-only test is now built using the checkra1n/Pongo
 path already proven on this J72: identify the loaded XNU kernel, boot arguments
-and reserved memory-map slots. [Actual observer source/results](code/storage/ios12-pongo-probe/).
+and reserved memory-map slots. [Actual observer source/results](../../code/storage/ios12-pongo-probe/).
 
 The next DFU establishes that inventory; it is not an installation or a claim
 that the recovery image boots. A healthy Pongo session can be reused while the
@@ -142,7 +142,7 @@ minimum-size query without mounted APFS. It will not create space or install.
 The original snapshot remains intact; its effect on the high shrink minimum
 is still unproved. After recovery qualification we can prepare a concrete
 space-creation proposal, including recovery limits, for separate review.
-[Actual source and checks](code/storage/ios12-ram-recovery/).
+[Actual source and checks](../../code/storage/ios12-ram-recovery/).
 
 # J72 internal storage: morning runbook
 
@@ -155,11 +155,11 @@ Preserve iOS by default. The host kernel stays unchanged.
 
 ## Ready on the host
 
-- [GPT checker and free-space planner](code/storage/j72_storage_preflight.py):
+- [GPT checker and free-space planner](../../code/storage/j72_storage_preflight.py):
   validates both table copies, geometry, CRCs, ranges and overlaps; preserves
   every existing partition. It operates on captured regular files only and
   generates no write commands. Sixteen synthetic unit tests pass.
-- [ANS1 loader candidates and audit](code/storage/README.md): duplicate-free
+- [ANS1 loader candidates and audit](../../code/storage/README.md): duplicate-free
   fix plus a positive command allowlist, measured geometry and read bounds.
   The second candidate passes 280 cases using actual extracted source with
   host stubs and UBSan. No complete loader build or hardware qualification.
@@ -167,13 +167,13 @@ Preserve iOS by default. The host kernel stays unchanged.
   read-only `e2fsck` passes. The original image hash is unchanged. This is a
   filesystem rehearsal, not a bootable internal-root release.
 - Pinned Orchard/J81 reference material, historical J72 controller facts,
-  synthetic accepted/blocked/corrupt GPT captures and [sanitized results](code/storage/PREPARATION-RESULT.json).
+  synthetic accepted/blocked/corrupt GPT captures and [sanitized results](../../code/storage/PREPARATION-RESULT.json).
 - Existing proven RAM boot, desktop, Wi-Fi and USB recovery path retained as
   the rescue baseline. Private firmware and image contents stay local.
 
 ## 2 November observer build
 
-A new [Linux ASP observer](code/storage/linux-asp-observer35/) is fully built
+A new [Linux ASP observer](../../code/storage/linux-asp-observer35/) is fully built
 in isolation: #35 kernel, matching storage/recovery modules, new loader and
 RAM USB shells. All strong imports resolve; 307 actual-source host cases and
 payload/archive checks pass. The storage module is not loaded automatically.
@@ -201,7 +201,7 @@ before requesting buttons. Compatible checks share a running boot.
 ## iOS checks passed; next recovery work
 
 The owner reapplied the existing Amethyst jailbreak and root SSH returned.
-The [device-tested read-only helpers](code/storage/ios12-readonly-inspect/)
+The [device-tested read-only helpers](../../code/storage/ios12-readonly-inspect/)
 confirm one root snapshot and no data snapshots. The exact
 `APFSContainerGetMinimalSize` spelling used in Orchard returns success and
 126,357,602,304 bytes, leaving only 1,642,352,640 bytes against the measured

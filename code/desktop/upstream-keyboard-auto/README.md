@@ -8,7 +8,7 @@ unit suite passes 113 tests with no skips. Actual Wayland/client behavior and a
 finished image are untested; no new device is marked supported.
 
 [Patch](keyboard-auto.patch), [base/hash/results](RESULT.json),
-[integration plan](../../../UPSTREAM-INTEGRATION-PLAN.md).
+[integration plan](../../../history/plans-and-reports/UPSTREAM-INTEGRATION-PLAN.md).
 
 Apply to that pinned source checkout with `git apply --check`, then `git apply`.
 Run its documented unit suite in the correct isolated test environment. The

@@ -1,4 +1,4 @@
-> **Historical report / superseded plan.** Start with the [current status](J72-PROGRESS.md) and [replication guide](QUICKSTART.md). Statements below describe their original session, not current support.
+> **Historical report / superseded plan.** Start with the [current status](../../J72-PROGRESS.md) and [replication guide](../../QUICKSTART.md). Statements below describe their original session, not current support.
 
 # Completing J72 power support
 
@@ -32,7 +32,7 @@ was 36.7°C, below the actual thermal-trip cutoff. The final warm wait dominated
 the tail of the run; this is a cause identified in the trace, not proof that a
 policy change will produce net gain.
 
-The separate [restart candidate](code/charging/voltage-resume35/) permits only
+The separate [restart candidate](../../code/charging/voltage-resume35/) permits only
 voltage/SOC-hold restart in the existing active 36.6–38°C range. Initial starts,
 expired windows and actual thermal recovery retain the cool gate. Actual
 thermal history is latched. Hard active cutoffs, source/current/window/fault

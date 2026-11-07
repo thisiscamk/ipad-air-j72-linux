@@ -1,4 +1,4 @@
-> **Historical report / superseded plan.** Start with the [current status](J72-PROGRESS.md) and [replication guide](QUICKSTART.md). Statements below describe their original session, not current support.
+> **Historical report / superseded plan.** Start with the [current status](../../J72-PROGRESS.md) and [replication guide](../../QUICKSTART.md). Statements below describe their original session, not current support.
 
 # J72 integration with Orchard and Omarchy A
 
@@ -8,7 +8,7 @@ The latest device trial stopped before charging on seven captured state-2 report
 
 ## Prepared native CLI candidate
 
-The [source review bundle](code/upstream/orchard-j72-cli/) contains the
+The [source review bundle](../../code/upstream/orchard-j72-cli/) contains the
 experimental descriptor, verified firmware recipe, explicit A7 bootstrap and
 standard USB console, plus a separately scoped shared-tools reuse fix.
 A real 11.9 MB image builds through the checkout's `orchard build` command
@@ -253,8 +253,8 @@ the known lab/client combination as already integrated.
 
 ## Source review and host results
 
-The isolated Omarchy change is supplied as a [reviewable patch](code/desktop/upstream-keyboard-auto/) against the exact revision above. Its full unit suite passes 113 tests; eight are new controller subprocess tests. It has not been tested in the actual Wayland session or a freshly assembled desktop artifact, and no upstream PR was opened by this preparation.
+The isolated Omarchy change is supplied as a [reviewable patch](../../code/desktop/upstream-keyboard-auto/) against the exact revision above. Its full unit suite passes 113 tests; eight are new controller subprocess tests. It has not been tested in the actual Wayland session or a freshly assembled desktop artifact, and no upstream PR was opened by this preparation.
 
 Wi-Fi PR #53 replayed cleanly onto Orchard `6b5fca6` in an isolated local worktree. Eleven converter tests and five producer/distribution-contract tests pass. The remote PR branch is unchanged. A broad Orchard-suite run used an uninstalled checkout and was stopped/reaped after isolated subprocess imports failed; it is not a full-suite pass. Final whole-suite qualification needs a correctly installed isolated test environment.
 
-The immediate hardware follow-up is the [separate inactive-state candidate](code/touch/inactive1235/), which passes host replay/build/preflight but is device untested. Its lab result will inform native driver work; it will not qualify a newer Orchard kernel by itself.
+The immediate hardware follow-up is the [separate inactive-state candidate](../../code/touch/inactive1235/), which passes host replay/build/preflight but is device untested. Its lab result will inform native driver work; it will not qualify a newer Orchard kernel by itself.

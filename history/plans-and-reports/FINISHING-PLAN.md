@@ -1,4 +1,4 @@
-> **Historical report / superseded plan.** Start with the [current status](J72-PROGRESS.md) and [replication guide](QUICKSTART.md). Statements below describe their original session, not current support.
+> **Historical report / superseded plan.** Start with the [current status](../../J72-PROGRESS.md) and [replication guide](../../QUICKSTART.md). Statements below describe their original session, not current support.
 
 # Plan from the current RAM desktop to an installed J72 tablet
 
@@ -35,7 +35,7 @@ does not establish persistence, autonomous charging or PC-free startup by itself
 - [ ] Measure the candidate on the same workload, retaining qualified input.
 - [ ] Natural actual-thermal-trip cooldown/restart, repeatability and longer endurance.
 
-The [candidate](code/charging/voltage-resume35/) deliberately relaxes only
+The [candidate](../../code/charging/voltage-resume35/) deliberately relaxes only
 voltage/SOC-hold restart eligibility to 36.6–38°C. Initial starts and actual
 thermal recovery retain 36.5°C; hard active limits, source lease, current,
 restoration and fault guards remain intact. **Host-tested, device untested**.
@@ -56,7 +56,7 @@ retries recovered a frame. Cleanup and iOS charging pass.
 
 The state-1 worker then passed owner input checks and processed seven state-1
 frames, but seven captured state-2 reports stopped progression before charging.
-Normal cleanup and iOS charging pass. The [next inactive-state-1/2 candidate](code/touch/inactive1235/)
+Normal cleanup and iOS charging pass. The [next inactive-state-1/2 candidate](../../code/touch/inactive1235/)
 passes actual eight-report/emitter tests, build and V4 preflight; device execution
 remains untested. Input gates remain strict. A fresh DFU is required because the
 current kernel disables module unloading. Continue guarded charging in that boot
@@ -113,7 +113,7 @@ Finish an iOS12-native implementation of the already rehearsed transaction:
 - Keep inspection/classification separate from repair. An unknown, torn or
   foreign state stops progression; no automatic resume or generic GPT repair.
 
-The [portable C fenced-I/O core](code/storage/fenced-io/) now passes 34 actual
+The [portable C fenced-I/O core](../../code/storage/fenced-io/) now passes 34 actual
 C scenarios, a new unlinked host-file write/fsync/readback/fence check, and an
 arm64 iOS12 compile-only probe. Native descriptor/media identity, the native
 flush adapter, full transaction owner and detached resize operation are still

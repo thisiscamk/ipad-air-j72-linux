@@ -17,7 +17,7 @@ published. [Measured result](RESULT.json).
 
 A conditional 1536 MiB Linux partition could hold this base with space left for
 filesystem metadata and a future overlay. An actual shrink remains unqualified
-and requires separate approval. [Capacity/layout review](../../../SPACE-CREATION-REVIEW.md).
+and requires separate approval. [Capacity/layout review](../../../history/plans-and-reports/SPACE-CREATION-REVIEW.md).
 
 ## Device test: desktop-format qualification only
 

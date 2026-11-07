@@ -70,7 +70,7 @@ override; building Pongo locally requires Apple's toolchain.
 
 Review the build receipt. Select the A7 `checkra1n`/Pongo route used here rather
 than assuming another device's default launcher works. The reviewed source
-and [first native CLI report](NATIVE-CLI-BOOT-2026-11-03.md) describe the explicit
+and [first native CLI report](history/plans-and-reports/NATIVE-CLI-BOOT-2026-11-03.md) describe the explicit
 bootstrap/components. Use `orchard run` with the built project/output named in
 that checkout's help; do not invent a prebuilt filename from a historical report.
 

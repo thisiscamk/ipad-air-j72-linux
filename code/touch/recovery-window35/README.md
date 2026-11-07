@@ -4,7 +4,7 @@ The subsequent precharge attempt found **three rejected layouts** while input
 continued with zero SPI errors/timeouts. Its power test was aborted before
 arming. Normal cleanup and iOS charging after unlock pass. The report cause
 is unknown; the earlier bounded run below remains a separate successful result.
-[Follow-up diagnosis](../../../TOUCH-FOLLOWUP-2026-11-03.md),
+[Follow-up diagnosis](../../../history/plans-and-reports/TOUCH-FOLLOWUP-2026-11-03.md),
 [separate resync candidate](../data-resync35/).
 
 The [long-run failure](../LONG-RUN-20261102.md) reached the old six-recovery

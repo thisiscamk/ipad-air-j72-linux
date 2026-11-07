@@ -1,7 +1,7 @@
 # Owner charging overnight; next session prepared
 
 No DFU or device action is pending during the charging break.
-[The next-session runbook](../NEXT-SESSION-PLAN.md) batches:
+[The next-session runbook](plans-and-reports/NEXT-SESSION-PLAN.md) batches:
 
 - [x] New touch recovery-window module built and host-tested.
 - [x] Bounded input/power supervisor:12 host tests and preflight pass; device untested.
@@ -43,7 +43,7 @@ unchanged charging or DFU retries will not resolve the remaining gates.
 
 [Power measurements](../code/charging/maintain35/),
 [touch failure](../code/touch/LONG-RUN-20261102.md),
-[storage transaction plan](../INSTALL-TRANSACTION-PLAN.md).
+[storage transaction plan](plans-and-reports/INSTALL-TRANSACTION-PLAN.md).
 
 ## Earlier preparation
 
@@ -120,7 +120,7 @@ is conditional on native access, installation-method and recovery qualification.
 The compressed export is detached; the RAM desktop and Wi-Fi are running. No internal storage, resize or
 snapshot operation is part of it.
 [Compressed candidate/runbook](../code/storage/compressed-desktop/),
-[space/layout review](../SPACE-CREATION-REVIEW.md).
+[space/layout review](plans-and-reports/SPACE-CREATION-REVIEW.md).
 
 ## Earlier checkpoints
 
@@ -297,7 +297,7 @@ shutdown still requires the Pi; autonomous power policy remains open.
 
 ## Next storage preparation
 
-The [morning runbook](../STORAGE-MORNING-PLAN.md) lists the read-only inventory, implementation, backup, coexistence, rehearsal and later installation batches. Offline checks pass; no fully built ANS1 observer or installer is ready yet. Leave the iPad in iOS charging until a concrete changed test is ready. No storage writes are authorized.
+The [morning runbook](plans-and-reports/STORAGE-MORNING-PLAN.md) lists the read-only inventory, implementation, backup, coexistence, rehearsal and later installation batches. Offline checks pass; no fully built ANS1 observer or installer is ready yet. Leave the iPad in iOS charging until a concrete changed test is ready. No storage writes are authorized.
 
 ## Latest Wi-Fi session
 
@@ -323,7 +323,7 @@ The [morning runbook](../STORAGE-MORNING-PLAN.md) lists the read-only inventory,
 
 No new DFU is needed for the current RAM desktop work. Radio firmware has
 been loaded successfully in RAM; it remains private.
-See [Wi-Fi findings and reuse plan](../WIFI-PLAN.md).
+See [Wi-Fi findings and reuse plan](plans-and-reports/WIFI-PLAN.md).
 
 ## Current Wi-Fi and charging batch
 

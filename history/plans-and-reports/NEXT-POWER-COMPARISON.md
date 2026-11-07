@@ -1,4 +1,4 @@
-> **Historical report / superseded plan.** Start with the [current status](J72-PROGRESS.md) and [replication guide](QUICKSTART.md). Statements below describe their original session, not current support.
+> **Historical report / superseded plan.** Start with the [current status](../../J72-PROGRESS.md) and [replication guide](../../QUICKSTART.md). Statements below describe their original session, not current support.
 
 # Next prepared Linux charging comparison
 
@@ -21,7 +21,7 @@ independent baseline restoration and iOS charging after unlock pass.
 The latest state-1 boot passed owner input checks and processed seven state-1
 reports, but seven captured checksum-valid state-2 reports stopped progression
 before charging. No charging module loaded. Normal cleanup and iOS charging pass.
-The [inactive-state-1/2 candidate](code/touch/inactive1235/) and V4 runner pass
+The [inactive-state-1/2 candidate](../../code/touch/inactive1235/) and V4 runner pass
 actual eight-report replay/tests/build/preflight; they are device untested.
 This kernel has module unloading disabled, so a changed DFU is required.
 The earlier three uncaptured reports remain unexplained. Keep all input, source
@@ -31,7 +31,7 @@ and battery health gates intact. This is a combined touch/power qualification.
 
 Use the same #35 cold payload and new inactive-state-1/2 touch candidate (retaining the prior resync policy).
 The power-policy change remains the separate
-[voltage-hold restart candidate](code/charging/voltage-resume35/): voltage/SOC
+[voltage-hold restart candidate](../../code/charging/voltage-resume35/): voltage/SOC
 holds may resume at 36.6–38°C. Initial starts, actual thermal recovery,
 stop/rearm and expired-window starts retain 36.5°C. An actual >38°C reading
 latches thermal history until a cool restart. Active hard limits, 1050 mA
@@ -70,8 +70,8 @@ sudo -n python3 tools/run-j72-inactive12-session35.py --run --touch-inactive1235
 sudo -n python3 tools/ensure-j72-inactive12-ios-charging.py --run --touch-inactive1235
 ```
 
-[V4 host source references](code/touch/inactive1235/workspace-reference-v4/).
+[V4 host source references](../../code/touch/inactive1235/workspace-reference-v4/).
 These require the private research workspace; they are not public turnkey tools.
 Do not run the original morning driver or load its original charging module
 for this comparison. Storage qualification remains separate: the new
-[C I/O core](code/storage/fenced-io/) is host tested, not a native installer.
+[C I/O core](../../code/storage/fenced-io/) is host tested, not a native installer.

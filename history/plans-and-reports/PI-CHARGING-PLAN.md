@@ -1,4 +1,4 @@
-> **Historical report / superseded plan.** Start with the [current status](J72-PROGRESS.md) and [replication guide](QUICKSTART.md). Statements below describe their original session, not current support.
+> **Historical report / superseded plan.** Start with the [current status](../../J72-PROGRESS.md) and [replication guide](../../QUICKSTART.md). Statements below describe their original session, not current support.
 
 # Latest: #35 hour completes with net loss during thermal hold
 
@@ -7,7 +7,7 @@ at 38.1°C. Full-hour integration is −97.30 mAh, including the hold; independe
 final restoration passed without a controller fault. Brightness and governor
 were restored. Thermal restart, sustained net gain at this workload and
 unattended charging remain open. The device is back in iOS charging.
-[Final measurements and limits](code/charging/maintain35/).
+[Final measurements and limits](../../code/charging/maintain35/).
 
 ## Earlier checkpoint
 
@@ -18,7 +18,7 @@ The reduced-brightness continuous-input run reached **27.2 minutes**, with
 **+449 mA**. At **4.201 V / 37.5°C**, the unchanged **4.2 V voltage guard**
 ended charging. Both independent PMIC snapshots confirmed `04c0=02`; the
 recorder and source monitor are stopped and logs retained. This was not a
-thermal stop or a full-hour pass. [Complete sanitized result](code/charging/hub1050-session/CONTINUOUS-DESKTOP-RESULT.json).
+thermal stop or a full-hour pass. [Complete sanitized result](../../code/charging/hub1050-session/CONTINUOUS-DESKTOP-RESULT.json).
 
 Next: qualify source-aware autonomous charging and the full operating range,
 retain battery protections, and repeat a longer usability run with suitable
@@ -65,7 +65,7 @@ maximum **37.4 C**. It did not complete a full 30-minute run. Its worker
 sample counter retained only the final 295-second window, so that count
 remained zero; the host gauge logs provide the stated observations.
 
-A revised [60-minute continuation](code/charging/hub1050-session/) is active,
+A revised [60-minute continuation](../../code/charging/hub1050-session/) is active,
 with sampling timing fixed and charging independent of the touch window.
 A controlled touch stop/healthy cleanup/restart preserved charging. Full
 duration and restoration on this new worker remain pending. Touch and
@@ -79,7 +79,7 @@ with **140 positive retained readings at +178…+216 mA**, versus a −849 mA
 baseline. USB data remained attached, all guards were clear, maximum
 recorded temperature was **37.8 C**, and original `04c0=02` restoration
 was verified. The owner confirmed the new battery percentage indicator
-and charging symbol. [Exact source and validation](code/charging/hub1050-desktop/).
+and charging symbol. [Exact source and validation](../../code/charging/hub1050-desktop/).
 
 A separate continuation is running with display brightness reduced from
 1604 to 802 out of 2047. Initial live gauge reads are approximately
@@ -101,8 +101,8 @@ powered JCH377 port. Autonomous charger detection, source transitions and
 full desktop charging remain open. Battery percentage jumped under load
 changes, so a percentage increase is not claimed as charge gained.
 
-The [measured five-minute worker source](code/charging/hub1050-long/) is now
-included beside the [short worker](code/charging/hub1050/). Both are also in
+The [measured five-minute worker source](../../code/charging/hub1050-long/) is now
+included beside the [short worker](../../code/charging/hub1050/). Both are also in
 Orchard PR #43 for interim implementation review. Wi-Fi will be a separate
 follow-up once it works. No internal-storage write is authorized.
 
@@ -121,7 +121,7 @@ and timestamps establish successful duration and restoration. The later
 candidate checks terminal state on this race and still propagates errors
 while a trial is active.
 
-The [actual short-test source](code/charging/hub1050/) is published with tests
+The [actual short-test source](../../code/charging/hub1050/) is published with tests
 and sanitized validation. A separate **1,050 mA / five-minute** worker is
 staged unarmed in the same RAM boot, gated on the actual successful short
 result and restoration. It retains all battery/source/USB guards. Sustained

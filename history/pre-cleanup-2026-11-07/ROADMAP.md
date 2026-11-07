@@ -2,8 +2,8 @@
 
 # Roadmap to a usable J72 Omarchy A tablet
 
-Updated 3 November 2026. The [full finishing plan](../../FINISHING-PLAN.md) is the
-current action list; [DFU-PLAN.md](../../DFU-PLAN.md) tracks proposed boot batches.
+Updated 3 November 2026. The [full finishing plan](../plans-and-reports/FINISHING-PLAN.md) is the
+current action list; [DFU-PLAN.md](../plans-and-reports/DFU-PLAN.md) tracks proposed boot batches.
 
 ## Demonstrated
 

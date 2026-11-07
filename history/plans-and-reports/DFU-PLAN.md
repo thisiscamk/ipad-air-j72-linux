@@ -1,11 +1,11 @@
-> **Historical report / superseded plan.** Start with the [current status](J72-PROGRESS.md) and [replication guide](QUICKSTART.md). Statements below describe their original session, not current support.
+> **Historical report / superseded plan.** Start with the [current status](../../J72-PROGRESS.md) and [replication guide](../../QUICKSTART.md). Statements below describe their original session, not current support.
 
 # Remaining DFU batches — 3 November 2026
 
 ## Current integration sequence
 
 The owner has asked to progress toward normal `orchard build` and `orchard run`
-commands. The [native CLI candidate](code/upstream/orchard-j72-cli/) is prepared
+commands. The [native CLI candidate](../../code/upstream/orchard-j72-cli/) is prepared
 for the next authorized direct-Pi DFU:
 
 - [x] Experimental J72 descriptor and explicit A7 bootstrap.
@@ -97,4 +97,4 @@ and its stop/cleanup conditions before requesting DFU. Use the proven direct-Pi
 boot path; the unchanged hub handoff has failed. Reap the one boot owner before
 starting another. Keep firmware/calibration and identifying captures local.
 
-[Earlier dated checklist history](history/DFU-PLAN-BEFORE-2026-11-03.md).
+[Earlier dated checklist history](../DFU-PLAN-BEFORE-2026-11-03.md).

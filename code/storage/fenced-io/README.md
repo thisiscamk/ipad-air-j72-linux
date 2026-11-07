@@ -39,7 +39,7 @@ report unflushed/unverified bytes as installed.
 [Machine-readable result and hashes](RESULT.json). No iPad was contacted.
 Host `fsync` and a compiled ABI object do not establish native iOS flush support,
 NAND durability, encrypted APFS resizing or recovery after interrupted writes.
-The [RAM ownership harness](../../../RAM-APFS-REHEARSAL-PLAN.md) is still unbuilt.
+The [RAM ownership harness](../../../history/plans-and-reports/RAM-APFS-REHEARSAL-PLAN.md) is still unbuilt.
 
 Run locally from this directory:
 

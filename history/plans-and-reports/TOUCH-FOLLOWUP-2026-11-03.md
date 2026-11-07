@@ -1,4 +1,4 @@
-> **Historical report / superseded plan.** Start with the [current status](J72-PROGRESS.md) and [replication guide](QUICKSTART.md). Statements below describe their original session, not current support.
+> **Historical report / superseded plan.** Start with the [current status](../../J72-PROGRESS.md) and [replication guide](../../QUICKSTART.md). Statements below describe their original session, not current support.
 
 # 3 November follow-up: charging stopped at the input gate
 
@@ -20,7 +20,7 @@ Normal desktop/input/radio cleanup and independent baseline `02` pass. iOS
 returned. Diagnostics initially could not confirm charging; the owner unlocked
 with the PIN and confirmed it. Two later iOS diagnostic samples confirm charging
 on the qualified hub. The iPad remains charging in iOS.
-[Sanitized result](code/charging/voltage-resume35/DEVICE-STAGE-RESULT.json).
+[Sanitized result](../../code/charging/voltage-resume35/DEVICE-STAGE-RESULT.json).
 
 ## Evidence gap and preparation
 
@@ -36,7 +36,7 @@ type, unrestored baseline refusal, active-session refusal, failed stop APIs,
 wrong export size and shell syntax. The synthetic type is not evidence of the
 actual rejected report type.
 
-The [separate data-phase resync candidate](code/touch/data-resync35/) builds
+The [separate data-phase resync candidate](../../code/touch/data-resync35/) builds
 warning-free and passes acquisition/recovery tests, including every advertised
 16-bit length. It addresses checksum-valid E1 headers in data replies, a known
 lead from prior private J72 captures and Orchard's J71b fix. Its initial device checks now pass, but it may not fix the three layout
@@ -86,7 +86,7 @@ We will retain complete packet/bounds/duplicate-ID validation and reject other
 unknown states. No parser change is yet qualified. The three uncaptured reports
 from the prior attempt remain unexplained. Raw packets stay private.
 
-The [separate state-1 inactive candidate](code/touch/state135/) now passes actual
+The [separate state-1 inactive candidate](../../code/touch/state135/) now passes actual
 emitter/private-report replay, exhaustive state tests, warning-free build/import
 checks and V3 host preflight. It is device untested. The device remains in iOS
 charging; use the new runbook selector for the next changed DFU.
@@ -107,7 +107,7 @@ The selected V3 iOS-return helper now handled the absent charging module normall
 iOS returned, the owner unlocked and two fresh diagnostic samples confirm charging
 at 70% on the qualified hub.
 
-The [next inactive-state-1/2 candidate](code/touch/inactive1235/) preserves active
+The [next inactive-state-1/2 candidate](../../code/touch/inactive1235/) preserves active
 states 3/4 and all other packet/layout/refusal/cleanup rules. Actual C emitter
 replay of the earlier state-1 report plus all seven state-2 reports, exhaustive
 state/malformed-report checks, original acquisition/recovery tests, warning-free

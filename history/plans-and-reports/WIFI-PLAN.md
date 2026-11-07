@@ -1,4 +1,4 @@
-> **Historical report / superseded plan.** Start with the [current status](J72-PROGRESS.md) and [replication guide](QUICKSTART.md). Statements below describe their original session, not current support.
+> **Historical report / superseded plan.** Start with the [current status](../../J72-PROGRESS.md) and [replication guide](../../QUICKSTART.md). Statements below describe their original session, not current support.
 
 # J72 Wi-Fi preparation
 
@@ -11,8 +11,8 @@ SSH all passed. Deliberate disconnect/reconnect and an explicit DHCP renewal
 also passed, with USB recovery still available. Wi-Fi SSH can control the live
 RAM system. The owner confirmed the brighter desktop, touch, menu and keyboard.
 
-The [actual HSIC provider and USB driver source/patches](code/wifi/usb-hsic/)
-are now shared with measured limits. The [Wi-Fi bar icon](code/desktop/wifi/)
+The [actual HSIC provider and USB driver source/patches](../../code/wifi/usb-hsic/)
+are now shared with measured limits. The [Wi-Fi bar icon](../../code/desktop/wifi/)
 shows connection, signal and frequency in a tappable popup. Desktop-user HTTPS
 also passed after supplying the DHCP resolver through a RAM file bind; the
 original desktop image remains unchanged.
@@ -100,7 +100,7 @@ private firmware and vendor-helper readiness. The next overlay includes the
 complete recovery-module set and starts at owner-requested brightness 1604/2047.
 
 Offline verification passes 84 actual-source HCD/lifecycle cases under UBSan,
-plus USB transfer/ROM/TRX checks and [18 synthetic packer cases](code/wifi/usb-firmware/).
+plus USB transfer/ROM/TRX checks and [18 synthetic packer cases](../../code/wifi/usb-firmware/).
 The private J72 image passes CRC/layout/size checks. **Cold boot and radio
 firmware startup with this candidate remain untested.**
 
@@ -112,7 +112,7 @@ desktop; brightness was then raised from 802 to 1604 in that live session.
 The desktop image lacks Wi-Fi tools and an SSH server. A separate RAM-only
 userspace bundle is now staged privately, without modifying that image. Native
 ARM64 tool checks, pinned-key localhost SSH and exact-bootstrap BusyBox bundle
-transfer passed. The reusable [network scripts and offline checks](code/wifi/network-userspace/)
+transfer passed. The reusable [network scripts and offline checks](../../code/wifi/network-userspace/)
 are published; no archive, credentials, keys or firmware are included.
 
 Orchard's [firmware-handshake port-authorization fix](https://github.com/OrchardLinux/orchard/blob/824bf0346ae4c3debd208cd34b053130576af60c/kernel/patches/drivers/wifi/0004-wifi-brcmfmac-Report-port-authorized-after-the-firm.patch)
@@ -139,7 +139,7 @@ USB clock configuration words already set to `0x108`. The existing kernel
 power-domain owner restored HSIC1 and its USB2HOST0 parent after the read.
 HSIC1 enters automatic clock gating after a successful resume; the diagnostic
 now recognizes the owning driver's state semantics without raw gate writes.
-[Source, host fault tests and measured limits](code/wifi/hsic-phy-observer/).
+[Source, host fault tests and measured limits](../../code/wifi/hsic-phy-observer/).
 
 The next step is a bounded native PHY transition with exact restoration of
 control `0x4`. Radio reset/ready sequencing, USB enumeration, chip/firmware
@@ -186,7 +186,7 @@ Keep original attribution when adapting any code.
 
 ## Concrete preparation completed
 
-The [offline staging helper](code/wifi/prepare-j72-wifi.py) now:
+The [offline staging helper](../../code/wifi/prepare-j72-wifi.py) now:
 
 1. Checks the pinned kernel image, configuration, symbol table and existing
    module hashes. The two development kernels share a release string, so
@@ -208,7 +208,7 @@ The [offline staging helper](code/wifi/prepare-j72-wifi.py) now:
 The real local candidate passed these offline checks. Seven synthetic refusal
 tests cover changed inputs, incomplete receipts, path/symlink escapes, bad TRX,
 already-packed input and overwriting a pinned candidate. The
-[sanitized preparation receipt](code/wifi/VALIDATION.json) contains no firmware,
+[sanitized preparation receipt](../../code/wifi/VALIDATION.json) contains no firmware,
 calibration, credentials or device-specific identifiers.
 
 This is a module/input staging area, **not a complete boot payload**. Kernel

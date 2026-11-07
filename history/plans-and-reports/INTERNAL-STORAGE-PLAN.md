@@ -1,4 +1,4 @@
-> **Historical report / superseded plan.** Start with the [current status](J72-PROGRESS.md) and [replication guide](QUICKSTART.md). Statements below describe their original session, not current support.
+> **Historical report / superseded plan.** Start with the [current status](../../J72-PROGRESS.md) and [replication guide](../../QUICKSTART.md). Statements below describe their original session, not current support.
 
 # Latest preparation: first read-only root can use an iOS write backend
 
@@ -6,7 +6,7 @@ The combined #35 desktop/Wi-Fi/native-read boot now passes; owner UI and normal
 nested loop/ext4/NBD/export cleanup also pass. This kernel also reports a linear
 DM target. The bounded view planner and host-only future GPT rehearsal pass 13
 test methods, and the actual current all-APFS capture refuses native mapping.
-[Prepared source, exact arithmetic and limits](code/storage/native-root-preparation/).
+[Prepared source, exact arithmetic and limits](../../code/storage/native-root-preparation/).
 
 The first local root may use a separately qualified **iOS native writer** to
 install the image, keeping Linux ASP read-only. Linux write/flush qualification
@@ -29,13 +29,13 @@ The owner has no backup and states that no personal content needs preserving. A 
 
 ## Prepared now
 
-See the [morning runbook](STORAGE-MORNING-PLAN.md) for the next actions, the [offline tools and ANS1 audit](code/storage/README.md), and [test receipts](code/storage/PREPARATION-RESULT.json). The metadata checker validates both GPT copies and makes a free-space-only dry run. An inactive loader guard passes 280 host cases; a separate 3 GiB host filesystem copy passes a canary reopening check and read-only e2fsck. None of these is a boot-qualified storage image or an installer.
+See the [morning runbook](STORAGE-MORNING-PLAN.md) for the next actions, the [offline tools and ANS1 audit](../../code/storage/README.md), and [test receipts](../../code/storage/PREPARATION-RESULT.json). The metadata checker validates both GPT copies and makes a free-space-only dry run. An inactive loader guard passes 280 host cases; a separate 3 GiB host filesystem copy passes a canary reopening check and read-only e2fsck. None of these is a boot-qualified storage image or an installer.
 
-Fresh read-only #35 results identify a 128,000,000,000-byte disk with 4096-byte logical blocks. Repeated direct 4 KiB reads match. Both GPT copies and their arrays pass CRC and consistency checks: one APFS partition occupies LBAs 6–31,249,994, with **no unallocated gap**. Bounded APFS checkpoint and space-manager metadata checks report 71,745,007,616 free bytes inside the container. This is not a validated shrink minimum. No filesystem was mounted and no internal write or unlock was issued by that observer. See the [measured observer result](code/storage/linux-asp-observer35/RESULT.json).
+Fresh read-only #35 results identify a 128,000,000,000-byte disk with 4096-byte logical blocks. Repeated direct 4 KiB reads match. Both GPT copies and their arrays pass CRC and consistency checks: one APFS partition occupies LBAs 6–31,249,994, with **no unallocated gap**. Bounded APFS checkpoint and space-manager metadata checks report 71,745,007,616 free bytes inside the container. This is not a validated shrink minimum. No filesystem was mounted and no internal write or unlock was issued by that observer. See the [measured observer result](../../code/storage/linux-asp-observer35/RESULT.json).
 
-Subsequent live iOS inspection with the existing Amethyst jailbreak confirms one root snapshot and no data snapshots. Orchard's exact `APFSContainerGetMinimalSize` query reports 126,357,602,304 bytes, leaving only 1,642,352,640 bytes geometrically available for shrink. That is insufficient for the original uncompressed desktop. The later 1536 MiB compressed-container host rehearsal fits the conditional aligned layout; the actual shrink remains unqualified. The original root snapshot supports Amethyst rollback and has not been changed. A snapshot contribution to the high minimum is plausible, not proved. [Measured helpers and result](code/storage/ios12-readonly-inspect/).
+Subsequent live iOS inspection with the existing Amethyst jailbreak confirms one root snapshot and no data snapshots. Orchard's exact `APFSContainerGetMinimalSize` query reports 126,357,602,304 bytes, leaving only 1,642,352,640 bytes geometrically available for shrink. That is insufficient for the original uncompressed desktop. The later 1536 MiB compressed-container host rehearsal fits the conditional aligned layout; the actual shrink remains unqualified. The original root snapshot supports Amethyst rollback and has not been changed. A snapshot contribution to the high minimum is plausible, not proved. [Measured helpers and result](../../code/storage/ios12-readonly-inspect/).
 
-Current Orchard uses a boot partition read by m1n1 itself; the latest launch change removes the host fallback reader. Its 1 GiB boot / 8 GiB minimum root policy is a sizing reference, not an approved J72 layout. The original reviewed tree has no Linux ASP implementation to enable for J72. Our subsequently ported and hardened [read-only Linux ASP observer](code/storage/linux-asp-observer35/) now passes initial hardware reads; writable storage remains unqualified.
+Current Orchard uses a boot partition read by m1n1 itself; the latest launch change removes the host fallback reader. Its 1 GiB boot / 8 GiB minimum root policy is a sizing reference, not an approved J72 layout. The original reviewed tree has no Linux ASP implementation to enable for J72. Our subsequently ported and hardened [read-only Linux ASP observer](../../code/storage/linux-asp-observer35/) now passes initial hardware reads; writable storage remains unqualified.
 
 ## When to start
 
@@ -64,7 +64,7 @@ Reviewed Orchard at
 
 **Audit result:** the imported `ans1_shutdown()` frees its command buffer
 twice. No later patch in the reviewed series changes that function. The
-[one-line candidate and host reproducer](code/storage/README.md) reproduce
+[one-line candidate and host reproducer](../../code/storage/README.md) reproduce
 the duplicate-free assertion in the extracted original function and pass
 with the candidate, including repeat shutdown and UBSan checks. The full
 loader has not been rebuilt or hardware tested with it. Review error-path

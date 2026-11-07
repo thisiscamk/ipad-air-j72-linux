@@ -24,7 +24,7 @@ The normal checkout `bin/orchard build examples/usb-console --device j72`
 path has produced a real 11.9 MB image using coherent verified nightly kernel,
 loader and tools plus an explicit known Pongo 2.6.3 image. The device booted that image with `orchard run ... --no-build --yes`.
 Serial/SSH, `orchard exec`, RAM-only file transfer and normal iOS USB return
-pass. See the [measured result](../../../NATIVE-CLI-BOOT-2026-11-03.md).
+pass. See the [measured result](../../../history/plans-and-reports/NATIVE-CLI-BOOT-2026-11-03.md).
 
 A source build can use `--kernel-tree`; the prepared first image instead
 uses the normal `--kernel-dir`, `--busybox`, `--loader`, `--pongo` and `--cache`

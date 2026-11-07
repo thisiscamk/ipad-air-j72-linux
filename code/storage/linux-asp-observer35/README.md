@@ -76,7 +76,7 @@ write/flush/recovery qualification, iOS 12 coexistence and native-root boot
 remain open. No internal writes, unlock, format, auxiliary access, discard or
 filesystem mount occurred. Raw metadata, device identities and logs stay local.
 
-See the [storage runbook](../../../STORAGE-MORNING-PLAN.md) for remaining gates.
+See the [storage runbook](../../../history/plans-and-reports/STORAGE-MORNING-PLAN.md) for remaining gates.
 
 [host-inventory-reference.py](host-inventory-reference.py) is the actual workspace
 helper, intended at `tools/run-j72-storage-observer.py` alongside the workspace

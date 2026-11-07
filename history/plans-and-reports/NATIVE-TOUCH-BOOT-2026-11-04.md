@@ -1,4 +1,4 @@
-> **Historical report / superseded plan.** Start with the [current status](J72-PROGRESS.md) and [replication guide](QUICKSTART.md). Statements below describe their original session, not current support.
+> **Historical report / superseded plan.** Start with the [current status](../../J72-PROGRESS.md) and [replication guide](../../QUICKSTART.md). Statements below describe their original session, not current support.
 
 # Native touch and Omarchy RAM desktop: first device result
 
@@ -63,7 +63,7 @@ detached processes rooted in its overlay, verifying process identity first.
 All desktop mounts were then verified gone. Follow-up source fixes incorporate
 that ownership check, ordinary process-exit races and BusyBox-compatible group
 signaling. The new source passes **136 host tests**, including a detached-process
-regression fixture. [Source patches](code/upstream/omarchy-a-ram-foot/).
+regression fixture. [Source patches](../../code/upstream/omarchy-a-ram-foot/).
 
 The tested session was the original payload plus those documented RAM fixes.
 A rebuilt image containing all fixes has not yet been tested on the device.

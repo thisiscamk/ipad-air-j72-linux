@@ -47,4 +47,4 @@ The target still needs its exact working kernel/driver/firmware, a live radio,
 regulatory configuration appropriate to its location and an owner-supplied
 network profile. The first prepared connection test is WPA2 personal/RSN/CCMP;
 WPA3, enterprise and roaming are not claimed. USB recovery stays available.
-See the [current Wi-Fi plan](../../../WIFI-PLAN.md).
+See the [current Wi-Fi plan](../../../history/plans-and-reports/WIFI-PLAN.md).

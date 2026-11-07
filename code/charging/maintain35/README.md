@@ -6,7 +6,7 @@ restart was blocked above 36.5°C; peak temperature was 36.7°C, without an
 actual thermal trip above 38°C. Independent final baseline restoration and
 normal input/desktop/radio cleanup pass. iOS charging at 81% is now owner- and
 diagnostic-confirmed after PIN entry. [Measured result](NINETY-MINUTE-RESULT.json),
-[session diagnosis](../../../SESSION-2026-11-03.md),
+[session diagnosis](../../../history/plans-and-reports/SESSION-2026-11-03.md),
 [separate device-untested restart candidate](../voltage-resume35/).
 
 The earlier result below is retained as a distinct experiment.

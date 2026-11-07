@@ -23,8 +23,8 @@ There is no automatic repair/resume or approval interface.
 [failure tests](../test_j72_host_write_rehearsal.py),
 [workspace driver reference](rehearse-j72-stream-write.py).
 
-[Next batched session](../../../NEXT-SESSION-PLAN.md),
-[proposed RAM APFS experiment](../../../RAM-APFS-REHEARSAL-PLAN.md).
+[Next batched session](../../../history/plans-and-reports/NEXT-SESSION-PLAN.md),
+[proposed RAM APFS experiment](../../../history/plans-and-reports/RAM-APFS-REHEARSAL-PLAN.md).
 The owner is charging overnight; no device action is pending.
 
 ## Earlier checkpoint
@@ -77,7 +77,7 @@ sysfs DM name. A transient busy removal was inspected and normally cleaned;
 the successful second rehearsal also waits for udev and uses normal retry.
 The host swap loop was untouched. This is not a device-root boot result.
 
-See [the transaction and recovery plan](../../../INSTALL-TRANSACTION-PLAN.md),
+See [the transaction and recovery plan](../../../history/plans-and-reports/INSTALL-TRANSACTION-PLAN.md),
 [interruption model](../j72_install_state.py),
 [checkpoint checker](../j72_apfs_checkpoint_plan.py), and
 [host rehearsal reference](rehearse-j72-host-native-view.py).

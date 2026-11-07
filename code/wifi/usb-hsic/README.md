@@ -43,4 +43,4 @@ stop/restoration is still unqualified.** Sustained traffic, power transitions,
 autonomous charging, suspend/resume and repeat cold starts remain open.
 The desktop still depends on read-only USB/NBD storage and must be detached
 before moving its cable. No internal-storage writes or installation occurred.
-See [measured validation](VALIDATION.json) and the [session plan](../../../DFU-PLAN.md).
+See [measured validation](VALIDATION.json) and the [session plan](../../../history/plans-and-reports/DFU-PLAN.md).

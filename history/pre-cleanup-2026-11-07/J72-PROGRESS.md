@@ -21,8 +21,8 @@ battery/voltage limits can delay the charging measurement; use that period for
 ordinary input/idle checks. Exact-stock RAM/APFS tools were found offline, and
 a guarded scratch experiment is designed but not built or ready to run.
 
-[Next-session plan](../../NEXT-SESSION-PLAN.md), [power plan](../../POWER-COMPLETION-PLAN.md),
-[scratch APFS design](../../RAM-APFS-REHEARSAL-PLAN.md).
+[Next-session plan](../plans-and-reports/NEXT-SESSION-PLAN.md), [power plan](../plans-and-reports/POWER-COMPLETION-PLAN.md),
+[scratch APFS design](../plans-and-reports/RAM-APFS-REHEARSAL-PLAN.md).
 
 ## Earlier checkpoint
 
@@ -107,7 +107,7 @@ The next #35 candidate combines native read-only storage with matched desktop,
 touch, Wi-Fi and SquashFS modules. A 1536 MiB ext4 host container holding the
 compressed base passes capacity/read-only verification and cleanup. The combined
 payload and its USB container-desktop rehearsal are **device untested**. No
-internal writes are authorized or performed. [Next DFU](../../DFU-PLAN.md),
+internal writes are authorized or performed. [Next DFU](../plans-and-reports/DFU-PLAN.md),
 [candidate source](../../code/storage/desktop-storage35).
 
 ## Previous checkpoint
@@ -140,7 +140,7 @@ for an interim local-root milestone. Native storage/root qualification, durable
 writes and unattended charging remain open.
 [Recovery result](../../code/storage/ios12-pongo-handoff),
 [compressed test/source](../../code/storage/compressed-desktop),
-[space review](../../SPACE-CREATION-REVIEW.md).
+[space review](../plans-and-reports/SPACE-CREATION-REVIEW.md).
 
 ## Earlier checkpoints
 
@@ -396,7 +396,7 @@ passes read-only e2fsck. The original image hash is unchanged. This checks
 filesystem persistence only; native-root boot, package updates and persistent
 network/desktop services remain untested.
 
-The [morning runbook](../../STORAGE-MORNING-PLAN.md) records the next batches and
+The [morning runbook](../plans-and-reports/STORAGE-MORNING-PLAN.md) records the next batches and
 [remaining source audit](../../code/storage/ANS1-AUDIT.md). Key blockers are J72 ANS1
 integration/qualification and a verified iOS 12 space-creation/coexistence
 procedure. Cached iOS inventory suggests almost all the main disk is APFS;
@@ -480,7 +480,7 @@ This is the accepted first independence milestone: **Pi-assisted startup,
 then unplugged RAM use**. It is not persistent storage or PC-free cold startup.
 Autonomous charging/source policy, complete radio cleanup and repeatability
 remain open. iOS and internal storage are unchanged. See the
-[independence plan](../../INDEPENDENCE-PLAN.md) and [current checklist](../../DFU-PLAN.md).
+[independence plan](../plans-and-reports/INDEPENDENCE-PLAN.md) and [current checklist](../plans-and-reports/DFU-PLAN.md).
 
 # 1 November: the Wi-Fi radio responds to HOST_READY
 
@@ -570,7 +570,7 @@ is discharging; no new charging control trial has run. Wi-Fi remains offline.
 
 The owner accepts Pi-assisted startup followed by unplugged operation as the
 first independence milestone. Offline work can proceed while iOS charges.
-The [Wi-Fi plan](../../WIFI-PLAN.md) records Orchard applicability and the exact
+The [Wi-Fi plan](../plans-and-reports/WIFI-PLAN.md) records Orchard applicability and the exact
 HSIC/BCM4324B5 gaps. A new helper verified/staged the #34 kernel's wireless
 modules, vendor helper, matched continuous-touch candidate and private inputs.
 It found the built USB aliases do not match the identity observed in iOS;
@@ -579,9 +579,9 @@ no WLAN enumeration, firmware upload or association is claimed.
 The storage review found an imported ANS1 shutdown double-free. A one-line
 candidate passed a host reproducer against the extracted original function,
 including repeated shutdown and UBSan checks. The full loader is not built
-or device tested with it. The [storage plan](../../INTERNAL-STORAGE-PLAN.md) now maps
+or device tested with it. The [storage plan](../plans-and-reports/INTERNAL-STORAGE-PLAN.md) now maps
 Orchard's ANS1/firmware handoff, J81 native-root code and iOS 12 gaps; the
-[full independence plan](../../INDEPENDENCE-PLAN.md) covers RAM root through a later
+[full independence plan](../plans-and-reports/INDEPENDENCE-PLAN.md) covers RAM root through a later
 separately approved install. No new DFU or internal write is requested.
 
 # 1 November: iOS charging break after the temperature test cutoff
@@ -648,7 +648,7 @@ No further DFU is planned tonight. Internal storage and the Pi kernel are
 unchanged.
 
 Next: finish J72 source/controller mapping and adapt the existing
-[Orchard charging architecture](../../ORCHARD-POWER-PLAN.md), then qualify source
+[Orchard charging architecture](../plans-and-reports/ORCHARD-POWER-PLAN.md), then qualify source
 transitions, sustained positive current and charging with the desktop.
 A new DFU will be requested only after a concrete changed test is prepared.
 
@@ -763,7 +763,7 @@ The owner then completed holds, swipes and two-finger gestures during a roughly 
 
 Full returned packets are retained privately. Compressed snapshot export removes a transfer bottleneck. Thirteen synthetic parser and shell-transfer checks pass, including the larger full-session snapshot and version/size rejection. The runner verifies the exact J72 model, kernel, module ABI and artifact hashes, and stops on failed firmware health or restoration. The gesture recorder now has a ten-minute maximum and an explicit stop control so an owner response can finish it while it is still active. Firmware, calibration, binaries and raw captures remain local.
 
-The [expanded session plan](../../DFU-PLAN.md) now covers input integration, battery/brightness, J72 HSIC Wi-Fi, Bluetooth, charging, the remaining tablet services, integrated qualification and the separately gated internal installation.
+The [expanded session plan](../plans-and-reports/DFU-PLAN.md) now covers input integration, battery/brightness, J72 HSIC Wi-Fi, Bluetooth, charging, the remaining tablet services, integrated qualification and the separately gated internal installation.
 
 ### Development queue
 
@@ -877,7 +877,7 @@ The owner confirms the iPad is charging in iOS. A private 11.7 MB RAM bundle is 
 
 The matching module builds without warnings under the additional kernel warning checks. The contact decoder accepts all 1,801 earlier native reports and passes malformed-input checks; six anomaly-ring tests and twenty existing audit tests pass. No device was contacted during preparation. These are offline results: the new worker, external-initramfs handoff and automatic desktop startup still need the next hardware test.
 
-A read-only platform inventory and a guarded three-second backlight dim/restore tool are staged for later use in the same boot. They do not enable or qualify the J72 HDQ battery gauge, Linux charging or HSIC Wi-Fi. The next hardware gates and remaining storage prerequisites are in [the DFU plan](../../DFU-PLAN.md). No internal-storage installation is authorized.
+A read-only platform inventory and a guarded three-second backlight dim/restore tool are staged for later use in the same boot. They do not enable or qualify the J72 HDQ battery gauge, Linux charging or HSIC Wi-Fi. The next hardware gates and remaining storage prerequisites are in [the DFU plan](../plans-and-reports/DFU-PLAN.md). No internal-storage installation is authorized.
 
 
 ## Integrated cold start and same-boot touch reuse
@@ -895,7 +895,7 @@ The owner confirmed native Home menu open/close and the guarded three-second bri
 
 The final reusable-worker cycle emitted 38,237 frames with no layout rejects, timeouts, recoveries or SPI errors. Rejected wire replies were filtered separately. Final firmware health and hardware restoration passed. Desktop shutdown revealed that Arch's udev daemon resolves to a different executable path; resolving the expected symlink fixed the PID check. The revised teardown then unmounted the original read-only root, detached NBD and stopped the owned host export successfully. A normal reboot to iOS was requested.
 
-A passive J72 check found the inherited UART5 pad on peripheral function 1 and its power domain off; it sent no battery traffic. Saved J72 configuration distinguishes AP GPIO44 for UART5 from a separate PMU GPIO control, unlike the Air 2 reference wiring. An exact-board DT variant and bounded voltage-only reader are prepared for the next boot, preserving the kernel. The reader passed encoding, malformed-response and timeout tests using pseudo-terminals, plus a loader test and wrong-controller refusal in the live Arch environment. Actual gauge communication, exact identity, telemetry and charging remain unqualified. See the [next DFU checklist](../../DFU-PLAN.md).
+A passive J72 check found the inherited UART5 pad on peripheral function 1 and its power domain off; it sent no battery traffic. Saved J72 configuration distinguishes AP GPIO44 for UART5 from a separate PMU GPIO control, unlike the Air 2 reference wiring. An exact-board DT variant and bounded voltage-only reader are prepared for the next boot, preserving the kernel. The reader passed encoding, malformed-response and timeout tests using pseudo-terminals, plus a loader test and wrong-controller refusal in the live Arch environment. Actual gauge communication, exact identity, telemetry and charging remain unqualified. See the [next DFU checklist](../plans-and-reports/DFU-PLAN.md).
 
 
 ## Battery transport identified; touch and keyboard recovered in one boot
@@ -1092,7 +1092,7 @@ A separate hub-source 850 mA / 30-second worker and source-gated host helper
 are prepared; native build and policy/topology/refusal tests pass. No Linux
 hub current trial has run yet, no charger setting was changed during this
 preparation, and the next test keeps all cables fixed. See
-[the Pi charging plan](../../PI-CHARGING-PLAN.md).
+[the Pi charging plan](../plans-and-reports/PI-CHARGING-PLAN.md).
 
 ## First powered-hub boot attempt: download handoff did not return
 
@@ -1121,7 +1121,7 @@ A direct-Pi boot followed by a one-shot RAM USB handoff is prepared. It
 requires clean desktop/root/NBD/input teardown before unbinding, then an
 owner move to the powered hub and one Home-triggered rebind. Charging is
 gated on live data and completed handoff; no current write occurs during
-the transfer. See [the revised plan](../../PI-CHARGING-PLAN.md).
+the transfer. See [the revised plan](../plans-and-reports/PI-CHARGING-PLAN.md).
 
 ## Direct RAM boot and powered-hub data handoff passed
 
@@ -1139,5 +1139,5 @@ unarmed at the original 100 mA input setting. The current comparison has
 not yet run.
 
 Current Orchard main was reviewed for reuse; see
-[the integration notes](../../ORCHARD-POWER-PLAN.md). No driver/mux/source-detection
+[the integration notes](../plans-and-reports/ORCHARD-POWER-PLAN.md). No driver/mux/source-detection
 change was made to the running kernel.

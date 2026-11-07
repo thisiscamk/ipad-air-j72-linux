@@ -1,4 +1,4 @@
-> **Historical report / superseded plan.** Start with the [current status](J72-PROGRESS.md) and [replication guide](QUICKSTART.md). Statements below describe their original session, not current support.
+> **Historical report / superseded plan.** Start with the [current status](../../J72-PROGRESS.md) and [replication guide](../../QUICKSTART.md). Statements below describe their original session, not current support.
 
 # Next session: one boot for input, storage power and charging
 
@@ -24,9 +24,9 @@ write, resize, snapshot mutation or erase is authorized. The host kernel stays u
 - Exact-stock recovery image contains RAM-disk and APFS tools. A guarded scratch
   experiment is planned, **not built or ready to execute**.
 
-[Touch candidate](code/touch/recovery-window35/),
-[observation supervisor](code/charging/observation35/),
-[storage write rehearsal](code/storage/native-root-preparation/HOST-WRITE-RESULT.json).
+[Touch candidate](../../code/touch/recovery-window35/),
+[observation supervisor](../../code/charging/observation35/),
+[storage write rehearsal](../../code/storage/native-root-preparation/HOST-WRITE-RESULT.json).
 
 ## A — Before the next DFU
 

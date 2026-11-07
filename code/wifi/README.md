@@ -32,6 +32,6 @@ python3 -B code/wifi/test-j72-wifi-preparation.py -v
 ```
 
 The [sanitized result](VALIDATION.json) records build/export/dependency checks,
-not hardware qualification. See the [Wi-Fi plan](../../WIFI-PLAN.md) for
+not hardware qualification. See the [Wi-Fi plan](../../history/plans-and-reports/WIFI-PLAN.md) for
 upstream applicability, protocol gaps, first-probe vendor handling and
 the remaining steps.

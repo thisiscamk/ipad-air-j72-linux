@@ -26,7 +26,7 @@ on the native kernel after RAM-only userspace fixes. Patches 2 and 3 include
 those startup/closure fixes and detached-process cleanup by chroot root, PID
 and start time, with ordinary TERM only. The latest source passes 136 combined
 host tests, including 19 RAM fixtures. Patch replay independently matches the
-source tree. [Measured device result](../../../NATIVE-TOUCH-BOOT-2026-11-04.md).
+source tree. [Measured device result](../../../history/plans-and-reports/NATIVE-TOUCH-BOOT-2026-11-04.md).
 
 The actual tested SquashFS and payload remain the original image with runtime
 repairs. A new clean build containing both follow-up patches still needs device

@@ -1,4 +1,4 @@
-> **Historical report / superseded plan.** Start with the [current status](J72-PROGRESS.md) and [replication guide](QUICKSTART.md). Statements below describe their original session, not current support.
+> **Historical report / superseded plan.** Start with the [current status](../../J72-PROGRESS.md) and [replication guide](../../QUICKSTART.md). Statements below describe their original session, not current support.
 
 # Latest host filesystem rehearsal
 
@@ -8,7 +8,7 @@ pass. Free after the first base: 958,230,528 bytes; after an equal second base:
 386,228,224 bytes. State is empty; no persistent overlay is enabled.
 The matched #35 USB container-format desktop candidate is prepared but device
 untested. **No APFS shrink, partition-table write or installation occurred.**
-[Source and results](code/storage/desktop-storage35/).
+[Source and results](../../code/storage/desktop-storage35/).
 
 ## Previous measurements and conditional layout
 

@@ -20,4 +20,4 @@ behavior and network operation require physical testing.
 The current USB driver/provider candidate builds against the exact development
 kernel and passes separate synthetic transport/lifecycle tests. Its first
 firmware test is pending; this helper alone does not enable Wi-Fi. Keep inputs
-and generated firmware private. See [the current Wi-Fi plan](../../../WIFI-PLAN.md).
+and generated firmware private. See [the current Wi-Fi plan](../../../history/plans-and-reports/WIFI-PLAN.md).

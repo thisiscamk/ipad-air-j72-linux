@@ -26,8 +26,8 @@ authorize or perform an internal installation.
 The offline tools prepare metadata review and candidate source changes.
 The [live iOS inspection](ios12-readonly-inspect/) measures snapshots and the
 container minimum without resizing.
-See the [morning runbook](../../STORAGE-MORNING-PLAN.md),
-[installation gates](../../INTERNAL-STORAGE-PLAN.md) and
+See the [morning runbook](../../history/plans-and-reports/STORAGE-MORNING-PLAN.md),
+[installation gates](../../history/plans-and-reports/INTERNAL-STORAGE-PLAN.md) and
 [measured host results](PREPARATION-RESULT.json).
 
 ## Built Linux observer candidate
