@@ -1,10 +1,12 @@
 # Guarded charging source and reusable qualification
 
 These sources preserve the measured policy; they do not provide permission
-to start a session on an unmeasured source. The latest failure is documented in
-[current status](../../../J72-PROGRESS.md#charging-measured-results-and-present-failure).
+to start a session on an unmeasured source. Current physical results are in
+[current status](../../../J72-PROGRESS.md#charging-autonomous-on-device-qualification).
 
-- `tools/`: actual supervisor/source-admission helpers and synthetic tests.
+- `autonomous/`: qualified on-device controller, runtime service, synthetic
+  test and sanitized result.
+- `tools/`: earlier host supervisor/source-admission helpers and synthetic tests.
 - `config/j72-charging/`: shared hardware pins, per-installation profile
   workflow and systemd templates. Start with
   [its instructions](config/j72-charging/README.txt); run the relative commands
@@ -23,7 +25,8 @@ temperature hysteresis and voltage/SOC windows. Arbitrary hubs, direct Pi power
 and higher current limits are not qualified. File hashes do not certify that
 someone performed a test.
 
-A later supervisor status-read delay/watchdog stopped charging. The failure is
-not fixed by these sources. Its battery snapshot then became stale; do not use
-old controller values to infer remaining runtime. A low-battery test guard and
-power reliability work remain before recommending overnight Linux charging.
+The later host-supervisor watchdog failure is addressed by the autonomous
+on-device controller. Its physical ten-minute charge, unplug restoration,
+automatic reconnect and explicit stop tests passed. The exact service is
+installed and enabled; automatic startup still needs observation on the next
+natural Omarchy boot. The older host admission services are disabled.

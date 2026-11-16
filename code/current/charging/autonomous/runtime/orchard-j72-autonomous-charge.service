@@ -1,0 +1,13 @@
+[Unit]
+Description=J72 guarded autonomous charging
+ConditionPathExists=/proc/device-tree/compatible
+Requires=orchard-j72-external-power.service
+After=orchard-j72-external-power.service
+
+[Service]
+Type=simple
+ExecStart=/usr/lib/orchard/j72-autonomous-charge-start.py
+TimeoutStopSec=20
+
+[Install]
+WantedBy=multi-user.target

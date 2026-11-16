@@ -1,6 +1,6 @@
 {
-  "date": "2026-11-07",
-  "scope": "public source/documentation cleanup; no device access",
+  "date": "2026-11-16",
+  "scope": "public source/documentation update with sanitized measured charging evidence",
   "source_reconstruction": {
     "kernel_tree": "ad8938bc17a2ab9151cb9067a601e3bd8f9d41c2",
     "orchard_tree": "9c7228f29298c1e02992ecc7cc58d3876935e357",
@@ -29,5 +29,23 @@
   "documentation_links": "maintained entry points and archived copies checked locally",
   "private_binary_publication": false,
   "fresh_device_reproduction": false,
-  "upstream_changes_submitted": false
+  "upstream_changes_submitted": false,
+  "charging_autonomous": {
+    "offline_core": "pass",
+    "kernel_module_build": {
+      "kernel": "7.3.0-rc1-j72-pw1-orchard-apple-4k",
+      "architecture": "arm64",
+      "compiler": "LLVM/Clang 19",
+      "W": 1,
+      "result": "pass with pre-existing unused helper warning"
+    },
+    "hardware": {
+      "ten_minute_positive_charge": "pass",
+      "unplug_restore": "pass",
+      "automatic_reconnect": "pass",
+      "explicit_stop_restore": "pass"
+    },
+    "persistent_service": "installed, enabled and active",
+    "next_natural_boot": "pending"
+  }
 }

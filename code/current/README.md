@@ -10,7 +10,7 @@ the owner's separate review; publishing here does not submit a PR.
 | [orchard](orchard/) | Current Orchard integration diff against a pinned public base | Native CLI, firmware recipe and recovery/storage service work; feature metadata in the historical snapshot predates later hardware tests |
 | [kernel](kernel/) | Combined J72 kernel diff and separate gauge-cache wait delta | Installed ext4/FAT boot, touch, Wi-Fi, battery and bounded charging on the tested device; includes experimental storage writes |
 | [wifi](wifi/) | Hardware-ordering service used before NetworkManager | Connected Wi-Fi on the installed system; firmware and network credentials are supplied privately |
-| [charging](charging/) | Supervisor, source admission, reusable profile templates, tests and read-only external-power reporter | Positive-charge qualification passed; later browser-load supervisor watchdog failure remains unresolved |
+| [charging](charging/) | Qualified autonomous controller, earlier supervisor/profile tools and read-only external-power reporter | Ten-minute charge, cable restoration, automatic reconnect and explicit stop pass; next natural boot remains |
 | [audio](audio/) | Actual MCA-v1, SmartIO variant, DMA dependencies and DT overlay source | Both channels heard, ALSA and PipeWire playback pass; next-boot service verification remains open |
 
 The 7.0.12/#33–35 experiments elsewhere under `code/` remain useful historical

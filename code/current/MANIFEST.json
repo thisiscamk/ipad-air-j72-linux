@@ -1,10 +1,10 @@
 {
   "schema": 1,
-  "updated": "2026-11-07",
+  "updated": "2026-11-16",
   "source_only": true,
   "files": {
-    "README.md": "8c5715daaa2c57470a70d92ffe89c440f7aa8df642e966c22b2fff8d3e17ad7f",
-    "VALIDATION.json": "fedcf0cbc4586326755cb64fa22b5e61dc92d48513cf02138fafe34eb58a5e7a",
+    "README.md": "abd5e68605071a271e8d4a919b2c132f7ac350dc37c8060ebb84a5efef81d6ae",
+    "VALIDATION.json": "fec1f16b544a078a28e9351dc825841f414c52d2d9d092081f34f86bb6dae499",
     "audio/Makefile": "1295fa6ad6d3b8165111fb6ea1612446219d9729efc7141a988db517f361c1b5",
     "audio/README.md": "d4bdd82b96da26f935cdc43b403c0a777d20c307610e6a626d80e2e66dbbc35e",
     "audio/apple-sio-core.c": "e2bd5071b203df84a8ee91ffef45f6b340653397b480fe4aaf96fbe1d9003250",
@@ -20,7 +20,16 @@
     "audio/stage-runtime.py": "5e74da26e945390f77bd81951315197ca37abd4d4a15f834534618908cd8ef02",
     "audio/virt-dma.c": "471a96dc86b8d79f65780874687f64f8deeccb93e98f616c67e57a6b206512f0",
     "audio/virt-dma.h": "695955f347bf51c852fd527c46943277694f812416d3e142991a6f120c3ddad3",
-    "charging/README.md": "5294a74cedf179af688769960143c7e5bfc78d8ac04f64dd2ea692bf95eb5942",
+    "charging/README.md": "35c9d5970ff2022b622ba240af48999d790280f5ccf637deaf22a611d9f50296",
+    "charging/autonomous/README.md": "f1a24cf9a0ebdc20be5ae24e83a8d62408bb8ebc42ac6cb49897bf373a32c2ef",
+    "charging/autonomous/RESULT.json": "56f15f55a8a66fc9a2e22a590baa1097c147ef1fc8570a1226a0aec0743f3a37",
+    "charging/autonomous/module/Makefile": "e808148aa800347eada03faf6273eba1c1a48f56881fb0401eed62e59e988165",
+    "charging/autonomous/module/j72-limit-core.h": "6c37efdd866d011d7f8a8879d7b99908d30176c193d3e253267790f2121e0526",
+    "charging/autonomous/module/j72-maintain-core.h": "063d51f6214fd49a0c422af12682de19294fdf72c1fbad3679ae679677b64b74",
+    "charging/autonomous/module/j72_charge_maintain_auto.c": "06a0d1daee9a779de4e530888e30bec0660a110a07a206872dad2d840f9042ff",
+    "charging/autonomous/runtime/j72-autonomous-charge-start.py": "aebd0acb39feeab53d65e622c05d562e65cfef5f328f328ccca9093e5263c82b",
+    "charging/autonomous/runtime/orchard-j72-autonomous-charge.service": "a3456a578937f58ab74e948c344f370dbb3327dfa0be4e9d5814692699350017",
+    "charging/autonomous/test-autonomous-core.c": "d72ea669c2022155fea5521c1c3d203a9a47b6e34497384fb4124b0a8b5607cd",
     "charging/config/j72-charging/README.txt": "fe2b98dbb2a80e7e45376d2943e49ea4a62f26d830e63cfb66e3f4091efbba5d",
     "charging/config/j72-charging/hardware.json": "d964690f13ef3e82b15f8983a07bca88e4d9d678668b08461dffdf5a343dbd31",
     "charging/config/j72-charging/orchard-j72-charge-auto.service": "b6e510c9933d83ca86d31240a1337ab65c0ca25356396ab0aaf2c0a043f6f6ba",
@@ -64,5 +73,12 @@
     "fresh_boot_tested": false,
     "headphone_or_capture_tested": false
   },
-  "privacy": "Test ECID/boot identifiers are synthetic; firmware and private deployment outputs excluded."
+  "privacy": "Test ECID/boot identifiers are synthetic; firmware and private deployment outputs excluded.",
+  "charging": {
+    "autonomous_result": "charging/autonomous/RESULT.json",
+    "source_only": true,
+    "qualified_module_sha256": "56970240dd103ac86ec3433123e6ec798e6eef64f103eaa97af71ed01ef1ef2d",
+    "compiled_module_included": false,
+    "next_natural_boot_tested": false
+  }
 }

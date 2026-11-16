@@ -1,6 +1,6 @@
 # Current J72 status
 
-Updated 7 November 2026. This page supersedes the dated reports; it separates
+Updated 16 November 2026. This page supersedes the dated reports; it separates
 physical-device results from host preparation. [Start guide](QUICKSTART.md).
 
 ## Device and working system
@@ -23,35 +23,38 @@ physical-device results from host preparation. [Start guide](QUICKSTART.md).
 | On-screen keyboard | Manual icon and terminal-tap reopening confirmed | Test against the exact desktop/client combination |
 | Storage | Native read/write/flush, installed ext4 root and mounted FAT boot demonstrated | Native bare-loader launch has a heap failure; recovery-to-installed startup is the working route |
 | Wi-Fi | BCM43241 rev 6, association, HTTPS and SSH demonstrated | Private matching firmware and J72 HSIC startup required |
-| Battery UI | Percentage, current, voltage and temperature; external-source reporting | Controller snapshots become stale when supervision stops; calibration is not established |
-| Guarded charging | Positive net charge on the tested powered JCH377 port, with restoration and thermal holds | Supervisor failed its timing watchdog under the later browser workload; no unattended/overnight Linux charging claim |
-| Charging reconnect | Automatic reconnect admission and later positive current observed in the same boot | Fresh-boot automation and arbitrary sources are not qualified |
+| Battery UI | Percentage, current, voltage, temperature and physically qualified external-source reporting | Pack calibration is not established |
+| Guarded charging | On-device autonomous controller sustained +279 to +423 mA, restored on unplug and resumed after reconnect | Service is installed and enabled; verify automatic startup on the next natural Omarchy boot |
+| Charging reconnect | Physical unplug restored 0x02; transitional source/PMIC states stayed stopped; reconnect resumed automatically | Arbitrary sources and other devices are not qualified |
 | Speakers | Both channel tones heard; ALSA and unchanged PipeWire/WirePlumber playback transfer pass | Enabled startup service has not passed a fresh boot; hot-overlay teardown reference warning remains |
 | YouTube/Firefox | Page/player loads | Memory exhaustion, swapping and very slow UI; audible usable browser playback not confirmed |
 | Headphones/microphone/Bluetooth/cameras/cellular | No qualification claimed | Future work |
 | PC-free startup | None | No demonstrated iOS-app handoff or standalone startup after shutdown |
 
-## Charging: measured results and present failure
+## Charging: autonomous on-device qualification
 
-The tested policy used a nominal **1,050 mA USB input limit** on the marked
-powered JCH377 data/charging port, whose paired iOS checks reported 5 V / 1,500 mA.
-That is not battery charging current or authorization for every hub/charger.
+The tested policy uses a nominal **1,050 mA USB input limit** on the marked
+powered JCH377 data/charging port, whose paired iOS checks reported 5 V /
+1,500 mA. That is not battery charging current or authorization for every
+hub, charger, battery or iPad.
 
-- Bounded qualification: 7,200.06 seconds, **+366.693 mAh net**, maximum 37.0°C.
-- Separate continuous-mode observation: 2,736.663 seconds, **+255.8135 mAh net**,
-  maximum 37.2°C.
-- Restoration/stop, hold/restart, source-loss and supervisor-failure checks were
-  exercised. Reusable profile code requires each installation's own evidence.
-- Later, during the browser session, the supervisor reported a slow status
-  read and hit its watchdog. Charging stopped and baseline restoration passed.
-  This failure was not cleared or bypassed.
-- The iPad subsequently restarted unexpectedly. The owner found the iOS battery
-  very low and confirmed iOS charging; depletion is plausible, not a proven reset cause.
+- The earlier host-lease supervisor passed long charging runs but later stopped
+  on a slow status read under browser load. It is now disabled.
+- The replacement controller runs on the iPad and does not depend on Pi uptime,
+  USB enumeration or a host lease. It retains the one-hour window, independent
+  250 ms restoration deadline, PMIC ceiling checks and pack safety limits.
+- A ten-minute live run stayed at **+279 to +423 mA**, raised the gauge from
+  60% to 63%, and held 35.8–36.1 C with zero controller/restoration faults.
+- Physical cable removal restored PMIC `0x04c0` to `0x02`. Transitional reporter
+  `ENODATA` and reconnect PMIC-settle `EPERM` both keep charging stopped. Exact
+  online, valid PMIC invariants, fresh safe battery data and cooldown are all
+  required before automatic resume.
+- Explicit stop/restoration passed. The exact qualified module and service are
+  installed; the service is enabled and active. The next natural Omarchy boot
+  still needs to confirm automatic startup, so iOS remains retained as fallback.
 
-**Do not interpret “connected” or an old positive current snapshot as live
-charging.** Fresh direct battery readings, controller/service state and signed
-current matter. Do not rely on this Linux setup for unattended charging yet.
-Current failure/low-battery protection takes priority over raising current limits.
+Source and sanitized results are under
+[`code/current/charging/autonomous`](code/current/charging/autonomous/).
 
 ## Audio: exactly what passed
 

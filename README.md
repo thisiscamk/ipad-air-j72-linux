@@ -1,7 +1,7 @@
 # Omarchy-A on iPad Air 1 Cellular (J72)
 
 Experimental Orchard/Omarchy-A support for **iPad4,2 / J72AP / Apple A7**.
-Current as of **7 November 2026**. The desktop runs from internal storage;
+Current as of **16 November 2026**. The desktop runs from internal storage;
 iOS is retained as a bootable charging fallback.
 
 ## What works now
@@ -13,15 +13,16 @@ iOS is retained as a bootable charging fallback.
 | Wi-Fi | Internal BCM43241 connected; HTTPS, SSH and unplugged desktop use demonstrated |
 | Battery reporting | Percentage, voltage, current, temperature and external-power indication |
 | Speaker audio | Both channels heard; normal PipeWire output works |
-| Guarded charging | Positive net charging measured on the qualified powered hub; reliability under load remains open |
+| Guarded charging | Autonomous on-device charging, restoration and cable reconnect qualified on the powered hub |
 
 **Important limits:** startup still needs a computer. The working installed
 startup goes through RAM recovery; direct bare-loader launch has an unresolved
 heap error. Audio startup is enabled but not yet verified after a fresh boot.
-Linux charging is not dependable for unattended use: a supervisor timeout
-stopped charging during the browser test. Firefox/YouTube remains too slow and
-has exhausted memory; usable video playback is not qualified. Use iOS for
-reliable overnight charging.
+The earlier host-supervisor charging timeout is resolved by the qualified
+on-device controller; automatic service startup still needs observation on the
+next natural Omarchy boot. Firefox/YouTube remains too slow and
+has exhausted memory; usable video playback is not qualified. iOS remains
+retained as a charging fallback until the owner accepts the next-boot evidence.
 
 [Detailed current support and measurements](J72-PROGRESS.md).
 

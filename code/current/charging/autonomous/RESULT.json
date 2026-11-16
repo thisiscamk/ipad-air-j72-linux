@@ -1,0 +1,39 @@
+{
+  "date": "2026-11-16",
+  "target": "iPad Air 1 Cellular / J72 / A7",
+  "kernel_release": "7.3.0-rc1-j72-pw1-orchard-apple-4k",
+  "source": "owner-qualified powered JCH377 hub port",
+  "policy": {
+    "nominal_input_limit_mA": 1050,
+    "pmic_trial_register": "0x04c0",
+    "trial_code": "0x4e",
+    "restore_code": "0x02",
+    "maximum_window_seconds": 3600,
+    "reconnect_cooldown_seconds": 30
+  },
+  "hardware_results": {
+    "high_soc_hold": "pass; no PMIC trial write",
+    "sustained_charge_seconds": 600,
+    "observed_net_battery_current_uA": [279000, 423000],
+    "battery_percent": [60, 63],
+    "observed_temperature_tenth_C": [358, 361],
+    "unplug_restore": "pass",
+    "automatic_reconnect": "pass",
+    "explicit_stop_restore": "pass",
+    "controller_faults": 0,
+    "restore_failures": 0,
+    "persistent_service": "installed, enabled and active"
+  },
+  "transition_evidence": {
+    "reporter_ENODATA": "keeps controller restored and stopped",
+    "reconnect_PMIC_settle_EPERM": "keeps controller restored and stopped until invariants pass",
+    "resume_requires": [
+      "exact external ONLINE=1",
+      "valid PMIC ceiling and source registers",
+      "fresh safe battery vector",
+      "cooldown complete"
+    ]
+  },
+  "remaining_boundary": "automatic service startup has not yet been observed across the next natural Omarchy boot",
+  "privacy": "raw logs, device identifiers, credentials, firmware and compiled modules omitted"
+}
