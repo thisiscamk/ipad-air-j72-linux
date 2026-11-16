@@ -147,12 +147,16 @@ fails with a heap error. “Internal root” does not mean fully PC-free startup
 [Audio source/build instructions](code/current/audio/README.md) cover the actual
 48 kHz stereo playback implementation. The matching private A7 SmartIO firmware
 is still required. Unchanged PipeWire/WirePlumber discovers the resulting card.
-The enabled development service has not passed a new boot yet.
+The enabled development service has passed a fresh Omarchy boot and audible
+application playback.
 
-Firefox/YouTube is **not** a passing benchmark: the 1 GB device ran out of memory,
-and the later low-memory/swap experiment remained slow. Extra swap was temporary,
-not an established default. Safari is an iOS browser, not the Linux test browser.
-A quiet tone, a completed PCM transfer and usable browser video are separate gates.
+Firefox remains unsuitable for YouTube on this 1 GB software-rendered device: it
+ran out of memory and remained slow after low-memory tuning. Direct playback is
+qualified instead: Arch `yt-dlp` feeding `mpv` played a combined 360p H.264/AAC
+YouTube stream with speaker audio. The tested `mpv` setup used the `wlshm` video
+output, a 16 MiB demuxer cache, two decoder threads, fast bilinear scaling and a
+768x1024 window. Full-screen software scaling at 2048x1536 dropped too many frames.
+Safari is an iOS browser, not the Linux test browser.
 
 ## What is not yet a one-command recipe
 
@@ -161,8 +165,7 @@ A quiet tone, a completed PCM transfer and usable browser video are separate gat
 - Generic per-device private firmware/calibration provisioning for every feature,
   including the A7 audio extractor and complete installed service packaging.
 - A reviewed automatic APFS/GPT resize/install transaction for another iPad.
-- Reliable charging under browser pressure, low-battery fallback and cold-start
-  qualification of charging/audio automation.
+- Reliable charging under sustained application pressure and low-battery fallback.
 - A working iOS-app or PC-free boot path.
 
 Those are real remaining tasks, not implicit private commands the reader is

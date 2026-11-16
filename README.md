@@ -12,16 +12,16 @@ iOS is retained as a bootable charging fallback.
 | Display and input | Portrait display, brightness, touchscreen, Home button and on-screen keyboard |
 | Wi-Fi | Internal BCM43241 connected; HTTPS, SSH and unplugged desktop use demonstrated |
 | Battery reporting | Percentage, voltage, current, temperature and external-power indication |
-| Speaker audio | Both channels heard; normal PipeWire output works |
+| Speaker audio | Both channels heard; PipeWire output and YouTube playback through `mpv` work |
 | Guarded charging | Autonomous on-device charging, restoration and cable reconnect qualified on the powered hub |
 
 **Important limits:** startup still needs a computer. The working installed
 startup goes through RAM recovery; direct bare-loader launch has an unresolved
-heap error. Audio startup is enabled but not yet verified after a fresh boot.
+heap error. Audio startup and audible application playback have passed after a fresh boot.
 The earlier host-supervisor charging timeout is resolved by the qualified
 on-device controller; automatic service startup still needs observation on the
-next natural Omarchy boot. Firefox/YouTube remains too slow and
-has exhausted memory; usable video playback is not qualified. iOS remains
+next natural Omarchy boot. Firefox remains too slow and has exhausted memory,
+but 360p YouTube video with speaker audio works through `yt-dlp` and `mpv`. iOS remains
 retained as a charging fallback until the owner accepts the next-boot evidence.
 
 [Detailed current support and measurements](J72-PROGRESS.md).

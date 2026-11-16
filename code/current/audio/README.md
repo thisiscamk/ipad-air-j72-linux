@@ -14,9 +14,10 @@ are the implementation used for the speaker tests. `apple-sio-dma.c`,
 - Unchanged PipeWire/WirePlumber discovered a stereo output. A normal
   `pw-play` transfer completed. The PCM closed and MCA suspended after idle.
 
-The on-device audio service was enabled, but a fresh boot has **not** verified
-it. No headphone, microphone, Bluetooth audio or browser playback qualification
-is claimed. A dynamic-overlay teardown reference warning remains unresolved.
+The on-device audio service passed a fresh Omarchy boot and audible 360p YouTube
+playback through `yt-dlp` and `mpv`. No headphone, microphone or Bluetooth audio
+qualification is claimed. Firefox remains too slow for usable video. A
+dynamic-overlay teardown reference warning remains unresolved.
 Do not repeatedly insert/remove the overlay as if cleanup were leak-free.
 
 ## Build only

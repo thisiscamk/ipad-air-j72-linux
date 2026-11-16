@@ -26,8 +26,8 @@ physical-device results from host preparation. [Start guide](QUICKSTART.md).
 | Battery UI | Percentage, current, voltage, temperature and physically qualified external-source reporting | Pack calibration is not established |
 | Guarded charging | On-device autonomous controller sustained +279 to +423 mA, restored on unplug and resumed after reconnect | Service is installed and enabled; verify automatic startup on the next natural Omarchy boot |
 | Charging reconnect | Physical unplug restored 0x02; transitional source/PMIC states stayed stopped; reconnect resumed automatically | Arbitrary sources and other devices are not qualified |
-| Speakers | Both channel tones heard; ALSA and unchanged PipeWire/WirePlumber playback transfer pass | Enabled startup service has not passed a fresh boot; hot-overlay teardown reference warning remains |
-| YouTube/Firefox | Page/player loads | Memory exhaustion, swapping and very slow UI; audible usable browser playback not confirmed |
+| Speakers | Both channel tones heard; ALSA, PipeWire/WirePlumber and audible `mpv` playback pass after a fresh boot | Hot-overlay teardown reference warning remains |
+| YouTube/video | 360p H.264/AAC YouTube playback with speaker audio works through `yt-dlp` and `mpv` | Firefox remains too slow; software rendering requires a reduced player window and low-memory settings |
 | Headphones/microphone/Bluetooth/cameras/cellular | No qualification claimed | Future work |
 | PC-free startup | None | No demonstrated iOS-app handoff or standalone startup after shutdown |
 
@@ -64,9 +64,10 @@ different sides, but separation was difficult to judge. PipeWire discovered
 stereo output and a normal `pw-play` transfer completed. PCM closed and MCA
 suspended when idle. No microphone or headphone result is claimed.
 
-Audio was installed and enabled on the development iPad. **That is not proof
-of automatic startup:** a fresh boot and audible browser playback remain open.
-Source and build-only instructions: [audio](code/current/audio/README.md).
+Audio was installed and enabled on the development iPad. A fresh Omarchy boot
+then produced audible YouTube playback through `yt-dlp` and `mpv`, confirming
+startup and normal application audio. Firefox remains impractical on this 1 GB,
+software-rendered system. Source and build-only instructions: [audio](code/current/audio/README.md).
 
 ## Reproducibility scope
 

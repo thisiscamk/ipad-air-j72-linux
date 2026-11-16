@@ -1,15 +1,15 @@
 # Remaining work
 
-Updated 7 November 2026. [Current support matrix](J72-PROGRESS.md).
+Updated 16 November 2026. [Current support matrix](J72-PROGRESS.md).
 
 1. **Power reliability:** diagnose the supervisor timing/read failure under load;
    add fresh battery monitoring and low-battery fallback; compare actual iOS and
    Linux source/current policy on the same cable/hub. Requalify continuous use
    before recommending unattended charging. Do not simply raise current limits.
-2. **Audio startup:** verify the enabled service on a fresh boot, then audible
-   app playback. Resolve overlay teardown references and package J72-only changes.
-3. **Usable applications:** address the 1 GB RAM/software-rendering constraints;
-   qualify actual browser video and sound without destabilising power/input.
+2. **Audio follow-up:** fresh-boot application audio and YouTube playback pass.
+   Resolve overlay teardown references and package the J72-only changes.
+3. **Usable applications:** retain the qualified low-memory `yt-dlp`/`mpv` path;
+   improve software-rendered video and general browsing within the 1 GB limit.
 4. **Reproducible release:** clean-checkout Orchard/Omarchy-A build and deployment,
    private-input provisioning and exact installed service integration. The public
    source snapshots are available; a turnkey release remains unqualified.
