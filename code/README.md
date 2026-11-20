@@ -4,6 +4,15 @@
 Orchard/kernel source, Wi-Fi ordering, reusable charging profiles/supervisor and
 actual speaker audio source. [Replication guide](../QUICKSTART.md).
 
+Recent experimental source is grouped under:
+
+- [`boot-debug`](boot-debug/) — RAM flight recorder, watchdog observers and
+  entry-state comparison.
+- [`display/cascadia`](display/cascadia/) — J72 framebuffer early-console work
+  adapted from the Cascadia approach.
+- [`device-tree/j72`](device-tree/j72/) — disabled, controller-only J72 SPI2
+  device-tree staging. It enables no transfers or touch firmware.
+
 ## Historical experiments
 
 These preserve earlier lab implementations and synthetic tests. They are not

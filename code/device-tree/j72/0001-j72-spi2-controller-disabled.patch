@@ -1,0 +1,29 @@
+--- a/arch/arm64/boot/dts/apple/s5l8960x-j72.dts
++++ b/arch/arm64/boot/dts/apple/s5l8960x-j72.dts
+@@ -12,3 +12,26 @@
+ 	compatible = "apple,j72", "apple,s5l8960x", "apple,arm-platform";
+ 	model = "Apple iPad Air (Cellular)";
++
++	spi2_clock: spi2-clock {
++		compatible = "fixed-clock";
++		#clock-cells = <0>;
++		clock-frequency = <60000000>;
++		clock-output-names = "spi2";
++	};
+ };
++
++/* Controller-only J72 SPI2 candidate. No touch child or transfers yet. */
++&{/soc} {
++	spi2: spi@20a088000 {
++		compatible = "apple,s5l8960x-spi";
++		reg = <0x2 0x0a088000 0x0 0x4000>;
++		interrupt-parent = <&aic>;
++		interrupts = <AIC_IRQ 138 IRQ_TYPE_LEVEL_HIGH>;
++		/* Live J72 iBoot ADT: clock-id 0x134 -> 60 MHz. */
++		clocks = <&spi2_clock>;
++		power-domains = <&ps_spi2>;
++		#address-cells = <1>;
++		#size-cells = <0>;
++		status = "disabled";
++	};
++};

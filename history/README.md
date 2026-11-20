@@ -6,6 +6,15 @@ project goals are tracked in the current roadmap.
 Use [current status](../J72-PROGRESS.md), [replication](../QUICKSTART.md) and
 [current source](../code/current/README.md) for today's state.
 
+## 17–20 November computer-free bring-up
+
+- [Boot flight recorder](bringup-20261117-20/BOOT-FLIGHT-RECORDER.md)
+- [A7 EL2 compatibility audit](bringup-20261117-20/A7-EL2-COMPATIBILITY-AUDIT.md)
+- [Next early-boot audit](bringup-20261117-20/NEXT-EARLY-BOOT-AUDIT.md)
+- [Future boot audit](bringup-20261117-20/FUTURE-BOOT-AUDIT.md)
+- [Exact entry-state comparison](bringup-20261117-20/ENTRY-STATE-DIFF.md)
+- [Orchard 188 adoption plan](bringup-20261117-20/ORCHARD-188-ADOPTION.md)
+
 ## Preserved before the 7 November cleanup
 
 - [Old landing page](pre-cleanup-2026-11-07/README.md)

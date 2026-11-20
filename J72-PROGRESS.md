@@ -1,7 +1,34 @@
 # Current J72 status
 
-Updated 16 November 2026. This page supersedes the dated reports; it separates
+Updated 20 November 2026. This page supersedes the dated reports; it separates
 physical-device results from host preparation. [Start guide](QUICKSTART.md).
+
+## Computer-free boot investigation, 17–20 November
+
+The computer-free path reaches A7 early Linux execution, but it does not yet
+reach a usable kernel console. RAM-only watchdog checkpoints and bounded
+instruction probes narrowed the current failure to A7 translation-maintenance
+state around the temporary TTBR transition. No storage calls were made by
+these probes.
+
+An important correction retired several earlier instruction-level conclusions:
+the original watchdog observer executed `dsb sy`, so it could perturb or stall
+at the same maintenance boundary it was intended to measure. The corrected
+observer uses a readback of the watchdog register to complete only that MMIO
+write. Further one-instruction guessing is paused in favor of comparing the
+complete CPU state at the exact final kernel branch on the working tethered and
+computer-free paths.
+
+m1n1's USB proxy will be retained for all returning register captures, payload
+validation and device-tree work. DFU should be needed only for the final
+one-way entry test or after a terminal hang/reset. Source-only tooling is in
+[`code/boot-debug`](code/boot-debug/); the evidence and compatibility audits
+are in [`history/bringup-20261117-20`](history/bringup-20261117-20/).
+
+Orchard PR 188 now supplies the shared ANS1/ASP driver and normal installer
+plumbing. J72 still needs hardware-qualified A7 device-tree nodes, a verified
+loader-populated firmware reservation and an RTKit protocol-version check
+before any storage probe or install attempt.
 
 ## Device and working system
 
