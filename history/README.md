@@ -15,6 +15,10 @@ Use [current status](../J72-PROGRESS.md), [replication](../QUICKSTART.md) and
 - [Exact entry-state comparison](bringup-20261117-20/ENTRY-STATE-DIFF.md)
 - [Orchard 188 adoption plan](bringup-20261117-20/ORCHARD-188-ADOPTION.md)
 
+## 24–25 November storage and installation
+
+- [J72 storage regression to successful Orchard install](J72-STORAGE-INSTALL-2026-11-25.md)
+
 ## Preserved before the 7 November cleanup
 
 - [Old landing page](pre-cleanup-2026-11-07/README.md)
